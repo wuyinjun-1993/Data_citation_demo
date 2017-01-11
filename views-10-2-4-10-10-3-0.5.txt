@@ -1,0 +1,2 @@
+v1(family_id,name,type) :- family(family_id,name,type)
+v2(family_id,text) :- introduction(family_id,text)

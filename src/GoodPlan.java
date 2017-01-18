@@ -64,11 +64,11 @@ class GoodPlan {
     public static boolean isView;
     
   public static void main(String[] args) {
-      String type = args[0];
-      String viewFile = args[1];
-      String queryFile = args[2];
+//      String type = args[0];
+//      String viewFile = args[1];
+//      String queryFile = args[2];
 
-      doOneTestYoli2(type, queryFile, viewFile);
+      doOneTestYoli2();
     
   }
 
@@ -216,19 +216,19 @@ class GoodPlan {
         return new Query(head_name, head_subgoal, body_subgoals);
     }
 
-    static void doOneTestYoli2(String type, String queryFile, String viewFile) {
+    static void doOneTestYoli2() {
 
 //    Vector dummyquery = readViews(queryFile);
     	
    
 
-    String query_str = "q(name):family(family_id,name,type),introduction(family_id,text)";
+    String query_str = "q1(S,C) :- car(M,anderson), loc(anderson,C), part(S,M,C)";
     
-    String []view_strs = new String[2];
+    String []view_strs = new String[1];
     
-    view_strs[0]="v1(family_id,name,type):family(family_id,name,type)";
+    view_strs[0]="v3(S) :- car(M,'anderson'), loc('anderson',C), part(S,M,C),";
     
-    view_strs[1]="v2(family_id,text):introduction(family_id,text)";
+//    view_strs[1]="v2(family_id,text):introduction(family_id,text)";
     
     
     Vector dummyquery = new Vector();
@@ -245,7 +245,7 @@ class GoodPlan {
     }
     
     
-    genPlan2(type, query, views);
+    genPlan2(query, views);
     showStat();
     }
 
@@ -363,7 +363,7 @@ class GoodPlan {
       }
   }
 
-    static HashSet genPlan2(String type, Query query, Vector views) {
+    static HashSet genPlan2(Query query, Vector views) {
     HashSet rewritings = null;
     HashSet rewritings2 = null;
     

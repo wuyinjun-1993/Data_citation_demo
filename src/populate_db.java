@@ -161,34 +161,43 @@ public class populate_db {
 			
 			Subgoal subgoal = (Subgoal) view.body.get(i);
 			
-			Vector<Argument> lambda_term = new Vector<Argument>();//get_lambda_terms(view.lambda_term, subgoal);
-			
-			if(lambda_term.isEmpty())
-			{
-				String q_primary_key = "select kc.column_name from information_schema.table_constraints tc,information_schema.key_column_usage kc where tc.constraint_type = 'PRIMARY KEY' and kc.table_name = tc.table_name and kc.table_schema = tc.table_schema and kc.constraint_name = tc.constraint_name and tc.table_name='"+subgoal.name+"'";
-		    	pst = c.prepareStatement(q_primary_key);
-			    ResultSet rs = pst.executeQuery();
-		    	
-			    String primary_key = new String();
-			    if(rs.next())
-			    	primary_key = rs.getString(1);
-			    
-			    lambda_term.add(new Argument(primary_key));
-			    
-			    lambda_terms.add(lambda_term);
+			Vector<Argument> args = new Vector<Argument>();//get_lambda_terms(view.lambda_term, subgoal);
 
-			    lambda_term_sql = lambda_term_sql + "," + primary_key;
-			}
-			else
+			
+			for(int j = 0; j<subgoal.args.size(); j++)
 			{
-				lambda_terms.add(lambda_term);
+				lambda_term_sql += "," + subgoal.args.get(j).toString();
 				
-				String lambda_term_str = lambda_term.toString();
-				
-				int len = lambda_term_str.length();
-				
-				lambda_term_sql = lambda_term_sql + "," + lambda_term_str.substring(1, len - 1);
+				args.add((Argument) subgoal.args.get(j));
 			}
+			
+//			
+//			if(lambda_term.isEmpty())
+//			{
+//				String q_primary_key = "select kc.column_name from information_schema.table_constraints tc,information_schema.key_column_usage kc where tc.constraint_type = 'PRIMARY KEY' and kc.table_name = tc.table_name and kc.table_schema = tc.table_schema and kc.constraint_name = tc.constraint_name and tc.table_name='"+subgoal.name+"'";
+//		    	pst = c.prepareStatement(q_primary_key);
+//			    ResultSet rs = pst.executeQuery();
+//		    	
+//			    String primary_key = new String();
+//			    if(rs.next())
+//			    	primary_key = rs.getString(1);
+//			    
+//			    lambda_term.add(new Argument(primary_key));
+//			    
+//			    lambda_terms.add(lambda_term);
+//
+//			    lambda_term_sql = lambda_term_sql + "," + primary_key;
+//			}
+//			else
+//			{
+//				lambda_terms.add(lambda_term);
+//				
+//				String lambda_term_str = lambda_term.toString();
+//				
+//				int len = lambda_term_str.length();
+//				
+//				lambda_term_sql = lambda_term_sql + "," + lambda_term_str.substring(1, len - 1);
+//			}
 			
 
 		
@@ -218,41 +227,49 @@ public class populate_db {
 	    		
 	    		String update_citation_view_sql = new String();
 	    		
-	    		for(int j = 0; j<lambda_term.size(); j++)
+	    		for(int j = 0; j<args.size(); j++)
 	    		{
 					if(j >= 1)
 						key_sql = key_sql + " and ";
-	    			key_sql = key_sql + lambda_term.get(j).name + "='" + rs.getString(++pointer) + "'";
+					
+					String item = rs.getString(++pointer);
+					
+					if(item.contains("'"))
+						item = item.replaceAll("'", "''");
+					
+	    			key_sql = key_sql + args.get(j).name + "='" + item + "'";
 	    		}
 	    		
-		    	String q_primary_key = "select kc.column_name from information_schema.table_constraints tc,information_schema.key_column_usage kc where tc.constraint_type = 'PRIMARY KEY' and kc.table_name = tc.table_name and kc.table_schema = tc.table_schema and kc.constraint_name = tc.constraint_name and tc.table_name='"+ subgoal.name +"'";
-		    	
-		    	pst = c.prepareStatement(q_primary_key);
-			    
-		    	ResultSet temp_rs = pst.executeQuery();
-		    	
-		    	String primary_key = new String();
-		    	if(temp_rs.next())
-		    	{
-		    		primary_key = temp_rs.getString(1);
-		    	}
+//		    	String q_primary_key = "select kc.column_name from information_schema.table_constraints tc,information_schema.key_column_usage kc where tc.constraint_type = 'PRIMARY KEY' and kc.table_name = tc.table_name and kc.table_schema = tc.table_schema and kc.constraint_name = tc.constraint_name and tc.table_name='"+ subgoal.name +"'";
+//		    	
+//		    	pst = c.prepareStatement(q_primary_key);
+//			    
+//		    	ResultSet temp_rs = pst.executeQuery();
+//		    	
+//		    	String primary_key = new String();
+//		    	if(temp_rs.next())
+//		    	{
+//		    		primary_key = temp_rs.getString(1);
+//		    	}
 	    		
-	    		String curr_citation_view_sql = "select "+ primary_key +", citation_view from " + subgoal.name + " where " + key_sql;
+	    		String curr_citation_view_sql = "select "+ "citation_view from " + subgoal.name + " where " + key_sql;
 	    		
 //	    		System.out.println(view.name + "|"+curr_citation_view_sql);
 	    		
 	    		pst = c.prepareStatement(curr_citation_view_sql);
+	    			    		
+	    		ResultSet temp_rs = pst.executeQuery();
 	    		
-	    		temp_rs = pst.executeQuery();
+	    		
 
 	    		while(temp_rs.next())
 	    		{
 	    			
 	    			String primary_key_value = temp_rs.getString(1);
 	    			
-	    			String update_sql = primary_key + "='" + primary_key_value +"'"; 
+	    			String update_sql = key_sql;//primary_key + "='" + primary_key_value +"'"; 
 	    			
-    				String curr_citation_view = temp_rs.getString(2);
+    				String curr_citation_view = temp_rs.getString(1);
 
 	    			if(curr_citation_view==null)
 	    			{

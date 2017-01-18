@@ -4,20 +4,191 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Vector;
 
+import java_cup.assoc;
+import jdk.nashorn.internal.AssertsEnabled;
+
 public class Gen_citation1 {
 	public static void main(String args[]) throws ClassNotFoundException, SQLException {
+				
+				
+		String query = "q(name):family_c(f,name,type), introduction_c(f,text), contributor2family_c(cid, f)";
+		
+//		Vector<Vector<Vector<citation_view>>> c_views = gen_citation_main(query);
+//		
+//	    output(c_views);
+		
+		compare(query);
+	}
+	
+	public static void compare(String query) throws ClassNotFoundException, SQLException
+	{		
+		Vector<Vector<Vector<citation_view>>> c1 = gen_citation_main(query);
+		
+		Vector<Vector<citation_view_vector>> c2 = Gen_citation2.gen_citation_main(query);
 		
 		
+		if(c1.get(0).size()!=c2.size())
+			throw new IllegalArgumentException("two citation not equal");
+				
+		HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
 		
-		String query = "q(name):family_c('1',name,type),introduction_c('1',text)";
+		for(int i = 0; i<c1.size(); i++)
+		{
+			Vector<Vector<citation_view>> c1_1 = c1.get(i);
+			
+			String index_c = get_index(c1_1.get(0));
+			
+			Vector<citation_view_vector> c2_1 = c2.get(0);
+			
+			for(int j = 0; j<c2_1.size(); j++)
+			{
+				citation_view_vector c2_1_1 = c2_1.get(j);
+				
+				String index = get_index(c2_1_1);
+				
+				
+				if(index.equals(index_c))
+				{
+					
+					
+					
+					
+					map.put(i, j);
+					break;
+				}
+			}
+		}
 		
+		
+		for(int i = 0; i<c1.size(); i++)
+		{
+			
+			Vector<Vector<citation_view>> c1_1 = c1.get(i);
+			
+			int id = map.get(i);
+			
+			for(int j = 0; j<c2.size(); j++)
+			{
+				citation_view_vector c2_entry = c2.get(j).get(id);
+				
+				if(vec_contains(c1_1,c2_entry))
+					continue;
+				else
+					throw new IllegalArgumentException("two citation not equal");
+			}
+			
+		}
+		
+	}
+	
+	public static boolean vec_contains(Vector<Vector<citation_view>> c1, citation_view_vector c2)
+	{
+		int i = 0;
+		
+		Vector<citation_view> c2_entry = c2.c_vec;
+		
+		for(i = 0; i<c1.size(); i++)
+		{
+			Vector<citation_view> c1_entry = c1.get(i);
+			
+			HashMap<String, citation_view> map = new HashMap<String, citation_view>();
+			
+			for(int k = 0; k<c2_entry.size(); k++)
+			{
+				map.put(c2_entry.get(k).toString(), c2_entry.get(k));
+			}
+			
+			int k = 0;
+			
+			for(k = 0; k<c1_entry.size(); k++)
+			{
+				if(map.get(c1_entry.get(k).toString()) == null)
+				{
+					break;
+				}
+			}
+			
+			if(k < c1_entry.size())
+				continue;
+			else
+				break;
+		}
+		
+		if(i < c1.size())
+			return true;
+		else
+			return false;
+	}
+	
+	public static String get_index(Vector<citation_view> c_combination)
+	{		
+		char[] seq = new char[c_combination.size()];
+		
+		for(int j = 0; j<c_combination.size();j++)
+		{
+			seq[j]= (c_combination.get(j).get_index());
+		}
+		
+		Arrays.sort(seq);
+		
+		String str = String.valueOf(seq);
+		
+		return str;
+	}
+	
+	public static String get_index(citation_view_vector c_combination)
+	{		
+		char[] seq = new char[c_combination.index_vec.size()];
+		
+		for(int j = 0; j<c_combination.index_vec.size();j++)
+		{
+			seq[j]= (c_combination.index_vec.get(j));
+		}
+		
+		Arrays.sort(seq);
+		
+		String str = String.valueOf(seq);
+		
+		return str;
+	}
+	
+	public static HashMap<String, Vector<citation_view>> build_index_vec(Vector<Vector<citation_view>> c_combinations)
+	{
+		HashMap<String, Vector<citation_view>> update_combinations = new HashMap<String, Vector<citation_view>>();
+		
+		for(int i = 0; i<c_combinations.size(); i++)
+		{
+			Vector<citation_view> c_combination = c_combinations.get(i);
+			
+			char[] seq = new char[c_combination.size()];
+			
+			for(int j = 0; j<c_combination.size();j++)
+			{
+				seq[j]= (c_combination.get(j).get_index());
+			}
+			
+			Arrays.sort(seq);
+			
+			String str = String.valueOf(seq);
+			
+			update_combinations.put(str, c_combination);
+		}
+		
+		return update_combinations;
+	}
+	
+	public static Vector<Vector<Vector<citation_view>>> gen_citation_main(String query) throws ClassNotFoundException, SQLException
+	{
 		Vector views = get_views_schema();
 		
-		HashSet rewritings = GoodPlan.genPlan2("rw",Parse_datalog.parse_query(query), views);
+		HashSet rewritings = GoodPlan.genPlan2(Parse_datalog.parse_query(query), views);
+		
+		
 		
 		Connection c = null;
 		
@@ -32,7 +203,8 @@ public class Gen_citation1 {
 	        "postgres","123");
 	    Vector<Vector<Vector<citation_view>>> c_views = gen_citation(rewritings, c, pst);
 
-	    output(c_views);
+	    return c_views;
+			    
 	}
 	
 	public static void output(Vector<Vector<Vector<citation_view>>> c_views)
@@ -57,62 +229,6 @@ public class Gen_citation1 {
 		}
 	}
 	
-//	public static Vector<Vector<citation_view>> gen_citation_combination_template(HashSet rewritings, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
-//	{
-//		
-//		Vector<Vector<citation_view>> c_template = new Vector<Vector<citation_view>>();
-//		
-//		for(Iterator iter = rewritings.iterator();iter.hasNext();)
-//		{
-//			Rewriting rw = (Rewriting) iter.next();
-//			
-//			Vector<citation_view> c_view_model_vec = new Vector<citation_view>();
-//			
-//			for(Iterator iterator = rw.viewTuples.iterator();iterator.hasNext();)
-//			{
-//				
-//				Tuple view = (Tuple) iterator.next();
-//				
-//				String get_citation_query = "select citation_view_name,lambda_term from citation_view join view_table on citation_view.view_name = view_table.view where citation_view.view_name = '" + view.name + "'";
-//				
-//				pst = c.prepareStatement(get_citation_query);
-//				
-//				ResultSet rs = pst.executeQuery();
-//				
-//				if(rs.next())
-//				{
-//					String citation_view_name = rs.getString(1);
-//					
-//					String lambda_terms = rs.getString(2);
-//					
-//					citation_view c_unit;
-//					
-//					if(lambda_terms.isEmpty())
-//					{
-//						c_unit = new citation_view_unparametered(citation_view_name);
-//					}
-//					else
-//					{
-//						Vector<String> lambda_term_vec = new Vector<String>();
-//						
-//						lambda_term_vec.addAll(Arrays.asList(lambda_terms.split(",")));
-//						
-//						c_unit = new citation_view_parametered(citation_view_name, lambda_term_vec);
-//					}
-//					
-//					c_view_model_vec.add(c_unit);
-//				}
-//				
-//				
-//								
-//			}
-//			
-//			c_template.add(c_view_model_vec);
-//		}
-//		
-//		return c_template;
-//	}
-//	
 	public static Vector<Vector<Vector<citation_view>>> gen_citation(HashSet rewritings, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
 		
@@ -133,29 +249,6 @@ public class Gen_citation1 {
 			Query_converter.pre_processing_view(rw.rew);
 			
 			String sql = Query_converter.datalog2sql_citation_view(rw.rew);
-			
-//			for(Iterator iterator = rw.viewTuples.iterator();iterator.hasNext();)
-//			{
-//				Tuple view = (Tuple) iterator.next();
-//				
-//				rename_column(view, c, pst);
-//				
-//				if(num >= 1)
-//				{
-//					citation_unit += ",";
-//					
-//					citation_table += " natural inner join ";
-//				}
-//				
-//				citation_unit += view.name + "_citation_view";
-//				
-//				citation_table += view.name + "_table";
-//				
-//				num++;
-//								
-//			}
-//			
-//			sql = "select " + citation_unit + " from " + citation_table;
 			
 			pst = c.prepareStatement(sql);
 			
@@ -245,37 +338,30 @@ public class Gen_citation1 {
 //	         pst = c.prepareStatement("SELECT *  FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = 'v2'");
 	         pst = c.prepareStatement("SELECT *  FROM view_table");
 	         rs = pst.executeQuery();
-	         int num=1;
 	         
 	            while (rs.next()) {
 	            	
-	            	String head = rs.getString(1);
+	            	String head_name = rs.getString(1);
 	            	
 	            	String [] str_lambda_terms = null;
 	            	
-	            	if(!rs.getString(2).equals(""))
+	            	String [] head_vars = rs.getString(2).split(",");
+	            	
+	            	
+	            	if(rs.getString(3) != null && !rs.getString(3).equals(""))
 	            	{
-	            		str_lambda_terms = rs.getString(2).split(",");
+	            		str_lambda_terms = rs.getString(3).split(",");
 	            	}
+	            		            	
+	            	Vector<String> subgoal_names = new Vector<String>();
 	            	
-	            	String [] subgoals = rs.getString(3).split("\\),");
-	                
-	                subgoals[subgoals.length-1]=subgoals[subgoals.length-1].split("\\)")[0];
+	            	Vector<String> subgoal_arguments = new Vector<String>();
 	            	
+	            	get_subgoals(subgoal_names, subgoal_arguments, head_name, c, pst);	            	
 	            	
-	                Query view = parse_query(head, subgoals,str_lambda_terms);
+	                Query view = parse_query(head_name, head_vars, subgoal_names, subgoal_arguments, str_lambda_terms);
 	                
 	                views.add(view);
-//	                System.out.print(rs.getString(1));
-//	                System.out.print('|');
-//	                System.out.print(rs.getString(2));
-//	                if(rs.getString(2).length()==0)
-//	                {
-//	                	int y=0;
-//	                	y++;
-//	                }
-//	                System.out.print('|');
-//	                System.out.println(rs.getString(3));
 	            }
 	         
 	      } catch (Exception e) {
@@ -286,35 +372,46 @@ public class Gen_citation1 {
 	      
 	      return views;
 	}
+	
+	static void get_subgoals (Vector<String> subgoal_names, Vector<String> subgoal_arguments, String view_id, Connection c, PreparedStatement pst ) throws SQLException
+	{
+		String subgoal_query = "select s.subgoal_names, a.arguments from subgoals s join subgoal_arguments a using (subgoal_names) where s.view = '" + view_id + "'";
+		
+		pst = c.prepareStatement(subgoal_query);
+		
+		ResultSet rs = pst.executeQuery();
+				
+		while(rs.next())
+		{
+			subgoal_names.add(rs.getString(1));
+			
+			subgoal_arguments.add(rs.getString(2));
+		}
+		
+	}
 
 	
-    static Query parse_query(String head, String []body, String []lambda_term_str)
+    static Query parse_query(String head_name, String[] head_vars, Vector<String> body, Vector<String> arguments, String []lambda_term_str)
     {
-                
-        String head_name=head.split("\\(")[0];
-        
-        String []head_var=head.split("\\(")[1].split("\\)")[0].split(",");
-        
+                        
         Vector<Argument> head_v = new Vector<Argument>();
         
-        for(int i=0;i<head_var.length;i++)
+        for(int i=0;i<head_vars.length;i++)
         {
-        	head_v.add(new Argument(head_var[i]));
+        	head_v.add(new Argument(head_vars[i]));
         }
         
         Subgoal head_subgoal = new Subgoal(head_name, head_v);
         
 //        String []body = query.split(":")[1].split("\\),");
+                
+        Vector<Subgoal> body_subgoals = new Vector<Subgoal>(body.size());
         
-        body[body.length-1]=body[body.length-1].split("\\)")[0];
-        
-        Vector<Subgoal> body_subgoals = new Vector<Subgoal>(body.length);
-        
-        for(int i=0; i<body.length; i++)
+        for(int i=0; i<body.size(); i++)
         {
-        	String body_name=body[i].split("\\(")[0];
+        	String body_name=body.get(i);
             
-            String []body_var=body[i].split("\\(")[1].split(",");
+            String []body_var=arguments.get(i).split(",");
             
             Vector<Argument> body_v = new Vector<Argument>();
             

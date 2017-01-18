@@ -1,9 +1,10 @@
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Vector;
 
 public abstract class citation_view {
 	
-	public abstract Vector<String> get_full_query();
+	public abstract String get_full_query() throws ClassNotFoundException, SQLException;
 
 	public abstract String get_name();
 	

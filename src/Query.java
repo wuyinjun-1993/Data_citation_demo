@@ -19,7 +19,7 @@ class Query {
 
   int     count = 0; // number of equivalent views in the same class
 
-  Vector<Argument> lambda_term;
+  Vector<Argument> lambda_term = new Vector<Argument>();
   
   
   Vector<Argument> get_lambda_term()

@@ -15,12 +15,89 @@ public class Gen_citation2 {
 	
 	static String query;
 	
+	static HashMap<String, Tuple> map = new HashMap<String, Tuple>();
+	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException
 	{
-		query = "q(name):family_c(f,name,'gpcr'),introduction_c(f,text)";
+		String query = "q(name):family_c(f,name,type),introduction_c(f,text),contributor2family_c(cid, f)";
+
+		Vector<Vector<citation_view_vector>> citation_views = gen_citation_main(query);
+		
+//		output(citation_views);
+		
+		output_sql(citation_views);
+
+	}
+	
+	public static void output_sql(Vector<Vector<citation_view_vector>> citation_views) throws ClassNotFoundException, SQLException
+	{
+		for(int i = 0; i<citation_views.size(); i++)
+		{
+			Vector<citation_view_vector> c_vec = citation_views.get(i);
+			
+			for(int j = 0; j<c_vec.size(); j++)
+			{
+				if(j >= 1)
+					System.out.print(",");
+				System.out.print(c_vec.get(j).toString());
+//				gen_citation(c_vec.get(j));
+			}
+			
+			System.out.println();
+		}
+	}
+	
+	
+	public static Vector<Query> pre_processing(Query q, Connection c, PreparedStatement pst) throws SQLException
+	{
+		
+		Vector<Query> views = Gen_citation1.get_views_schema();
+
+		
+	    q = q.minimize();
+
+	    // construct the canonical db
+	    Database canDb = CoreCover.constructCanonicalDB(q);
+	    UserLib.myprintln("canDb = " + canDb.toString());
+
+	    // compute view tuples
+	    HashSet viewTuples = CoreCover.computeViewTuples(canDb, views);
+
+	    // compute tuple-cores
+	    CoreCover.computeTupleCores(viewTuples, q);
+	    
+	    CoreCover.computeNumVTs(viewTuples);
+	    
+	    for(Iterator iter = viewTuples.iterator();iter.hasNext();)
+	    {
+	    	Tuple tuple = (Tuple) iter.next();
+	    	
+	    	String c_name_query = "select citation_view_name from citation_view where view_name = '" + tuple.name + "'";
+	    	
+	    	pst = c.prepareStatement(c_name_query);
+	    	
+	    	ResultSet rs = pst.executeQuery();
+	    	
+	    	if(rs.next())
+	    	{
+	    		map.put(rs.getString(1), tuple);
+	    	}
+	    	
+	    }
+	    
+	    return views;
+	    
+	    
+	}
+	
+	public static Vector<Vector<citation_view_vector>> gen_citation_main(String query) throws ClassNotFoundException, SQLException
+	{
+		
 		
 		
 		Query q = Parse_datalog.parse_query(query);
+		
+		
 				
 		Connection c = null;
 		
@@ -31,9 +108,17 @@ public class Gen_citation2 {
 	    c = DriverManager
 	        .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
 	        "postgres","123");
+	    
+		pre_processing(q,c,pst);
 		
-		Vector<Vector<Vector<citation_view>>> citation_views = get_citation_views(q, c, pst);
+		Vector<Vector<citation_view_vector>> citation_views = get_citation_views(q, c, pst);
 		
+		return citation_views;
+		
+	}
+	
+	public static void output (Vector<Vector<Vector<citation_view>>> citation_views)
+	{
 		for(int i = 0; i<citation_views.size(); i++)
 		{
 			Vector<Vector<citation_view>> citation_view_vec = citation_views.get(i);
@@ -59,7 +144,6 @@ public class Gen_citation2 {
 			System.out.println();
 			
 		}
-		
 	}
 	
 	public static Vector<citation_view> gen_citation_arr(Vector<Query> views)
@@ -67,30 +151,32 @@ public class Gen_citation2 {
 		return new Vector<citation_view>(views.size());
 	}
 	
-	public static void gen_citation(Vector<citation_view> citation_views)
+	public static void gen_citation(Vector<citation_view> citation_views) throws ClassNotFoundException, SQLException
 	{
 		for(int i = 0; i<citation_views.size();i++)
 		{
-			Vector<String> query = citation_views.get(i).get_full_query();
+			String query = citation_views.get(i).get_full_query();
 			
 			System.out.println(query);
 		}
 	}
 	
-	public static Vector<Vector<Vector<citation_view>>> get_citation_views(Query query,Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	public static Vector<Vector<citation_view_vector>> get_citation_views(Query query,Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
-		Vector<Vector<Vector<citation_view>>> c_views = query_execution(query, c, pst);
+		Vector<Vector<citation_view_vector>> c_views = query_execution(query, c, pst);
 				
 		return c_views;
 	}
 	
-	public static Vector<Vector<Vector<citation_view>>> query_execution(Query query, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	public static Vector<Vector<citation_view_vector>> query_execution(Query query, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
 				
-		Vector<Vector<Vector<citation_view>>> c_views = new Vector<Vector<Vector<citation_view>>>();
+		Vector<Vector<citation_view_vector>> c_views = new Vector<Vector<citation_view_vector>>();
 				
 		Vector<String> subgoal_names = new Vector<String>();
 				
+//		Query_converter.post_processing(query);
+		
 		Query_converter.pre_processing(query);
 		
 		String sql = Query_converter.datalog2sql_citation(query);
@@ -124,7 +210,7 @@ public class Gen_citation2 {
 			{
 				Vector<Vector<citation_view>> c_unit_vec = get_citation_units(c_units);
 				
-				Vector<Vector<citation_view>> c_unit_combinaton = get_valid_citation_combination(c_unit_vec,subgoal_names);
+				Vector<citation_view_vector> c_unit_combinaton = get_valid_citation_combination(c_unit_vec,subgoal_names);
 				
 				c_views.add(c_unit_combinaton);
 				
@@ -137,11 +223,11 @@ public class Gen_citation2 {
 				
 				HashMap<String,citation_view> c_unit_vec = get_citation_units_unique(c_units);
 				
-				Vector<Vector<citation_view>> curr_c_view = c_views.get(0);
+				Vector<citation_view_vector> curr_c_view = c_views.get(0);
 				
-				Vector<Vector<citation_view>> insert_c_view = (Vector<Vector<citation_view>>) curr_c_view.clone();
+				Vector<citation_view_vector> insert_c_view = (Vector<citation_view_vector>) curr_c_view.clone();
 				
-				Vector<Vector<citation_view>> update_c_view = update_valid_citation_combination(insert_c_view,c_unit_vec);
+				Vector<citation_view_vector> update_c_view = update_valid_citation_combination(insert_c_view,c_unit_vec);
 				
 				c_views.add(update_c_view);
 			}
@@ -152,27 +238,27 @@ public class Gen_citation2 {
 		return c_views;
 	}
 	
-	public static Vector<Vector<citation_view>> update_valid_citation_combination(Vector<Vector<citation_view>> insert_c_view, HashMap<String,citation_view> c_unit_vec)
+	public static Vector<citation_view_vector> update_valid_citation_combination(Vector<citation_view_vector> insert_c_view, HashMap<String,citation_view> c_unit_vec)
 	{
 		
-		Vector<Vector<citation_view>> update_c_views = new Vector<Vector<citation_view>>();
+		Vector<citation_view_vector> update_c_views = new Vector<citation_view_vector>();
 		
 		for(int i = 0; i<insert_c_view.size();i++)
 		{
-			Vector<citation_view> insert_c_view_vec = insert_c_view.get(i);
+			citation_view_vector insert_c_view_vec = insert_c_view.get(i);
 			
 			Vector<citation_view> update_c_view_vec = new Vector<citation_view>();
 			
-			for(int j = 0; j < insert_c_view_vec.size(); j++)
+			for(int j = 0; j < insert_c_view_vec.c_vec.size(); j++)
 			{
-				citation_view c = insert_c_view_vec.get(j);
+				citation_view c = insert_c_view_vec.c_vec.get(j);
 				
 				c = c_unit_vec.get(String.valueOf(c.get_index()));
 				
 				update_c_view_vec.add(c);
 			}
 			
-			update_c_views.add(update_c_view_vec);
+			update_c_views.add(new citation_view_vector(update_c_view_vec, insert_c_view_vec.index_vec, insert_c_view_vec.tuple_cores));
 		}
 		
 		return update_c_views;
@@ -267,9 +353,9 @@ public class Gen_citation2 {
 	
 	
 	
-	public static Vector<Vector<citation_view>> get_valid_citation_combination(Vector<Vector<citation_view>>c_unit_vec, Vector<String> subgoal_names)
+	public static Vector<citation_view_vector> get_valid_citation_combination(Vector<Vector<citation_view>>c_unit_vec, Vector<String> subgoal_names)
 	{
-		Vector<Vector<citation_view>> c_combinations = new Vector<Vector<citation_view>>();
+		HashMap<String, citation_view_vector> c_combinations = new HashMap<String, citation_view_vector>();
 		
 		Vector<Vector<String>> c_subgoal_names = new Vector<Vector<String>>();
 		
@@ -286,57 +372,123 @@ public class Gen_citation2 {
 			{
 				citation_view curr_c_unit = curr_c_unit_vec.get(j);
 				
-				if(subgoal_names.containsAll(curr_c_unit.get_table_names()))
+				Vector<String> core_str = new Vector<String>();
+				
+				HashSet core_set = map.get(curr_c_unit.get_name()).core;
+				
+				for(Iterator iter = core_set.iterator(); iter.hasNext();)
+				{
+					Subgoal subgoal = (Subgoal) iter.next();
+					
+					core_str.add(subgoal.name);
+				}
+
+				
+				if(subgoal_names.containsAll(curr_c_unit.get_table_names()) && core_str.contains(subgoal_names.get(i)))
 				{
 					curr_combination.add(curr_c_unit);
 					curr_subgoal_name.add(curr_c_unit.get_table_names());
 				}
 			}
 			
-			join_operation(c_combinations, curr_combination, c_subgoal_names, curr_subgoal_name, i);
+			c_combinations = join_operation(c_combinations, curr_combination, i);
+			
+			c_combinations = remove_duplicate(c_combinations);
 		}
 		
-		remove_duplicate(c_combinations);
-		
-		return c_combinations;
+		return remove_duplicate_final(c_combinations);
 	}
 	
 	
-	public static void remove_duplicate(Vector<Vector<citation_view>> c_combinations)
+	public static HashMap<String, citation_view_vector> remove_duplicate(HashMap<String, citation_view_vector> c_combinations)
 	{
-		HashMap<String, Vector<citation_view>> update_combinations = new HashMap<String, Vector<citation_view>>();
+//		Vector<Boolean> retains = new Vector<Boolean>();
 		
-		for(int i = 0; i<c_combinations.size(); i++)
+//		HashMap<String, Vector<citation_view>> update_combinations = new HashMap<String, Vector<citation_view>>();
+		
+		HashMap<String, citation_view_vector> update_combinations = new HashMap<String, citation_view_vector>();
+		
+		Set set = c_combinations.keySet();
+		
+		for(Iterator iter = set.iterator(); iter.hasNext();)
 		{
-			Vector<citation_view> c_combination = c_combinations.get(i);
+			String str = (String) iter.next();
 			
-			char[] seq = new char[c_combination.size()];
+			boolean contains = false;
 			
-			for(int j = 0; j<c_combination.size();j++)
+			citation_view_vector c_combination = c_combinations.get(str);
+			
+			for(Iterator iterator = set.iterator(); iterator.hasNext();)
 			{
-				seq[j]= (c_combination.get(j).get_index());
+				String string = (String) iterator.next();
+				
+				if(str!=string)
+				{
+					citation_view_vector curr_combination = c_combinations.get(string);
+					
+					if(c_combination.index_vec.containsAll(curr_combination.index_vec))
+					{
+						contains = true;
+						
+						break;
+					}
+				}
+				
 			}
 			
-			Arrays.sort(seq);
-			
-			String str = String.valueOf(seq);
-			
-			update_combinations.put(str, c_combination);
+			if(!contains)
+				update_combinations.put(str, c_combination);
 		}
 		
-		c_combinations.clear();
-		
-		Set set = update_combinations.keySet();
-		
-		for(Iterator iter = set.iterator();iter.hasNext();)
-		{
-			String key = (String) iter.next();
-			
-			c_combinations.add(update_combinations.get(key));
-		}
+				
+		return update_combinations;
 	}
 	
-	public static void join_operation(Vector<Vector<citation_view>> c_combinations, Vector<citation_view> insert_citations, Vector<Vector<String>> c_subgoal_names, Vector<Vector<String>> curr_subgoal_name, int i)
+	public static Vector<citation_view_vector> remove_duplicate_final(HashMap<String, citation_view_vector> c_combinations)
+	{
+//		Vector<Boolean> retains = new Vector<Boolean>();
+		
+//		HashMap<String, Vector<citation_view>> update_combinations = new HashMap<String, Vector<citation_view>>();
+		
+		Vector<citation_view_vector> update_combinations = new Vector<citation_view_vector>();
+		
+		Set set = c_combinations.keySet();
+		
+		for(Iterator iter = set.iterator(); iter.hasNext();)
+		{
+			String str = (String) iter.next();
+			
+			boolean contains = false;
+			
+			citation_view_vector c_combination = c_combinations.get(str);
+			
+			for(Iterator iterator = set.iterator(); iterator.hasNext();)
+			{
+				String string = (String) iterator.next();
+				
+				if(str!=string)
+				{
+					citation_view_vector curr_combination = c_combinations.get(string);
+					
+					if(c_combination.index_vec.containsAll(curr_combination.index_vec))
+					{
+						contains = true;
+						
+						break;
+					}
+				}
+				
+			}
+			
+			if(!contains)
+				update_combinations.add(c_combination);
+		}
+		
+				
+		return update_combinations;
+	}
+	
+	public static HashMap<String, citation_view_vector> join_operation(HashMap<String, citation_view_vector> c_combinations, Vector<citation_view> insert_citations,  int i)
 	{
 		if(i == 0)
 		{
@@ -346,73 +498,89 @@ public class Gen_citation2 {
 				
 				c.add(insert_citations.get(k));
 				
-				c_combinations.add(c);
-
+				String str = String.valueOf(insert_citations.get(k).get_index());
+				
+				c_combinations.put(str, new citation_view_vector(c));
+				
 			}
-			c_subgoal_names.addAll(curr_subgoal_name);
+			
+			return c_combinations;
 		}
 		else
 		{
-			Vector<Vector<citation_view>> updated_c_combinations = new Vector<Vector<citation_view>>();
+			HashMap<String, citation_view_vector> updated_c_combinations = new HashMap<String, citation_view_vector>();
 			
 			Vector<Vector<String>> updated_c_subgoals = new Vector<Vector<String>>();
 			
-			for(int j = 0; j<c_combinations.size(); j++)
+			Set set = c_combinations.keySet();
+			
+			for(Iterator iter = set.iterator(); iter.hasNext();)
 			{
-				Vector<citation_view> curr_combination = c_combinations.get(j);
+				String string = (String) iter.next();
 				
-				Vector<String> curr_subgoal = c_subgoal_names.get(j);
-				
+				citation_view_vector curr_combination = c_combinations.get(string);
+								
 				for(int k = 0; k<insert_citations.size(); k++)
 				{
-					if(insert_citations.get(k).get_table_names().containsAll(curr_subgoal))
+					
+					citation_view_vector new_citation_vec = citation_view_vector.merge(curr_combination, insert_citations.get(k));
+					
+					char [] index_vec = new char[new_citation_vec.index_vec.size()]; 
+							
+					for(int r = 0; r < new_citation_vec.index_vec.size(); r++)
 					{
-						Vector<citation_view> c = new Vector<citation_view>();
-						
-						c.add(insert_citations.get(k));
-						
-						updated_c_combinations.add(c);
-						
-						updated_c_subgoals.add(insert_citations.get(k).get_table_names());
+						index_vec[r] = new_citation_vec.index_vec.get(r);
 					}
-					else
-					{
-						if(curr_subgoal.containsAll(insert_citations.get(k).get_table_names()))
-						{
-							updated_c_combinations.add((Vector<citation_view>) curr_combination.clone());
-							
-							updated_c_subgoals.add(curr_subgoal);
-						}
-						
-						else
-						{
-							Vector<citation_view> c = new Vector<citation_view>();
-							
-							Vector<String> str_vec = new Vector<String>();
-							
-							c = (Vector<citation_view>) curr_combination.clone();
-							
-							str_vec = (Vector<String>) curr_subgoal.clone();
-							
-							str_vec.addAll(insert_citations.get(k).get_table_names());
-							
-							c.add(insert_citations.get(k));
-							
-							updated_c_combinations.add(c);
-							
-							updated_c_subgoals.add(str_vec);
-						}
-					}
+					
+					Arrays.sort(index_vec);
+//					
+					String str = String.valueOf(index_vec);
+					
+					updated_c_combinations.put(str, new_citation_vec);
+					
+//					if(insert_citations.get(k).get_table_names().containsAll(curr_subgoal))
+//					{
+//						Vector<citation_view> c = new Vector<citation_view>();
+//						
+//						c.add(insert_citations.get(k));
+//						
+//						updated_c_combinations.add(c);
+//						
+//						updated_c_subgoals.add(insert_citations.get(k).get_table_names());
+//					}
+//					else
+//					{
+//						if(curr_subgoal.containsAll(insert_citations.get(k).get_table_names()))
+//						{
+//							updated_c_combinations.add((Vector<citation_view>) curr_combination.clone());
+//							
+//							updated_c_subgoals.add(curr_subgoal);
+//						}
+//						
+//						else
+//						{
+//							Vector<citation_view> c = new Vector<citation_view>();
+//							
+//							Vector<String> str_vec = new Vector<String>();
+//							
+//							c = (Vector<citation_view>) curr_combination.clone();
+//							
+//							str_vec = (Vector<String>) curr_subgoal.clone();
+//							
+//							str_vec.addAll(insert_citations.get(k).get_table_names());
+//							
+//							c.add(insert_citations.get(k));
+//							
+//							updated_c_combinations.add(c);
+//							
+//							updated_c_subgoals.add(str_vec);
+//						}
+//					}
 				}
 			}
+						
+			return updated_c_combinations;
 			
-			c_combinations.clear();
-			
-			c_combinations.addAll(updated_c_combinations);
-			
-			c_subgoal_names.clear();
-			
-			c_subgoal_names.addAll(updated_c_subgoals);
 		}
 	}
 	
@@ -580,163 +748,104 @@ public class Gen_citation2 {
 		return c_view;
 	}
 	
-	
-	public static Vector<Query> get_views_schema()
-	{
-	      Connection c = null;
-	      ResultSet rs = null;
-	      PreparedStatement pst = null;
-	      Vector<Query> views = new Vector<Query>();
-	      
-	      try {
-	         Class.forName("org.postgresql.Driver");
-	         c = DriverManager
-	            .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
-	            "postgres","123");
-	         
-//	         pst = c.prepareStatement("SELECT *  FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = 'v2'");
-	         pst = c.prepareStatement("SELECT *  FROM view_table");
-	         rs = pst.executeQuery();
-	         int num=1;
-	         
-	            while (rs.next()) {
-	            	
-	            	String head = rs.getString(1);
-	            	
-	            	String [] str_lambda_terms = null;
-	            	
-	            	if(!rs.getString(2).equals(""))
-	            	{
-	            		str_lambda_terms = rs.getString(2).split(",");
-	            	}
-	            	
-	            	String [] subgoals = rs.getString(3).split("\\),");
-	                
-	                subgoals[subgoals.length-1]=subgoals[subgoals.length-1].split("\\)")[0];
-	            	
-	            	
-	                Query view = parse_query(head, subgoals,str_lambda_terms);
-	                
-	                views.add(view);
-//	                System.out.print(rs.getString(1));
-//	                System.out.print('|');
-//	                System.out.print(rs.getString(2));
-//	                if(rs.getString(2).length()==0)
-//	                {
-//	                	int y=0;
-//	                	y++;
-//	                }
-//	                System.out.print('|');
-//	                System.out.println(rs.getString(3));
-	            }
-	         
-	      } catch (Exception e) {
-	         e.printStackTrace();
-	         System.err.println(e.getClass().getName()+": "+e.getMessage());
-	         System.exit(0);
-	      }
-	      
-	      return views;
-	}
 
-
-    static Query parse_query(String query)
-    {
-        
-        String head = query.split(":")[0];
-        
-        String head_name=head.split("\\(")[0];
-        
-        String []head_var=head.split("\\(")[1].split("\\)")[0].split(",");
-        
-        Vector<Argument> head_v = new Vector<Argument>();
-        
-        for(int i=0;i<head_var.length;i++)
-        {
-        	head_v.add(new Argument(head_var[i]));
-        }
-        
-        Subgoal head_subgoal = new Subgoal(head_name, head_v);
-        
-        String []body = query.split(":")[1].split("\\),");
-        
-        body[body.length-1]=body[body.length-1].split("\\)")[0];
-        
-        Vector<Subgoal> body_subgoals = new Vector<Subgoal>(body.length);
-        
-        for(int i=0; i<body.length; i++)
-        {
-        	String body_name=body[i].split("\\(")[0];
-            
-            String []body_var=body[i].split("\\(")[1].split(",");
-            
-            Vector<Argument> body_v = new Vector<Argument>();
-            
-            for(int j=0;j<body_var.length;j++)
-            {
-            	body_v.add(new Argument(body_var[j]));
-            }
-            
-            Subgoal body_subgoal = new Subgoal(body_name, body_v);
-            
-            body_subgoals.add(body_subgoal);
-        }
-        return new Query(head_name, head_subgoal, body_subgoals);
-    }
-    
-    static Query parse_query(String head, String []body, String []lambda_term_str)
-    {
-                
-        String head_name=head.split("\\(")[0];
-        
-        String []head_var=head.split("\\(")[1].split("\\)")[0].split(",");
-        
-        Vector<Argument> head_v = new Vector<Argument>();
-        
-        for(int i=0;i<head_var.length;i++)
-        {
-        	head_v.add(new Argument(head_var[i]));
-        }
-        
-        Subgoal head_subgoal = new Subgoal(head_name, head_v);
-        
+//    static Query parse_query(String query)
+//    {
+//        
+//        String head = query.split(":")[0];
+//        
+//        String head_name=head.split("\\(")[0];
+//        
+//        String []head_var=head.split("\\(")[1].split("\\)")[0].split(",");
+//        
+//        Vector<Argument> head_v = new Vector<Argument>();
+//        
+//        for(int i=0;i<head_var.length;i++)
+//        {
+//        	head_v.add(new Argument(head_var[i]));
+//        }
+//        
+//        Subgoal head_subgoal = new Subgoal(head_name, head_v);
+//        
 //        String []body = query.split(":")[1].split("\\),");
-        
-        body[body.length-1]=body[body.length-1].split("\\)")[0];
-        
-        Vector<Subgoal> body_subgoals = new Vector<Subgoal>(body.length);
-        
-        for(int i=0; i<body.length; i++)
-        {
-        	String body_name=body[i].split("\\(")[0];
-            
-            String []body_var=body[i].split("\\(")[1].split(",");
-            
-            Vector<Argument> body_v = new Vector<Argument>();
-            
-            for(int j=0;j<body_var.length;j++)
-            {
-            	body_v.add(new Argument(body_var[j]));
-            }
-            
-            Subgoal body_subgoal = new Subgoal(body_name, body_v);
-            
-            body_subgoals.add(body_subgoal);
-        }
-        
-        
-        Vector<Argument> lambda_terms = new Vector<Argument>();
-        
-        if(lambda_term_str != null)
-        {
-	        for(int i =0;i<lambda_term_str.length; i++)
-	        {
-	        	lambda_terms.add(new Argument(lambda_term_str[i]));
-	        }
-        
-        }
-        return new Query(head_name, head_subgoal, body_subgoals,lambda_terms);
-    }
+//        
+//        body[body.length-1]=body[body.length-1].split("\\)")[0];
+//        
+//        Vector<Subgoal> body_subgoals = new Vector<Subgoal>(body.length);
+//        
+//        for(int i=0; i<body.length; i++)
+//        {
+//        	String body_name=body[i].split("\\(")[0];
+//            
+//            String []body_var=body[i].split("\\(")[1].split(",");
+//            
+//            Vector<Argument> body_v = new Vector<Argument>();
+//            
+//            for(int j=0;j<body_var.length;j++)
+//            {
+//            	body_v.add(new Argument(body_var[j]));
+//            }
+//            
+//            Subgoal body_subgoal = new Subgoal(body_name, body_v);
+//            
+//            body_subgoals.add(body_subgoal);
+//        }
+//        return new Query(head_name, head_subgoal, body_subgoals);
+//    }
+//    
+//    static Query parse_query(String head, String []body, String []lambda_term_str)
+//    {
+//                
+//        String head_name=head.split("\\(")[0];
+//        
+//        String []head_var=head.split("\\(")[1].split("\\)")[0].split(",");
+//        
+//        Vector<Argument> head_v = new Vector<Argument>();
+//        
+//        for(int i=0;i<head_var.length;i++)
+//        {
+//        	head_v.add(new Argument(head_var[i]));
+//        }
+//        
+//        Subgoal head_subgoal = new Subgoal(head_name, head_v);
+//        
+////        String []body = query.split(":")[1].split("\\),");
+//        
+//        body[body.length-1]=body[body.length-1].split("\\)")[0];
+//        
+//        Vector<Subgoal> body_subgoals = new Vector<Subgoal>(body.length);
+//        
+//        for(int i=0; i<body.length; i++)
+//        {
+//        	String body_name=body[i].split("\\(")[0];
+//            
+//            String []body_var=body[i].split("\\(")[1].split(",");
+//            
+//            Vector<Argument> body_v = new Vector<Argument>();
+//            
+//            for(int j=0;j<body_var.length;j++)
+//            {
+//            	body_v.add(new Argument(body_var[j]));
+//            }
+//            
+//            Subgoal body_subgoal = new Subgoal(body_name, body_v);
+//            
+//            body_subgoals.add(body_subgoal);
+//        }
+//        
+//        
+//        Vector<Argument> lambda_terms = new Vector<Argument>();
+//        
+//        if(lambda_term_str != null)
+//        {
+//	        for(int i =0;i<lambda_term_str.length; i++)
+//	        {
+//	        	lambda_terms.add(new Argument(lambda_term_str[i]));
+//	        }
+//        
+//        }
+//        return new Query(head_name, head_subgoal, body_subgoals,lambda_terms);
+//    }
 
 
 }

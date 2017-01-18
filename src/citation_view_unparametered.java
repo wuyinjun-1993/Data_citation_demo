@@ -11,23 +11,13 @@ public class citation_view_unparametered extends citation_view{
 	public String name;
 	
 	public char index;
-//	public boolean lambda;
-	public Vector<String> queries = new Vector<String>();
-	
+//	public boolean lambda;	
 	public Vector<String> table_names = new Vector<String>();
 	
 	public citation_view_unparametered(String name) throws ClassNotFoundException, SQLException
 	{
 		this.name = name;
 		
-		get_lambda_terms();
-		
-		gen_index();
-//		lambda = false;
-	}
-	
-	void get_lambda_terms() throws ClassNotFoundException, SQLException
-	{
 		Connection c = null;
 		
 	    PreparedStatement pst = null;
@@ -37,8 +27,20 @@ public class citation_view_unparametered extends citation_view{
 	    c = DriverManager
 	        .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
 	        "postgres","123");
+		
+		gen_table_names(c, pst);
+		
+		gen_index();
 	    
-	    String lambda_term_query = "select v.lambda_term, v.subgoal_names from citation_view c join view_table v on v.view=c.view_name where c.citation_view_name = '"+ name +"'";
+	    c.close();
+//		lambda = false;
+	}
+	
+	void gen_table_names(Connection c, PreparedStatement pst ) throws ClassNotFoundException, SQLException
+	{
+		
+	    
+	    String lambda_term_query = "select v.subgoal_names from citation_view c join subgoals v on v.view=c.view_name where c.citation_view_name = '"+ name +"'";
 	    
 	    pst = c.prepareStatement(lambda_term_query);
 	    
@@ -46,15 +48,11 @@ public class citation_view_unparametered extends citation_view{
 	    
 	    while(rs.next())
 	    {
-	    	
-	    	String[] t_names = rs.getString(2).split(",");
-	    	
-	    	table_names.addAll(Arrays.asList(t_names));
+	    		    	
+	    	table_names.add(rs.getString(1));
 	    }
 	    
-	    pst.close();
-	    
-	    c.close();
+
 	}
 
 	
@@ -68,9 +66,38 @@ public class citation_view_unparametered extends citation_view{
 	
 	//TODO: consider more complicated queries
 	
-	public Vector<String> get_full_query()
+	public String get_full_query() throws ClassNotFoundException, SQLException
 	{
-			return queries;
+		Connection c = null;
+		
+	    PreparedStatement pst = null;
+	      
+		Class.forName("org.postgresql.Driver");
+		
+	    c = DriverManager
+	        .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
+	        "postgres","123");
+		
+	    String citation_query = "select citation_view_query from citation_view where citation_view_name = '" + name + "'";
+	    
+	    pst = c.prepareStatement(citation_query);
+	    
+	    ResultSet rs = pst.executeQuery();
+	    
+	    String query4citation = new String();
+	    
+	    if(rs.next())
+	    {
+	    	query4citation = rs.getString(1);
+	    }
+	    
+	    Query query = Parse_datalog.parse_query(query4citation);
+	    	    
+	    String q = Query_converter.datalog2sql(query);
+	    
+	    c.close();
+	    
+	    return q;
 		
 	}
 

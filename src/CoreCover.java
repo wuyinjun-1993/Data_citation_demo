@@ -283,7 +283,7 @@ class CoreCover {
 	  return false;
 
 	// queryArg = ND, and viewArg = ND
-	if (checkProperty2(queryArg, qSubgoalSeq, query))
+	if (!checkProperty2(queryArg, qSubgoalSeq, query))
 	  return false;
 
 	// remember the 1-to-1 mapping

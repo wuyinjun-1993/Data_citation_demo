@@ -14,9 +14,7 @@ public class citation_view_parametered extends citation_view{
 	public String name = new String ();
 	
 	public Vector<String> lambda_terms = new Vector<String>();
-	
-	public Vector<Sql> queries = new Vector<Sql>();
-	
+		
 	public Vector<String> parameters = new Vector<String>();
 	
 	HashMap<String, String> map = new HashMap<String, String>();
@@ -25,19 +23,11 @@ public class citation_view_parametered extends citation_view{
 	
 	public char index;
 	
-	void get_lambda_terms() throws ClassNotFoundException, SQLException
+	void gen_lambda_terms(Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
-		Connection c = null;
 		
-	    PreparedStatement pst = null;
-	      
-		Class.forName("org.postgresql.Driver");
-		
-	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
-	        "postgres","123");
 	    
-	    String lambda_term_query = "select v.lambda_term, v.subgoal_names from citation_view c join view_table v on v.view=c.view_name where c.citation_view_name = '"+ name +"'";
+	    String lambda_term_query = "select v.lambda_term from citation_view c join view_table v on v.view=c.view_name where c.citation_view_name = '"+ name +"'";
 	    
 	    pst = c.prepareStatement(lambda_term_query);
 	    
@@ -47,23 +37,45 @@ public class citation_view_parametered extends citation_view{
 	    {
 	    	String []lambda_term_strs = rs.getString(1).split(",");
 	    	
-	    	for(int i = 0; i<lambda_term_strs.length; i++)
-	    	{
-	    		lambda_terms.add(lambda_term_strs[i]);
-	    	}
+	    	lambda_terms.addAll(Arrays.asList(lambda_term_strs));
 	    	
-	    	String[] t_names = rs.getString(2).split(",");
-	    	
-	    	table_names.addAll(Arrays.asList(t_names));
+//	    	for(int i = 0; i<lambda_term_strs.length; i++)
+//	    	{
+//	    		lambda_terms.add(lambda_term_strs[i]);
+//	    	}
 	    }
 	    
-	    pst.close();
-	    
-	    c.close();
+
 	}
 	
-	void get_queries() throws ClassNotFoundException, SQLException
+	void gen_table_names(Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
+		
+	    
+	    String lambda_term_query = "select v.subgoal_names from citation_view c join subgoals v on v.view=c.view_name where c.citation_view_name = '"+ name +"'";
+	    
+	    pst = c.prepareStatement(lambda_term_query);
+	    
+	    ResultSet rs = pst.executeQuery();
+	    
+	    while(rs.next())
+	    {
+	    		    	
+	    	table_names.add(rs.getString(1));
+	    }
+	    
+
+	}
+	
+	
+	public void gen_index()
+	{
+		index = (char)Integer.parseInt(name.substring(1, name.length()));
+	}
+	
+	public citation_view_parametered(String name) throws ClassNotFoundException, SQLException
+	{
+		
 		Connection c = null;
 		
 	    PreparedStatement pst = null;
@@ -74,57 +86,37 @@ public class citation_view_parametered extends citation_view{
 	        .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
 	        "postgres","123");
 	    
-	    String citation_view_query = "select c.citation_view_query from citation_view c where c.citation_view_name = '"+ name +"'";
-	    
-	    pst = c.prepareStatement(citation_view_query);
-	    
-	    ResultSet rs = pst.executeQuery();
-	    
-	    if(rs.next())
-	    {
-	    	String [] query_strs = rs.getString(1).split("\\" + populate_db.separator);
-	    	
-	    	for(int i = 0; i<query_strs.length; i++)
-	    	{
-	    		if(query_strs[i].contains("(") && query_strs[i].contains(")"))
-	    		{
-	    			String q_name = query_strs[i].split("\\(")[0];
-	    			
-	    			Vector<String> q_lambda_terms = new Vector<String>();
-	    			
-	    			q_lambda_terms.addAll(Arrays.asList(query_strs[i].split("\\(")[1].split("\\")[0]));
-	    			
-	    			queries.add(new Sql_parametered(q_name, q_lambda_terms));
-	    		}
-	    		
-	    		else
-	    		{
-	    			queries.add(new Sql_unparametered(query_strs[i]));
-	    		}
-	    	}
-	    	
-	    	
-	    }
-	}
-	
-	public void gen_index()
-	{
-		index = (char)Integer.parseInt(name.substring(1, name.length()));
-	}
-	
-	public citation_view_parametered(String name) throws ClassNotFoundException, SQLException
-	{
 		this.name = name;
-		get_lambda_terms();
+		gen_lambda_terms(c,pst);
+		
+		gen_table_names(c, pst);
+		
 		gen_index();
+			    
+	    c.close();
 //		get_queries();
 	}
 	
 	
 	public citation_view_parametered(String name, Vector<String> lambda_terms) throws ClassNotFoundException, SQLException {
+		
+		Connection c = null;
+		
+	    PreparedStatement pst = null;
+	      
+		Class.forName("org.postgresql.Driver");
+		
+	    c = DriverManager
+	        .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
+	        "postgres","123");
+		
 		this.name = name;
 		this.lambda_terms = lambda_terms;
 		gen_index();
+			    
+		gen_table_names(c,pst);
+		
+	    c.close();
 //		get_queries();
 	}
 	
@@ -143,76 +135,78 @@ public class citation_view_parametered extends citation_view{
 	
 	
 	@Override
-	public Vector<String> get_full_query()
+	public String get_full_query() throws ClassNotFoundException, SQLException
 	{
-//		if(map.length == 0)
-//			return null;
-//		else
 		
-//			String [] queries = query.split("|");
-			String new_query = null;
+		Connection c = null;
+		
+	    PreparedStatement pst = null;
+	      
+		Class.forName("org.postgresql.Driver");
+		
+	    c = DriverManager
+	        .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
+	        "postgres","123");
+		
+	    String citation_query = "select citation_view_query from citation_view where citation_view_name = '" + name + "'";
+	    
+	    pst = c.prepareStatement(citation_query);
+	    
+	    ResultSet rs = pst.executeQuery();
+	    
+	    String query4citation = new String();
+	    
+	    if(rs.next())
+	    {
+	    	query4citation = rs.getString(1);
+	    }
+	    
+	    Query query = Parse_datalog.parse_query(query4citation);
+	    
+	    assign_paras(query);
+	    
+	    String q = Query_converter.datalog2sql(query);
+	    
+	    c.close();
+	    
+	    return q;
+	    
+	    
+		
+	}
+	
+	public void assign_paras(Query query)
+	{
+		for(int i = 0; i<query.head.args.size(); i++)
+		{
+			Argument arg = (Argument) query.head.args.get(i);
 			
-			Vector<String> rs_queries = new Vector<String>();
-			
-			
-			for(int i=0;i<queries.size();i++)
-			{
-				String new_sub_query = null;
-				String [] sub_terms = queries.get(i).sql.split(" ");
-				for(int j = 0; j<sub_terms.length; j++)
-				{
-					if(sub_terms[j].contains("="))
-					{
-						
-						
-						String key = sub_terms[j].split("=")[0];
-						if(key.contains("."))
-							key=key.split(".")[1];
-						String variable = map.get(key);
-						sub_terms[j] = sub_terms[j].replace("x", variable);
-					}
-					if(j!=0)
-					new_sub_query = new_sub_query + " " + sub_terms[j];
-					else
-						new_sub_query = sub_terms[j];
-				}
+			if(map.get(arg.toString()) != null)
+			{				
+				query.head.args.setElementAt(new Argument("'"+ map.get(arg.toString()) + "'",arg.toString()), i);
 				
+				break;
 				
-				
-				rs_queries.add(new_sub_query);
-	//			if(sub_terms.length <= 1)
-	//				continue;
-	//			else
-	//			{
-	//				String[] terms = sub_terms[1].split("and|or");
-	//				
-	//				for(int j = 0;j<terms.length;j++)
-	//				{
-	//					String []assign_v = terms[j].split("=");
-	//					String variable = map.get(assign_v[0]);
-	//					String new_assign_v = assign_v[1].replace("x", variable);
-	//					
-	//				}
-	//				 
-	//			}
-			
-			
-//			for(int i = 0; i<queries.size(); i++)
-//			{
-//				if(i!=0)
-//					new_query = new_query + "|" + queries[i];
-//				else
-//					new_query = queries[i];
-//			}
-//			
-//			return new_query;
+			}
 		}
-			
-			
-		return rs_queries;
-//		else
-//			return query;
 		
+		for(int i = 0; i<query.body.size(); i++)
+		{
+			
+			Subgoal subgoal = (Subgoal) query.body.get(i);
+			
+			for(int j = 0; j<subgoal.args.size(); j++)
+			{
+				Argument arg = (Argument) subgoal.args.get(j);
+				
+				if(map.get(arg.toString()) != null)
+				{				
+					subgoal.args.setElementAt(new Argument("'" + map.get(arg.toString()) + "'",arg.toString()), j);
+					
+					break;
+				}
+			}
+		}
 	}
 
 	@Override
@@ -221,7 +215,6 @@ public class citation_view_parametered extends citation_view{
 		
 		String insert_citation_view = name + "(";
 		int num = lambda_terms.size();
-		String sql = new String();
 		for(int i =0;i<num;i++)
 		{
 			String lambda_term = lambda_terms.get(i);

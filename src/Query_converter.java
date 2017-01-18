@@ -35,9 +35,9 @@ public class Query_converter {
 	public static void main(String [] args) throws JSQLParserException, ClassNotFoundException, SQLException
 	{
 		
-		Query query = sql2datalog("select * from family_c join introduction_c using (family_id) where family_id = '2' and type = 'gpcr'");
+		Query query = sql2datalog("select * from family_c ,introduction_c where type = 'gpcr' and family_id= '2'");
 		
-		String q = Datalog2Sql(query);
+		String q = datalog2sql(query);
 		
 		System.out.println(query.toString());
 		
@@ -230,16 +230,16 @@ public class Query_converter {
 	    
 	}
 	
-	public static String Datalog2Sql(Query query) throws ClassNotFoundException, SQLException
-	{
-		pre_processing(query);
-		
-		String q = datalog2sql(query);
-		
-		post_processing(query);
-		
-		return q;
-	}
+//	public static String Datalog2Sql(Query query) throws ClassNotFoundException, SQLException
+//	{
+//		pre_processing(query);
+//		
+//		String q = datalog2sql(query);
+//		
+//		post_processing(query);
+//		
+//		return q;
+//	}
 	
 	static String datalog2sql(Query query) throws SQLException, ClassNotFoundException
 	{

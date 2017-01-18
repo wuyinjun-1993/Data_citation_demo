@@ -1,1 +1,1 @@
-q(name) :- family(family_id,name,type),introduction(family_id,text)
+q(name) :- a(x,z),a(z,z),b(z,y)

@@ -19,14 +19,29 @@ public class Gen_citation2 {
 	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException
 	{
-		String query = "q(name):family_c(f,name,type),introduction_c(f,text),contributor2family_c(cid, f)";
+		String query = "q(name):family_c('2',name,type),introduction_c('2',text)";
 
 		Vector<Vector<citation_view_vector>> citation_views = gen_citation_main(query);
 		
 //		output(citation_views);
 		
 		output_sql(citation_views);
+		
+		gen_citation_all(citation_views);
 
+	}
+	
+	public static void gen_citation_all(Vector<Vector<citation_view_vector>> citation_views) throws ClassNotFoundException, SQLException
+	{
+		for(int i = 0; i<citation_views.size(); i++)
+		{
+			Vector<citation_view_vector> c_vec = citation_views.get(i);
+			
+			for(int j = 0; j< c_vec.size(); j++)
+			{
+				gen_citation(c_vec.get(j));
+			}
+		}
 	}
 	
 	public static void output_sql(Vector<Vector<citation_view_vector>> citation_views) throws ClassNotFoundException, SQLException
@@ -151,11 +166,11 @@ public class Gen_citation2 {
 		return new Vector<citation_view>(views.size());
 	}
 	
-	public static void gen_citation(Vector<citation_view> citation_views) throws ClassNotFoundException, SQLException
+	public static void gen_citation(citation_view_vector citation_views) throws ClassNotFoundException, SQLException
 	{
-		for(int i = 0; i<citation_views.size();i++)
+		for(int i = 0; i<citation_views.c_vec.size();i++)
 		{
-			String query = citation_views.get(i).get_full_query();
+			String query = citation_views.c_vec.get(i).get_full_query();
 			
 			System.out.println(query);
 		}
@@ -177,9 +192,9 @@ public class Gen_citation2 {
 				
 //		Query_converter.post_processing(query);
 		
-		Query_converter.pre_processing(query);
+//		Query_converter.pre_processing(query);
 		
-		String sql = Query_converter.datalog2sql_citation(query);
+		String sql = Query_converter.datalog2sql_citation(query, false);
 		
 		for(int i = 0; i < query.body.size(); i++)
 		{
@@ -200,7 +215,7 @@ public class Gen_citation2 {
 			Vector<String[]> c_units = new Vector<String[]>();
 			for(int i = 0; i<query.body.size();i++)
 			{
-				String[] c_unit= rs.getString(subgoal_names.get(i) + "_citation_view").split("\\"+ populate_db.separator);
+				String[] c_unit= rs.getString(i+1).split("\\"+ populate_db.separator);
 				c_units.add(c_unit);
 			}
 			
@@ -233,7 +248,7 @@ public class Gen_citation2 {
 			}
 		}
 		
-		Query_converter.post_processing(query);
+//		Query_converter.post_processing(query);
 		
 		return c_views;
 	}

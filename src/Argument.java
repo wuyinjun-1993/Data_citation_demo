@@ -14,7 +14,7 @@ class Argument {
   int    type;  // VAR or CONST
   String name;
   
-  public String lambda_term = null;
+  public String origin_name = null;
   
   Argument(String name, boolean isConstant) {
     if (name == null) {
@@ -38,9 +38,9 @@ class Argument {
   }
   
   Argument(String name, String lambda_term) {
-      this(name, true);
+      this(name);
       
-      this.lambda_term = lambda_term;
+      this.origin_name = lambda_term;
   }
 
   /**

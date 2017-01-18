@@ -66,8 +66,83 @@ public class citation_view_unparametered extends citation_view{
 	
 	//TODO: consider more complicated queries
 	
+//	public String get_full_query() throws ClassNotFoundException, SQLException
+//	{
+//		Connection c = null;
+//		
+//	    PreparedStatement pst = null;
+//	      
+//		Class.forName("org.postgresql.Driver");
+//		
+//	    c = DriverManager
+//	        .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
+//	        "postgres","123");
+//		
+//	    String citation_query = "select citation_view_query from citation_view where citation_view_name = '" + name + "'";
+//	    
+//	    pst = c.prepareStatement(citation_query);
+//	    
+//	    ResultSet rs = pst.executeQuery();
+//	    
+//	    String query4citation = new String();
+//	    
+//	    if(rs.next())
+//	    {
+//	    	query4citation = rs.getString(1);
+//	    }
+//	    
+//	    Query query = Parse_datalog.parse_query(query4citation);
+//	    	    
+//	    String q = Query_converter.datalog2sql(query);
+//	    
+//	    c.close();
+//	    
+//	    return q;
+//		
+//	}
+
+	String get_head_variables(Connection c, PreparedStatement pst) throws SQLException
+	{
+		String citation_query = "select head_variables from citation_view where citation_view_name = '" + name + "'";
+	    
+	    pst = c.prepareStatement(citation_query);
+	    
+	    ResultSet rs = pst.executeQuery();
+	    
+	    if(rs.next())
+	    	return rs.getString(1);
+	    else
+	    	return null;
+	}
+	
+	String get_body(Connection c, PreparedStatement pst) throws SQLException
+	{
+		String citation_query = "select subgoal_names, arguments from citation_subgoals join subgoal_arguments using (subgoal_names) where citation_view_name = '" + name + "'";
+	    
+	    pst = c.prepareStatement(citation_query);
+	    
+	    ResultSet rs = pst.executeQuery();
+	    
+	    String body = new String();
+	    
+	    int num = 0;
+	    
+	    while(rs.next())
+	    {
+	    	
+	    	if(num >= 1)
+	    		body += ",";
+	    	body += rs.getString(1) + "(" + rs.getString(2) + ")";
+	    	
+	    	num++;
+	    }
+	    return body;
+	}
+	
+	@Override
 	public String get_full_query() throws ClassNotFoundException, SQLException
 	{
+		
 		Connection c = null;
 		
 	    PreparedStatement pst = null;
@@ -78,29 +153,26 @@ public class citation_view_unparametered extends citation_view{
 	        .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
 	        "postgres","123");
 		
-	    String citation_query = "select citation_view_query from citation_view where citation_view_name = '" + name + "'";
+	    String head_variables = get_head_variables(c, pst);
 	    
-	    pst = c.prepareStatement(citation_query);
+	    String body = get_body(c, pst);
 	    
-	    ResultSet rs = pst.executeQuery();
-	    
-	    String query4citation = new String();
-	    
-	    if(rs.next())
-	    {
-	    	query4citation = rs.getString(1);
-	    }
+	    String query4citation = this.name + "(" + head_variables + "):" + body;
 	    
 	    Query query = Parse_datalog.parse_query(query4citation);
-	    	    
+	    
+//	    assign_paras(query);
+	    
 	    String q = Query_converter.datalog2sql(query);
 	    
 	    c.close();
 	    
 	    return q;
+	    
+	    
 		
 	}
-
+	
 	@Override
 	public String gen_citation_unit(Vector<String> lambda_terms) {
 		// TODO Auto-generated method stub

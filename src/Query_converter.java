@@ -35,7 +35,9 @@ public class Query_converter {
 	public static void main(String [] args) throws JSQLParserException, ClassNotFoundException, SQLException
 	{
 		
-		Query query = sql2datalog("select * from family_c ,introduction_c where type = 'gpcr' and family_id= '2'");
+		String str = "Q(v,head_variables):view_table(v, head_variables, lambda_term),citation_view(citation_view_name, v, h)";
+		
+		Query query = Parse_datalog.parse_query(str);//sql2datalog("select * from family_c ,introduction_c where type = 'gpcr' and family_id= '2'");
 		
 		String q = datalog2sql(query);
 		
@@ -241,6 +243,138 @@ public class Query_converter {
 //		return q;
 //	}
 	
+	static String[] gen_condition(Query query, HashMap<String, Vector<String[]>>arg_name_map,boolean view)
+	{
+		String where = new String();
+		
+		String citation_table = new String();
+		
+		int num = 0;
+		
+		String citation_str = new String();
+		
+		boolean condition = false;
+		
+		for(int i = 0; i < query.body.size(); i++)
+		{
+			Subgoal subgoal = (Subgoal) query.body.get(i);
+									
+			if(i >= 1)
+				citation_str += ",";
+			if(!view)	
+				citation_str += subgoal.name + "." + "citation_view";
+			else
+				citation_str += subgoal.name + "_table." + "citation_view";
+			
+			for(int j = 0; j<subgoal.args.size();j++)
+			{
+				Argument arg = (Argument) subgoal.args.get(j);
+				
+//				String[] str_list = {arg.name, subgoal.name};
+				
+				if(arg.type == 1)
+				{
+					
+					if(!condition)
+					{
+						where += " where ";
+						condition = true;
+					}
+					
+					if(num >= 1)
+						where += " and "; 
+					
+					if(!view)
+						where += subgoal.name + "." +arg.origin_name  + "=" + arg.name;
+					else
+						where += subgoal.name + "_table" + "." +arg.origin_name  + "=" + arg.name;
+					
+					if(arg_name_map.get(arg.name)==null)
+					{
+						Vector<String[]> table_names = new Vector<String[]>();
+						
+						String[] str_list = {subgoal.name, arg.origin_name};
+						
+						table_names.add(str_list);
+						
+						arg_name_map.put(arg.name, table_names);
+					}
+					
+					else
+					{
+						Vector<String[]> table_names = arg_name_map.get(arg.name);
+												
+						String[] str_list = {subgoal.name, arg.origin_name};
+						
+						table_names.add(str_list);
+						
+						arg_name_map.put(arg.name, table_names);
+												
+					}
+					
+					num++;
+				}
+				
+				else
+				{
+					if(arg_name_map.get(arg.name)==null)
+					{
+						Vector<String[]> table_names = new Vector<String[]>();
+						
+						String[]str_list = {subgoal.name, arg.origin_name};
+						
+						table_names.add(str_list);
+						
+						arg_name_map.put(arg.name, table_names);
+					}
+					
+					else
+					{
+						Vector<String[]> table_names = arg_name_map.get(arg.name);
+						
+						int vec_size = table_names.size();
+						
+						if(!condition)
+						{
+							where += " where ";
+							condition = true;
+						}
+						
+						if(num >= 1)
+							where += " and "; 
+						
+						if(!view)
+							where += table_names.get(vec_size - 1)[0] + "." + table_names.get(vec_size - 1)[1] + "=" + subgoal.name + "." + arg.origin_name;
+						else
+							where += table_names.get(vec_size - 1)[0] + "_table" + "." + table_names.get(vec_size - 1)[1] + "=" + subgoal.name + "_table" + "." + arg.origin_name;
+						
+						String [] str_list = {subgoal.name, arg.origin_name};
+						
+						table_names.add(str_list);
+						
+						arg_name_map.put(arg.name, table_names);
+						
+						num++;
+						
+					}
+					
+				}
+			}
+			
+			if(i >= 1)
+				citation_table += ",";
+			
+			if(!view)
+				citation_table += subgoal.name;
+			else
+				citation_table += subgoal.name + "_table";
+		}
+		
+		String []str_l = {where, citation_table,citation_str};
+		
+		return str_l;
+	}
+	
 	static String datalog2sql(Query query) throws SQLException, ClassNotFoundException
 	{
 		
@@ -248,7 +382,6 @@ public class Query_converter {
 		
 		String sel_item = new String();
 		
-		String citation_table = new String();
 		
 		Connection c = null;
 		
@@ -260,63 +393,15 @@ public class Query_converter {
 	        .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
 	        "postgres","123");
 		
-		String sql = new String();
+		String sql = new String();				
+				
+		HashMap<String, Vector<String[]>> arg_name_map = new HashMap<String, Vector<String[]>>();
+				
+		String[] str_l = gen_condition(query, arg_name_map, false);
 		
-		int num = 0;
-				
-		String where = new String();
+		String where = str_l[0];
 		
-		HashMap<String, String> map = new HashMap<String, String>();
-		
-		for(int i = 0; i < query.body.size(); i++)
-		{
-			Subgoal subgoal = (Subgoal) query.body.get(i);
-						
-			if(num >= 1)
-			{				
-				citation_table += " natural inner join ";
-			}
-									
-			citation_table += subgoal.name;
-			
-			num++;
-			
-			for(int j = 0; j<subgoal.args.size();j++)
-			{
-				Argument arg = (Argument) subgoal.args.get(j);
-				
-				if(arg.type == 1)
-				{
-					map.put(arg.lambda_term, arg.name);
-				}
-			}
-						
-		}
-		
-		if(!map.isEmpty())
-		{
-			Set set = map.keySet();
-			
-			where = " where ";
-			
-			int number = 0;
-			
-			for(Iterator iter = set.iterator();iter.hasNext();)
-			{
-				String key = (String) iter.next();
-				
-				String value = map.get(key);
-				
-				if(number >= 1)
-					where += " and ";
-				
-				where += key + "=" + value;
-				
-				number ++;
-			}
-			
-		}
-			
+		String citation_table = str_l[1];
 		
 		
 		for(int i = 0; i<query.head.args.size(); i++)
@@ -325,12 +410,15 @@ public class Query_converter {
 			
 			if(i >= 1)
 				sel_item += ",";
-			if(arg.type == 0)
-				sel_item += arg;
-			else
-			{
-				sel_item += arg.lambda_term;
-			}
+			
+			Vector<String[]> table_names = arg_name_map.get(arg.name);
+			sel_item += table_names.get(0)[0] + "." + table_names.get(0)[1];
+//			if(arg.type == 0)
+//				sel_item += arg;
+//			else
+//			{
+//				sel_item += arg.origin_name;
+//			}
 				
 		}
 		
@@ -341,15 +429,11 @@ public class Query_converter {
 		return sql;
 	}
 	
-	static String datalog2sql_citation(Query query) throws SQLException, ClassNotFoundException
+	static String datalog2sql_citation(Query query, boolean view) throws SQLException, ClassNotFoundException
 	{
-		
-		String citation_unit = new String();
-		
+				
 //		String sel_item = new String();
-		
-		String citation_table = new String();
-		
+				
 		Connection c = null;
 		
 	    PreparedStatement pst = null;
@@ -362,153 +446,74 @@ public class Query_converter {
 		
 		String sql = new String();
 		
-		int num = 0;
+		HashMap<String, Vector<String[]>> arg_name_map = new HashMap<String, Vector<String[]>>();
 		
-		HashMap<String, String> map = new HashMap<String, String>();
+		String[] str_l = gen_condition(query, arg_name_map,view);
 		
-		for(int i = 0; i < query.body.size(); i++)
-		{
-			Subgoal subgoal = (Subgoal) query.body.get(i);
-						
-			if(num >= 1)
-			{
-				citation_unit += ",";
-				
-				citation_table += " natural inner join ";
-			}
-			
-			citation_unit += subgoal.name + "_citation_view";
-						
-			citation_table += subgoal.name;
-			
-			num++;
-			
-			for(int j = 0; j<subgoal.args.size();j++)
-			{
-				Argument arg = (Argument) subgoal.args.get(j);
-				
-				if(arg.type == 1)
-				{
-					map.put(arg.lambda_term, arg.name);
-				}
-			}
-							
-		}
-				
-		String where = new String();
+		String where = str_l[0];
 		
-		if(!map.isEmpty())
-		{
-			Set set = map.keySet();
-			
-			where = " where ";
-			
-			int number = 0;
-			
-			for(Iterator iter = set.iterator();iter.hasNext();)
-			{
-				String key = (String) iter.next();
-				
-				String value = map.get(key);
-				
-				if(number >= 1)
-					where += " and ";
-				
-				where += key + "=" + value;
-				
-				number ++;
-			}
-			
-		}
+		String citation_table = str_l[1];
 		
-		sql = "select " + citation_unit + " from " + citation_table + where;
-
-//		pst.close();
+		String citation_unit = str_l[2];
 		
-		c.close();
-		
-		return sql;
-	}
-
-	static String datalog2sql_citation_view(Query query) throws SQLException, ClassNotFoundException
-	{
-		
-		String citation_unit = new String();
-		
-//		String sel_item = new String();
-		
-		String citation_table = new String();
-		
-		Connection c = null;
-		
-	    PreparedStatement pst = null;
-	      
-		Class.forName("org.postgresql.Driver");
-		
-	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
-	        "postgres","123");
-		
-		String sql = new String();
-		
-		int num = 0;
-		
-		HashMap<String, String> map = new HashMap<String, String>();
-		
-		for(int i = 0; i < query.body.size(); i++)
-		{
-			Subgoal subgoal = (Subgoal) query.body.get(i);
-						
-			if(num >= 1)
-			{
-				citation_unit += ",";
-				
-				citation_table += " natural inner join ";
-			}
-			
-			citation_unit += subgoal.name + "_table" + "_citation_view";
-						
-			citation_table += subgoal.name + "_table";
-			
-			num++;
-			
-			for(int j = 0; j<subgoal.args.size();j++)
-			{
-				Argument arg = (Argument) subgoal.args.get(j);
-				
-				if(arg.type == 1)
-				{
-					map.put(arg.lambda_term, arg.name);
-				}
-			}
-							
-		}
-				
-		String where = new String();
-		
-		if(!map.isEmpty())
-		{
-			Set set = map.keySet();
-			
-			where = " where ";
-			
-			int number = 0;
-			
-			for(Iterator iter = set.iterator();iter.hasNext();)
-			{
-				String key = (String) iter.next();
-				
-				String value = map.get(key);
-				
-				if(number >= 1)
-					where += " and ";
-				
-				where += key + "=" + value;
-				
-				number ++;
-			}
-			
-		}
+//		int num = 0;
+//		
+//		HashMap<String, String> map = new HashMap<String, String>();
+//		
+//		for(int i = 0; i < query.body.size(); i++)
+//		{
+//			Subgoal subgoal = (Subgoal) query.body.get(i);
+//						
+//			if(num >= 1)
+//			{
+//				citation_unit += ",";
+//				
+//				citation_table += " natural inner join ";
+//			}
+//			
+//			citation_unit += subgoal.name + "_citation_view";
+//						
+//			citation_table += subgoal.name;
+//			
+//			num++;
+//			
+//			for(int j = 0; j<subgoal.args.size();j++)
+//			{
+//				Argument arg = (Argument) subgoal.args.get(j);
+//				
+//				if(arg.type == 1)
+//				{
+//					map.put(arg.origin_name, arg.name);
+//				}
+//			}
+//							
+//		}
+//				
+//		String where = new String();
+//		
+//		if(!map.isEmpty())
+//		{
+//			Set set = map.keySet();
+//			
+//			where = " where ";
+//			
+//			int number = 0;
+//			
+//			for(Iterator iter = set.iterator();iter.hasNext();)
+//			{
+//				String key = (String) iter.next();
+//				
+//				String value = map.get(key);
+//				
+//				if(number >= 1)
+//					where += " and ";
+//				
+//				where += key + "=" + value;
+//				
+//				number ++;
+//			}
+//			
+//		}
 		
 		sql = "select " + citation_unit + " from " + citation_table + where;
 
@@ -518,89 +523,179 @@ public class Query_converter {
 		
 		return sql;
 	}
+	
+
+//	static String datalog2sql_citation_view(Query query) throws SQLException, ClassNotFoundException
+//	{
+//		
+//		String citation_unit = new String();
+//		
+////		String sel_item = new String();
+//		
+//		String citation_table = new String();
+//		
+//		Connection c = null;
+//		
+//	    PreparedStatement pst = null;
+//	      
+//		Class.forName("org.postgresql.Driver");
+//		
+//	    c = DriverManager
+//	        .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
+//	        "postgres","123");
+//		
+//		String sql = new String();
+//		
+//		int num = 0;
+//		
+//		HashMap<String, String> map = new HashMap<String, String>();
+//		
+//		for(int i = 0; i < query.body.size(); i++)
+//		{
+//			Subgoal subgoal = (Subgoal) query.body.get(i);
+//						
+//			if(num >= 1)
+//			{
+//				citation_unit += ",";
+//				
+//				citation_table += " natural inner join ";
+//			}
+//			
+//			citation_unit += subgoal.name + "_table" + "_citation_view";
+//						
+//			citation_table += subgoal.name + "_table";
+//			
+//			num++;
+//			
+//			for(int j = 0; j<subgoal.args.size();j++)
+//			{
+//				Argument arg = (Argument) subgoal.args.get(j);
+//				
+//				if(arg.type == 1)
+//				{
+//					map.put(arg.origin_name, arg.name);
+//				}
+//			}
+//							
+//		}
+//				
+//		String where = new String();
+//		
+//		if(!map.isEmpty())
+//		{
+//			Set set = map.keySet();
+//			
+//			where = " where ";
+//			
+//			int number = 0;
+//			
+//			for(Iterator iter = set.iterator();iter.hasNext();)
+//			{
+//				String key = (String) iter.next();
+//				
+//				String value = map.get(key);
+//				
+//				if(number >= 1)
+//					where += " and ";
+//				
+//				where += key + "=" + value;
+//				
+//				number ++;
+//			}
+//			
+//		}
+//		
+//		sql = "select " + citation_unit + " from " + citation_table + where;
+//
+////		pst.close();
+//		
+//		c.close();
+//		
+//		return sql;
+//	}
 
 	
-	public static void pre_processing(Query query) throws ClassNotFoundException, SQLException
-	{
-		for(int i = 0; i < query.body.size(); i++)
-		{
-			Subgoal subgoal = (Subgoal) query.body.get(i);
-			
-			rename_column(subgoal.name);
-		}
-	}
+//	public static void pre_processing(Query query) throws ClassNotFoundException, SQLException
+//	{
+//		for(int i = 0; i < query.body.size(); i++)
+//		{
+//			Subgoal subgoal = (Subgoal) query.body.get(i);
+//			
+//			rename_column(subgoal.name);
+//		}
+//	}
 	
-	public static void post_processing(Query query) throws ClassNotFoundException, SQLException
-	{
-		for(int i = 0; i < query.body.size(); i++)
-		{
-			Subgoal subgoal = (Subgoal) query.body.get(i);
-			
-			rename_column_back(subgoal.name);
-		}
-	}
+//	public static void post_processing(Query query) throws ClassNotFoundException, SQLException
+//	{
+//		for(int i = 0; i < query.body.size(); i++)
+//		{
+//			Subgoal subgoal = (Subgoal) query.body.get(i);
+//			
+//			rename_column_back(subgoal.name);
+//		}
+//	}
+//	
+//	public static void pre_processing_view(Query query) throws ClassNotFoundException, SQLException
+//	{
+//		for(int i = 0; i < query.body.size(); i++)
+//		{
+//			Subgoal subgoal = (Subgoal) query.body.get(i);
+//			
+//			rename_column(subgoal.name + "_table");
+//		}
+//	}
+//	
+//	public static void post_processing_view(Query query) throws ClassNotFoundException, SQLException
+//	{
+//		for(int i = 0; i < query.body.size(); i++)
+//		{
+//			Subgoal subgoal = (Subgoal) query.body.get(i);
+//			
+//			rename_column_back(subgoal.name + "_table");
+//		}
+//	}
 	
-	public static void pre_processing_view(Query query) throws ClassNotFoundException, SQLException
-	{
-		for(int i = 0; i < query.body.size(); i++)
-		{
-			Subgoal subgoal = (Subgoal) query.body.get(i);
-			
-			rename_column(subgoal.name + "_table");
-		}
-	}
-	
-	public static void post_processing_view(Query query) throws ClassNotFoundException, SQLException
-	{
-		for(int i = 0; i < query.body.size(); i++)
-		{
-			Subgoal subgoal = (Subgoal) query.body.get(i);
-			
-			rename_column_back(subgoal.name + "_table");
-		}
-	}
-	
-	static void rename_column(String view) throws SQLException, ClassNotFoundException
-	{
-		
-		Connection c = null;
-		
-	    PreparedStatement pst = null;
-	      
-		Class.forName("org.postgresql.Driver");
-		
-	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
-	        "postgres","123");
-		
-		String rename_query = "alter table "+view +" rename column citation_view to "+ view + "_citation_view";
-		
-		pst = c.prepareStatement(rename_query);
-		
-		pst.execute();
-		
-		c.close();
-	}
-	
-	static void rename_column_back(String view) throws SQLException, ClassNotFoundException
-	{
-		
-		Connection c = null;
-		
-	    PreparedStatement pst = null;
-	      
-		Class.forName("org.postgresql.Driver");
-		
-	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
-	        "postgres","123");
-		
-		String rename_query = "alter table "+view +" rename column "+ view +"_citation_view to citation_view";
-		
-		pst = c.prepareStatement(rename_query);
-		
-		pst.execute();
-		
-		c.close();
-	}
+//	static void rename_column(String view) throws SQLException, ClassNotFoundException
+//	{
+//		
+//		Connection c = null;
+//		
+//	    PreparedStatement pst = null;
+//	      
+//		Class.forName("org.postgresql.Driver");
+//		
+//	    c = DriverManager
+//	        .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
+//	        "postgres","123");
+//		
+//		String rename_query = "alter table "+view +" rename column citation_view to "+ view + "_citation_view";
+//		
+//		pst = c.prepareStatement(rename_query);
+//		
+//		pst.execute();
+//		
+//		c.close();
+//	}
+//	
+//	static void rename_column_back(String view) throws SQLException, ClassNotFoundException
+//	{
+//		
+//		Connection c = null;
+//		
+//	    PreparedStatement pst = null;
+//	      
+//		Class.forName("org.postgresql.Driver");
+//		
+//	    c = DriverManager
+//	        .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
+//	        "postgres","123");
+//		
+//		String rename_query = "alter table "+view +" rename column "+ view +"_citation_view to citation_view";
+//		
+//		pst = c.prepareStatement(rename_query);
+//		
+//		pst.execute();
+//		
+//		c.close();
+//	}
 }

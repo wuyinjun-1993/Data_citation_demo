@@ -16,13 +16,15 @@ public class Gen_citation1 {
 	public static void main(String args[]) throws ClassNotFoundException, SQLException {
 				
 				
-		String query = "q(name):family_c(f,name,type), introduction_c(f,text), contributor2family_c(cid, f)";
+		String query = "q(name):family_c(f,name,type), introduction_c(f,text)";
 		
-//		Vector<Vector<Vector<citation_view>>> c_views = gen_citation_main(query);
-//		
-//	    output(c_views);
+		Vector<Vector<Vector<citation_view>>> c_views = gen_citation_main(query);
 		
-		compare(query);
+		
+		
+	    output(c_views);
+		
+//		compare(query);
 	}
 	
 	public static void compare(String query) throws ClassNotFoundException, SQLException
@@ -246,9 +248,9 @@ public class Gen_citation1 {
 			
 //			Query_converter.post_processing_view(rw.rew);
 			
-			Query_converter.pre_processing_view(rw.rew);
+//			Query_converter.pre_processing_view(rw.rew);
 			
-			String sql = Query_converter.datalog2sql_citation_view(rw.rew);
+			String sql = Query_converter.datalog2sql_citation(rw.rew, true);
 			
 			pst = c.prepareStatement(sql);
 			
@@ -258,7 +260,7 @@ public class Gen_citation1 {
 			
 			c_view_m.add(c_view_vec);
 			
-			Query_converter.post_processing_view(rw.rew);
+//			Query_converter.post_processing_view(rw.rew);
 		}
 		
 		return c_view_m;
@@ -304,23 +306,6 @@ public class Gen_citation1 {
 		return c_view_vec;
 	}
 	
-	public static void rename_column(Tuple view, Connection c, PreparedStatement pst) throws SQLException
-	{
-		String rename_query = "alter table "+view.name +"_table rename column citation_view to "+ view.name + "_citation_view";
-		
-		pst = c.prepareStatement(rename_query);
-		
-		pst.execute();
-	}
-	
-	public static void rename_column_back(Tuple view, Connection c, PreparedStatement pst) throws SQLException
-	{
-		String rename_query = "alter table "+view.name +"_table rename column "+ view.name +"_citation_view to citation_view";
-		
-		pst = c.prepareStatement(rename_query);
-		
-		pst.execute();
-	}
 	
 	public static Vector<Query> get_views_schema()
 	{
@@ -363,7 +348,8 @@ public class Gen_citation1 {
 	                
 	                views.add(view);
 	            }
-	         
+	  	      c.close();
+
 	      } catch (Exception e) {
 	         e.printStackTrace();
 	         System.err.println(e.getClass().getName()+": "+e.getMessage());
@@ -482,9 +468,5 @@ public class Gen_citation1 {
         return new Query(head_name, head_subgoal, body_subgoals);
     }
 	
-//	public static Query gen_query()
-//	{
-//		
-//	}
 
 }

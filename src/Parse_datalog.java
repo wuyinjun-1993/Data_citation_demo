@@ -73,10 +73,15 @@ public class Parse_datalog {
 	            		body_v.add(new Argument(body_var[j].trim(), col_names.get(j)));
 	            	}
 	            	else
-	            		body_v.add(new Argument(body_var[j].trim()));
+	            		body_v.add(new Argument(body_var[j].trim(), col_names.get(j)));
             	}
             	else
+            	{
+            		args.get(body_var[j].trim()).origin_name = col_names.get(j);
+            		
             		body_v.add(args.get(body_var[j].trim()));
+
+            	}
             }
             
             Subgoal body_subgoal = new Subgoal(body_name, body_v);
@@ -111,7 +116,8 @@ public class Parse_datalog {
 	    	col_names.add(rs.getString(1));
 	    }
 	    
-	    col_names.remove(col_names.size() - 1);
+	    if(col_names.lastElement().equals("citation_view"))
+	    	col_names.remove(col_names.size() - 1);
 	    
 	    c.close();
 	    

@@ -4,9 +4,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.Vector;
 
 import java_cup.assoc;
@@ -18,18 +20,62 @@ public class Gen_citation1 {
 				
 		String query = "q(name):family_c(f,name,type), introduction_c(f,text)";
 		
-		Vector<Vector<Vector<citation_view>>> c_views = gen_citation_main(query);
+//		HashMap<String, Vector<Vector<citation_view>>> c_views = gen_citation_main(query);
 		
 		
 		
-	    output(c_views);
+//	    output(c_views);
 		
-//		compare(query);
+		compare(query);
+	}
+	
+	public static Vector<Vector<Vector<citation_view>>> convert(HashMap<String, Vector<Vector<citation_view>>> c)
+	{
+		Vector<Vector<Vector<citation_view>>> c_vecs = new Vector<Vector<Vector<citation_view>>>();
+		
+		Set set = c.keySet();
+		
+		boolean start = true;
+		
+		for(Iterator iter = set.iterator(); iter.hasNext();)
+		{
+			String str = (String) iter.next();
+			
+			Vector<Vector<citation_view>> c_vec = c.get(str);
+			
+			
+			if(start)
+			{
+				start = false;
+				for(int k = 0; k<c_vec.size();k++)
+				{
+					Vector<Vector<citation_view>> invert_vec = new Vector<Vector<citation_view>>();
+					
+					c_vecs.add(invert_vec);
+				}
+				
+			}
+			
+			for(int i = 0; i<c_vec.size(); i++)
+			{
+				Vector<citation_view> curr_c_com = c_vec.get(i);
+				
+				Vector<Vector<citation_view>> c_com = c_vecs.get(i);
+				
+				c_com.add(curr_c_com);
+					
+			}
+			
+		}
+		
+		return c_vecs;
 	}
 	
 	public static void compare(String query) throws ClassNotFoundException, SQLException
 	{		
-		Vector<Vector<Vector<citation_view>>> c1 = gen_citation_main(query);
+		HashMap<String, Vector<Vector<citation_view>>> c = gen_citation_main(query);
+		
+		Vector<Vector<Vector<citation_view>>> c1 = convert(c);
 		
 		Vector<Vector<citation_view_vector>> c2 = Gen_citation2.gen_citation_main(query);
 		
@@ -184,7 +230,7 @@ public class Gen_citation1 {
 		return update_combinations;
 	}
 	
-	public static Vector<Vector<Vector<citation_view>>> gen_citation_main(String query) throws ClassNotFoundException, SQLException
+	public static HashMap<String, Vector<Vector<citation_view>>> gen_citation_main(String query) throws ClassNotFoundException, SQLException
 	{
 		Vector views = get_views_schema();
 		
@@ -203,21 +249,28 @@ public class Gen_citation1 {
 	    c = DriverManager
 	        .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
 	        "postgres","123");
-	    Vector<Vector<Vector<citation_view>>> c_views = gen_citation(rewritings, c, pst);
+	    HashMap<String, Vector<Vector<citation_view>>> c_views = gen_citation(rewritings, c, pst);
 
 	    return c_views;
 			    
 	}
 	
-	public static void output(Vector<Vector<Vector<citation_view>>> c_views)
+	public static void output(HashMap<String, Vector<Vector<citation_view>>> c_views)
 	{
-		for(int i = 0; i<c_views.size(); i++)
+		Set set = c_views.keySet();
+		
+		for(Iterator iter = set.iterator();iter.hasNext();)
 		{
-			Vector<Vector<citation_view>> c_view_vec = c_views.get(i);
+			String key = (String) iter.next();
+			
+			Vector<Vector<citation_view>> c_view_vec = c_views.get(key);
 			
 			for(int j = 0; j<c_view_vec.size(); j++)
 			{
 				Vector<citation_view> c_vec = c_view_vec.get(j);
+				
+				if(j >= 1)
+					System.out.print(",");
 				
 				for(int k = 0; k<c_vec.size(); k++)
 				{
@@ -225,16 +278,16 @@ public class Gen_citation1 {
 						System.out.print("*");
 					System.out.print(c_vec.get(k));
 				}
-				
-				System.out.println();
 			}
+			
+			System.out.println();
 		}
 	}
 	
-	public static Vector<Vector<Vector<citation_view>>> gen_citation(HashSet rewritings, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	public static HashMap<String, Vector<Vector<citation_view>>> gen_citation(HashSet rewritings, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
 		
-		Vector<Vector<Vector<citation_view>>> c_view_m = new Vector<Vector<Vector<citation_view>>>();
+		HashMap<String, Vector<Vector<citation_view>>> c_view_vec = new HashMap<String, Vector<Vector<citation_view>>>();
 			
 		for(Iterator iter = rewritings.iterator();iter.hasNext();)
 		{
@@ -256,29 +309,37 @@ public class Gen_citation1 {
 			
 			ResultSet rs = pst.executeQuery();
 			
-			Vector<Vector<citation_view>> c_view_vec = gen_citation_view_vec(rs, rw.rew.body.size());
-			
-			c_view_m.add(c_view_vec);
-			
+			gen_citation_view_vec(c_view_vec, rs, rw.rew.body.size());
+						
 //			Query_converter.post_processing_view(rw.rew);
 		}
 		
-		return c_view_m;
+		return c_view_vec;
 	}
 	
 	
-	public static Vector<Vector<citation_view>> gen_citation_view_vec(ResultSet rs, int num) throws SQLException, ClassNotFoundException
+	public static void gen_citation_view_vec(HashMap<String, Vector<Vector<citation_view>>> c_view_vec, ResultSet rs, int num) throws SQLException, ClassNotFoundException
 	{
 		
-		Vector<Vector<citation_view>> c_view_vec = new Vector<Vector<citation_view>>();
 		
 		while(rs.next())
 		{
 			Vector<citation_view> c_view = new Vector<citation_view>();
 			
+			String key = new String();
+			
+			BitSet set = new BitSet();
+						
 			for(int i = 0; i<num; i++)
 			{
 				String c_str = rs.getString(i+1);
+				
+				String[] provenances = rs.getString(i + 1 + num).split(",");
+				
+				for(int r = 0; r<provenances.length; r++)
+				{
+					set.set(Integer.valueOf(provenances[r]));
+				}
 				
 				if(c_str.contains("(") && c_str.contains(")"))
 				{
@@ -300,10 +361,21 @@ public class Gen_citation1 {
 				}
 			}
 			
-			c_view_vec.add(c_view);
+			Vector<Vector<citation_view>> curr_view = c_view_vec.get(set.toString());
+			if(curr_view == null)
+			{
+				curr_view = new Vector<Vector<citation_view>>();
+				curr_view.add(c_view);
+				c_view_vec.put(set.toString(), curr_view);
+				
+			}
+			else
+			{
+				curr_view.add(c_view);
+				c_view_vec.put(set.toString(), curr_view);
+			}
 		}
 		
-		return c_view_vec;
 	}
 	
 	
@@ -330,7 +402,7 @@ public class Gen_citation1 {
 	            	
 	            	String [] str_lambda_terms = null;
 	            	
-	            	String [] head_vars = rs.getString(2).split(",");
+//	            	String [] head_vars = rs.getString(2).split(",");
 	            	
 	            	
 	            	if(rs.getString(3) != null && !rs.getString(3).equals(""))
@@ -342,9 +414,11 @@ public class Gen_citation1 {
 	            	
 	            	Vector<String> subgoal_arguments = new Vector<String>();
 	            	
-	            	get_subgoals(subgoal_names, subgoal_arguments, head_name, c, pst);	            	
+	            	String subgoal_string = get_subgoals(subgoal_names, subgoal_arguments, head_name, c, pst);	            	
 	            	
-	                Query view = parse_query(head_name, head_vars, subgoal_names, subgoal_arguments, str_lambda_terms);
+	            	String query = head_name + "(" + rs.getString(2) + "):" + subgoal_string;
+	            	
+	                Query view = Parse_datalog.parse_query(query);
 	                
 	                views.add(view);
 	            }
@@ -359,7 +433,7 @@ public class Gen_citation1 {
 	      return views;
 	}
 	
-	static void get_subgoals (Vector<String> subgoal_names, Vector<String> subgoal_arguments, String view_id, Connection c, PreparedStatement pst ) throws SQLException
+	static String get_subgoals (Vector<String> subgoal_names, Vector<String> subgoal_arguments, String view_id, Connection c, PreparedStatement pst ) throws SQLException
 	{
 		String subgoal_query = "select s.subgoal_names, a.arguments from subgoals s join subgoal_arguments a using (subgoal_names) where s.view = '" + view_id + "'";
 		
@@ -367,12 +441,25 @@ public class Gen_citation1 {
 		
 		ResultSet rs = pst.executeQuery();
 				
+		String subgoal_str = new String();
+		
+		int num = 0;
+		
 		while(rs.next())
 		{
-			subgoal_names.add(rs.getString(1));
+			if(num >= 1)
+			{
+				subgoal_str += ",";
+			}
 			
-			subgoal_arguments.add(rs.getString(2));
+			subgoal_str += rs.getString(1) + "(";
+			
+			subgoal_str += rs.getString(2) + ")";
+			
+			num++;
 		}
+		
+		return subgoal_str;
 		
 	}
 

@@ -169,7 +169,8 @@ public class Query_converter {
 			    	column_list.add(rs.getString(1));
 			    }
 			    
-			    column_list.remove("citation_view");
+			    if(column_list.contains("citation_view"))
+			    	column_list.remove("citation_view");
 		    }
 		    
 		    selectitems.clear();
@@ -253,6 +254,8 @@ public class Query_converter {
 		
 		String citation_str = new String();
 		
+		String citation_provenance = new String();
+		
 		boolean condition = false;
 		
 		for(int i = 0; i < query.body.size(); i++)
@@ -260,11 +263,20 @@ public class Query_converter {
 			Subgoal subgoal = (Subgoal) query.body.get(i);
 									
 			if(i >= 1)
+			{
 				citation_str += ",";
+				citation_provenance += ",";
+			}
 			if(!view)	
+			{
 				citation_str += subgoal.name + "." + "citation_view";
+				citation_provenance += subgoal.name + ".provenance";
+			}
 			else
+			{
 				citation_str += subgoal.name + "_table." + "citation_view";
+				citation_provenance += subgoal.name + "_table." + "provenance";
+			}
 			
 			for(int j = 0; j<subgoal.args.size();j++)
 			{
@@ -370,7 +382,7 @@ public class Query_converter {
 				citation_table += subgoal.name + "_table";
 		}
 		
-		String []str_l = {where, citation_table,citation_str};
+		String []str_l = {where, citation_table,citation_str, citation_provenance};
 		
 		return str_l;
 	}
@@ -432,7 +444,7 @@ public class Query_converter {
 	static String datalog2sql_citation(Query query, boolean view) throws SQLException, ClassNotFoundException
 	{
 				
-//		String sel_item = new String();
+		String sel_item = new String();
 				
 		Connection c = null;
 		
@@ -456,66 +468,69 @@ public class Query_converter {
 		
 		String citation_unit = str_l[2];
 		
-//		int num = 0;
-//		
-//		HashMap<String, String> map = new HashMap<String, String>();
-//		
-//		for(int i = 0; i < query.body.size(); i++)
-//		{
-//			Subgoal subgoal = (Subgoal) query.body.get(i);
-//						
-//			if(num >= 1)
-//			{
-//				citation_unit += ",";
-//				
-//				citation_table += " natural inner join ";
-//			}
-//			
-//			citation_unit += subgoal.name + "_citation_view";
-//						
-//			citation_table += subgoal.name;
-//			
-//			num++;
-//			
-//			for(int j = 0; j<subgoal.args.size();j++)
-//			{
-//				Argument arg = (Argument) subgoal.args.get(j);
-//				
-//				if(arg.type == 1)
-//				{
-//					map.put(arg.origin_name, arg.name);
-//				}
-//			}
-//							
-//		}
-//				
-//		String where = new String();
-//		
-//		if(!map.isEmpty())
-//		{
-//			Set set = map.keySet();
-//			
-//			where = " where ";
-//			
-//			int number = 0;
-//			
-//			for(Iterator iter = set.iterator();iter.hasNext();)
-//			{
-//				String key = (String) iter.next();
-//				
-//				String value = map.get(key);
-//				
-//				if(number >= 1)
-//					where += " and ";
-//				
-//				where += key + "=" + value;
-//				
-//				number ++;
-//			}
-//			
-//		}
+		String citation_provenance = str_l[3];
 		
-		sql = "select " + citation_unit + " from " + citation_table + where;
+		for(int i = 0; i<query.head.args.size(); i++)
+		{
+			Argument arg = (Argument)query.head.args.get(i);
+			
+			if(i >= 1)
+				sel_item += ",";
+			
+			Vector<String[]> table_names = arg_name_map.get(arg.name);
+			sel_item += table_names.get(0)[0] + "." + table_names.get(0)[1];
+				
+		}
+		
+		sql = "select " + citation_unit + "," + citation_provenance + " from " + citation_table + where;
+
+//		pst.close();
+		
+		c.close();
+		
+		return sql;
+	}
+	
+	static String datalog2sql_provenance(Query query, boolean view) throws SQLException, ClassNotFoundException
+	{
+				
+		String sel_item = new String();
+				
+		Connection c = null;
+		
+	    PreparedStatement pst = null;
+	      
+		Class.forName("org.postgresql.Driver");
+		
+	    c = DriverManager
+	        .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
+	        "postgres","123");
+		
+		String sql = new String();
+		
+		HashMap<String, Vector<String[]>> arg_name_map = new HashMap<String, Vector<String[]>>();
+		
+		String[] str_l = gen_condition(query, arg_name_map,view);
+		
+		String where = str_l[0];
+		
+		String citation_table = str_l[1];
+		
+		String citation_provenance = str_l[3];
+		
+		for(int i = 0; i<query.head.args.size(); i++)
+		{
+			Argument arg = (Argument)query.head.args.get(i);
+			
+			if(i >= 1)
+				sel_item += ",";
+			
+			Vector<String[]> table_names = arg_name_map.get(arg.name);
+			sel_item += table_names.get(0)[0] + "." + table_names.get(0)[1];
+				
+		}
+		
+		sql = "select " + citation_provenance + "," + sel_item + " from " + citation_table + where;
 
 //		pst.close();
 		

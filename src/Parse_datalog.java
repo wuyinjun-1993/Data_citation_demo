@@ -116,8 +116,11 @@ public class Parse_datalog {
 	    	col_names.add(rs.getString(1));
 	    }
 	    
-	    if(col_names.lastElement().equals("citation_view"))
-	    	col_names.remove(col_names.size() - 1);
+	    if(col_names.contains("citation_view"))
+	    	col_names.remove("citation_view");
+	    if(col_names.contains("provenance"))
+	    	col_names.remove("provenance");
+	    
 	    
 	    c.close();
 	    

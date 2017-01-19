@@ -27,7 +27,7 @@ public class Gen_citation2 {
 		
 		output_sql(citation_views);
 		
-		gen_citation_all(citation_views);
+//		gen_citation_all(citation_views);
 
 	}
 	

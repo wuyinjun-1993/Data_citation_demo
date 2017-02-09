@@ -5,6 +5,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
 
+import Corecover.Argument;
+import Corecover.Query;
+import Corecover.Subgoal;
+import Pre_processing.populate_db;
+
 public class create_citation_view {
 	
 	
@@ -35,7 +40,7 @@ public class create_citation_view {
 		Vector<Query> views = get_views_schema();	         
 		Class.forName("org.postgresql.Driver");
 	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
+	        .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
 	        "postgres","123");
 		for(int i=0;i<views.size();i++)
 		{
@@ -57,7 +62,7 @@ public class create_citation_view {
 	      try {
 	         Class.forName("org.postgresql.Driver");
 	         c = DriverManager
-	            .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
+	            .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
 	            "postgres","123");
 	         
 //	         pst = c.prepareStatement("SELECT *  FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = 'v2'");

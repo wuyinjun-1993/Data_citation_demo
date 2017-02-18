@@ -223,7 +223,7 @@ public class GoodPlan {
     	
    
 
-    String query_str = "q1(ty,ty1):r1(id,ty),r2(id1,ty1)";
+    String query_str = "q1(ty,ty1,ty2):r1(id,ty),r2(id1,ty1),r2(id2,ty2)";
     
     String []view_strs = new String[3];
     
@@ -231,7 +231,7 @@ public class GoodPlan {
     
     view_strs[1]="v2(id,ty):r2(id,ty)";
     
-    view_strs[2]="v3(ty,ty1):r1(id,ty),r2(id,ty1)";
+    view_strs[2]="v3(ty,ty1):r1(id1,ty),r2(id2,ty1)";
        
     
     Vector dummyquery = new Vector();

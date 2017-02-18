@@ -17,7 +17,6 @@ import datalog.Query_converter;
 public class citation_view_unparametered extends citation_view{
 	public String name;
 	
-	public char index;
 //	public boolean lambda;	
 	public Vector<String> table_names = new Vector<String>();
 	
@@ -37,7 +36,31 @@ public class citation_view_unparametered extends citation_view{
 		
 		gen_table_names(c, pst);
 		
-		gen_index();
+//		gen_index();
+	    
+	    c.close();
+//		lambda = false;
+	}
+	
+	public citation_view_unparametered(String name, Vector<String> table_names) throws ClassNotFoundException, SQLException
+	{
+		this.name = name;
+		
+		Connection c = null;
+		
+	    PreparedStatement pst = null;
+	      
+		Class.forName("org.postgresql.Driver");
+		
+	    c = DriverManager
+	        .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
+	        "postgres","123");
+		
+//		gen_table_names(c, pst);
+	    
+	    this.table_names = table_names;
+		
+//		gen_index();
 	    
 	    c.close();
 //		lambda = false;
@@ -47,17 +70,40 @@ public class citation_view_unparametered extends citation_view{
 	{
 		
 	    
-	    String lambda_term_query = "select v.subgoal_names from citation_view c join subgoals v on v.view=c.view_name where c.citation_view_name = '"+ name +"'";
-	    
+//	    String lambda_term_query = "select v.subgoal_names from citation_view c join subgoals v on v.view=c.view_name where c.citation_view_name = '"+ name +"'";
+	    String lambda_term_query = "select subgoal_names from view2subgoals where view = '"+ name +"'";
+
+		
 	    pst = c.prepareStatement(lambda_term_query);
 	    
 	    ResultSet rs = pst.executeQuery();
 	    
-	    while(rs.next())
+	    if(!rs.wasNull())
 	    {
-	    		    	
-	    	table_names.add(rs.getString(1));
+	    	while(rs.next())
+		    {
+		    		    	
+		    	table_names.add(rs.getString(1));
+		    }
 	    }
+	    
+	    else
+	    {
+	    	lambda_term_query = "select subgoal from web_view_table where renamed_view = '"+ name +"'";
+
+			
+		    pst = c.prepareStatement(lambda_term_query);
+		    
+		    ResultSet r = pst.executeQuery();
+
+		    while(r.next())
+		    {
+		    		    	
+		    	table_names.add(r.getString(1));
+		    }
+	    }
+	    
+	    
 	    
 
 	}
@@ -214,15 +260,15 @@ public class citation_view_unparametered extends citation_view{
 		return table_names;
 	}
 	
-	public void gen_index()
-	{
-		index = (char)Integer.parseInt(name.substring(1, name.length()));
-	}
+//	public void gen_index()
+//	{
+//		index = (char)Integer.parseInt(name.substring(1, name.length()));
+//	}
 
 	@Override
-	public char get_index() {
+	public String get_index() {
 		// TODO Auto-generated method stub
-		return index;
+		return name;
 	}
 
 	@Override
@@ -241,6 +287,12 @@ public class citation_view_unparametered extends citation_view{
 	public citation_view clone() {
 		// TODO Auto-generated method stub
 		return this;
+	}
+
+	@Override
+	public String gen_citation_unit(String name, Vector<String> lambda_terms) {
+		// TODO Auto-generated method stub
+		return name;
 	}
 
 }

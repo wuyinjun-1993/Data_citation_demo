@@ -1,8 +1,10 @@
 package citation_view;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
@@ -10,7 +12,7 @@ public class citation_view_vector {
 	
 	public Vector<citation_view> c_vec;
 	
-	public Vector<Character> index_vec;
+	public ArrayList<String> index_vec;
 	
 	public HashSet<String> view_strs;
 	
@@ -18,7 +20,7 @@ public class citation_view_vector {
 	{
 		c_vec = new Vector<citation_view>();
 		
-		index_vec = new Vector<Character>();
+		index_vec = new ArrayList<String>();
 		
 		view_strs = new HashSet<String>();
 		
@@ -28,7 +30,7 @@ public class citation_view_vector {
 		
 		c_vec = vec;
 		
-		index_vec = new Vector<Character>();
+		index_vec = new ArrayList<String>();
 		
 		view_strs = new HashSet<String>();
 		
@@ -53,7 +55,7 @@ public class citation_view_vector {
 		
 	}
 	
-	public citation_view_vector(Vector<citation_view> vec, Vector<Character> index_vec, HashSet<String> tuple_cores){
+	public citation_view_vector(Vector<citation_view> vec, ArrayList<String> index_vec, HashSet<String> tuple_cores){
 		
 		this.c_vec = vec;
 		
@@ -69,7 +71,7 @@ public class citation_view_vector {
 		
 		c_vec.add(c);
 		
-		index_vec = new Vector<Character>();
+		index_vec = new ArrayList<String>();
 		
 		view_strs = new HashSet<String>();
 		
@@ -134,7 +136,7 @@ public class citation_view_vector {
 		
 		vec_new.addAll((vec2.c_vec));
 		
-		Vector<Character> index_new = (Vector<Character>) vec1.index_vec.clone();
+		ArrayList<String> index_new = (ArrayList<String>) vec1.index_vec.clone();
 		
 		index_new.addAll(vec2.index_vec);
 		

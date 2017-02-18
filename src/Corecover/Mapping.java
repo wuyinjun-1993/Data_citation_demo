@@ -11,8 +11,8 @@ package Corecover;
 
 import java.util.*;
 
-class Mapping {
-  Map    map = null;  // recording the map
+public class Mapping {
+  public Map    map = null;  // recording the map
 
   Mapping() {
     map = new HashMap();

@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.Vector;
 import java_cup.assoc;
 import jdk.nashorn.internal.AssertsEnabled;
-import tuple_reasoning.Tuple_reasoning1;
+import reasoning.Tuple_reasoning1;
 import citation_view.*;
 import Corecover.*;
 import Operation.*;
@@ -40,7 +40,7 @@ public class Gen_citation1 {
 		
 //	    output(c_views);
 		
-		compare(query);
+//		compare(query);
 	}
 	
 	public static Vector<Vector<Vector<citation_view>>> convert(HashMap<String, Vector<Vector<citation_view>>> c)
@@ -85,81 +85,81 @@ public class Gen_citation1 {
 		return c_vecs;
 	}
 	
-	public static void compare(String query) throws ClassNotFoundException, SQLException
-	{		
-		
-		long s1 = System.currentTimeMillis();
-		
-		HashMap<String, Vector<Vector<citation_view>>> c = gen_citation_main(query);
-		
-		long e1 = System.currentTimeMillis();
-		
-		System.out.println(e1 - s1);
-		
-		Vector<Vector<Vector<citation_view>>> c1 = convert(c);
-
-		long s2 = System.currentTimeMillis();
-		
-		Vector<Vector<citation_view_vector>> c2 = Tuple_reasoning1.gen_citation_main(query);
-		
-		long t2 = System.currentTimeMillis();
-		
-		System.out.println(t2 - s2);
-		
-		
-		if(c1.get(0).size()!=c2.size())
-			throw new IllegalArgumentException("two citation not equal");
-				
-		HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
-		
-		for(int i = 0; i<c1.size(); i++)
-		{
-			Vector<Vector<citation_view>> c1_1 = c1.get(i);
-			
-			String index_c = get_index(c1_1.get(0));
-			
-			Vector<citation_view_vector> c2_1 = c2.get(0);
-			
-			for(int j = 0; j<c2_1.size(); j++)
-			{
-				citation_view_vector c2_1_1 = c2_1.get(j);
-				
-				String index = get_index(c2_1_1);
-				
-				
-				if(index.equals(index_c))
-				{
-					
-					
-					
-					
-					map.put(i, j);
-					break;
-				}
-			}
-		}
-		
-		
-		for(int i = 0; i<c1.size(); i++)
-		{
-			
-			Vector<Vector<citation_view>> c1_1 = c1.get(i);
-			
-			int id = map.get(i);
-			
-			for(int j = 0; j<c2.size(); j++)
-			{
-				citation_view_vector c2_entry = c2.get(j).get(id);
-				
-				if(vec_contains(c1_1,c2_entry))
-					continue;
-				else
-					throw new IllegalArgumentException("two citation not equal");
-			}
-			
-		}
-		
-	}
+//	public static void compare(String query) throws ClassNotFoundException, SQLException
+//	{		
+//		
+//		long s1 = System.currentTimeMillis();
+//		
+//		HashMap<String, Vector<Vector<citation_view>>> c = gen_citation_main(query);
+//		
+//		long e1 = System.currentTimeMillis();
+//		
+//		System.out.println(e1 - s1);
+//		
+//		Vector<Vector<Vector<citation_view>>> c1 = convert(c);
+//
+//		long s2 = System.currentTimeMillis();
+//		
+//		Vector<Vector<citation_view_vector>> c2 = Tuple_reasoning1.gen_citation_main(query);
+//		
+//		long t2 = System.currentTimeMillis();
+//		
+//		System.out.println(t2 - s2);
+//		
+//		
+//		if(c1.get(0).size()!=c2.size())
+//			throw new IllegalArgumentException("two citation not equal");
+//				
+//		HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
+//		
+//		for(int i = 0; i<c1.size(); i++)
+//		{
+//			Vector<Vector<citation_view>> c1_1 = c1.get(i);
+//			
+//			String index_c = get_index(c1_1.get(0));
+//			
+//			Vector<citation_view_vector> c2_1 = c2.get(0);
+//			
+//			for(int j = 0; j<c2_1.size(); j++)
+//			{
+//				citation_view_vector c2_1_1 = c2_1.get(j);
+//				
+//				String index = get_index(c2_1_1);
+//				
+//				
+//				if(index.equals(index_c))
+//				{
+//					
+//					
+//					
+//					
+//					map.put(i, j);
+//					break;
+//				}
+//			}
+//		}
+//		
+//		
+//		for(int i = 0; i<c1.size(); i++)
+//		{
+//			
+//			Vector<Vector<citation_view>> c1_1 = c1.get(i);
+//			
+//			int id = map.get(i);
+//			
+//			for(int j = 0; j<c2.size(); j++)
+//			{
+//				citation_view_vector c2_entry = c2.get(j).get(id);
+//				
+//				if(vec_contains(c1_1,c2_entry))
+//					continue;
+//				else
+//					throw new IllegalArgumentException("two citation not equal");
+//			}
+//			
+//		}
+//		
+//	}
 	
 	public static boolean vec_contains(Vector<Vector<citation_view>> c1, citation_view_vector c2)
 	{
@@ -200,87 +200,87 @@ public class Gen_citation1 {
 			return false;
 	}
 	
-	public static String get_index(Vector<citation_view> c_combination)
-	{		
-		char[] seq = new char[c_combination.size()];
-		
-		for(int j = 0; j<c_combination.size();j++)
-		{
-			seq[j]= (c_combination.get(j).get_index());
-		}
-		
-		Arrays.sort(seq);
-		
-		String str = String.valueOf(seq);
-		
-		return str;
-	}
+//	public static String get_index(Vector<citation_view> c_combination)
+//	{		
+//		char[] seq = new char[c_combination.size()];
+//		
+//		for(int j = 0; j<c_combination.size();j++)
+//		{
+//			seq[j]= (c_combination.get(j).get_index());
+//		}
+//		
+//		Arrays.sort(seq);
+//		
+//		String str = String.valueOf(seq);
+//		
+//		return str;
+//	}
 	
-	public static String get_index(citation_view_vector c_combination)
-	{		
-		char[] seq = new char[c_combination.index_vec.size()];
-		
-		for(int j = 0; j<c_combination.index_vec.size();j++)
-		{
-			seq[j]= (c_combination.index_vec.get(j));
-		}
-		
-		Arrays.sort(seq);
-		
-		String str = String.valueOf(seq);
-		
-		return str;
-	}
+//	public static String get_index(citation_view_vector c_combination)
+//	{		
+//		char[] seq = new char[c_combination.index_vec.size()];
+//		
+//		for(int j = 0; j<c_combination.index_vec.size();j++)
+//		{
+//			seq[j]= (c_combination.index_vec.get(j));
+//		}
+//		
+//		Arrays.sort(seq);
+//		
+//		String str = String.valueOf(seq);
+//		
+//		return str;
+//	}
+//	
+//	public static HashMap<String, Vector<citation_view>> build_index_vec(Vector<Vector<citation_view>> c_combinations)
+//	{
+//		HashMap<String, Vector<citation_view>> update_combinations = new HashMap<String, Vector<citation_view>>();
+//		
+//		for(int i = 0; i<c_combinations.size(); i++)
+//		{
+//			Vector<citation_view> c_combination = c_combinations.get(i);
+//			
+//			char[] seq = new char[c_combination.size()];
+//			
+//			for(int j = 0; j<c_combination.size();j++)
+//			{
+//				seq[j]= (c_combination.get(j).get_index());
+//			}
+//			
+//			Arrays.sort(seq);
+//			
+//			String str = String.valueOf(seq);
+//			
+//			update_combinations.put(str, c_combination);
+//		}
+//		
+//		return update_combinations;
+//	}
 	
-	public static HashMap<String, Vector<citation_view>> build_index_vec(Vector<Vector<citation_view>> c_combinations)
-	{
-		HashMap<String, Vector<citation_view>> update_combinations = new HashMap<String, Vector<citation_view>>();
-		
-		for(int i = 0; i<c_combinations.size(); i++)
-		{
-			Vector<citation_view> c_combination = c_combinations.get(i);
-			
-			char[] seq = new char[c_combination.size()];
-			
-			for(int j = 0; j<c_combination.size();j++)
-			{
-				seq[j]= (c_combination.get(j).get_index());
-			}
-			
-			Arrays.sort(seq);
-			
-			String str = String.valueOf(seq);
-			
-			update_combinations.put(str, c_combination);
-		}
-		
-		return update_combinations;
-	}
-	
-	public static HashMap<String, Vector<Vector<citation_view>>> gen_citation_main(String query) throws ClassNotFoundException, SQLException
-	{
-		Vector views = get_views_schema();
-		
-		HashSet rewritings = GoodPlan.genPlan2(Parse_datalog.parse_query(query), views);
-		
-		
-		
-		Connection c = null;
-		
-	    ResultSet rs = null;
-	    
-	    PreparedStatement pst = null;
-	    
-		Class.forName("org.postgresql.Driver");
-		
-	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
-	        "postgres","123");
-	    HashMap<String, Vector<Vector<citation_view>>> c_views = gen_citation(rewritings, c, pst);
-
-	    return c_views;
-			    
-	}
+//	public static HashMap<String, Vector<Vector<citation_view>>> gen_citation_main(String query) throws ClassNotFoundException, SQLException
+//	{
+//		Vector views = get_views_schema();
+//		
+//		HashSet rewritings = GoodPlan.genPlan2(Parse_datalog.parse_query(query), views);
+//		
+//		
+//		
+//		Connection c = null;
+//		
+//	    ResultSet rs = null;
+//	    
+//	    PreparedStatement pst = null;
+//	    
+//		Class.forName("org.postgresql.Driver");
+//		
+//	    c = DriverManager
+//	        .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
+//	        "postgres","123");
+//	    HashMap<String, Vector<Vector<citation_view>>> c_views = gen_citation(rewritings, c, pst);
+//
+//	    return c_views;
+//			    
+//	}
 	
 	public static void output(HashMap<String, Vector<Vector<citation_view>>> c_views)
 	{
@@ -311,38 +311,38 @@ public class Gen_citation1 {
 		}
 	}
 	
-	public static HashMap<String, Vector<Vector<citation_view>>> gen_citation(HashSet rewritings, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
-	{
-		
-		HashMap<String, Vector<Vector<citation_view>>> c_view_vec = new HashMap<String, Vector<Vector<citation_view>>>();
-			
-		for(Iterator iter = rewritings.iterator();iter.hasNext();)
-		{
-			Rewriting rw = (Rewriting) iter.next();
-			
-			String citation_unit = new String();
-			
-			String citation_table = new String();
-						
-			int num = 0;
-			
-//			Query_converter.post_processing_view(rw.rew);
-			
-//			Query_converter.pre_processing_view(rw.rew);
-			
-			String sql = Query_converter.datalog2sql_citation(rw.rew, true);
-			
-			pst = c.prepareStatement(sql);
-			
-			ResultSet rs = pst.executeQuery();
-			
-			gen_citation_view_vec(c_view_vec, rs, rw.rew.body.size());
-						
-//			Query_converter.post_processing_view(rw.rew);
-		}
-		
-		return c_view_vec;
-	}
+//	public static HashMap<String, Vector<Vector<citation_view>>> gen_citation(HashSet rewritings, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+//	{
+//		
+//		HashMap<String, Vector<Vector<citation_view>>> c_view_vec = new HashMap<String, Vector<Vector<citation_view>>>();
+//			
+//		for(Iterator iter = rewritings.iterator();iter.hasNext();)
+//		{
+//			Rewriting rw = (Rewriting) iter.next();
+//			
+//			String citation_unit = new String();
+//			
+//			String citation_table = new String();
+//						
+//			int num = 0;
+//			
+////			Query_converter.post_processing_view(rw.rew);
+//			
+////			Query_converter.pre_processing_view(rw.rew);
+//			
+//			String sql = Query_converter.datalog2sql_citation(rw.rew, true);
+//			
+//			pst = c.prepareStatement(sql);
+//			
+//			ResultSet rs = pst.executeQuery();
+//			
+//			gen_citation_view_vec(c_view_vec, rs, rw.rew.body.size());
+//						
+////			Query_converter.post_processing_view(rw.rew);
+//		}
+//		
+//		return c_view_vec;
+//	}
 	
 	
 	public static void gen_citation_view_vec(HashMap<String, Vector<Vector<citation_view>>> c_view_vec, ResultSet rs, int num) throws SQLException, ClassNotFoundException
@@ -460,7 +460,7 @@ public class Gen_citation1 {
 	      return views;
 	}
 	
-	static void check_equality(Query view)
+	public static void check_equality(Query view)
 	{
 		
 		HashMap<String, String> arg_name = new HashMap<String, String>();
@@ -513,10 +513,10 @@ public class Gen_citation1 {
 		view.conditions = conditions;
 	}
 	
-	static Vector<Argument> get_lambda_terms(String head_name, Connection c, PreparedStatement pst) throws SQLException
+	public static Vector<Lambda_term> get_lambda_terms(String head_name, Connection c, PreparedStatement pst) throws SQLException
 	{
 		
-		Vector<Argument> lambda_terms = new Vector<Argument>();
+		Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();
 		
 //		for(int i = 0; i<str_lambda_terms.length; i++)
 //		{
@@ -530,7 +530,12 @@ public class Gen_citation1 {
 		
 		while(rs.next())
 		{
-			lambda_terms.add(new Argument(rs.getString(2)));
+			
+			String lambda_term_name = rs.getString(2);
+			
+			String table_name = rs.getString(3);
+			
+			lambda_terms.add(new Lambda_term(lambda_term_name, table_name));
 		}
 		
 		return lambda_terms;
@@ -539,7 +544,7 @@ public class Gen_citation1 {
 	
 	static String get_subgoals (Vector<String> subgoal_names, Vector<String> subgoal_arguments, String view_id, Connection c, PreparedStatement pst ) throws SQLException
 	{
-		String subgoal_query = "select s.subgoal_names, a.arguments from subgoals s join subgoal_arguments a using (subgoal_names) where s.view = '" + view_id + "'";
+		String subgoal_query = "select s.subgoal_names, a.arguments from view2subgoals s join subgoal_arguments a using (subgoal_names) where s.view = '" + view_id + "'";
 		
 		pst = c.prepareStatement(subgoal_query);
 		

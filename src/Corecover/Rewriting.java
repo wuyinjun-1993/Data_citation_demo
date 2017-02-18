@@ -10,9 +10,9 @@ import java.util.*;
 
 public class Rewriting {
   public Query   rew  = null; // a rewriting is essentially a query
-  HashSet mcds = null; // the corresponding mcds
-  Mapping ec   = null; // the EC function
-  HashSet viewTuples = null;
+  public HashSet mcds = null; // the corresponding mcds
+  public Mapping ec   = null; // the EC function
+  public HashSet viewTuples = null;
 
   /**
    * Creates a query given an id.

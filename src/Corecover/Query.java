@@ -23,11 +23,13 @@ public class Query {
 
   int     count = 0; // number of equivalent views in the same class
 
-  public Vector<Argument> lambda_term = new Vector<Argument>();
+  public Vector<Lambda_term> lambda_term = new Vector<Lambda_term>();
   
   public Vector<Conditions> conditions = null;
   
-  Vector<Argument> get_lambda_term()
+  public boolean web_view = false;
+  
+  Vector<Lambda_term> get_lambda_term()
   {
 	  return lambda_term;
   }

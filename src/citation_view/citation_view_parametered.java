@@ -26,9 +26,7 @@ public class citation_view_parametered extends citation_view{
 	HashMap<Lambda_term, String> map = new HashMap<Lambda_term, String>();
 	
 	public Vector<String> table_names = new Vector<String>();
-	
-	public char index;
-	
+		
 	void gen_lambda_terms(Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
 		
@@ -57,30 +55,150 @@ public class citation_view_parametered extends citation_view{
 
 	}
 	
+	void gen_lambda_terms(boolean web_view, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	{
+		
+		if(web_view)
+		{
+			String lambda_term_query = "select v.lambda_term, v.table_name from view2lambda_term v join web_view_table w using (view) where w.renamed_view = '"+name + "'";
+			
+			pst = c.prepareStatement(lambda_term_query);
+		    
+		    ResultSet rs = pst.executeQuery();
+		    	    
+		    while(rs.next())
+		    {
+//			    	String []lambda_term_strs = rs.getString(1).split(",");
+		    	Lambda_term l_term = new Lambda_term(rs.getString(1));
+		    	
+		    	l_term.table_name = rs.getString(2);
+		    	
+		    	this.lambda_terms.add(l_term);
+		    	
+//			    	for(int i = 0; i<lambda_term_strs.length; i++)
+//			    	{
+//			    		lambda_terms.add(lambda_term_strs[i]);
+//			    	}
+		    }
+			
+			
+		}
+		
+		else
+		{
+			String lambda_term_query = "select v.lambda_term, v.table_name from view2lambda_term v where v.view = '"+ name +"'";
+		    
+		    pst = c.prepareStatement(lambda_term_query);
+		    
+		    ResultSet rs = pst.executeQuery();
+		    	    
+		    while(rs.next())
+		    {
+//		    	String []lambda_term_strs = rs.getString(1).split(",");
+		    	Lambda_term l_term = new Lambda_term(rs.getString(1));
+		    	
+		    	l_term.table_name = rs.getString(2);
+		    	
+		    	this.lambda_terms.add(l_term);
+		    	
+//		    	for(int i = 0; i<lambda_term_strs.length; i++)
+//		    	{
+//		    		lambda_terms.add(lambda_term_strs[i]);
+//		    	}
+		    }
+		}
+		
+	    
+	    
+	    
+
+	}
+	
 	void gen_table_names(Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
 		
 	    
-	    String lambda_term_query = "select v.subgoal_names from citation_view c join subgoals v on v.view=c.view_name where c.citation_view_name = '"+ name +"'";
-	    
+		String lambda_term_query = "select subgoal_names from view2subgoals where view = '"+ name +"'";
+
+		
 	    pst = c.prepareStatement(lambda_term_query);
 	    
 	    ResultSet rs = pst.executeQuery();
 	    
-	    while(rs.next())
+	    if(!rs.wasNull())
 	    {
-	    		    	
-	    	table_names.add(rs.getString(1));
+	    	while(rs.next())
+		    {
+		    		    	
+		    	table_names.add(rs.getString(1));
+		    }
+	    }
+	    
+	    else
+	    {
+	    	lambda_term_query = "select subgoal from web_view_table where renamed_view = '"+ name +"'";
+
+			
+		    pst = c.prepareStatement(lambda_term_query);
+		    
+		    ResultSet r = pst.executeQuery();
+
+		    while(r.next())
+		    {
+		    		    	
+		    	table_names.add(r.getString(1));
+		    }
+	    }
+	    
+
+	}
+	
+	void gen_table_names(boolean web_view, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	{
+		
+	    
+		
+	    
+	    if(!web_view)
+	    {
+	    	String lambda_term_query = "select subgoal_names from view2subgoals where view = '"+ name +"'";
+
+			
+		    pst = c.prepareStatement(lambda_term_query);
+		    
+		    ResultSet rs = pst.executeQuery();
+	    	
+	    	while(rs.next())
+		    {
+		    		    	
+		    	table_names.add(rs.getString(1));
+		    }
+	    }
+	    
+	    else
+	    {
+	    	String lambda_term_query = "select subgoal from web_view_table where renamed_view = '"+ name +"'";
+
+			
+		    pst = c.prepareStatement(lambda_term_query);
+		    
+		    ResultSet r = pst.executeQuery();
+
+		    while(r.next())
+		    {
+		    		    	
+		    	table_names.add(r.getString(1));
+		    }
 	    }
 	    
 
 	}
 	
 	
-	public void gen_index()
-	{
-		index = (char)Integer.parseInt(name.substring(1, name.length()));
-	}
+//	public void gen_index()
+//	{
+//		index = (char)Integer.parseInt(name.substring(1, name.length()));
+//	}
 	
 	public citation_view_parametered()
 	{
@@ -105,7 +223,31 @@ public class citation_view_parametered extends citation_view{
 		
 		gen_table_names(c, pst);
 		
-		gen_index();
+//		gen_index();
+			    
+	    c.close();
+//		get_queries();
+	}
+	
+	public citation_view_parametered(String name, boolean web_view) throws ClassNotFoundException, SQLException
+	{
+		
+		Connection c = null;
+		
+	    PreparedStatement pst = null;
+	      
+		Class.forName("org.postgresql.Driver");
+		
+	    c = DriverManager
+	        .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
+	        "postgres","123");
+	    
+		this.name = name;
+		gen_lambda_terms(web_view, c,pst);
+		
+		gen_table_names(web_view, c, pst);
+		
+//		gen_index();
 			    
 	    c.close();
 //		get_queries();
@@ -132,9 +274,39 @@ public class citation_view_parametered extends citation_view{
 		}
 		
 		
-		gen_index();
+//		gen_index();
 			    
 		gen_table_names(c,pst);
+		
+	    c.close();
+//		get_queries();
+	}
+	
+	public citation_view_parametered(String name, Vector<String> lambda_terms, Vector<String> table_names) throws ClassNotFoundException, SQLException {
+		
+		Connection c = null;
+		
+	    PreparedStatement pst = null;
+	      
+		Class.forName("org.postgresql.Driver");
+		
+	    c = DriverManager
+	        .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
+	        "postgres","123");
+		
+		this.name = name;
+		
+		for(int i = 0; i<lambda_terms.size(); i++)
+		{
+			this.lambda_terms.add(new Lambda_term(lambda_terms.get(i)));
+		}
+		
+		
+//		gen_index();
+			    
+//		gen_table_names(c,pst);
+		
+		this.table_names = table_names;
 		
 	    c.close();
 //		get_queries();
@@ -282,6 +454,28 @@ public class citation_view_parametered extends citation_view{
 	}
 	
 	@Override
+	public String gen_citation_unit(String name, Vector<String> lambda_terms) {
+		// TODO Auto-generated method stub
+		
+		String insert_citation_view = name + "(";
+		int num = lambda_terms.size();
+		for(int i =0;i<num;i++)
+		{
+			String lambda_term = lambda_terms.get(i);
+			
+			if(i!=num-1)
+				insert_citation_view = insert_citation_view + lambda_term + ",";
+			else
+				insert_citation_view = insert_citation_view + lambda_term;
+			
+		}
+		insert_citation_view = insert_citation_view + ")";
+		
+		
+		return insert_citation_view;
+	}
+	
+	@Override
 	public String toString()
 	{
 		String str = name + "(";
@@ -319,9 +513,9 @@ public class citation_view_parametered extends citation_view{
 	}
 
 	@Override
-	public char get_index() {
+	public String get_index() {
 		// TODO Auto-generated method stub
-		return index;
+		return name;
 	}
 
 	@Override
@@ -358,7 +552,7 @@ public class citation_view_parametered extends citation_view{
 		
 		citation_view_parametered c_v = new citation_view_parametered();
 		
-		c_v.index = this.index;
+//		c_v.index = this.index;
 		
 		c_v.lambda_terms = this.lambda_terms;
 		

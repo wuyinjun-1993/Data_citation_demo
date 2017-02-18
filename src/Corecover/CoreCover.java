@@ -67,6 +67,17 @@ public class CoreCover {
     UserLib.myprintln("viewTuples = " + viewTuples);
     // use tuple-cores to cover query subgoals
     HashSet rewritings = coverQuerySubgoals(viewTuples, query);
+    
+    for(Iterator iter = viewTuples.iterator(); iter.hasNext();)
+    {
+    	Tuple tuple = (Tuple) iter.next();
+    	
+    	int y = 0;
+    	y++;
+    	
+    }
+    
+    
     UserLib.myprintln("rewritings = " + rewritings);
 
     if (!rewritings.isEmpty()) { // only count non-empty rewritings
@@ -106,12 +117,31 @@ public class CoreCover {
     	  Tuple tuple = (Tuple) iter.next();
           tuple.lambda_terms = view.lambda_term;
           tuple.conditions = view.conditions;
+          tuple.web_view = view.web_view;
           viewTuples.add(tuple);
       }
        // add them to the results
     }
     return viewTuples;
   }
+  
+  public static HashSet computeViewTuples(Database canDb, Vector views, Query query) {
+	    HashSet viewTuples = new HashSet();
+	    for (int i = 0; i < views.size(); i ++) {
+	      Query view = (Query) views.elementAt(i);
+
+	      Relation rel = canDb.execQuery(view);
+	      
+	      for (Iterator iter = rel.getTuples().iterator(); iter.hasNext();) {
+	    	  Tuple tuple = (Tuple) iter.next();
+	          tuple.lambda_terms = view.lambda_term;
+	          tuple.conditions = view.conditions;
+	          viewTuples.add(tuple);
+	      }
+	       // add them to the results
+	    }
+	    return viewTuples;
+	  }
   
   
   static void computeViewCost(HashSet viewTuples)
@@ -169,7 +199,7 @@ public class CoreCover {
 		     vSubgoalSubsets)) {
 	  UserLib.myprintln("!!!!Find a core: " + qSubgoalSubset);
 	  viewTuple.setCore(qSubgoalSubset);
-	  viewTuple.set_cost(cal_cost(view, query, phi));
+	  viewTuple.set_cost(0);//cal_cost(view, query, phi));
 	  return;
 	}
       }
@@ -180,31 +210,31 @@ public class CoreCover {
   }
 
   
-  static double cal_cost(Query view, Query query, Mapping phi)
-  {
-	  double cost = 1;
-	  if(!view.lambda_term.isEmpty())
-	  {
-		  
-		  Vector temp = view.lambda_term;
-		  boolean map2const = true;
-		  
-		  
-		  for(int k =0;k<temp.size();k++)
-		  {
-			  Argument arg = (Argument) phi.map.get(temp.get(k));
-			  if(arg.type != 1)
-				  map2const = false;
-			  
-		  }
-		  if(!map2const)
-			  cost = 10;
-	  }
-	  
-	  
-	  return cost;
-  }
-  
+//  static double cal_cost(Query view, Query query, Mapping phi)
+//  {
+////	  double cost = 1;
+////	  if(!view.lambda_term.isEmpty())
+////	  {
+////		  
+////		  Vector temp = view.lambda_term;
+////		  boolean map2const = true;
+////		  
+////		  
+////		  for(int k =0;k<temp.size();k++)
+////		  {
+////			  Argument arg = (Argument) phi.map.get(temp.get(k));
+////			  if(arg.type != 1)
+////				  map2const = false;
+////			  
+////		  }
+////		  if(!map2const)
+////			  cost = 10;
+////	  }
+//	  
+//	  
+//	  return cost;
+//  }
+//  
   /**
    * Given a set of query subgoals, a view tuple, and all subsets of the
    * subgoals in the tuple's expansion, checks if there is a mapping from
@@ -438,7 +468,7 @@ public class CoreCover {
     return result;
   }
 
-  static HashSet coverQuerySubgoals(HashSet viewTuples, Query query) {
+  public static HashSet coverQuerySubgoals(HashSet viewTuples, Query query) {
     HashSet rewritings = new HashSet();
     
     HashSet curr_rewritings = new HashSet();
@@ -451,7 +481,7 @@ public class CoreCover {
     numMR   = 0;
     numGMR  = 0;
 
-    int upperBound = viewTuples.size();
+    int upperBound = query.body.size();
 //    if (upperBound >= query.getSubgoalNum()) // according to LMSS95
 //      upperBound = query.getSubgoalNum();
 
@@ -467,35 +497,28 @@ public class CoreCover {
     double min_cost = Double.MAX_VALUE;
     Rewriting min_rewriting = null;
     
-//    for (int size = 1; (size <= upperBound) && !found; size ++) 
-    
-    for(Iterator iter = curr_rewritings.iterator();iter.hasNext();)
-    {
-    	
-    }
-    
     for (int size = 1; (size <= upperBound); size ++) 
     {
       // considers subsets with the current size 
       //System.out.println("# of view tuples = " + viewTuples.size() +
       //" size = " + size);
-    	if(curr_rewritings.size() == 0)
-    	{
+//    	if(curr_rewritings.size() == 0)
+//    	{
     		gen_rewriting(viewTuples, size, query, rewritings, curr_rewritings);
-    	}
-    	else
-    	{
-    		
-    		HashSet curr_rewritings_all = new HashSet();
-    		
-    		for(Iterator iter = curr_rewritings.iterator();iter.hasNext();)
-    		{
-    			HashSet curr_rewriting = (HashSet) iter.next();
-    			curr_rewritings_all.addAll(curr_rewriting);
-    			
-    		}
-			gen_rewriting(gen_complementary_set(viewTuples, curr_rewritings_all), size, query, rewritings, curr_rewritings);
-    	}
+//    	}
+//    	else
+//    	{
+//    		
+//    		HashSet curr_rewritings_all = new HashSet();
+//    		
+//    		for(Iterator iter = curr_rewritings.iterator();iter.hasNext();)
+//    		{
+//    			HashSet curr_rewriting = (HashSet) iter.next();
+//    			curr_rewritings_all.addAll(curr_rewriting);
+//    			
+//    		}
+//			gen_rewriting(gen_complementary_set(viewTuples, curr_rewritings_all), size, query, rewritings, curr_rewritings);
+//    	}
 
 //      if (found) {
 //    	  rewritings.add(min_rewriting);

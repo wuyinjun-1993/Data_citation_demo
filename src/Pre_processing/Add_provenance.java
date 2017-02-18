@@ -1,6 +1,5 @@
 package Pre_processing;
 import java.sql.Connection;
-import tuple_reasoning.*;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,6 +13,7 @@ import java.util.Vector;
 import Corecover.Query;
 import datalog.Parse_datalog;
 import datalog.Query_converter;
+import reasoning.*;
 import schema_reasoning.Gen_citation1;
 
 public class Add_provenance {

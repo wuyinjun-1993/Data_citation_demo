@@ -14,16 +14,18 @@ public class Tuple {
   Vector args = null;  // a list of arguments
   Mapping phi = null;  // mapping from query args to the database deriving
 		       // the tuple
-  Subgoal subgoal = null; // the subgoal that produces this tuple in canDb.
-  HashMap mapSubgoals = null;
+  public Subgoal subgoal = null; // the subgoal that produces this tuple in canDb.
+  public HashMap mapSubgoals = null;
   public Query   query = null;
   public HashSet core = new HashSet();
+  
+  public boolean web_view = false;
   
   public Vector<Conditions> conditions = null;
 
   HashSet equTuples = new HashSet(); // set of view tuples with the same tuple-core
   
-  Vector<Argument> lambda_terms = new Vector<Argument>();
+  Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();
   
   double cost = 1;
 

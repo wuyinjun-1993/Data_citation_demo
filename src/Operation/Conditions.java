@@ -9,16 +9,18 @@ public class Conditions {
 	
 	
 	public String subgoal1;
-	
+		
 	public Argument arg1;
 	
 	public Argument arg2;
-	
+		
 	public String subgoal2;
 	
 	public Operation op;
 	
 	public String citation_view;
+	
+	public String expression;
 	
 	public int id1 = -1;
 	
@@ -112,8 +114,9 @@ public class Conditions {
 	
 	public static Conditions negation(Conditions conditions)
 	{
-		conditions.op = conditions.op.negation();
 		
+		Conditions condition = new Conditions(conditions.arg1, conditions.subgoal1, conditions.op.negation(), conditions.arg2, conditions.subgoal2);
+				
 		return conditions;
 	}
 	
@@ -133,4 +136,63 @@ public class Conditions {
 		return false;
 	}
 
+	
+	public static Conditions parse(String condition_str)
+	{
+		int i = 0;
+		
+		for(i = 0; i< ops.length; i++)
+		{
+			if(condition_str.contains(ops[i]))
+				break;
+		}
+		
+		
+		Operation op;
+		
+		switch(i)
+		{
+		case 0: op = new op_not_equal(); break;
+		case 1: op = new op_greater_equal(); break;
+		case 2: op = new op_less_equal(); break;
+		case 3: op = new op_greater(); break;
+		case 4: op = new op_less(); break;
+		case 5: op = new op_equal(); break;
+		default: op = null; break;
+		}
+		
+		String [] args = condition_str.split(op.toString());
+		
+		String arg1_str = args[0].trim();
+		
+		String []strs = arg1_str.split("_");
+		
+		String t1 = strs[0] + "_" + strs[1];
+		
+		String arg1 = arg1_str;//.substring(t1.length() + 1, arg1_str.length());
+		
+		if(!args[1].contains("'"))
+		{
+			String arg2_str = args[1].trim();
+			
+			strs = arg2_str.split("_");
+			
+			String t2 = strs[0] + "_" + strs[1];
+			
+			String arg2 = arg2_str;//.substring(t2.length() + 1, arg2_str.length());
+			
+			return new Conditions(new Argument(arg1, arg1), t1, op, new Argument(arg2, arg2), t2);
+
+		}
+		
+		else
+		{
+			return new Conditions(new Argument(arg1, arg1), t1, op, new Argument(args[1], arg1), new String());
+		}
+		
+		
+		
+		
+	}
+	
 }

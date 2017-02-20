@@ -9,7 +9,7 @@ import java.util.Vector;
 
 public class rename_base_relation {
 	
-	public static String[] base_relations = {"gpcr_c","object_c","interaction_c","ligand_c","pathophysiology_c","interaction_affinity_refs_c","gtip_process_c","process_assoc_c","disease_c"};
+	public static String[] base_relations = {"contributor_c", "contributor2family_c", "contributor2object_c", "contributor2intro_c", "contributor2ligand_c", "introduction_c", "gpcr_c","object_c","interaction_c","ligand_c","pathophysiology_c","interaction_affinity_refs_c","gtip_process_c","process_assoc_c","disease_c"};
 
 	
 	public static void main(String[] args) throws ClassNotFoundException, SQLException
@@ -22,7 +22,7 @@ public class rename_base_relation {
 	        .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
 	        "postgres","123");
 	   
-	    create_table(c, pst);
+	    create_table(c, pst, base_relations);
 	    
 	    
 	    
@@ -31,7 +31,7 @@ public class rename_base_relation {
 	}
 	
 	
-	public static void create_table(Connection c, PreparedStatement pst) throws SQLException
+	public static void create_table(Connection c, PreparedStatement pst, String[] base_relations) throws SQLException
 	{
 		
 		for(int i = 0; i<base_relations.length; i++)
@@ -50,19 +50,24 @@ public class rename_base_relation {
 			{
 				boolean exist = rs.getBoolean(1);
 				
-				if(exist)
+//				if(exist)
+//				{
+//					query = "drop table " + base_relations[i];
+//					
+//					pst = c.prepareStatement(query);
+//					
+//					pst.execute();
+//					
+//				}
+				
+				if(!exist)
 				{
-					query = "drop table " + base_relations[i];
-					
-					pst = c.prepareStatement(query);
-					
-					pst.execute();
-					
+					Vector<String> col_names = get_column_names(c, pst, i);
+
+					gen_table(i, col_names, c, pst);
 				}
 				
-				Vector<String> col_names = get_column_names(c, pst, i);
 
-				gen_table(i, col_names, c, pst);
 				
 				
 			}

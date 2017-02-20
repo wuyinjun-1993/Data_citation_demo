@@ -34,7 +34,7 @@ public class populate_db {
 	
 	public static String db_name = "iuphar_org";
 
-	public static String[] base_relations = {"gpcr_c","object_c","interaction_c","ligand_c","pathophysiology_c","interaction_affinity_refs_c","gtip_process_c","process_assoc_c","disease_c"};
+	public static String[] base_relations = {"gpcr_c","object_c","interaction_c","ligand_c","pathophysiology_c","interaction_affinity_refs_c","gtip_process_c","process_assoc_c","disease_c", "family_c", "introduction_c"};
 
 	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException
@@ -827,7 +827,6 @@ public class populate_db {
 					
 					String where_values = new String();
 					
-					String id = rs.getString("interaction_c_interaction_id");
 					if(web_view)
 					{
 						insert_citation_view = citation_views.get(0).gen_citation_unit(table_name_view.get(subgoal.name), null);

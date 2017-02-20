@@ -42,7 +42,7 @@ public class Query_converter {
 	public static void main(String [] args) throws JSQLParserException, ClassNotFoundException, SQLException
 	{
 		
-		String str = "Q(v,head_variables):view_table(v, head_variables, lambda_term),citation_view(citation_view_name, v, h)";
+		String str = "Q(f):family(f, n, tx), introduction(f, ty)";
 		
 		Query query = Parse_datalog.parse_query(str);//sql2datalog("select * from family_c ,introduction_c where type = 'gpcr' and family_id= '2'");
 		
@@ -240,16 +240,183 @@ public class Query_converter {
 	    
 	}
 	
-//	public static String Datalog2Sql(Query query) throws ClassNotFoundException, SQLException
-//	{
-//		pre_processing(query);
-//		
-//		String q = datalog2sql(query);
-//		
-//		post_processing(query);
-//		
-//		return q;
-//	}
+	static String[] gen_condition(Query query, HashMap<String, Vector<String[]>>arg_name_map)
+	{
+		String where = new String();
+		
+		String citation_table = new String();
+		
+		int num = 0;
+						
+		boolean condition = false;
+		
+		HashSet<String> table_set = new HashSet<String>();
+		
+		for(int i = 0; i < query.body.size(); i++)
+		{
+			Subgoal subgoal = (Subgoal) query.body.get(i);
+			
+			String curr_table_name = new String();
+			
+			if(i >= 1)
+				citation_table += ",";
+			
+//			if(!view)
+			{
+				if(!table_set.contains(subgoal.name))
+				{
+					citation_table += subgoal.name;
+					
+					curr_table_name = subgoal.name;
+					
+					table_set.add(subgoal.name);
+					
+					Vector<String> t_str = new Vector<String>();
+					
+					t_str.add(curr_table_name);
+					
+				}
+				else
+				{
+					citation_table += subgoal.name + " " + subgoal.name + i;
+										
+					curr_table_name = subgoal.name + i;
+					
+				}
+			}
+			
+			for(int j = 0; j<subgoal.args.size();j++)
+			{
+				Argument arg = (Argument) subgoal.args.get(j);
+				
+//				String[] str_list = {arg.name, subgoal.name};
+				
+				if(arg.type == 1)
+				{
+					
+//					if(!condition)
+//					{
+//						where += " where ";
+//						condition = true;
+//					}
+//					
+//					if(num >= 1)
+//						where += " and "; 
+//					
+//					if(!view)
+//						where += subgoal.name + "." +arg.origin_name  + "=" + arg.name;
+//					else
+//						where += subgoal.name + "_table" + "." +arg.origin_name  + "=" + arg.name;
+					
+					if(arg_name_map.get(arg.name)==null)
+					{
+						Vector<String[]> table_names = new Vector<String[]>();
+						
+						String[] str_list = {curr_table_name, arg.origin_name};
+						
+						table_names.add(str_list);
+						
+						arg_name_map.put(arg.name, table_names);
+					}
+					
+					else
+					{
+						Vector<String[]> table_names = arg_name_map.get(arg.name);
+												
+						String[] str_list = {curr_table_name, arg.origin_name};
+						
+						table_names.add(str_list);
+						
+						arg_name_map.put(arg.name, table_names);
+												
+					}
+					
+					num++;
+				}
+				
+				else
+				{
+					if(arg_name_map.get(arg.name)==null)
+					{
+						Vector<String[]> table_names = new Vector<String[]>();
+						
+						String[]str_list = {curr_table_name, arg.origin_name};
+						
+						table_names.add(str_list);
+						
+						arg_name_map.put(arg.name, table_names);
+					}
+					
+					else
+					{
+						Vector<String[]> table_names = arg_name_map.get(arg.name);
+						
+						int vec_size = table_names.size();
+						
+						if(!condition)
+						{
+//							where += " where ";
+							condition = true;
+						}
+						
+//						if(num >= 1)
+//							where += " and "; 
+						
+//						if(!view)
+//							where += table_names.get(vec_size - 1)[0] + "." + table_names.get(vec_size - 1)[1] + "=" + subgoal.name + "." + arg.origin_name;
+//						else
+//							where += table_names.get(vec_size - 1)[0] + "_table" + "." + table_names.get(vec_size - 1)[1] + "=" + subgoal.name + "_table" + "." + arg.origin_name;
+						
+						String [] str_list = {curr_table_name, arg.origin_name};
+						
+						table_names.add(str_list);
+						
+						arg_name_map.put(arg.name, table_names);
+						
+						num++;
+						
+					}
+					
+				}
+			}
+			
+		}
+		
+		for(int i = 0; i<query.conditions.size(); i++)
+		{
+			
+			if(!condition)
+			{
+				where += " where ";
+				condition = true;
+			}
+			
+			if(i >= 1)
+				where += " and "; 
+			
+			if(query.conditions.get(i).subgoal2 == null)
+			{
+				String table1 = arg_name_map.get(query.conditions.get(i).arg1.name).get(0)[0];
+				
+//				String table2 = arg_name_map.get(query.conditions.get(i).arg2.name).get(0)[0];
+				
+				where += table1 + "." + query.conditions.get(i).arg1.origin_name + query.conditions.get(i).op + query.conditions.get(i).arg2 ;
+			}
+			else
+			{
+				String table1 = arg_name_map.get(query.conditions.get(i).arg1.name).get(0)[0];
+				
+				String table2 = arg_name_map.get(query.conditions.get(i).arg2.name).get(0)[0];
+				
+				where += table1 + "." + query.conditions.get(i).arg1.origin_name + query.conditions.get(i).op + table2 + "." + query.conditions.get(i).arg2.origin_name;
+			}
+		}
+		
+		
+		String []str_l = {where, citation_table};
+		
+		return str_l;
+	}
 	
 	static String[] gen_condition(Query query, HashMap<String, Vector<String[]>>arg_name_map, HashMap<String, Vector<String>> table_name_map, boolean view, HashMap<String, Integer> table_seq_map)
 	{
@@ -339,11 +506,11 @@ public class Query_converter {
 			if(i >= 1)
 			{
 				citation_str += ",";
-				citation_provenance += ",";
+//				citation_provenance += ",";
 			}
 					
 			citation_str += curr_table_name + "." + "citation_view";
-			citation_provenance += curr_table_name + ".provenance";
+//			citation_provenance += curr_table_name + ".provenance";
 			
 			
 			for(int j = 0; j<subgoal.args.size();j++)
@@ -480,13 +647,303 @@ public class Query_converter {
 		return str_l;
 	}
 	
+	static String[] gen_condition(Query query, HashMap<String, Vector<String[]>>arg_name_map, HashMap<String, Vector<String>> table_name_map, boolean view, HashMap<String, Integer> table_seq_map, Vector<Integer> valid_ids)
+	{
+		String where = new String();
+		
+		String citation_table = new String();
+		
+		int num = 0;
+		
+		String citation_str = new String();
+		
+		String citation_provenance = new String();
+		
+		boolean condition = false;
+		
+		HashSet<String> table_set = new HashSet<String>();
+		
+		for(int i = 0; i < query.body.size(); i++)
+		{
+			Subgoal subgoal = (Subgoal) query.body.get(i);
+			
+			String curr_table_name = new String();
+			
+			if(i >= 1)
+				citation_table += ",";
+			
+			if(!view)
+			{
+				if(!table_set.contains(subgoal.name))
+				{
+					citation_table += subgoal.name;
+					
+					curr_table_name = subgoal.name;
+					
+					table_set.add(subgoal.name);
+					
+					Vector<String> t_str = new Vector<String>();
+					
+					t_str.add(curr_table_name);
+					
+					table_name_map.put(subgoal.name, t_str);
+				}
+				else
+				{
+					citation_table += subgoal.name + " " + subgoal.name + i;
+					
+					Vector<String> t_str = table_name_map.get(subgoal.name);
+					
+					curr_table_name = subgoal.name + i;
+					
+					t_str.add(curr_table_name);
+					
+					table_name_map.put(subgoal.name, t_str);
+				}
+			}
+			else
+			{
+				if(!table_set.contains(subgoal.name))
+				{
+					citation_table += subgoal.name + "_table";
+					
+					curr_table_name = subgoal.name + "_table";
+					
+					table_set.add(subgoal.name);
+					
+					Vector<String> t_str = new Vector<String>();
+					
+					t_str.add(curr_table_name);
+					
+					table_name_map.put(subgoal.name, t_str);
+				}
+				else
+				{
+					citation_table += subgoal.name + "_table" + " " + subgoal.name + "_table" + i;
+					
+					curr_table_name = subgoal.name + "_table" + i;
+					
+					Vector<String> t_str = table_name_map.get(subgoal.name);
+					
+					t_str.add(curr_table_name);
+					
+					table_name_map.put(subgoal.name, t_str);
+				}
+			}
+			
+			
+			if(valid_ids.contains(i))
+			{
+				if(num >= 1)
+				{
+					citation_str += ",";
+//					citation_provenance += ",";
+				}
+						
+				citation_str += curr_table_name + "." + "citation_view";
+				
+				num++;
+			}
+			
+			
+//			citation_provenance += curr_table_name + ".provenance";
+			
+			
+			for(int j = 0; j<subgoal.args.size();j++)
+			{
+				Argument arg = (Argument) subgoal.args.get(j);
+				
+//				String[] str_list = {arg.name, subgoal.name};
+				
+				if(arg.type == 1)
+				{
+					
+//					if(!condition)
+//					{
+//						where += " where ";
+//						condition = true;
+//					}
+//					
+//					if(num >= 1)
+//						where += " and "; 
+//					
+//					if(!view)
+//						where += subgoal.name + "." +arg.origin_name  + "=" + arg.name;
+//					else
+//						where += subgoal.name + "_table" + "." +arg.origin_name  + "=" + arg.name;
+					
+					if(arg_name_map.get(arg.name)==null)
+					{
+						Vector<String[]> table_names = new Vector<String[]>();
+						
+						String[] str_list = {curr_table_name, arg.origin_name};
+						
+						table_names.add(str_list);
+						
+						arg_name_map.put(arg.name, table_names);
+					}
+					
+					else
+					{
+						Vector<String[]> table_names = arg_name_map.get(arg.name);
+												
+						String[] str_list = {curr_table_name, arg.origin_name};
+						
+						table_names.add(str_list);
+						
+						arg_name_map.put(arg.name, table_names);
+												
+					}
+					
+					num++;
+				}
+				
+				else
+				{
+					if(arg_name_map.get(arg.name)==null)
+					{
+						Vector<String[]> table_names = new Vector<String[]>();
+						
+						String[]str_list = {curr_table_name, arg.origin_name};
+						
+						table_names.add(str_list);
+						
+						arg_name_map.put(arg.name, table_names);
+					}
+					
+					else
+					{
+						Vector<String[]> table_names = arg_name_map.get(arg.name);
+						
+						int vec_size = table_names.size();
+						
+						if(!condition)
+						{
+//							where += " where ";
+							condition = true;
+						}
+						
+//						if(num >= 1)
+//							where += " and "; 
+						
+//						if(!view)
+//							where += table_names.get(vec_size - 1)[0] + "." + table_names.get(vec_size - 1)[1] + "=" + subgoal.name + "." + arg.origin_name;
+//						else
+//							where += table_names.get(vec_size - 1)[0] + "_table" + "." + table_names.get(vec_size - 1)[1] + "=" + subgoal.name + "_table" + "." + arg.origin_name;
+						
+						String [] str_list = {curr_table_name, arg.origin_name};
+						
+						table_names.add(str_list);
+						
+						arg_name_map.put(arg.name, table_names);
+						
+						num++;
+						
+					}
+					
+				}
+			}
+			
+			table_seq_map.put(curr_table_name, i);
+		}
+		
+		for(int i = 0; i<query.conditions.size(); i++)
+		{
+			
+			if(!condition)
+			{
+				where += " where ";
+				condition = true;
+			}
+			
+			if(i >= 1)
+				where += " and "; 
+			
+			if(query.conditions.get(i).subgoal2 == null || query.conditions.get(i).subgoal2.isEmpty())
+			{
+				String table1 = arg_name_map.get(query.conditions.get(i).arg1.name).get(0)[0];
+				
+//				String table2 = arg_name_map.get(query.conditions.get(i).arg2.name).get(0)[0];
+				
+				where += table1 + "." + query.conditions.get(i).arg1.origin_name + query.conditions.get(i).op + query.conditions.get(i).arg2 ;
+			}
+			else
+			{
+				String table1 = arg_name_map.get(query.conditions.get(i).arg1.name).get(0)[0];
+				
+				String table2 = arg_name_map.get(query.conditions.get(i).arg2.name).get(0)[0];
+				
+				where += table1 + "." + query.conditions.get(i).arg1.origin_name + query.conditions.get(i).op + table2 + "." + query.conditions.get(i).arg2.origin_name;
+			}
+		}
+		
+		
+		String []str_l = {where, citation_table,citation_str, citation_provenance};
+		
+		return str_l;
+	}
+	
+//	public static String datalog2sql(Query query) throws SQLException, ClassNotFoundException
+//	{
+//		
+////		String citation_unit = new String();
+//		
+//		String sel_item = new String();
+//		
+//		
+//		Connection c = null;
+//		
+//	    PreparedStatement pst = null;
+//	      
+//		Class.forName("org.postgresql.Driver");
+//		
+//	    c = DriverManager
+//	        .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
+//	        "postgres","123");
+//		
+//		String sql = new String();				
+//				
+//		HashMap<String, Vector<String[]>> arg_name_map = new HashMap<String, Vector<String[]>>();
+//		
+//		HashMap<String, Vector<String>> table_name_map = new HashMap<String, Vector<String>>();
+//		
+//		HashMap<String, Integer> table_seq_map = new HashMap<String, Integer>();
+//				
+//		String[] str_l = gen_condition(query, arg_name_map, table_name_map, false, table_seq_map);
+//		
+//		String where = str_l[0];
+//		
+//		String citation_table = str_l[1];
+//		
+//		
+//		for(int i = 0; i<query.head.args.size(); i++)
+//		{
+//			Argument arg = (Argument)query.head.args.get(i);
+//			
+//			if(i >= 1)
+//				sel_item += ",";
+//			
+//			Vector<String[]> table_names = arg_name_map.get(arg.name);
+//			sel_item += table_names.get(0)[0] + "." + table_names.get(0)[1];
+////			if(arg.type == 0)
+////				sel_item += arg;
+////			else
+////			{
+////				sel_item += arg.origin_name;
+////			}
+//				
+//		}
+//		
+//		sql = "select " + sel_item + " from " + citation_table + where;
+//		
+//		c.close();
+//		
+//		return sql;
+//	}
+//	
 	public static String datalog2sql(Query query) throws SQLException, ClassNotFoundException
 	{
-		
-//		String citation_unit = new String();
-		
 		String sel_item = new String();
-		
 		
 		Connection c = null;
 		
@@ -498,20 +955,17 @@ public class Query_converter {
 	        .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
 	        "postgres","123");
 		
-		String sql = new String();				
-				
+		String sql = new String();
+		
 		HashMap<String, Vector<String[]>> arg_name_map = new HashMap<String, Vector<String[]>>();
-		
-		HashMap<String, Vector<String>> table_name_map = new HashMap<String, Vector<String>>();
-		
-		HashMap<String, Integer> table_seq_map = new HashMap<String, Integer>();
-				
-		String[] str_l = gen_condition(query, arg_name_map, table_name_map, false, table_seq_map);
+						
+		String[] str_l = gen_condition(query, arg_name_map);
 		
 		String where = str_l[0];
 		
 		String citation_table = str_l[1];
-		
+				
+//		String citation_provenance = str_l[3];
 		
 		for(int i = 0; i<query.head.args.size(); i++)
 		{
@@ -522,21 +976,16 @@ public class Query_converter {
 			
 			Vector<String[]> table_names = arg_name_map.get(arg.name);
 			sel_item += table_names.get(0)[0] + "." + table_names.get(0)[1];
-//			if(arg.type == 0)
-//				sel_item += arg;
-//			else
-//			{
-//				sel_item += arg.origin_name;
-//			}
 				
 		}
 		
-		sql = "select " + sel_item + " from " + citation_table + where;
+		sql = "select distinct " + sel_item + " from " + citation_table + where ;//+ group_by_web_view;
 		
 		c.close();
 		
 		return sql;
 	}
+	
 	
 	public static String datalog2sql_full(Query query) throws SQLException, ClassNotFoundException
 	{
@@ -612,7 +1061,7 @@ public class Query_converter {
 		return sql;
 	}
 	
-	public static String datalog2sql_citation(Query query, Vector<Conditions> valid_conditions, Vector<Conditions> condition_seq, HashMap<String, HashSet<String>> return_vals, HashMap<String, Vector<Integer>> table_pos_map, boolean view, Vector<int[]> condition_seq_id) throws SQLException, ClassNotFoundException
+	public static String datalog2sql_citation(Query query, Vector<Conditions> valid_conditions, Vector<Conditions> condition_seq, HashMap<String, HashSet<String>> return_vals, HashMap<String, Vector<Integer>> table_pos_map, boolean view, Vector<int[]> condition_seq_id, Vector<Integer> valid_subgoal_id) throws SQLException, ClassNotFoundException
 	{
 				
 		String sel_item = new String();
@@ -635,7 +1084,7 @@ public class Query_converter {
 		
 		HashMap<String, Integer> table_seq_map = new HashMap<String, Integer>();
 		
-		String[] str_l = gen_condition(query, arg_name_map, table_name_map, view, table_seq_map);
+		String[] str_l = gen_condition(query, arg_name_map, table_name_map, view, table_seq_map, valid_subgoal_id);
 		
 		String where = str_l[0];
 		
@@ -831,22 +1280,22 @@ public class Query_converter {
 		{
 			condition_order = " order by " + condition_order;
 			
-			if(!group_by_web_view.isEmpty())
-			{
-				group_by_web_view = "," + group_by_web_view;
-			}
-		}
-		else
-		{
-			if(!group_by_web_view.isEmpty())
-			{
-				group_by_web_view = " order by " + group_by_web_view;
-			}
+//			if(!group_by_web_view.isEmpty())
+//			{
+//				group_by_web_view = "," + group_by_web_view;
+//			}
+//		}
+//		else
+//		{
+//			if(!group_by_web_view.isEmpty())
+//			{
+//				group_by_web_view = " order by " + group_by_web_view;
+//			}
 			
 		}
 		
 		
-		sql = "select " + sel_item + "," + citation_unit + sel_lambda_terms + conditions + sel_web_view +  " from " + citation_table + where + condition_order + group_by_web_view;
+		sql = "select " + sel_item + "," + citation_unit + sel_lambda_terms + conditions + /*sel_web_view +*/  " from " + citation_table + where + condition_order ;//+ group_by_web_view;
 		
 		c.close();
 		

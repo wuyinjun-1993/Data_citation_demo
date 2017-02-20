@@ -2102,251 +2102,251 @@ public class Tuple_reasoning2 {
 	
 	
 	
-	public static Vector<citation_view_vector> get_valid_citation_combination(Vector<Vector<citation_view>>c_unit_vec, Vector<String> subgoal_names, HashMap<String, Tuple> curr_map)
-	{
-		HashMap<String, citation_view_vector> c_combinations = new HashMap<String, citation_view_vector>();
-		
-		Vector<Vector<String>> c_subgoal_names = new Vector<Vector<String>>();
-		
-		for(int i = 0; i<c_unit_vec.size(); i++)
-		{
-			Vector<citation_view> curr_c_unit_vec = c_unit_vec.get(i);
-			
-			Vector<citation_view> curr_combination = new Vector<citation_view>();
-			
-			Vector<Vector<String>> curr_subgoal_name = new Vector<Vector<String>>();
-			
-			//check validation
-			for(int j = 0; j < curr_c_unit_vec.size(); j++)
-			{
-				citation_view curr_c_unit = curr_c_unit_vec.get(j);
-				
-				Vector<String> core_str = new Vector<String>();
-				
-				if(curr_map.get(curr_c_unit.get_name()) == null)
-					continue;
-				
-//				Vector<Subgoal> core_set = curr_map.get(curr_c_unit.get_name()).core;
+//	public static Vector<citation_view_vector> get_valid_citation_combination(Vector<Vector<citation_view>>c_unit_vec, Vector<String> subgoal_names, HashMap<String, Tuple> curr_map)
+//	{
+//		HashMap<String, citation_view_vector> c_combinations = new HashMap<String, citation_view_vector>();
+//		
+//		Vector<Vector<String>> c_subgoal_names = new Vector<Vector<String>>();
+//		
+//		for(int i = 0; i<c_unit_vec.size(); i++)
+//		{
+//			Vector<citation_view> curr_c_unit_vec = c_unit_vec.get(i);
+//			
+//			Vector<citation_view> curr_combination = new Vector<citation_view>();
+//			
+//			Vector<Vector<String>> curr_subgoal_name = new Vector<Vector<String>>();
+//			
+//			//check validation
+//			for(int j = 0; j < curr_c_unit_vec.size(); j++)
+//			{
+//				citation_view curr_c_unit = curr_c_unit_vec.get(j);
 //				
-//				for(int r = 0; r<core_set.size(); r++)
+//				Vector<String> core_str = new Vector<String>();
+//				
+//				if(curr_map.get(curr_c_unit.get_name()) == null)
+//					continue;
+//				
+////				Vector<Subgoal> core_set = curr_map.get(curr_c_unit.get_name()).core;
+////				
+////				for(int r = 0; r<core_set.size(); r++)
+////				{
+////					Subgoal subgoal = core_set.get(r);
+////					
+////					core_str.add(subgoal.name);
+////				}
+//				
+//				HashSet core_set = curr_map.get(curr_c_unit.get_name()).core;
+//				
+//				for(Iterator iter = core_set.iterator(); iter.hasNext();)
 //				{
-//					Subgoal subgoal = core_set.get(r);
+//					Subgoal subgoal = (Subgoal) iter.next();
 //					
 //					core_str.add(subgoal.name);
 //				}
-				
-				HashSet core_set = curr_map.get(curr_c_unit.get_name()).core;
-				
-				for(Iterator iter = core_set.iterator(); iter.hasNext();)
-				{
-					Subgoal subgoal = (Subgoal) iter.next();
-					
-					core_str.add(subgoal.name);
-				}
-
-				
-				if(subgoal_names.containsAll(curr_c_unit.get_table_names()) && core_str.contains(subgoal_names.get(i)))
-				{
-					curr_combination.add(curr_c_unit);
-					curr_subgoal_name.add(curr_c_unit.get_table_names());
-				}
-			}
-			
-			c_combinations = join_operation(c_combinations, curr_combination, i);
-			
-//			c_combinations = remove_duplicate(c_combinations);
-		}
-		
-		return remove_duplicate_final(c_combinations);
-	}
+//
+//				
+//				if(subgoal_names.containsAll(curr_c_unit.get_table_names()) && core_str.contains(subgoal_names.get(i)))
+//				{
+//					curr_combination.add(curr_c_unit);
+//					curr_subgoal_name.add(curr_c_unit.get_table_names());
+//				}
+//			}
+//			
+//			c_combinations = join_operation(c_combinations, curr_combination, i);
+//			
+////			c_combinations = remove_duplicate(c_combinations);
+//		}
+//		
+//		return remove_duplicate_final(c_combinations);
+//	}
 	
 	
-	public static HashMap<String, citation_view_vector> remove_duplicate(HashMap<String, citation_view_vector> c_combinations)
-	{
-//		Vector<Boolean> retains = new Vector<Boolean>();
-		
-//		HashMap<String, Vector<citation_view>> update_combinations = new HashMap<String, Vector<citation_view>>();
-		
-		HashMap<String, citation_view_vector> update_combinations = new HashMap<String, citation_view_vector>();
-		
-		Set set = c_combinations.keySet();
-		
-		for(Iterator iter = set.iterator(); iter.hasNext();)
-		{
-			String str = (String) iter.next();
-			
-			boolean contains = false;
-			
-			citation_view_vector c_combination = c_combinations.get(str);
-			
-			for(Iterator iterator = set.iterator(); iterator.hasNext();)
-			{
-				String string = (String) iterator.next();
-				
-				if(str!=string)
-				{
-					citation_view_vector curr_combination = c_combinations.get(string);
-					
-					if(c_combination.index_vec.containsAll(curr_combination.index_vec))
-					{
-						contains = true;
-						
-						break;
-					}
-				}
-				
-			}
-			
-			if(!contains)
-				update_combinations.put(str, c_combination);
-		}
-		
-				
-		return update_combinations;
-	}
-	
-	public static Vector<citation_view_vector> remove_duplicate_final(HashMap<String, citation_view_vector> c_combinations)
-	{
-//		Vector<Boolean> retains = new Vector<Boolean>();
-		
-//		HashMap<String, Vector<citation_view>> update_combinations = new HashMap<String, Vector<citation_view>>();
-		
-		Vector<citation_view_vector> update_combinations = new Vector<citation_view_vector>();
-		
-		Set set = c_combinations.keySet();
-		
-		for(Iterator iter = set.iterator(); iter.hasNext();)
-		{
-			String str = (String) iter.next();
-			
-			boolean contains = false;
-			
-			citation_view_vector c_combination = c_combinations.get(str);
-			
-			for(Iterator iterator = set.iterator(); iterator.hasNext();)
-			{
-				String string = (String) iterator.next();
-				
-				if(str!=string)
-				{
-					citation_view_vector curr_combination = c_combinations.get(string);
-					
-					if(c_combination.index_vec.containsAll(curr_combination.index_vec))
-					{
-						contains = true;
-						
-						break;
-					}
-				}
-				
-			}
-			
-			if(!contains)
-				update_combinations.add(c_combination);
-		}
-		
-				
-		return update_combinations;
-	}
-	
-	public static HashMap<String, citation_view_vector> join_operation(HashMap<String, citation_view_vector> c_combinations, Vector<citation_view> insert_citations,  int i)
-	{
-		if(i == 0)
-		{
-			for(int k = 0; k<insert_citations.size(); k++)
-			{
-				Vector<citation_view> c = new Vector<citation_view>();
-				
-				c.add(insert_citations.get(k));
-				
-				String str = String.valueOf(insert_citations.get(k).get_index());
-				
-				c_combinations.put(str, new citation_view_vector(c));
-				
-			}
-			
-			return c_combinations;
-		}
-		else
-		{
-			HashMap<String, citation_view_vector> updated_c_combinations = new HashMap<String, citation_view_vector>();
-			
-			Vector<Vector<String>> updated_c_subgoals = new Vector<Vector<String>>();
-			
-			Set set = c_combinations.keySet();
-			
-			for(Iterator iter = set.iterator(); iter.hasNext();)
-			{
-				String string = (String) iter.next();
-				
-				citation_view_vector curr_combination = c_combinations.get(string);
-								
-				for(int k = 0; k<insert_citations.size(); k++)
-				{
-					
-					citation_view_vector new_citation_vec = citation_view_vector.merge(curr_combination, insert_citations.get(k));
-					
-					ArrayList<String> str_list = new_citation_vec.index_vec;
-					
-					Collections.sort(str_list, String.CASE_INSENSITIVE_ORDER);
-					
-					String str = new String();
-					
-					for(int r = 0; r < str_list.size(); r++)
-					{
-						str += str_list.get(r);
-					}
-					
-						
-					
-					
-					updated_c_combinations.put(str, new_citation_vec);
-					
-//					if(insert_citations.get(k).get_table_names().containsAll(curr_subgoal))
+//	public static HashMap<String, citation_view_vector> remove_duplicate(HashMap<String, citation_view_vector> c_combinations)
+//	{
+////		Vector<Boolean> retains = new Vector<Boolean>();
+//		
+////		HashMap<String, Vector<citation_view>> update_combinations = new HashMap<String, Vector<citation_view>>();
+//		
+//		HashMap<String, citation_view_vector> update_combinations = new HashMap<String, citation_view_vector>();
+//		
+//		Set set = c_combinations.keySet();
+//		
+//		for(Iterator iter = set.iterator(); iter.hasNext();)
+//		{
+//			String str = (String) iter.next();
+//			
+//			boolean contains = false;
+//			
+//			citation_view_vector c_combination = c_combinations.get(str);
+//			
+//			for(Iterator iterator = set.iterator(); iterator.hasNext();)
+//			{
+//				String string = (String) iterator.next();
+//				
+//				if(str!=string)
+//				{
+//					citation_view_vector curr_combination = c_combinations.get(string);
+//					
+//					if(c_combination.index_vec.containsAll(curr_combination.index_vec))
 //					{
-//						Vector<citation_view> c = new Vector<citation_view>();
+//						contains = true;
 //						
-//						c.add(insert_citations.get(k));
-//						
-//						updated_c_combinations.add(c);
-//						
-//						updated_c_subgoals.add(insert_citations.get(k).get_table_names());
+//						break;
 //					}
-//					else
+//				}
+//				
+//			}
+//			
+//			if(!contains)
+//				update_combinations.put(str, c_combination);
+//		}
+//		
+//				
+//		return update_combinations;
+//	}
+	
+//	public static Vector<citation_view_vector> remove_duplicate_final(HashMap<String, citation_view_vector> c_combinations)
+//	{
+////		Vector<Boolean> retains = new Vector<Boolean>();
+//		
+////		HashMap<String, Vector<citation_view>> update_combinations = new HashMap<String, Vector<citation_view>>();
+//		
+//		Vector<citation_view_vector> update_combinations = new Vector<citation_view_vector>();
+//		
+//		Set set = c_combinations.keySet();
+//		
+//		for(Iterator iter = set.iterator(); iter.hasNext();)
+//		{
+//			String str = (String) iter.next();
+//			
+//			boolean contains = false;
+//			
+//			citation_view_vector c_combination = c_combinations.get(str);
+//			
+//			for(Iterator iterator = set.iterator(); iterator.hasNext();)
+//			{
+//				String string = (String) iterator.next();
+//				
+//				if(str!=string)
+//				{
+//					citation_view_vector curr_combination = c_combinations.get(string);
+//					
+//					if(c_combination.index_vec.containsAll(curr_combination.index_vec))
 //					{
-//						if(curr_subgoal.containsAll(insert_citations.get(k).get_table_names()))
-//						{
-//							updated_c_combinations.add((Vector<citation_view>) curr_combination.clone());
-//							
-//							updated_c_subgoals.add(curr_subgoal);
-//						}
+//						contains = true;
 //						
-//						else
-//						{
-//							Vector<citation_view> c = new Vector<citation_view>();
-//							
-//							Vector<String> str_vec = new Vector<String>();
-//							
-//							c = (Vector<citation_view>) curr_combination.clone();
-//							
-//							str_vec = (Vector<String>) curr_subgoal.clone();
-//							
-//							str_vec.addAll(insert_citations.get(k).get_table_names());
-//							
-//							c.add(insert_citations.get(k));
-//							
-//							updated_c_combinations.add(c);
-//							
-//							updated_c_subgoals.add(str_vec);
-//						}
+//						break;
 //					}
-				}
-			}
-						
-			return updated_c_combinations;
-			
-		}
-	}
+//				}
+//				
+//			}
+//			
+//			if(!contains)
+//				update_combinations.add(c_combination);
+//		}
+//		
+//				
+//		return update_combinations;
+//	}
+	
+//	public static HashMap<String, citation_view_vector> join_operation(HashMap<String, citation_view_vector> c_combinations, Vector<citation_view> insert_citations,  int i)
+//	{
+//		if(i == 0)
+//		{
+//			for(int k = 0; k<insert_citations.size(); k++)
+//			{
+//				Vector<citation_view> c = new Vector<citation_view>();
+//				
+//				c.add(insert_citations.get(k));
+//				
+//				String str = String.valueOf(insert_citations.get(k).get_index());
+//				
+//				c_combinations.put(str, new citation_view_vector(c));
+//				
+//			}
+//			
+//			return c_combinations;
+//		}
+//		else
+//		{
+//			HashMap<String, citation_view_vector> updated_c_combinations = new HashMap<String, citation_view_vector>();
+//			
+//			Vector<Vector<String>> updated_c_subgoals = new Vector<Vector<String>>();
+//			
+//			Set set = c_combinations.keySet();
+//			
+//			for(Iterator iter = set.iterator(); iter.hasNext();)
+//			{
+//				String string = (String) iter.next();
+//				
+//				citation_view_vector curr_combination = c_combinations.get(string);
+//								
+//				for(int k = 0; k<insert_citations.size(); k++)
+//				{
+//					
+//					citation_view_vector new_citation_vec = citation_view_vector.merge(curr_combination, insert_citations.get(k));
+//					
+//					ArrayList<String> str_list = new_citation_vec.index_vec;
+//					
+//					Collections.sort(str_list, String.CASE_INSENSITIVE_ORDER);
+//					
+//					String str = new String();
+//					
+//					for(int r = 0; r < str_list.size(); r++)
+//					{
+//						str += str_list.get(r);
+//					}
+//					
+//						
+//					
+//					
+//					updated_c_combinations.put(str, new_citation_vec);
+//					
+////					if(insert_citations.get(k).get_table_names().containsAll(curr_subgoal))
+////					{
+////						Vector<citation_view> c = new Vector<citation_view>();
+////						
+////						c.add(insert_citations.get(k));
+////						
+////						updated_c_combinations.add(c);
+////						
+////						updated_c_subgoals.add(insert_citations.get(k).get_table_names());
+////					}
+////					else
+////					{
+////						if(curr_subgoal.containsAll(insert_citations.get(k).get_table_names()))
+////						{
+////							updated_c_combinations.add((Vector<citation_view>) curr_combination.clone());
+////							
+////							updated_c_subgoals.add(curr_subgoal);
+////						}
+////						
+////						else
+////						{
+////							Vector<citation_view> c = new Vector<citation_view>();
+////							
+////							Vector<String> str_vec = new Vector<String>();
+////							
+////							c = (Vector<citation_view>) curr_combination.clone();
+////							
+////							str_vec = (Vector<String>) curr_subgoal.clone();
+////							
+////							str_vec.addAll(insert_citations.get(k).get_table_names());
+////							
+////							c.add(insert_citations.get(k));
+////							
+////							updated_c_combinations.add(c);
+////							
+////							updated_c_subgoals.add(str_vec);
+////						}
+////					}
+//				}
+//			}
+//						
+//			return updated_c_combinations;
+//			
+//		}
+//	}
 	
 	public static void rename_column(Subgoal view, Connection c, PreparedStatement pst) throws SQLException
 	{

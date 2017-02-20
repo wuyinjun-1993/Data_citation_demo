@@ -23,7 +23,7 @@ public class citation_view_parametered extends citation_view{
 		
 //	public Vector<String> parameters = new Vector<String>();
 	
-	HashMap<Lambda_term, String> map = new HashMap<Lambda_term, String>();
+	public HashMap<Lambda_term, String> map = new HashMap<Lambda_term, String>();
 	
 	public Vector<String> table_names = new Vector<String>();
 		

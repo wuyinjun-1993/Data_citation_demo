@@ -4,6 +4,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
@@ -32,7 +33,7 @@ public class Parse_datalog {
 	}
 	
 	
-    public static Query parse_query(String query) throws ClassNotFoundException, SQLException
+    public static Query parse_query(String query, Vector<Integer> valid_ids) throws ClassNotFoundException, SQLException
     {
 //        HashMap<String, Argument> args = new HashMap<String, Argument>();
         
@@ -43,6 +44,10 @@ public class Parse_datalog {
         String head_name=head.split("\\(")[0].trim();
         
         String []head_var=head.split("\\(")[1].split("\\)")[0].split(",");
+        
+        Vector<String> head_var_vec = new Vector<String>();
+        
+        head_var_vec.addAll(Arrays.asList(head_var));
         
         Vector<Argument> head_v = new Vector<Argument>();
         
@@ -67,7 +72,16 @@ public class Parse_datalog {
         }
         Vector<Subgoal> body_subgoals = new Vector<Subgoal>(body.length);
         
+        for(int i=0;i<head_var.length;i++)
+        {
+        	Argument arg = new Argument(head_var[i].trim());
+        	
+        	head_v.add(arg);
+        	
+//        	args.put(head_var[i].trim(), arg);
+        }
         
+        Subgoal head_subgoal = new Subgoal(head_name, head_v);
         
         for(int i=0; i<lenth; i++)
         {
@@ -81,6 +95,14 @@ public class Parse_datalog {
             
             for(int j=0;j<body_var.length;j++)
             {
+            	
+            	if(head_var_vec.contains(body_var[j]) && !valid_ids.contains(i))
+            	{
+            		valid_ids.add(i);
+            	}
+            		
+            	
+            	
 //            	if(args.get(body_var[j]) == null)
             	{
             		if(body_var[j].contains("'"))
@@ -117,6 +139,51 @@ public class Parse_datalog {
         	condition_vec.add(Conditions.parse(conditions[i].trim(), body_subgoals, orig_arg_names));
         }
         
+
+        
+        
+        return new Query(head_name.trim(), head_subgoal, body_subgoals, new Vector<Argument>(), condition_vec);
+    }
+    
+    public static Query parse_query(String query) throws ClassNotFoundException, SQLException
+    {
+//        HashMap<String, Argument> args = new HashMap<String, Argument>();
+        
+        HashMap<String, String> orig_arg_names = new HashMap<String, String>();
+    	
+        String head = query.split(":")[0];
+        
+        String head_name=head.split("\\(")[0].trim();
+        
+        String []head_var=head.split("\\(")[1].split("\\)")[0].split(",");
+        
+        Vector<String> head_var_vec = new Vector<String>();
+        
+        head_var_vec.addAll(Arrays.asList(head_var));
+        
+        Vector<Argument> head_v = new Vector<Argument>();
+        
+
+        
+        String []body = query.split(":")[1].split("\\),");
+        
+        String []conditions = null;
+        
+        int lenth = 0;
+        
+        if(body[body.length - 1].contains("("))
+        {
+        	body[body.length-1]=body[body.length-1].split("\\)")[0];
+        	lenth = body.length;
+        }
+        else
+        {
+        	conditions = body[body.length - 1].split(",");
+        	
+        	lenth = body.length - 1;
+        }
+        Vector<Subgoal> body_subgoals = new Vector<Subgoal>(body.length);
+        
         for(int i=0;i<head_var.length;i++)
         {
         	Argument arg = new Argument(head_var[i].trim());
@@ -127,6 +194,60 @@ public class Parse_datalog {
         }
         
         Subgoal head_subgoal = new Subgoal(head_name, head_v);
+        
+        for(int i=0; i<lenth; i++)
+        {
+        	String body_name=body[i].split("\\(")[0].trim();
+        	
+        	Vector<String> col_names = get_columns(body_name);
+                    
+            String []body_var=body[i].split("\\(")[1].split(",");
+            
+            Vector<Argument> body_v = new Vector<Argument>();
+            
+            for(int j=0;j<body_var.length;j++)
+            {
+
+            		
+            	
+            	
+//            	if(args.get(body_var[j]) == null)
+            	{
+            		if(body_var[j].contains("'"))
+	            	{
+            			orig_arg_names.put(body_var[j].trim(), col_names.get(j));
+	            		body_v.add(new Argument(body_var[j].trim(), col_names.get(j)));
+	            	}
+	            	else
+	            	{
+	            		orig_arg_names.put(body_var[j].trim(), col_names.get(j));
+	            		body_v.add(new Argument(body_var[j].trim(), col_names.get(j)));
+	            	}
+            	}
+//            	else
+//            	{
+//            		args.get(body_var[j].trim()).origin_name = col_names.get(j);
+//            		
+//            		body_v.add(args.get(body_var[j].trim()));
+//
+//            	}
+            }
+            
+            Subgoal body_subgoal = new Subgoal(body_name, body_v);
+            
+            body_subgoals.add(body_subgoal);
+        }
+        
+        
+        Vector<Conditions> condition_vec = new Vector<Conditions>();
+        
+        if(conditions != null)
+        for(int i = 0; i<conditions.length; i++)
+        {
+        	condition_vec.add(Conditions.parse(conditions[i].trim(), body_subgoals, orig_arg_names));
+        }
+        
+
         
         
         return new Query(head_name.trim(), head_subgoal, body_subgoals, new Vector<Argument>(), condition_vec);
@@ -159,8 +280,8 @@ public class Parse_datalog {
 	    
 	    if(col_names.contains("citation_view"))
 	    	col_names.remove("citation_view");
-	    if(col_names.contains("provenance"))
-	    	col_names.remove("provenance");
+	    if(col_names.contains("web_view_vec"))
+	    	col_names.remove("web_view_vec");
 	    
 	    
 	    c.close();

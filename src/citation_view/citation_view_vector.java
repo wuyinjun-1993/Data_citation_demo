@@ -8,19 +8,24 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import sort_citation_view_vec.binary_compare;
+import sort_citation_view_vec.sort_string_index;
+
 public class citation_view_vector {
 	
 	public Vector<citation_view> c_vec;
 	
-	public ArrayList<String> index_vec;
+	public Vector<String> index_vec;
 	
 	public HashSet<String> view_strs;
+	
+	public String index_str;
 	
 	public citation_view_vector()
 	{
 		c_vec = new Vector<citation_view>();
 		
-		index_vec = new ArrayList<String>();
+		index_vec = new Vector<String>();
 		
 		view_strs = new HashSet<String>();
 		
@@ -28,34 +33,122 @@ public class citation_view_vector {
 	
 	public citation_view_vector(Vector<citation_view> vec){
 		
-		c_vec = vec;
 		
-		index_vec = new ArrayList<String>();
+		index_vec = new Vector<String>();
 		
 		view_strs = new HashSet<String>();
 		
-		for(int i = 0; i<c_vec.size(); i++)
+		c_vec = new Vector<citation_view>();
+		
+		index_str = new String();
+		
+		for(int i = 0; i<vec.size(); i++)
 		{
 			
-			view_strs.add(vec.get(i).toString());
-			
-			index_vec.add(c_vec.get(i).get_index());
-//			
-//			Tuple tuple = Gen_citation2.map.get(c_vec.get(i).get_name());
-//			
-//			for(Iterator iter = tuple.core.iterator();iter.hasNext();)
-//			{
-//				String core_name = iter.next().toString();
-//				
-//				tuple_cores.add(core_name);
-//			}
-			
-			
+			if(!view_strs.contains(vec.get(i).toString()))
+			{
+				view_strs.add(vec.get(i).toString());
+				
+				insert_sort(index_vec, vec.get(i).get_index());
+				
+				c_vec.add(vec.get(i));
+				
+			}
+
+		}
+		
+		for(int i = 0; i< index_vec.size(); i++)
+		{
+			index_str += index_vec.get(i);
 		}
 		
 	}
 	
-	public citation_view_vector(Vector<citation_view> vec, ArrayList<String> index_vec, HashSet<String> tuple_cores){
+	public citation_view_vector merge(citation_view c)
+	{
+		
+		Vector<citation_view> vec_new = (Vector<citation_view>) c_vec.clone();
+				
+		Vector<String> index_new = (Vector<String>) index_vec.clone();
+				
+		HashSet<String> tuple_cores_new = (HashSet<String>) view_strs.clone();
+		
+		String index_str_new = new String();
+		
+		if(!tuple_cores_new.contains(c.toString()))
+		{
+			tuple_cores_new.add(c.toString());
+			
+			insert_sort(index_new, c.get_index());
+			
+			vec_new.add(c);
+			
+
+		}
+		
+		for(int i = 0; i< index_new.size(); i++)
+		{
+			index_str_new += index_new.get(i);
+		}
+		
+		citation_view_vector c_v = new citation_view_vector(vec_new, index_new, tuple_cores_new);
+		
+		c_v.index_str = index_str_new;
+		
+		return c_v;
+	}
+	
+	public void insert_sort(Vector<String> index_vec, String insert_str)
+	{
+		if(index_vec.size() == 0)
+		{
+			index_vec.add(insert_str);
+			return;
+		
+		}
+		
+		String first_str = index_vec.firstElement();
+		
+		if(insert_str.compareTo(first_str) < 0)
+		{
+			index_vec.insertElementAt(insert_str, 0);
+			
+			return;
+		}
+		
+		String last_str = index_vec.lastElement();
+		
+		if(insert_str.compareTo(last_str) > 0)
+		{
+			index_vec.add(insert_str);
+			
+			return;
+		}
+		
+		
+		int pos = sort_string_index.binary_search(index_vec, insert_str, new binary_compare<String>(){
+			
+			@Override			
+			public int compare(String a, String b)
+			{
+				if(a.compareTo(b) > 0)
+					return 1;
+				else
+				{
+					if(a.compareTo(b) < 0)
+						return -1;
+					else
+						return 0;
+				}
+			}
+		} );
+		
+		
+		index_vec.insertElementAt(insert_str, pos);
+		
+	}
+	
+	public citation_view_vector(Vector<citation_view> vec, Vector<String> index_vec, HashSet<String> tuple_cores){
 		
 		this.c_vec = vec;
 		
@@ -71,7 +164,7 @@ public class citation_view_vector {
 		
 		c_vec.add(c);
 		
-		index_vec = new ArrayList<String>();
+		index_vec = new Vector<String>();
 		
 		view_strs = new HashSet<String>();
 		
@@ -79,64 +172,31 @@ public class citation_view_vector {
 		
 		index_vec.add(c.get_index());
 		
-//		for(int i = 0; i<c_vec.size(); i++)
-//		{
-//			
-//			view_strs.add(c)
-//			index_vec.add(c_vec.get(i).get_index());
-//			
-//			Tuple tuple = Gen_citation2.map.get(c_vec.get(i).get_name());
-//			
-//			for(Iterator iter = tuple.core.iterator();iter.hasNext();)
-//			{
-//				String core_name = iter.next().toString();
-//				
-//				view_strs.add(core_name);
-//			}
-			
-			
-//		}
-		
 	}
 	
 	
 	public static citation_view_vector merge(citation_view_vector vec, citation_view c)
 	{
 		
-		if(vec.view_strs.contains(c.toString()))
-		{
-			return vec;
-		}
-		else
-			return merge_vector(new citation_view_vector(c), vec);
+		return vec.merge(c);
 		
-		
-//		citation_view_vector insert_vec = new citation_view_vector(c);
-//		
-//		if(vec.tuple_cores.containsAll(insert_vec.tuple_cores))
+//		if(vec.view_strs.contains(c.toString()))
 //		{
 //			return vec;
 //		}
 //		else
-//		{
-//			if(insert_vec.tuple_cores.containsAll(vec.tuple_cores))
-//			{
-//				return insert_vec;
-//			}
-//			else
-//			{
-//				return merge_vector(insert_vec, vec);
-//			}
-//		}
+//			return merge_vector(new citation_view_vector(c), vec);
 	}
 	
 	static citation_view_vector merge_vector(citation_view_vector vec1, citation_view_vector vec2)
 	{
+		
 		Vector<citation_view> vec_new = (Vector<citation_view>) vec1.c_vec.clone();
+		
 		
 		vec_new.addAll((vec2.c_vec));
 		
-		ArrayList<String> index_new = (ArrayList<String>) vec1.index_vec.clone();
+		Vector<String> index_new = (Vector<String>) vec1.index_vec.clone();
 		
 		index_new.addAll(vec2.index_vec);
 		
@@ -167,26 +227,8 @@ public class citation_view_vector {
 	
 	public static void main(String [] args)
 	{
-		Vector<Character> c_vec = new Vector<Character>();
-		
-		Vector<Character> vec = new Vector<Character>();
 		
 		
-		c_vec.add('c');
-		
-		c_vec.add('a');
-		
-		c_vec.add('b');
-		
-		vec.add('b');
-		
-		vec.add('c');
-		
-		if(c_vec.containsAll(vec))
-		{
-			int y = 0; 
-			y++;
-		}
 		
 	}
 	
@@ -206,6 +248,7 @@ public class citation_view_vector {
 		
 		c_v.view_strs.addAll(view_strs);
 		
+		c_v.index_str = index_str;
 		
 		return c_v;
 		

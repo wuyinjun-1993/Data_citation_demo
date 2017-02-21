@@ -1,8 +1,8 @@
-/java_cup/
-/output/
-/reasoning/
-/schema_reasoning/
-/sort_citation_view_vec/
-/gen_citation/
+/Corecover/
+/Operation/
+/Pre_processing/
+/Sql/
+/citation_view/
 /datalog/
-/aggregation/
+/schema_reasoning/
+/edu/

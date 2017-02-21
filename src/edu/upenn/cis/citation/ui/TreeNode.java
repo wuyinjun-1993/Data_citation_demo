@@ -1,4 +1,4 @@
-package edu.upenn.cis.citation;
+package edu.upenn.cis.citation.ui;
 
 import edu.upenn.cis.citation.dao.Database;
 import javafx.scene.control.TreeItem;

@@ -1,4 +1,4 @@
-package edu.upenn.cis.citation;
+package edu.upenn.cis.citation.ui;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;

@@ -1,6 +1,8 @@
 import java.sql.*;
 import java.sql.DriverManager;
 
+import Pre_processing.populate_db;
+
 
 
 
@@ -12,11 +14,11 @@ public class connect2db {
 	      try {
 	         Class.forName("org.postgresql.Driver");
 	         c = DriverManager
-	            .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
-	            "wuyinjun","123");
+	            .getConnection(populate_db.db_url,
+	        	        populate_db.usr_name,populate_db.passwd);
 	         
-//	         pst = c.prepareStatement("SELECT *  FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = 'v2'");
-	         pst = c.prepareStatement("SELECT *  FROM view_table");
+	         pst = c.prepareStatement("SELECT *  FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = 'v2'");
+//	         pst = c.prepareStatement("SELECT *  FROM view_table");
 	         rs = pst.executeQuery();
 	         int num=1;
 	         

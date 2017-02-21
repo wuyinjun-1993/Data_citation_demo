@@ -46,8 +46,8 @@ public class Add_provenance {
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");
 	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
-	        "postgres","123");
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
 	    
 	    pst = c.prepareStatement(query);
 	    
@@ -124,8 +124,8 @@ public class Add_provenance {
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");
 	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
-	        "postgres","123");
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
 	    
 	    String col_str = new String();
 	    
@@ -200,8 +200,8 @@ public class Add_provenance {
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");
 	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
-	        "postgres","123");
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
 	    
 	    String insert_col = "provenance";
 	    

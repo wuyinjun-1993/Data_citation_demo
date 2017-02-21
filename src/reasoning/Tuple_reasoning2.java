@@ -140,8 +140,8 @@ public class Tuple_reasoning2 {
 	{
 		 Class.forName("org.postgresql.Driver");
          Connection c = DriverManager
-            .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
-            "postgres","123");
+            .getConnection(populate_db.db_url,
+        	        populate_db.usr_name,populate_db.passwd);
          
 //         pst = c.prepareStatement("SELECT *  FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = 'v2'");
          
@@ -358,8 +358,8 @@ public class Tuple_reasoning2 {
 	      try {
 	         Class.forName("org.postgresql.Driver");
 	         c = DriverManager
-	            .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
-	            "postgres","123");
+	            .getConnection(populate_db.db_url,
+	        	        populate_db.usr_name,populate_db.passwd);
 	         
 //	         pst = c.prepareStatement("SELECT *  FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = 'v2'");
 	         pst = c.prepareStatement("SELECT *  FROM view_table");
@@ -841,8 +841,8 @@ public class Tuple_reasoning2 {
 		Class.forName("org.postgresql.Driver");
 		
 	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
-	        "postgres","123");
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
 	    
 	    
 	    Vector<String> subgoal_names = new Vector<String>();
@@ -1258,9 +1258,7 @@ public class Tuple_reasoning2 {
 		ResultSetMetaData r = rs.getMetaData();
 		
 		int col_num = r.getColumnCount();
-				
-		Set set = return_vals.keySet();	
-		
+						
 		String old_value = new String();
 		
 		Vector<Vector<String>> values = new Vector<Vector<String>>();
@@ -1416,7 +1414,7 @@ public class Tuple_reasoning2 {
 			}
 		}
 		
-		output2excel.citation_output(rs, query, values, c_views, file_name);
+		output2excel.citation_output(rs, query, values, c_views, file_name, values);
 		
 
 	}

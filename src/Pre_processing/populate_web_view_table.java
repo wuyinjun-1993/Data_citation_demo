@@ -18,8 +18,8 @@ public class populate_web_view_table {
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");
 	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/" + db_name,
-	        "postgres","123");
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
 	    
 	    populate(c, pst);
 		

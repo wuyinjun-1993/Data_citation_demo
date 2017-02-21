@@ -40,8 +40,8 @@ public class create_citation_view {
 		Vector<Query> views = get_views_schema();	         
 		Class.forName("org.postgresql.Driver");
 	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
-	        "postgres","123");
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
 		for(int i=0;i<views.size();i++)
 		{
 			 String str = "insert into citation_view values('C"+(i+1)+"','v"+(i+1)+"','"+citation_query.get(i)+"')";
@@ -62,8 +62,8 @@ public class create_citation_view {
 	      try {
 	         Class.forName("org.postgresql.Driver");
 	         c = DriverManager
-	            .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
-	            "postgres","123");
+	            .getConnection(populate_db.db_url,
+	        	        populate_db.usr_name,populate_db.passwd);
 	         
 //	         pst = c.prepareStatement("SELECT *  FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = 'v2'");
 	         pst = c.prepareStatement("SELECT *  FROM view_table");

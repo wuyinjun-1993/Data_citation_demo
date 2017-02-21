@@ -157,8 +157,8 @@ public class Query_converter {
 			Class.forName("org.postgresql.Driver");
 			
 		    c = DriverManager
-		        .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
-		        "postgres","123");
+		        .getConnection(populate_db.db_url,
+		    	        populate_db.usr_name,populate_db.passwd);
 		    
 		    
 		    HashSet<String> column_list = new HashSet<String>();
@@ -198,8 +198,8 @@ public class Query_converter {
 		Class.forName("org.postgresql.Driver");
 		
 	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
-	        "postgres","123");
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
 	    
 	    String schema_query = "SELECT column_name FROM information_schema.columns WHERE table_name = '"+ table_name + "'";
 	    
@@ -952,8 +952,8 @@ public class Query_converter {
 		Class.forName("org.postgresql.Driver");
 		
 	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
-	        "postgres","123");
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
 		
 		String sql = new String();
 		
@@ -1002,8 +1002,8 @@ public class Query_converter {
 		Class.forName("org.postgresql.Driver");
 		
 	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
-	        "postgres","123");
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
 		
 		String sql = new String();				
 				
@@ -1073,8 +1073,8 @@ public class Query_converter {
 		Class.forName("org.postgresql.Driver");
 		
 	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
-	        "postgres","123");
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
 		
 		String sql = new String();
 		
@@ -1314,8 +1314,8 @@ public class Query_converter {
 		Class.forName("org.postgresql.Driver");
 		
 	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
-	        "postgres","123");
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
 		
 		String sql = new String();
 		
@@ -1556,8 +1556,8 @@ public class Query_converter {
 		Class.forName("org.postgresql.Driver");
 		
 	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
-	        "postgres","123");
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
 		
 		String sql = new String();
 		

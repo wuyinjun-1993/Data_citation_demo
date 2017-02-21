@@ -4,5 +4,12 @@
 /Sql/
 /citation_view/
 /datalog/
+<<<<<<< HEAD
+/aggregation/
+/Pre_processing/
+/citation_view/
+/Sql/
+=======
 /schema_reasoning/
 /edu/
+>>>>>>> bf0356a4712de2984f6db26cdba7bf9ef14445cf

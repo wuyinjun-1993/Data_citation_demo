@@ -31,8 +31,8 @@ public class citation_view_unparametered extends citation_view{
 		Class.forName("org.postgresql.Driver");
 		
 	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
-	        "postgres","123");
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
 		
 		gen_table_names(c, pst);
 		
@@ -53,8 +53,8 @@ public class citation_view_unparametered extends citation_view{
 		Class.forName("org.postgresql.Driver");
 		
 	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
-	        "postgres","123");
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
 		
 //		gen_table_names(c, pst);
 	    
@@ -203,8 +203,8 @@ public class citation_view_unparametered extends citation_view{
 		Class.forName("org.postgresql.Driver");
 		
 	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
-	        "postgres","123");
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
 		
 	    String head_variables = get_head_variables(c, pst);
 	    

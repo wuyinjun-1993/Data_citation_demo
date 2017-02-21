@@ -23,8 +23,8 @@ public static String db_name = "iuphar_org";
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");
 	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/" + db_name,
-	        "postgres","123");
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
 	    
 	    read_view(c, pst);
 		

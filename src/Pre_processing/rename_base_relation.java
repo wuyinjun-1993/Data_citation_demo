@@ -19,8 +19,8 @@ public class rename_base_relation {
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");
 	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
-	        "postgres","123");
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
 	   
 	    create_table(c, pst, base_relations);
 	    

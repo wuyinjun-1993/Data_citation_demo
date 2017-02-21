@@ -36,8 +36,8 @@ public class insert_new_view {
 	{
 		Class.forName("org.postgresql.Driver");
         Connection c = DriverManager
-           .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
-           "postgres","123");
+           .getConnection(populate_db.db_url,
+       	        populate_db.usr_name,populate_db.passwd);
         
         PreparedStatement pst = null;
         
@@ -188,8 +188,8 @@ public class insert_new_view {
 	{
 		 Class.forName("org.postgresql.Driver");
          Connection c = DriverManager
-            .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
-            "postgres","123");
+            .getConnection(populate_db.db_url,
+        	        populate_db.usr_name,populate_db.passwd);
          
 //         pst = c.prepareStatement("SELECT *  FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = 'v2'");
          

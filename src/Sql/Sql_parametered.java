@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Vector;
 
+import Pre_processing.populate_db;
+
 public class Sql_parametered extends Sql{
 
 	public String sql = new String();
@@ -41,8 +43,8 @@ public class Sql_parametered extends Sql{
 		Class.forName("org.postgresql.Driver");
 		
 	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/IUPHAR",
-	        "postgres","123");
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
 	    
 	    String lambda_terms_query = "select query from queries where query_id = '" + name + "'";
 	    

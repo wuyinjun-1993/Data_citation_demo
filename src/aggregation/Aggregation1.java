@@ -104,14 +104,14 @@ public class Aggregation1 {
 	public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException, InterruptedException
 	{
 		
-		String q = Tuple_reasoning1.get_full_query(query);
-		
-		Vector<Vector<citation_view_vector>> c_views = Tuple_reasoning1.gen_citation_main(q);
-		
-		
-		Vector<Vector<citation_view_vector>> agg_res = aggegate(c_views);
-		
-		output(agg_res);
+//		String q = Tuple_reasoning1.get_full_query(query);
+//		
+//		Vector<Vector<citation_view_vector>> c_views = Tuple_reasoning1.gen_citation_main(q);
+//		
+//		
+//		Vector<Vector<citation_view_vector>> agg_res = aggegate(c_views);
+//		
+//		output(agg_res);
 	}
 	
 	

@@ -36,6 +36,12 @@ public class populate_db {
 
 	public static String[] base_relations = {"gpcr_c","object_c","interaction_c","ligand_c","pathophysiology_c","interaction_affinity_refs_c","gtip_process_c","process_assoc_c","disease_c", "family_c", "introduction_c"};
 
+	public static String db_url = "jdbc:postgresql://datacitation.cn7s3bpawoj2.us-east-1.rds.amazonaws.com:5432/";
+	
+	public static String usr_name = "postgres";
+	
+	public static String passwd = "12345678";
+	
 	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException
 	{
@@ -44,8 +50,7 @@ public class populate_db {
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");
 	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/" + db_name,
-	        "postgres","123");
+	        .getConnection(db_url, usr_name , passwd);
 		add_column(c,pst);
 		populate_db(c, pst);
 	}
@@ -942,8 +947,8 @@ public class populate_db {
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");
 	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/" + db_name,
-	        "postgres","123");
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
 	    
 	    
 	    String view_table_q = "select * from view_table where view = '" + view.name + "'";

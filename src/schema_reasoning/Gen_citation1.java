@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.Vector;
 import java_cup.assoc;
 import jdk.nashorn.internal.AssertsEnabled;
-import tuple_reasoning.Tuple_reasoning1;
+import reasoning.Tuple_reasoning1;
 import citation_view.*;
 import Corecover.*;
 import Operation.*;
@@ -274,8 +274,8 @@ public class Gen_citation1 {
 		Class.forName("org.postgresql.Driver");
 		
 	    c = DriverManager
-	        .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
-	        "postgres","123");
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
 	    HashMap<String, Vector<Vector<citation_view>>> c_views = gen_citation(rewritings, c, pst);
 
 	    return c_views;
@@ -416,8 +416,8 @@ public class Gen_citation1 {
 	      try {
 	         Class.forName("org.postgresql.Driver");
 	         c = DriverManager
-	            .getConnection("jdbc:postgresql://localhost:5432/" + populate_db.db_name,
-	            "postgres","123");
+	            .getConnection(populate_db.db_url,
+	        	        populate_db.usr_name,populate_db.passwd);
 	         
 //	         pst = c.prepareStatement("SELECT *  FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = 'v2'");
 	         pst = c.prepareStatement("SELECT *  FROM view_table");

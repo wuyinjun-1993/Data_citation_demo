@@ -6,12 +6,16 @@ import java.util.List;
 
 public class Database {
 
+	public static String DB_ADDR =  "jdbc:postgresql://datacitation.cn7s3bpawoj2.us-east-1.rds.amazonaws.com";
+	public static String DB_USERNAME = "postgres";
+	public static String DB_PASSWORD = "12345678";
+	
 	public static List<String> getTableList() {
 		List<String> list = new ArrayList<>();
 		Connection conn = null;
 		try {
 			Class.forName("org.postgresql.Driver");
-			conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/iuphar_org", "postgres", "123");
+			conn = DriverManager.getConnection(DB_ADDR, DB_USERNAME, DB_PASSWORD);
 			DatabaseMetaData metaData = conn.getMetaData();
 			ResultSet rs = metaData.getTables(null, null, "%", new String[] { "TABLE" });
 			while (rs.next()) {
@@ -36,7 +40,7 @@ public class Database {
 		Connection conn = null;
 		try {
 			Class.forName("org.postgresql.Driver");
-			conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/iuphar_org", "postgres", "123");
+			conn = DriverManager.getConnection(DB_ADDR, DB_USERNAME, DB_PASSWORD);
 			DatabaseMetaData metaData = conn.getMetaData();
 			ResultSet rs = metaData.getColumns(null, null, tableName, "%");
 			while (rs.next()) {

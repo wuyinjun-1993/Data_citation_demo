@@ -1,5 +1,16 @@
 package edu.upenn.cis.citation.ui;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+import org.controlsfx.control.table.TableRowExpanderColumn;
+
 import edu.upenn.cis.citation.dao.Database;
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
@@ -9,20 +20,33 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TreeCell;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Reflection;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -30,17 +54,12 @@ import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import org.controlsfx.control.table.TableRowExpanderColumn;
-
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 
 public class QBEApp extends Application {
 
     private Scene qbeScene;
     private Scene loginScene;
+    private Scene dbaScene;
     private Stage stage;
 	// Table view
 	private TableView<Entry> tableView = new TableView<Entry>();
@@ -78,7 +97,8 @@ public class QBEApp extends Application {
         this.stage = stage;
         buildLoginScene();
         buildQbeScene();
-        stage.setScene(qbeScene);
+        buildDbaScene();
+        stage.setScene(loginScene);
         stage.setMinWidth(300);
         stage.setMinHeight(300);
         // set width / height values to be 75% of users screen resolution
@@ -89,7 +109,70 @@ public class QBEApp extends Application {
         samplesTreeView.requestFocus();
 	}
 
-    private void buildLoginScene() {
+    private void buildDbaScene() {
+    	 // Adding HBox
+        HBox hb = new HBox();
+        hb.setPadding(new Insets(20, 20, 20, 30));
+    	DropShadow dropShadow = new DropShadow();
+        dropShadow.setOffsetX(5);
+        dropShadow.setOffsetY(5);
+    	Text text = new Text("Citation Management");
+    	text.setId("text");
+        text.setFont(Font.font("Courier New", FontWeight.BOLD, 28));
+        text.setEffect(dropShadow);
+        hb.getChildren().add(text);
+        
+        // Reflection for gridPane
+        BorderPane bp = new BorderPane();
+    	bp.setId("bp");
+        bp.setPadding(new Insets(10, 50, 50, 50));
+        // GridPane data views
+        GridPane gridPaneDataViews = new GridPane();
+        gridPaneDataViews.setPadding(new Insets(20, 20, 20, 20));
+        gridPaneDataViews.setHgap(5);
+        gridPaneDataViews.setVgap(5);
+        Label lableDataviews = new Label("Data Views");
+        ListView<String> listViewDataViews = new ListView<>();
+        Button buttonAddDataView = new Button("Add Data View");
+        GridPane.setHgrow(listViewDataViews, Priority.ALWAYS);
+        gridPaneDataViews.add(lableDataviews, 0, 0);
+        gridPaneDataViews.add(listViewDataViews, 0, 1);
+        gridPaneDataViews.add(buttonAddDataView, 0, 2);
+        Reflection r1 = new Reflection();
+        r1.setFraction(0.7f);
+        gridPaneDataViews.setEffect(r1);
+        gridPaneDataViews.setId("bproot");
+        // GridPane citation views
+        GridPane gridPaneCitationViews = new GridPane();
+        gridPaneCitationViews.setPadding(new Insets(20, 20, 20, 20));
+        gridPaneCitationViews.setHgap(5);
+        gridPaneCitationViews.setVgap(5);
+        Label lableCitationViews = new Label("Citation Views");
+        ListView<String> listViewCitationView = new ListView<>();
+        Button buttonAddCitationView = new Button("Add Citation View");
+        buttonAddCitationView.setOnAction(event -> { this.stage.setScene(qbeScene); });
+        GridPane.setHgrow(listViewCitationView, Priority.ALWAYS);
+        gridPaneCitationViews.add(lableCitationViews, 0, 0);
+        gridPaneCitationViews.add(listViewCitationView, 0, 1);
+        gridPaneCitationViews.add(buttonAddCitationView, 0, 2);
+        Reflection r2 = new Reflection();
+        r2.setFraction(0.7f);
+        gridPaneCitationViews.setEffect(r2);
+        gridPaneCitationViews.setId("bproot");
+        
+        SplitPane splitPane = new SplitPane();
+        splitPane.setId("bp");
+        splitPane.getItems().add(gridPaneDataViews);
+        splitPane.getItems().add(gridPaneCitationViews);
+        // Add HBox and GridPane layout to BorderPane Layout
+        bp.setTop(hb);
+        bp.setCenter(splitPane);
+        dbaScene = new Scene(bp);
+        dbaScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
+	}
+
+
+	private void buildLoginScene() {
         BorderPane bp = new BorderPane();
         bp.setPadding(new Insets(10, 50, 50, 50));
         // Adding HBox
@@ -147,6 +230,7 @@ public class QBEApp extends Application {
             }
             txtUserName.setText("");
             pf.setText("");
+            this.stage.setScene(dbaScene);
         });
         // Add HBox and GridPane layout to BorderPane Layout
         bp.setTop(hb);
@@ -155,8 +239,6 @@ public class QBEApp extends Application {
         // LOGIN SCENE
         loginScene = new Scene(bp);
         loginScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
-        // Button loginButton = new Button("Click to go to Other Scene");
-        // loginButton.setOnAction(e-> ButtonClicked(e));
     }
 
     private void buildQbeScene() {
@@ -298,10 +380,7 @@ public class QBEApp extends Application {
         hBox2.setAlignment(Pos.CENTER_RIGHT);
         final Button prevButton = new Button("Prev");
         final Button nextButton = new Button("Next");
-
-
         nextButton.setOnAction(e -> { next(); setDataView(); });
-        hBox2.setMargin(nextButton, new Insets(0, 5, 0, 5));
         hBox2.getChildren().addAll(prevButton, nextButton);
         GridPane.setHgrow(hBox2, Priority.ALWAYS);
         grid.add(hBox2, 2, 4);
@@ -385,6 +464,7 @@ public class QBEApp extends Application {
         lambdasAll.clear();
         lambdaIndex.clear();;
         lambdaSQL = Util.convertToSQLWithLambda(list);
+        System.out.println("[DEBUG] lambdaSQL: " + lambdaSQL);
         lambdas = Util.getLambda(list);
         for (String lambda : lambdas) {
             System.out.println(lambda);
@@ -402,7 +482,7 @@ public class QBEApp extends Application {
         try {
             Connection conn;
             Class.forName("org.postgresql.Driver");
-            conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/iuphar_org", "postgres", "123");
+            conn = DriverManager.getConnection(Database.DB_ADDR, Database.DB_USERNAME, Database.DB_PASSWORD);
             PreparedStatement st = conn.prepareStatement(lambdaSQL);
             // lambdaData.clear();
             hBoxLambda.getChildren().clear();
@@ -466,9 +546,6 @@ public class QBEApp extends Application {
         }
     }
 
-    public void ButtonClicked(ActionEvent e) {
-        this.stage.setScene(qbeScene);
-    }
 }
 
 

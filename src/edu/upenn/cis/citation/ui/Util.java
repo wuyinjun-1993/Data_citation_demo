@@ -79,17 +79,17 @@ public class Util {
         List<String> lambdas = new ArrayList<>();
         List<String> selected = new ArrayList<>(), wheres = new ArrayList<>();
         for (Entry item : list) {
-            if (item.getShow()) selected.add(item.getTable() + "." + item.getField());
-            if (item.getLambda()) lambdas.add(item.getTable() + "." + item.getField());
-            tables.add(item.getTable());
+            if (item.getShow()) selected.add(item.getTable() + "_c_" + item.getField());
+            if (item.getLambda()) lambdas.add(item.getTable() + "_c_" + item.getField());
+            tables.add(item.getTable() + "_c");
             if (item.getCriteria() != null && !item.getCriteria().isEmpty()) {
-                wheres.add(item.getTable() + "." + item.getField() + " " + item.getCriteria());
+                wheres.add(item.getTable() + "_c_"  + item.getField() + " " + item.getCriteria());
             }
         }
         sb.append("SELECT ");
         for (int i = 0; i < selected.size(); i++) {
             sb.append(selected.get(i));
-            if (i < selected.size() - 1)  sb.append(", ");
+            if (i < selected.size() - 1) sb.append(", ");
         }
         sb.append(" FROM ");
         for (String table : tables) sb.append(table + ", ");

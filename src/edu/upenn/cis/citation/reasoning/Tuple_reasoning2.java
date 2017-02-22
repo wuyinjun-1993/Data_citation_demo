@@ -85,17 +85,17 @@ public class Tuple_reasoning2 {
 //		long end_time = System.currentTimeMillis();
 //		
 //		System.out.println(end_time - start_time);
-		String query = "q(object_c_name):object_c(), object_c_in_gtip = 'true'";
+		String query = "q(family_c_family_id, family_c_name):family_c()";
 		
 		Vector<Vector<String>> citation_strs = new Vector<Vector<String>>();
 		
-		Vector<Vector<citation_view_vector>> c_views = tuple_reasoning(query, citation_strs);
+		Vector<Vector<citation_view_vector>> c_views = Tuple_reasoning2.tuple_reasoning(query, citation_strs);
 		
-		Vector<String> agg_citations = tuple_gen_agg_citations(c_views);
+		Vector<String> agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views);
 		
 		Vector<Integer> ids = new Vector<Integer>();
 		
-		Vector<String> subset_agg_citations = tuple_gen_agg_citations(c_views, ids);
+		Vector<String> subset_agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views, ids);
 
 	}
 	

@@ -223,7 +223,7 @@ public class GoodPlan {
     	
    
 
-    String query_str = "q1(ty,ty1,ty2):r1(id,ty),r2(id1,ty1),r2(id2,ty2)";
+    String query_str = "q1(ty):r1(id,ty),r1(id,ty)";
     
     String []view_strs = new String[3];
     

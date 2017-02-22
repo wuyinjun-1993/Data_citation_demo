@@ -1083,7 +1083,7 @@ public class Tuple_reasoning2 {
 		
 		
 //		if(valid_conditions.isEmpty())
-		citation_strs = reasoning(views, c_views, query, subgoal_names, c, pst, sql, map, start_pos, condition_seq, condition_seq_id, lambda_term_num[0]);
+		reasoning(views, c_views, query, subgoal_names, c, pst, sql, map, start_pos, condition_seq, condition_seq_id, lambda_term_num[0], citation_strs);
 
 //			reasoning(views, c_views, query, subgoal_names, c, pst, sql, map, valid_conditions, condition_seq, start_pos, table_pos_map, condition_seq_id, lambda_term_num[0]);
 //		else
@@ -1360,7 +1360,7 @@ public class Tuple_reasoning2 {
 		citation_strs.add(citations);
 	}
 	
-	public static Vector<Vector<String>> reasoning(HashSet views, Vector<Vector<citation_view_vector>> c_views, Query query, Vector<String> subgoal_names, Connection c, PreparedStatement pst, String sql, HashMap<String, Tuple> curr_map, Vector<Integer> start_pos, Vector<Conditions> condition_seq, Vector<int[]> condition_seq_id, int lambda_term_num) throws SQLException, ClassNotFoundException
+	public static void reasoning(HashSet views, Vector<Vector<citation_view_vector>> c_views, Query query, Vector<String> subgoal_names, Connection c, PreparedStatement pst, String sql, HashMap<String, Tuple> curr_map, Vector<Integer> start_pos, Vector<Conditions> condition_seq, Vector<int[]> condition_seq_id, int lambda_term_num, Vector<Vector<String>> citation_strs) throws SQLException, ClassNotFoundException
 	{
 		pst = c.prepareStatement(sql);
 		
@@ -1374,7 +1374,7 @@ public class Tuple_reasoning2 {
 		
 		Vector<Vector<String>> values = new Vector<Vector<String>>();
 		
-		Vector<Vector<String>> citation_strs = new Vector<Vector<String>>();
+//		Vector<Vector<String>> citation_strs = new Vector<Vector<String>>();
 		
 		Vector<HashMap<String, Vector<String>>> citation_strings = new Vector<HashMap<String, Vector<String>>>();
 		
@@ -1544,7 +1544,6 @@ public class Tuple_reasoning2 {
 			
 //		output2excel.citation_output(rs, query, values, c_views, file_name, values);
 		
-		return citation_strs;
 		
 
 	}

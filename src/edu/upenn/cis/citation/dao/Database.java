@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Database {
 
-	public static String DB_ADDR =  "jdbc:postgresql://datacitation.cn7s3bpawoj2.us-east-1.rds.amazonaws.com";
+	public static String DB_ADDR =  "jdbc:postgresql://datacitation.cn7s3bpawoj2.us-east-1.rds.amazonaws.com/postgres";
 	public static String DB_USERNAME = "postgres";
 	public static String DB_PASSWORD = "12345678";
 	

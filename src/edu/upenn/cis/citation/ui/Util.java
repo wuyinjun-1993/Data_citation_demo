@@ -1,14 +1,74 @@
 package edu.upenn.cis.citation.ui;
 
-import edu.upenn.cis.citation.dao.Database;
-
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
+
+import edu.upenn.cis.citation.citation_view.citation_view_vector;
+import edu.upenn.cis.citation.dao.Database;
+import edu.upenn.cis.citation.reasoning.Tuple_reasoning2;
 
 public class Util {
-    public static String convertToDatalog(List<Entry> list) {
+	
+	public static String convertToDatalog(List<Entry> list) {
+        if (list == null || list.size() == 0) return "";
+        Set<String> tables = new HashSet<>();
+        StringBuilder sb = new StringBuilder();
+        sb.append(" ");
+        for (int i = 0; i < list.size(); i++) {
+            Entry e = list.get(i);
+            tables.add(e.getTable());
+            if (i == 0) sb.append("q(");
+            if (e.getShow()) sb.append(e.getTable() + "_c_" + e.getField() + ", ");
+            if (i == list.size() - 1 && sb.charAt(sb.length()-1) ==  ' ')  {
+                sb.delete(sb.length()-2, sb.length());
+            }
+        }
+        sb.append("):");
+        for (String table : tables) {
+            sb.append(table + "_c" + "(), ");
+        }
+        for (Entry e : list) {
+            if (e.getCriteria() != null && !e.getCriteria().isEmpty()) {
+                sb.append(e.getTable() + "_c_" + e.getField() + " " + e.getCriteria() + ", ");
+            }
+        }
+        sb.delete(sb.length()-2, sb.length());
+        return sb.toString();
+    }
+	
+	public static String convertToDatalogOriginal(List<Entry> list) {
+        if (list == null || list.size() == 0) return "";
+        Set<String> tables = new HashSet<>();
+        StringBuilder sb = new StringBuilder();
+        sb.append(" ");
+        for (int i = 0; i < list.size(); i++) {
+            Entry e = list.get(i);
+            tables.add(e.getTable());
+            if (i == 0) sb.append("q(");
+            if (e.getShow()) sb.append(e.getField() + ", ");
+            if (i == list.size() - 1 && sb.charAt(sb.length()-1) ==  ' ')  {
+                sb.delete(sb.length()-2, sb.length());
+            }
+        }
+        sb.append("):");
+        for (String table : tables) {
+            sb.append(table + "(), ");
+        }
+        for (Entry e : list) {
+            if (e.getCriteria() != null && !e.getCriteria().isEmpty()) {
+                sb.append(e.getField() + " " + e.getCriteria() + ", ");
+            }
+        }
+        sb.delete(sb.length()-2, sb.length());
+        return sb.toString();
+    }
+	
+    public static String convertToDatalog2(List<Entry> list) {
         if (list == null || list.size() == 0) return "";
         Set<String> tables = new HashSet<>();
         StringBuilder sb = new StringBuilder();
@@ -98,7 +158,8 @@ public class Util {
             sb.append(" WHERE ");
             for (String where : wheres) sb.append(where + ", ");
             for (String lambda : lambdas) sb.append(lambda + "=? AND ");
-            if (sb.charAt(sb.length()-1) ==  ' ') sb.delete(sb.length()-5, sb.length());
+            if (lambdas.size() > 0 && sb.charAt(sb.length()-1) ==  ' ') sb.delete(sb.length()-5, sb.length());
+            else sb.delete(sb.length()-2, sb.length());
         }
         return sb.toString();
     }
@@ -112,5 +173,20 @@ public class Util {
         }
         return lambdas;
     }
+    
+    public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException, InterruptedException {
+    	Vector<Vector<String>> citation_strs = new Vector<Vector<String>>();
+    	String datalog = "q(family_c_family_id, family_c_name):family_c()";
+		try {
+			System.out.println("[DEBUG] datalog: " + datalog);
+			Vector<Vector<citation_view_vector>> c_views = Tuple_reasoning2.tuple_reasoning(datalog, citation_strs);
+			// Vector<String> agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views);
+			// Vector<String> subset_agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views, ids);
+			// System.out.println("[!!!!!!] " + subset_agg_citations);
+		} catch (ClassNotFoundException | SQLException | IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.out.println("[DEBUG] citation_strs: " + citation_strs.size());
+	}
 
 }

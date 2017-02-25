@@ -1,6 +1,9 @@
 package edu.upenn.cis.citation.ui;
 
+import java.awt.Desktop;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -31,6 +34,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
@@ -58,6 +62,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -90,8 +95,20 @@ public class QBEApp extends Application {
 	List<Integer> lambdaIndex = new ArrayList<>();
 	Vector<Integer> ids = new Vector<>();
 
+	VBox vboxDatalog;
+	HBox hBoxPrevNext, hBoxGenCitation;
+	//
+	SplitPane splitPaneQbe;
+	
+	TableRowExpanderColumn<Entry> expanderColumn;
+	TableColumn<Entry, String> tableColumn;
+	TableColumn<Entry, String> fieldColumn;
+	TableColumn<Entry, Boolean> showColumn;
+	TableColumn<Entry, String> criteraColumn;
+	TableColumn<Entry, Boolean> lambdaColumn;
+	
 	Vector<Vector<citation_view_vector>> c_views = null;
-	private boolean isDBA = true;
+	boolean isDba;
 
 	/**
 	 * GUI Main Method
@@ -139,6 +156,7 @@ public class QBEApp extends Application {
 		// GridPane data views
 		GridPane gridPaneDataViews = new GridPane();
 		gridPaneDataViews.setPadding(new Insets(20, 20, 20, 20));
+		gridPaneDataViews.setAlignment(Pos.CENTER);
 		gridPaneDataViews.setHgap(5);
 		gridPaneDataViews.setVgap(5);
 		Label lableDataviews = new Label("Data Views");
@@ -147,22 +165,30 @@ public class QBEApp extends Application {
 		ObservableList<String> listDataViews = FXCollections.observableArrayList(Database.getDataViews());
 		System.out.println(Database.getDataViews());
 		listViewDataViews.setItems(listDataViews);
-		
 		Button buttonAddDataView = new Button("Add Data View");
 		buttonAddDataView.setOnAction(event -> {
+			dbaMode(true);
 			this.stage.setScene(qbeScene);
 		});
-		GridPane.setHgrow(listViewDataViews, Priority.ALWAYS);
+		Button buttonDeleteDataView = new Button("Delete Data View");
+		buttonDeleteDataView.setOnAction(event -> {
+			dbaMode(true);
+			this.stage.setScene(qbeScene);
+		});
 		gridPaneDataViews.add(lableDataviews, 0, 0);
-		gridPaneDataViews.add(listViewDataViews, 0, 1);
+		gridPaneDataViews.add(listViewDataViews, 0, 1, 2, 1);
 		gridPaneDataViews.add(buttonAddDataView, 0, 2);
+		gridPaneDataViews.add(buttonDeleteDataView, 1, 2);
 		Reflection r1 = new Reflection();
 		r1.setFraction(0.7f);
 		gridPaneDataViews.setEffect(r1);
 		gridPaneDataViews.setId("bproot");
+		
+		
 		// GridPane citation views
 		GridPane gridPaneCitationViews = new GridPane();
 		gridPaneCitationViews.setPadding(new Insets(20, 20, 20, 20));
+		gridPaneCitationViews.setAlignment(Pos.CENTER);
 		gridPaneCitationViews.setHgap(5);
 		gridPaneCitationViews.setVgap(5);
 		Label lableCitationViews = new Label("Citation Views");
@@ -172,12 +198,22 @@ public class QBEApp extends Application {
 		listViewCitationView.setItems(listCitationViews);
 		Button buttonAddCitationView = new Button("Add Citation View");
 		buttonAddCitationView.setOnAction(event -> {
+			dbaMode(true);
+			this.stage.setScene(qbeScene);
+		});
+		Button buttonDeleteCitationView = new Button("Delete Citation View");
+		buttonDeleteCitationView.setOnAction(event -> {
+			dbaMode(true);
 			this.stage.setScene(qbeScene);
 		});
 		GridPane.setHgrow(listViewCitationView, Priority.ALWAYS);
+		GridPane.setVgrow(listViewCitationView, Priority.ALWAYS);
+		gridPaneCitationViews.setAlignment(Pos.CENTER);
+		gridPaneCitationViews.setPadding(new Insets(10, 10, 10, 10));
 		gridPaneCitationViews.add(lableCitationViews, 0, 0);
-		gridPaneCitationViews.add(listViewCitationView, 0, 1);
+		gridPaneCitationViews.add(listViewCitationView, 0, 1, 2, 1);
 		gridPaneCitationViews.add(buttonAddCitationView, 0, 2);
+		gridPaneCitationViews.add(buttonDeleteCitationView, 1, 2);
 		Reflection r2 = new Reflection();
 		r2.setFraction(0.7f);
 		gridPaneCitationViews.setEffect(r2);
@@ -194,18 +230,71 @@ public class QBEApp extends Application {
 		dbaScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
 	}
 
-	private void buildLoginScene() {
-		BorderPane bp = new BorderPane();
-		bp.setPadding(new Insets(10, 50, 50, 50));
+	private void buildLoginScene() {		
+		GridPane gp = new GridPane();
+		gp.setPadding(new Insets(10, 50, 50, 50));
 		// Adding HBox
 		HBox hb = new HBox();
 		hb.setPadding(new Insets(20, 20, 20, 30));
 		HBox hbox = new HBox();
 		// Adding GridPane
 		GridPane gridPane = new GridPane();
-		gridPane.setPadding(new Insets(20, 20, 20, 20));
-		gridPane.setHgap(5);
-		gridPane.setVgap(5);
+		GridPane gridPane2 = new GridPane();
+		gridPane2.add(new Label("IUPHAR/BPS"), 0, 0);
+		Hyperlink l1 = new Hyperlink();
+		l1.setText("Targets");
+		l1.setOnAction(Event -> {
+			try {
+				Desktop.getDesktop().browse(new URL("http://www.guidetopharmacology.org/targets.jsp").toURI());
+			} catch (IOException | URISyntaxException e) {
+				e.printStackTrace();
+			}
+		});
+		Hyperlink l2 = new Hyperlink();
+		l2.setText("Ligands");
+		l2.setOnAction(Event -> {
+			try {
+				Desktop.getDesktop().browse(new URL("http://www.guidetopharmacology.org/GRAC/LigandListForward?database=all").toURI());
+			} catch (IOException | URISyntaxException e) {
+				e.printStackTrace();
+			}
+		});
+		Hyperlink l3 = new Hyperlink();
+		l3.setText("Advanced Search");
+		l3.setOnAction(Event -> {
+			try {
+				Desktop.getDesktop().browse(new URL("http://www.guidetopharmacology.org/targets.jsp").toURI());
+			} catch (IOException | URISyntaxException e) {
+				e.printStackTrace();
+			}
+		});
+		gridPane2.add(l1, 0, 1);
+		gridPane2.add(l2, 0, 2);
+		gridPane2.add(l3, 0, 3);
+		Button citeButton = new Button("Cite a dataset");
+		citeButton.setOnAction(event -> {
+			dbaMode(false);
+			this.stage.setScene(qbeScene);
+		});
+		gridPane2.add(citeButton, 0, 4);
+		gridPane.setMaxSize(300, 300);
+		gridPane.setMinSize(300, 300);
+		gridPane2.setMaxSize(300, 300);
+		gridPane2.setMinSize(300, 300);
+		HBox.setMargin(gridPane, new Insets(20, 20, 0, 20));
+		HBox.setMargin(gridPane2, new Insets(20, 20, 0, 20));
+		hbox.setAlignment(Pos.CENTER);
+		gp.setAlignment(Pos.CENTER);
+		gridPane.setPadding(new Insets(20, 30, 20, 30));
+		gridPane2.setPadding(new Insets(20, 30, 20, 30));
+		gridPane.setHgap(10);
+		gridPane.setVgap(10);
+		GridPane.setHgrow(gridPane, Priority.ALWAYS);
+		GridPane.setVgrow(gridPane, Priority.ALWAYS);
+		gridPane2.setHgap(10);
+		gridPane2.setVgap(10);
+		GridPane.setHgrow(gridPane2, Priority.ALWAYS);
+		GridPane.setVgrow(gridPane2, Priority.ALWAYS);
 		// Implementing Nodes for GridPane
 		Label lblUserName = new Label("Username");
 		final TextField txtUserName = new TextField();
@@ -213,30 +302,38 @@ public class QBEApp extends Application {
 		final PasswordField pf = new PasswordField();
 		Button btnLogin = new Button("Login");
 		final Label lblMessage = new Label();
+		final Label dbsMessage = new Label("Admin Login");
 		// Adding Nodes to GridPane layout
-		gridPane.add(lblUserName, 0, 0);
-		gridPane.add(txtUserName, 1, 0);
-		gridPane.add(lblPassword, 0, 1);
-		gridPane.add(pf, 1, 1);
-		gridPane.add(btnLogin, 2, 1);
-		gridPane.add(lblMessage, 1, 2);
+		gridPane.add(dbsMessage, 0, 0);
+		gridPane.add(lblUserName, 0, 1);
+		gridPane.add(txtUserName, 1, 1);
+		gridPane.add(lblPassword, 0, 2);
+		gridPane.add(pf, 1, 2);
+		gridPane.add(btnLogin, 0, 3);
+		gridPane.add(lblMessage, 1, 3);
 		// Reflection for gridPane
 		Reflection r = new Reflection();
 		r.setFraction(0.7f);
 		gridPane.setEffect(r);
+		Reflection r2 = new Reflection();
+		r2.setFraction(0.7f);
+		gridPane2.setEffect(r2);
 		// DropShadow effect
 		DropShadow dropShadow = new DropShadow();
 		dropShadow.setOffsetX(5);
 		dropShadow.setOffsetY(5);
 		// Adding text and DropShadow effect to it
 		Text text = new Text("Data Citation System");
-		text.setFont(Font.font("Courier New", FontWeight.BOLD, 28));
+		text.setTextAlignment(TextAlignment.CENTER);
+		text.setFont(Font.font("Courier New", FontWeight.BOLD, 38));
 		text.setEffect(dropShadow);
 		// Adding text to HBox
+		hb.setAlignment(Pos.CENTER);
 		hb.getChildren().add(text);
 		// Add ID's to Nodes
-		bp.setId("bp");
+		gp.setId("bp");
 		gridPane.setId("bproot");
+		gridPane2.setId("bproot");
 		btnLogin.setId("btnLogin");
 		text.setId("text");
 		// Action for btnLogin
@@ -255,11 +352,11 @@ public class QBEApp extends Application {
 			this.stage.setScene(dbaScene);
 		});
 		// Add HBox and GridPane layout to BorderPane Layout
-		bp.setTop(hb);
-		hbox.getChildren().add(gridPane);
-		bp.setCenter(hbox);
+		gp.add(hb, 0, 0);
+		hbox.getChildren().addAll(gridPane, gridPane2);
+		gp.add(hbox, 0, 1);
 		// LOGIN SCENE
-		loginScene = new Scene(bp);
+		loginScene = new Scene(gp);
 		loginScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
 	}
 
@@ -278,6 +375,7 @@ public class QBEApp extends Application {
 
 		// Search box
 		final TextField searchBox = new TextField();
+		searchBox.setMinWidth(200);
 		searchBox.setPromptText("Search Table");
 		searchBox.textProperty().addListener(new InvalidationListener() {
 			@Override
@@ -331,18 +429,17 @@ public class QBEApp extends Application {
 					}
 				});
 		GridPane.setVgrow(samplesTreeView, Priority.ALWAYS);
-		GridPane.setHgrow(samplesTreeView, Priority.ALWAYS);
 		grid.add(samplesTreeView, 0, 1, 1, 4);
 
 		// Pane
-		SplitPane splitPane = new SplitPane();
-		GridPane.setHgrow(splitPane, Priority.ALWAYS);
-		GridPane.setVgrow(splitPane, Priority.ALWAYS);
-		splitPane.getItems().add(tableView);
+		splitPaneQbe = new SplitPane();
+		GridPane.setHgrow(splitPaneQbe, Priority.ALWAYS);
+		GridPane.setVgrow(splitPaneQbe, Priority.ALWAYS);
+		splitPaneQbe.getItems().add(tableView);
 		final HBox hBox = new HBox();
 		hBox.setAlignment(Pos.CENTER_RIGHT);
-		final Label datalogLabel = new Label("Datalog Generated:");
-		final TextArea datalogTextArea = new TextArea();
+		Label datalogLabel = new Label("Datalog Generated:");
+		TextArea datalogTextArea = new TextArea();
 		datalogTextArea.setWrapText(true);
 		final Button runButton = new Button("Run");
 		final Button clearButton = new Button("Clear");
@@ -369,29 +466,33 @@ public class QBEApp extends Application {
 		HBox.setMargin(clearButton, new Insets(0, 5, 0, 5));
 		HBox.setMargin(backButton, new Insets(0, 5, 0, 5));
 		hBox.getChildren().addAll(runButton, clearButton, backButton);
-		final VBox vbox = new VBox();
-		vbox.setSpacing(5);
-		vbox.setPadding(new Insets(10, 0, 0, 10));
-		if (isDBA)
-			vbox.getChildren().addAll(datalogLabel, datalogTextArea, hBox);
-		else
-			vbox.getChildren().addAll(hBox);
-
-		vbox.setPadding(new Insets(25, 25, 25, 25));
-		splitPane.getItems().add(vbox);
-		grid.add(splitPane, 1, 1, 2, 1);
+		vboxDatalog = new VBox();
+		vboxDatalog.setSpacing(5);
+		vboxDatalog.setPadding(new Insets(10, 0, 0, 10));
+		Button btDataView = new Button("Create Data View");
+		btDataView.setOnAction(e -> {
+			// TODO
+		});
+		btDataView.setId("buttonGen");
+		TextField tfDataView = new TextField();
+		Label viewNameLabel = new Label("View Name:");
+		vboxDatalog.getChildren().addAll(datalogLabel, datalogTextArea, viewNameLabel, tfDataView, btDataView);
+		vboxDatalog.setPadding(new Insets(25, 25, 25, 25));
+		splitPaneQbe.getItems().add(vboxDatalog);
+		grid.add(hBox, 2, 0);
+		grid.add(splitPaneQbe, 1, 1, 2, 1);
 
 		// Table View
 		tableView.setEditable(true);
 		tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-		TableRowExpanderColumn<Entry> expanderColumn = new TableRowExpanderColumn<>(this::createEditor);
+		expanderColumn = new TableRowExpanderColumn<>(this::createEditor);
 		expanderColumn.setMaxWidth(30);
 		expanderColumn.setMinWidth(30);
-		TableColumn<Entry, String> tableColumn = new TableColumn<>("Table");
-		TableColumn<Entry, String> fieldColumn = new TableColumn<>("Field");
-		TableColumn<Entry, Boolean> showColumn = new TableColumn<>("Show");
-		TableColumn<Entry, String> criteraColumn = new TableColumn<>("Criteria");
-		TableColumn<Entry, Boolean> lambdaColumn = new TableColumn<>("Lambda");
+		tableColumn = new TableColumn<>("Table");
+		fieldColumn = new TableColumn<>("Field");
+		showColumn = new TableColumn<>("Show");
+		criteraColumn = new TableColumn<>("Criteria");
+		lambdaColumn = new TableColumn<>("Lambda");
 		tableColumn.setCellValueFactory(new PropertyValueFactory<Entry, String>("table"));
 		fieldColumn.setCellValueFactory(new PropertyValueFactory<Entry, String>("field"));
 		showColumn.setCellValueFactory(new PropertyValueFactory<Entry, Boolean>("show"));
@@ -404,8 +505,6 @@ public class QBEApp extends Application {
 		lambdaColumn.setEditable(true);
 
 		tableView.setItems(data);
-		tableView.getColumns().addAll(expanderColumn, tableColumn, fieldColumn, showColumn, criteraColumn,
-				lambdaColumn);
 		tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
 		// Label data preview
@@ -425,47 +524,46 @@ public class QBEApp extends Application {
 		GridPane.setHgrow(hBoxLambda, Priority.ALWAYS);
 		grid.add(hBoxLambda, 1, 4);
 
-		final HBox hBox2 = new HBox();
-		hBox2.setAlignment(Pos.CENTER_RIGHT);
+		hBoxPrevNext = new HBox();
+		hBoxPrevNext.setAlignment(Pos.CENTER_RIGHT);
 		final Button prevButton = new Button("Prev");
 		final Button nextButton = new Button("Next");
 		nextButton.setOnAction(e -> {
 			next();
 			setDataView();
 		});
-		hBox2.getChildren().addAll(prevButton, nextButton);
-		GridPane.setHgrow(hBox2, Priority.ALWAYS);
-		grid.add(hBox2, 2, 4);
+		hBoxPrevNext.getChildren().addAll(prevButton, nextButton);
+		GridPane.setHgrow(hBoxPrevNext, Priority.ALWAYS);
+		grid.add(hBoxPrevNext, 2, 4);
 
-		final HBox hBox3 = new HBox();
-		hBox3.setAlignment(Pos.CENTER_RIGHT);
-		if (isDBA) {
-			final Button genButton = new Button("Generate Citation");
-			genButton.setOnAction(e -> {
-				int index = 0;
-				ObservableList<Integer> indices = dataView.getSelectionModel().getSelectedIndices();
-				System.out.println("[DEBUG] index = " + index);
-				ids.clear();
-				ids.addAll(indices);
-				Vector<String> subset_agg_citations = new Vector<>();
-				try {
-					subset_agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views, ids);
-				} catch (ClassNotFoundException | SQLException e1) {
-					e1.printStackTrace();
-				}
-				Alert alert = new Alert(AlertType.INFORMATION);
-				alert.setTitle("Information Dialog");
-				alert.setHeaderText(null);
-				StringBuilder stringBuilder = new StringBuilder();
-				for (String str : subset_agg_citations) stringBuilder.append(str + "\n");
-				alert.setContentText(stringBuilder.toString());
-				alert.showAndWait();
-			});
-			genButton.setId("buttonGen");
-			hBox3.getChildren().add(genButton);
-		}
-		
-		grid.add(hBox3, 2, 2);
+		hBoxGenCitation = new HBox();
+		hBoxGenCitation.setAlignment(Pos.CENTER_RIGHT);
+		Button genButton = new Button("Generate Citation");
+		genButton.setOnAction(e -> {
+			int index = 0;
+			ObservableList<Integer> indices = dataView.getSelectionModel().getSelectedIndices();
+			System.out.println("[DEBUG] index = " + index);
+			ids.clear();
+			ids.addAll(indices);
+			Vector<String> subset_agg_citations = new Vector<>();
+			try {
+				subset_agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views, ids);
+			} catch (ClassNotFoundException | SQLException e1) {
+				e1.printStackTrace();
+			}
+			Alert alert = new Alert(AlertType.INFORMATION);
+			alert.setTitle("Citation Generated");
+			alert.setHeaderText(null);
+			StringBuilder stringBuilder = new StringBuilder();
+			for (int i = 0; i < subset_agg_citations.size(); i++) {
+				stringBuilder.append("Citation #" + (i+1) + ":  ");
+				stringBuilder.append(subset_agg_citations.get(i) + "\n\n");
+			}
+			alert.setContentText(stringBuilder.toString());
+			alert.showAndWait();
+		});
+		genButton.setId("buttonGen");
+		grid.add(hBoxGenCitation, 2, 2);
 		// ===========================================================================
 		qbeScene = new Scene(grid);
 		qbeScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
@@ -601,52 +699,51 @@ public class QBEApp extends Application {
 						});
 				dataView.getColumns().addAll(col);
 			}
-			TableColumn citationColomn = new TableColumn("Citation");
-			Callback<TableColumn, TableCell> cellFactory = new Callback<TableColumn, TableCell>() {
-				@Override
-				public TableCell call(TableColumn p) {
-					return new ComboBoxCell();
-				}
-			};
-			
 			int num_rows = 0;
-			ids.clear();
 			while (rs.next()) {
 				ids.add(num_rows);
 				ObservableList row = FXCollections.observableArrayList();
 				for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
 					row.add(rs.getString(i));
 				}
-				// System.out.println("Row added: " + row);
 				dataViewList.add(row);
 				num_rows++;
 			}
-			
-			Vector<Vector<String>> citation_strs = new Vector<Vector<String>>();
-			try {
-				System.out.println("[DEBUG] datalog: " + datalog);
-				  c_views = Tuple_reasoning2.tuple_reasoning(datalog, citation_strs);
-				  // Vector<String> agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views);
-				  // Vector<String> subset_agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views, ids);
-			} catch (ClassNotFoundException | SQLException | IOException | InterruptedException e) {
-				e.printStackTrace();
+			if (!isDba) {
+				Vector<Vector<String>> citation_strs = new Vector<Vector<String>>();
+				TableColumn citationColomn = new TableColumn("Citation");
+				Callback<TableColumn, TableCell> cellFactory = new Callback<TableColumn, TableCell>() {
+					@Override
+					public TableCell call(TableColumn p) {
+						return new ComboBoxCell();
+					}
+				};
+				ids.clear();
+				try {
+					System.out.println("[DEBUG] datalog: " + datalog);
+					  c_views = Tuple_reasoning2.tuple_reasoning(datalog, citation_strs);
+					  // Vector<String> agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views);
+					  // Vector<String> subset_agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views, ids);
+				} catch (ClassNotFoundException | SQLException | IOException | InterruptedException e) {
+					e.printStackTrace();
+				}
+				for (int i = 0; i < dataViewList.size(); i++) {
+					ObservableList<String> lambdaData = FXCollections.observableArrayList(citation_strs.get(i));
+					((ObservableList) dataViewList.get(i)).add(lambdaData);
+				}
+				citationColomn.setCellFactory(cellFactory);
+				citationColomn.setCellValueFactory(
+						new Callback<TableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
+							public ObservableValue<String> call(TableColumn.CellDataFeatures<ObservableList, String> param) {
+								if (param.getValue() == null || param.getValue().get(size) == null) return new SimpleStringProperty("");
+								ObservableList<String> list =  (ObservableList<String>) param.getValue().get(size);
+								if (list == null || list.size() == 0) return new SimpleStringProperty("");
+								return new SimpleStringProperty(list.get(0));
+							}
+						});
+				dataView.getColumns().addAll(citationColomn);
 			}
-			for (int i = 0; i < dataViewList.size(); i++) {
-				ObservableList<String> lambdaData = FXCollections.observableArrayList(citation_strs.get(i));
-				((ObservableList) dataViewList.get(i)).add(lambdaData);
-			}
 			
-			citationColomn.setCellFactory(cellFactory);
-			citationColomn.setCellValueFactory(
-					new Callback<TableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
-						public ObservableValue<String> call(TableColumn.CellDataFeatures<ObservableList, String> param) {
-							if (param.getValue() == null || param.getValue().get(size) == null) return new SimpleStringProperty("");
-							ObservableList<String> list =  (ObservableList<String>) param.getValue().get(size);
-							if (list == null || list.size() == 0) return new SimpleStringProperty("");
-							return new SimpleStringProperty(list.get(0));
-						}
-					});
-			dataView.getColumns().addAll(citationColomn);
 			dataView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		} catch (SQLException | ClassNotFoundException e) {
 			e.printStackTrace();
@@ -665,4 +762,21 @@ public class QBEApp extends Application {
 		}
 	}
 
+	private void dbaMode(boolean b) {
+		isDba = b;
+		vboxDatalog.setVisible(b);
+		hBoxPrevNext.setVisible(b);
+		hBoxLambda.setVisible(b);
+		hBoxGenCitation.setVisible(!b);
+		splitPaneQbe.getItems().clear();
+		splitPaneQbe.getItems().add(tableView);
+		if (b) {
+			splitPaneQbe.getItems().add(vboxDatalog);
+			tableView.getColumns().clear();
+			tableView.getColumns().addAll(expanderColumn, tableColumn, fieldColumn, showColumn, criteraColumn, lambdaColumn);
+		} else {
+			tableView.getColumns().clear();
+			tableView.getColumns().addAll(expanderColumn, tableColumn, fieldColumn, showColumn, criteraColumn);
+		}
+	}
 }

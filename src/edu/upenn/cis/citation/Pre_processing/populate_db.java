@@ -29,6 +29,8 @@ import schema_reasoning.Gen_citation1;
 
 public class populate_db {
 	
+	//psql --host=datacitation.cn7s3bpawoj2.us-east-1.rds.amazonaws.com --port=5432 --username=postgres --password
+	
 	
 	public static String separator = "|";
 	
@@ -45,8 +47,12 @@ public class populate_db {
 	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException
 	{
-	      Connection c = null;
-	      ResultSet rs = null;
+	      update();
+	}
+	
+	public static void update() throws SQLException, ClassNotFoundException
+	{
+		Connection c = null;
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");
 	    c = DriverManager
@@ -752,7 +758,7 @@ public class populate_db {
 					
 					String curr_citation_sql = "select citation_view from " + subgoal.name + " where " + where_values;
 					
-					System.out.println(curr_citation_sql);
+//					System.out.println(curr_citation_sql);
 					
 					pst = c.prepareStatement(curr_citation_sql);
 					

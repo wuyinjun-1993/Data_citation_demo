@@ -13,13 +13,13 @@ import java.util.Set;
 import java.util.Vector;
 import java_cup.assoc;
 import jdk.nashorn.internal.AssertsEnabled;
-import reasoning.Tuple_reasoning1;
-import citation_view.*;
-import Corecover.*;
-import Operation.*;
-import Pre_processing.populate_db;
-import datalog.Parse_datalog;
-import datalog.Query_converter;
+import edu.upenn.cis.citation.Corecover.*;
+import edu.upenn.cis.citation.Operation.*;
+import edu.upenn.cis.citation.Pre_processing.populate_db;
+import edu.upenn.cis.citation.citation_view.*;
+import edu.upenn.cis.citation.datalog.Parse_datalog;
+import edu.upenn.cis.citation.datalog.Query_converter;
+import edu.upenn.cis.citation.reasoning.Tuple_reasoning1;
 
 public class Gen_citation1 {
 	public static void main(String args[]) throws ClassNotFoundException, SQLException {

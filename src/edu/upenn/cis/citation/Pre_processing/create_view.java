@@ -26,14 +26,23 @@ public static String db_name = "iuphar_org";
 	        .getConnection(populate_db.db_url,
 	    	        populate_db.usr_name,populate_db.passwd);
 	    
-	    read_view(c, pst);
+	    check_create_views();
 		
 	}
 	
 	
 	
-	public static void read_view(Connection c, PreparedStatement pst) throws SQLException
+	public static void check_create_views() throws SQLException, ClassNotFoundException
 	{
+		
+		Connection c = null;
+	      PreparedStatement pst = null;
+		Class.forName("org.postgresql.Driver");
+	    c = DriverManager
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
+		
+		
 		String query= "select * from view_table";
 		
 		pst = c.prepareStatement(query);

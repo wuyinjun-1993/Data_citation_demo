@@ -5,10 +5,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
 
-import Corecover.Argument;
-import Corecover.Query;
-import Corecover.Subgoal;
-import Pre_processing.populate_db;
+import edu.upenn.cis.citation.Corecover.Argument;
+import edu.upenn.cis.citation.Corecover.Query;
+import edu.upenn.cis.citation.Corecover.Subgoal;
+import edu.upenn.cis.citation.Pre_processing.populate_db;
 
 public class create_citation_view {
 	

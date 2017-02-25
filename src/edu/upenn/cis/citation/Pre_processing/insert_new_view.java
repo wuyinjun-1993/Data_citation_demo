@@ -14,17 +14,23 @@ public class insert_new_view {
 	
 	public static void main(String[] args) throws ClassNotFoundException, SQLException
 	{
-		String view = "q(ligand_c_ligand_id, interaction_c_object_id): ligand_c(), interaction_c(), interaction_c_ligand_id = ligand_c_ligand_id";
+		String view = "q(introduction_c_family_id): introduction_c()";
 		
 		view = get_full_query(view);
 		
 		Query v = Parse_datalog.parse_query(view);
 		
-		Lambda_term l = new Lambda_term("ligand_c_ligand_id", "ligand_c");
+//		Lambda_term l = new Lambda_term("ligand_c_ligand_id", "ligand_c");
+//		
+//		v.lambda_term.add(l);
 		
-		v.lambda_term.add(l);
+		String name = "introduction_view";
 		
-		insert_view(v);
+		insert_view(v, name);
+		
+		create_view.check_create_views();
+		
+		populate_db.update();
 		
 		
 	}
@@ -32,7 +38,7 @@ public class insert_new_view {
 	
 	
 	
-	static void insert_view(Query view) throws SQLException, ClassNotFoundException
+	static void insert_view(Query view, String name) throws SQLException, ClassNotFoundException
 	{
 		Class.forName("org.postgresql.Driver");
         Connection c = DriverManager
@@ -45,7 +51,7 @@ public class insert_new_view {
         
         int seq = get_view_num(c, pst) + 1;
         
-        view.name = "v" + seq;
+        view.name = name;//"v" + seq;
         
         insert_view_table(view, c, pst);
         

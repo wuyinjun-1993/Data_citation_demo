@@ -18,7 +18,7 @@ public class delete_view {
 	        .getConnection(populate_db.db_url,
 	    	        populate_db.usr_name,populate_db.passwd);
 	    
-	    String view_name = "v7";
+	    String view_name = "introduction_view";
 	    
 //	    rename_view("v4", c, pst, "v2");
 	    
@@ -76,7 +76,17 @@ public class delete_view {
 			}
 			
 			
+			String del_query = "drop view " + view_name;
 			
+			pst = c.prepareStatement(del_query);
+			
+			pst.execute();
+			
+			del_query = "drop table " + view_name + "_table";
+			
+			pst = c.prepareStatement(del_query);
+			
+			pst.execute();
 			
 		}
 		

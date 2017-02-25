@@ -1,0 +1,39 @@
+Q1(ligand_id, object_id1): -gpcr(object_id1, class, ligand), interaction(interaction_id, ligand_id1, object_id2, type, action, ...), ligand(ligand_id2, name) object_id1 = object_ud2, ligand1 = ligand2
+
+Q2(ligand_id, object_id1): -gpcr(object_id1, class, ligand), interaction(interaction_id, ligand_id1
+ object_id2, type, action, ...), ligand(ligand_id2, name) object_id1 = object_ud2, ligand1 = ligand2, approved = true
+
+Q3(object_id1): object(object_id1, name, last_modified, comments, ...), interaction(interaction_id, ligand_id1, object_id2, type, action, ...), ligand(ligand_id2, name,...), object_id1 = object_id2, ligand_id1 = ligand_id2, approved = true, primary_target = true
+
+Q4(object_id1): object(object_id1, name, last_modified, comments, ...), interaction(interaction_id, ligand_id1, object_id2, type1, action, ...), ligand(ligand_id2, name, type2..), object_id1 = object_id2, ligand_id1 = ligand_id2, affinity_high >= 8.0, type2 = ''
+
+Q5(): object(object_id1, name1, last_modified, comments, ...), pathophysiology(pathophysiology_id, object_id2, disease, role, drugs), disease(disease_id, name2
+ description, name_vector, description_vector), object_id1 = object_id2, 
+
+
+
+Q6(object_id, reference_id3):object(object_id1, name1, last_modified, comments, ...), interaction(interaction_id2, ligand_id1, object_id2, type1, action, ...), interaction_affinity_refs(interaction_id3, reference_id3), interaction_id2 = interaction_id3, object_id1 = object_id2, type1 = 'Agonist'
+
+
+Q7(object_id): ligand(ligand_id1, name,...), object(object_id2, name2, last_modified, comments, ...), interaction(interaction_id3, ligand_id3, object_id3, type3, action, ...), interaction_affinity_refs(interaction_id4, reference_id4), ligand_id1 = ligand_id3, object_id2 = object_id3, interaction_id3 = interaction_id4 
+
+
+Q8(object_id2): object(object_id2, name2, last_modified, comments, ...), in_gtip = 'true'
+
+Q9(object_id2): ligand(object_id2, name2, last_modified, comments, ...), in_gtip = 'true'
+
+Q10(object_id, gtip_process_id): gtip_process(gtip_process_id1, term1, definition1, last_modified1, term_vector1), process_assoc(object_id2, gtip_process_id2, comment2, direct_annotation2, go_annotation2, process_assoc_id2, comment_vector2), gtip_process_id1 = gtip_process_id2, gtip_process_id1 = ''
+
+
+
+
+
+view:
+
+v1: gpcr, object
+
+v2: interaction
+
+v3: object
+
+v4: ligand

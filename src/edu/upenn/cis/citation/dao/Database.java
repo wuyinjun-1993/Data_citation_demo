@@ -1,6 +1,11 @@
 package edu.upenn.cis.citation.dao;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +24,10 @@ public class Database {
 			DatabaseMetaData metaData = conn.getMetaData();
 			ResultSet rs = metaData.getTables(null, null, "%", new String[] { "TABLE" });
 			while (rs.next()) {
-				list.add(rs.getString("TABLE_NAME"));
+				String tableName = rs.getString("TABLE_NAME");
+				if (!tableName.endsWith("_c")) {
+					list.add(tableName);
+				}
 			}
 		} catch (SQLException | ClassNotFoundException e) {
 			
@@ -65,7 +73,7 @@ public class Database {
 		Connection conn = null;
 		try {
 			Class.forName("org.postgresql.Driver");
-			conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/iuphar_org", "postgres", "123");
+			conn = DriverManager.getConnection(DB_ADDR, DB_USERNAME, DB_PASSWORD);
 			Statement statement = conn.createStatement();
 			statement.execute(String.format("SELECT DISTINCT %s FROM %s A ORDER BY %s", field, tableName, field));
 			ResultSet rs = statement.getResultSet();
@@ -88,5 +96,57 @@ public class Database {
 
 	public static void main(String args[]) {
 		System.out.println(getDistincts("family", "family_id"));
+	}
+	
+	public static List<String> getDataViews() {
+		List<String> list = new ArrayList<>();
+		Connection conn = null;
+		try {
+			Class.forName("org.postgresql.Driver");
+			conn = DriverManager.getConnection(DB_ADDR, DB_USERNAME, DB_PASSWORD);
+			Statement statement = conn.createStatement();
+			statement.execute("SELECT DISTINCT view FROM citation_view ORDER BY view");
+			ResultSet rs = statement.getResultSet();
+			while (rs.next()) {
+				list.add(rs.getString(1));
+			}
+		} catch (SQLException | ClassNotFoundException e) {
+
+		} finally {
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return list;
+	}
+	
+	public static List<String> getCitationViews() {
+		List<String> list = new ArrayList<>();
+		Connection conn = null;
+		try {
+			Class.forName("org.postgresql.Driver");
+			conn = DriverManager.getConnection(DB_ADDR, DB_USERNAME, DB_PASSWORD);
+			Statement statement = conn.createStatement();
+			statement.execute("SELECT DISTINCT citation_view_name FROM citation_view ORDER BY citation_view_name");
+			ResultSet rs = statement.getResultSet();
+			while (rs.next()) {
+				list.add(rs.getString(1));
+			}
+		} catch (SQLException | ClassNotFoundException e) {
+
+		} finally {
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return list;
 	}
 }

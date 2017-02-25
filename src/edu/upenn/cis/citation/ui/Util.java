@@ -186,7 +186,7 @@ public class Util {
 		} catch (ClassNotFoundException | SQLException | IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
-		System.out.println("[DEBUG] citation_strs: " + citation_strs.size());
+		for (Vector<String> v : citation_strs) System.out.println(Math.max(v.get(0).length(), v.get(1).length()));
 	}
 
 }

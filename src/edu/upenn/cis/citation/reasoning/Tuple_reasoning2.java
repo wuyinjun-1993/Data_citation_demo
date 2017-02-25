@@ -67,7 +67,7 @@ public class Tuple_reasoning2 {
 	
 	static Vector<Tuple> web_views = new Vector<Tuple>();
 	
-	static int max_author_num = 0;
+	static int max_author_num = 10;
 	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException, IOException, InterruptedException
 	{

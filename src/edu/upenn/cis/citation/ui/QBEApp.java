@@ -8,14 +8,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 
 import org.controlsfx.control.table.TableRowExpanderColumn;
-
-import com.sun.org.apache.bcel.internal.generic.NEW;
 
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.dao.Database;
@@ -23,7 +19,6 @@ import edu.upenn.cis.citation.reasoning.Tuple_reasoning2;
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -50,7 +45,6 @@ import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.effect.DropShadow;
@@ -148,8 +142,16 @@ public class QBEApp extends Application {
 		gridPaneDataViews.setHgap(5);
 		gridPaneDataViews.setVgap(5);
 		Label lableDataviews = new Label("Data Views");
+		// ListView Data Views
 		ListView<String> listViewDataViews = new ListView<>();
+		ObservableList<String> listDataViews = FXCollections.observableArrayList(Database.getDataViews());
+		System.out.println(Database.getDataViews());
+		listViewDataViews.setItems(listDataViews);
+		
 		Button buttonAddDataView = new Button("Add Data View");
+		buttonAddDataView.setOnAction(event -> {
+			this.stage.setScene(qbeScene);
+		});
 		GridPane.setHgrow(listViewDataViews, Priority.ALWAYS);
 		gridPaneDataViews.add(lableDataviews, 0, 0);
 		gridPaneDataViews.add(listViewDataViews, 0, 1);
@@ -164,7 +166,10 @@ public class QBEApp extends Application {
 		gridPaneCitationViews.setHgap(5);
 		gridPaneCitationViews.setVgap(5);
 		Label lableCitationViews = new Label("Citation Views");
+		// ListView Citation Views
 		ListView<String> listViewCitationView = new ListView<>();
+		ObservableList<String> listCitationViews = FXCollections.observableArrayList(Database.getDataViews());
+		listViewCitationView.setItems(listCitationViews);
 		Button buttonAddCitationView = new Button("Add Citation View");
 		buttonAddCitationView.setOnAction(event -> {
 			this.stage.setScene(qbeScene);
@@ -266,7 +271,7 @@ public class QBEApp extends Application {
 		grid.setHgap(10);
 		grid.setVgap(10);
 
-		final Label label_0 = new Label("Query by Example");
+		final Label label_0 = new Label("Query Builder");
 		label_0.setId("prompt-text");
 		GridPane.setHgrow(label_0, Priority.ALWAYS);
 		grid.add(label_0, 1, 0, 2, 1);
@@ -310,11 +315,18 @@ public class QBEApp extends Application {
 					@Override
 					public void changed(ObservableValue<? extends TreeItem<TreeNode>> observable,
 							TreeItem<TreeNode> oldValue, TreeItem<TreeNode> node) {
-						if (node == null)
-							return;
+						if (node == null) return;
 						String table = node.getParent().getValue().getName();
-						String field = node.getValue().getName();
-						data.add(new Entry(table, field, true, "", "", false));
+						if (node.getParent() == samplesTreeView.getRoot()) {
+							if (node.getChildren().size() > 0) return;
+							for (String attr : Database.getAttrList(node.getValue().getName())) {
+								node.getChildren().add(new TreeItem<TreeNode>(new TreeNode(attr)));
+					        }
+							return;
+						} else {
+							String field = node.getValue().getName();
+							data.add(new Entry(table, field, true, "", "", false));
+						}
 						tableView.refresh();
 					}
 				});
@@ -427,16 +439,32 @@ public class QBEApp extends Application {
 
 		final HBox hBox3 = new HBox();
 		hBox3.setAlignment(Pos.CENTER_RIGHT);
-		final Button genButton = new Button("Generate Citation");
-		genButton.setOnAction(e -> {
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Information Dialog");
-			alert.setHeaderText(null);
-			alert.setContentText("I have a great message for you!");
-			alert.showAndWait();
-		});
-		genButton.setId("buttonGen");
-		hBox3.getChildren().add(genButton);
+		if (isDBA) {
+			final Button genButton = new Button("Generate Citation");
+			genButton.setOnAction(e -> {
+				int index = 0;
+				ObservableList<Integer> indices = dataView.getSelectionModel().getSelectedIndices();
+				System.out.println("[DEBUG] index = " + index);
+				ids.clear();
+				ids.addAll(indices);
+				Vector<String> subset_agg_citations = new Vector<>();
+				try {
+					subset_agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views, ids);
+				} catch (ClassNotFoundException | SQLException e1) {
+					e1.printStackTrace();
+				}
+				Alert alert = new Alert(AlertType.INFORMATION);
+				alert.setTitle("Information Dialog");
+				alert.setHeaderText(null);
+				StringBuilder stringBuilder = new StringBuilder();
+				for (String str : subset_agg_citations) stringBuilder.append(str + "\n");
+				alert.setContentText(stringBuilder.toString());
+				alert.showAndWait();
+			});
+			genButton.setId("buttonGen");
+			hBox3.getChildren().add(genButton);
+		}
+		
 		grid.add(hBox3, 2, 2);
 		// ===========================================================================
 		qbeScene = new Scene(grid);
@@ -481,7 +509,6 @@ public class QBEApp extends Application {
 		}
 		if (searchText != null) {
 			pruneSampleTree(root, searchText);
-			samplesTreeView.setRoot(null);
 			samplesTreeView.setRoot(root);
 		}
 		sort(root, Comparator.comparing(o -> o.getValue().getName()));
@@ -559,6 +586,7 @@ public class QBEApp extends Application {
 			dataViewList.clear();
 			dataView.getColumns().clear();
 			dataView.setEditable(true);
+			
 			final int size = rs.getMetaData().getColumnCount();
 			for (int i = 1; i <= size; i++) {
 				final int j = i - 1;
@@ -595,16 +623,16 @@ public class QBEApp extends Application {
 			}
 			
 			Vector<Vector<String>> citation_strs = new Vector<Vector<String>>();
-//			try {
-//				System.out.println("[DEBUG] datalog: " + datalog);
-//				 // c_views = Tuple_reasoning2.tuple_reasoning(datalog, citation_strs);
-//				 // Vector<String> agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views);
-//				 // Vector<String> subset_agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views, ids);
-//			} catch (ClassNotFoundException | SQLException | IOException | InterruptedException e) {
-//				e.printStackTrace();
-//			}
+			try {
+				System.out.println("[DEBUG] datalog: " + datalog);
+				  c_views = Tuple_reasoning2.tuple_reasoning(datalog, citation_strs);
+				  // Vector<String> agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views);
+				  // Vector<String> subset_agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views, ids);
+			} catch (ClassNotFoundException | SQLException | IOException | InterruptedException e) {
+				e.printStackTrace();
+			}
 			for (int i = 0; i < dataViewList.size(); i++) {
-				ObservableList<String> lambdaData = FXCollections.observableArrayList("1", "2", "3");
+				ObservableList<String> lambdaData = FXCollections.observableArrayList(citation_strs.get(i));
 				((ObservableList) dataViewList.get(i)).add(lambdaData);
 			}
 			
@@ -612,14 +640,14 @@ public class QBEApp extends Application {
 			citationColomn.setCellValueFactory(
 					new Callback<TableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
 						public ObservableValue<String> call(TableColumn.CellDataFeatures<ObservableList, String> param) {
-							if (param.getValue() == null || param.getValue().get(size-1) == null) return new SimpleStringProperty("");
-							ObservableList<String> list =  (ObservableList<String>) param.getValue().get(param.getValue().size()-1);
+							if (param.getValue() == null || param.getValue().get(size) == null) return new SimpleStringProperty("");
+							ObservableList<String> list =  (ObservableList<String>) param.getValue().get(size);
 							if (list == null || list.size() == 0) return new SimpleStringProperty("");
 							return new SimpleStringProperty(list.get(0));
 						}
 					});
 			dataView.getColumns().addAll(citationColomn);
-
+			dataView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		} catch (SQLException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}

@@ -2,6 +2,7 @@ package edu.upenn.cis.citation.ui;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableCell;
@@ -19,7 +20,11 @@ class ComboBoxCell extends TableCell<ObservableList, String> {
 		if (!isEmpty()) {
 			super.startEdit();
 			ObservableList list = getTableView().getItems().get(getIndex());
-			comboBox.setItems((ObservableList<String>) list.get(list.size()-1));
+			ObservableList<String> temp = FXCollections.observableArrayList();
+			for (String s : (ObservableList<String>) (list.get(list.size()-1))) {
+				temp.add(s);
+			}
+			comboBox.setItems(temp);
 			comboBox.getSelectionModel().select(getItem());
 			comboBox.focusedProperty().addListener(new ChangeListener<Boolean>() {
 				@Override

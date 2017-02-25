@@ -21,9 +21,9 @@ public class TreeNode {
     public static TreeItem<TreeNode> createTreeItem(String s) {
         TreeItem<TreeNode> treeItem = new TreeItem<TreeNode>(new TreeNode(s));
         treeItem.setExpanded(true);
-        for (String attr : Database.getAttrList(s)) {
-            treeItem.getChildren().add(new TreeItem<TreeNode>(new TreeNode(attr)));
-        }
+//        for (String attr : Database.getAttrList(s)) {
+//            treeItem.getChildren().add(new TreeItem<TreeNode>(new TreeNode(attr)));
+//        }
         return treeItem;
     }
 }

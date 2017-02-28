@@ -1,7 +1,7 @@
-.root {
+/* .root {
 	-fx-background-image: url("background.jpg");
 }
-
+ */
 #root {
 	-fx-background-image: url("background.jpg");
 }
@@ -30,7 +30,7 @@
 }
 
 #prompt-text {
-    -fx-font-size: 28px;
+    -fx-font-size: 22px;
     -fx-font-family: "Arial Black";
     -fx-fill: #d4d4d4;
     -fx-effect: innershadow( three-pass-box , rgba(163, 163, 163, 0.7), 6, 0.0 , 0 , 2 );
@@ -64,6 +64,18 @@
     -fx-font-size: 14px;
 }
 
+#prevnext {
+    -fx-background-color:
+            #c3c4c4,
+            linear-gradient(#d6d6d6 50%, white 100%),
+            radial-gradient(center 50% -40%, radius 200%, #e6e6e6 45%, rgba(230,230,230,0) 50%);
+    -fx-background-radius: 30;
+    -fx-background-insets: 0,1,1;
+    -fx-text-fill: black;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
+    -fx-padding: 1 20 2 20;
+}
+
 #bevel-grey {
     -fx-background-color: 
         linear-gradient(#f2f2f2, #d6d6d6),
@@ -73,9 +85,15 @@
     -fx-background-insets: 0,1,2;
     -fx-text-fill: black;
     -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
-    -fx-padding: 3 30 3 30;
+    -fx-padding: 2 25 2 25;
 }
 
 .split-pane:horizontal > .split-pane-divider {
    -fx-background-color: transparent;
+}
+
+.samples-tree {
+    -fx-background-color: -fx-outer-border, -fx-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 2, 0;
 }

@@ -73,7 +73,7 @@
     -fx-background-insets: 0,1,1;
     -fx-text-fill: black;
     -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
-    -fx-padding: 1 20 2 20;
+    -fx-padding: 1 15 2 15;
 }
 
 #bevel-grey {

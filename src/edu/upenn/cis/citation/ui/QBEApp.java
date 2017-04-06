@@ -1,21 +1,5 @@
 package edu.upenn.cis.citation.ui;
 
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Vector;
-
-import org.controlsfx.control.table.TableRowExpanderColumn;
-
 import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Pre_processing.insert_new_view;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
@@ -35,37 +19,20 @@ import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Hyperlink;
+import javafx.scene.control.*;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TreeCell;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Reflection;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -73,13 +40,25 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import org.controlsfx.control.table.TableRowExpanderColumn;
+
+import java.awt.*;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.sql.*;
+import java.util.*;
+import java.util.List;
 
 public class QBEApp extends Application {
 
 	private Scene viewScene;
 	private Scene loginScene;
+
+	private Tab dbaDataViewDataTab;
+	private ObservableList<String> dbaListCitationViews;
 	
-	private Scene newScene;
+	// private Scene newScene;
 	private Stage stage, newStage;
 	// private TableView<ObservableList> dataSelectedView = new TableView<>();
 	private ObservableList dataViewList = FXCollections.observableArrayList();
@@ -129,37 +108,49 @@ public class QBEApp extends Application {
 	@Override
 	public void start(Stage stage) {
 		this.stage = stage;
-		FlowPane newPane = new FlowPane();
-		this.newScene = new Scene(newPane, 400, 200);
+		// FlowPane newPane = new FlowPane();
+		// this.newScene = new Scene(newPane, 400, 200);
 		this.newStage = new Stage();
 		// this.newStage.setScene(newScene);
 		buildLoginScene();
-		
 		buildQbeSceneDba();
 		buildQbeSceneUser();
-		
 		buildViewScene();
 		stage.setScene(loginScene);
 		stage.setMinWidth(300);
 		stage.setMinHeight(300);
 		// set width / height values to be 75% of users screen resolution
 		Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-		stage.setWidth(screenBounds.getWidth() * 0.75);
+		stage.setWidth(screenBounds.getWidth() * 0.8);
 		stage.setHeight(screenBounds.getHeight() * 0.75);
 		stage.show();
 	}
 
 	private void buildViewScene() {
+        HBox hbox = new HBox();
+        TextField textFieldDataViewDataLog = new TextField();
+        DropShadow dropShadow = new DropShadow();
+        dropShadow.setOffsetX(5);
+        dropShadow.setOffsetY(5);
+		Text textDataLog = new Text("DataLog: ");
+        textDataLog.setId("text");
+        textDataLog.setFont(Font.font("Courier New", FontWeight.BOLD, 18));
+        textDataLog.setFill(Color.WHITE);
+        textDataLog.setEffect(dropShadow);
+        hbox.getChildren().addAll(textDataLog, textFieldDataViewDataLog);
+        HBox.setHgrow(textFieldDataViewDataLog, Priority.ALWAYS);
+        hbox.setAlignment(Pos.CENTER);
+
 		// Adding HBox
 		HBox hb = new HBox();
 		hb.setPadding(new Insets(20, 20, 20, 30));
-		DropShadow dropShadow = new DropShadow();
-		dropShadow.setOffsetX(5);
-		dropShadow.setOffsetY(5);
+		DropShadow dropShadow_2 = new DropShadow();
+        dropShadow_2.setOffsetX(5);
+        dropShadow_2.setOffsetY(5);
 		Text text = new Text("Citation Management");
 		text.setId("text");
 		text.setFont(Font.font("Courier New", FontWeight.BOLD, 28));
-		text.setEffect(dropShadow);
+		text.setEffect(dropShadow_2);
 		hb.getChildren().add(text);
 
 		// Reflection for gridPane
@@ -176,26 +167,70 @@ public class QBEApp extends Application {
 		// ListView Data Views
 		ListView<String> listViewDataViews = new ListView<>();
 		ObservableList<String> listDataViews = FXCollections.observableArrayList(Database.getDataViews());
-		System.out.println(Database.getDataViews());
+		// TODO
 		listViewDataViews.setItems(listDataViews);
-		Button buttonAddDataView = new Button("Add Data View");
+
+		listViewDataViews.setOnMouseClicked(event -> {
+            String dv = listViewDataViews.getSelectionModel().getSelectedItem();
+            if (dv == null) return;
+            String dataViewDataLog = Database.getDataViewDataLog(dv);
+            if (!hbox.isVisible()) hbox.setVisible(true);
+            textFieldDataViewDataLog.setText(dataViewDataLog);
+        });
+
+        Button buttonEditDataView = new Button("Edit");
+        buttonEditDataView.setOnAction(event -> {
+            String dv = listViewDataViews.getSelectionModel().getSelectedItem();
+            hbox.setVisible(false);
+            if (dv == null) return;
+            dbaDataViewDataTab.setText("Data View: " + dv);
+            dbaListCitationViews.setAll(Database.getCitationViews(dbaDataViewDataTab.getText().split(":")[1].trim()));
+            stage.setScene(dbaScene);
+        });
+		Button buttonAddDataView = new Button("Add");
 		buttonAddDataView.setOnAction(event -> {
-			this.stage.setScene(dbaScene);
+            TextInputDialog dialog = new TextInputDialog(null);
+            dialog.setTitle("Enter Data View Name");
+            dialog.setHeaderText(null);
+            Optional<String> result = dialog.showAndWait();
+            String entered;
+            if (result.isPresent()) {
+                entered = result.get();
+            } else {
+                return;
+            }
+			Database.createDataViewByName(entered);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Succeed");
+            alert.setHeaderText(null);
+            alert.setContentText("The database is successfully created");
+            alert.showAndWait();
+            dbaListCitationViews.add(entered);
 		});
-		Button buttonDeleteDataView = new Button("Delete Data View");
+		Button buttonDeleteDataView = new Button("Delete");
 		buttonDeleteDataView.setOnAction(event -> {
-			this.stage.setScene(dbaScene);
+            String dv = listViewDataViews.getSelectionModel().getSelectedItem();
+            dbaListCitationViews.remove(dv);
+            Database.deleteDataViewByName(dv);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Succeed");
+            alert.setHeaderText(null);
+            alert.setContentText("The database is successfully deleted");
+            alert.showAndWait();
+            dbaListCitationViews.remove(dv);
 		});
-		gridPaneDataViews.add(lableDataviews, 0, 0);
-		gridPaneDataViews.add(listViewDataViews, 0, 1, 2, 1);
-		gridPaneDataViews.add(buttonAddDataView, 0, 2);
-		gridPaneDataViews.add(buttonDeleteDataView, 1, 2);
+		GridPane.setHgrow(listViewDataViews, Priority.ALWAYS);
+		GridPane.setVgrow(listViewDataViews, Priority.ALWAYS);
+		gridPaneDataViews.add(lableDataviews, 0, 0, 3, 1);
+		gridPaneDataViews.add(listViewDataViews, 0, 1, 3, 1);
+        gridPaneDataViews.add(buttonEditDataView, 0, 2);
+		gridPaneDataViews.add(buttonAddDataView, 1, 2);
+		gridPaneDataViews.add(buttonDeleteDataView, 2, 2);
 		Reflection r1 = new Reflection();
 		r1.setFraction(0.7f);
 		gridPaneDataViews.setEffect(r1);
 		gridPaneDataViews.setId("bproot");
-		
-		
+
 		// GridPane citation views
 		GridPane gridPaneCitationViews = new GridPane();
 		gridPaneCitationViews.setPadding(new Insets(20, 20, 20, 20));
@@ -205,7 +240,7 @@ public class QBEApp extends Application {
 		Label lableCitationViews = new Label("Citation Views");
 		// ListView Citation Views
 		ListView<String> listViewCitationView = new ListView<>();
-		ObservableList<String> listCitationViews = FXCollections.observableArrayList(Database.getDataViews());
+		ObservableList<String> listCitationViews = FXCollections.observableArrayList(Database.getCitationViews(null));
 		listViewCitationView.setItems(listCitationViews);
 		Button buttonAddCitationView = new Button("Add Citation View");
 		buttonAddCitationView.setOnAction(event -> {
@@ -235,6 +270,8 @@ public class QBEApp extends Application {
 		// Add HBox and GridPane layout to BorderPane Layout
 		bp.setTop(hb);
 		bp.setCenter(splitPane);
+        hbox.setVisible(false);
+		bp.setBottom(hbox);
 		viewScene = new Scene(bp);
 		viewScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
 	}
@@ -345,9 +382,8 @@ public class QBEApp extends Application {
 		btnLogin.setId("btnLogin");
 		text.setId("text");
 		btnLogin.setOnAction(event -> {
-			
-			this.stage.setScene(dbaScene);
-			
+			this.stage.setScene(viewScene);
+			// TODO: add OAuth Authentication
 //			String checkUser = txtUserName.getText().toString();
 //			String checkPw = pf.getText().toString();
 //			if (checkUser.equals("u") && checkPw.equals("p")) {
@@ -424,7 +460,7 @@ public class QBEApp extends Application {
 		GridPane.setVgrow(splitPaneQbe, Priority.ALWAYS);
 		splitPaneQbe.getItems().add(tableView);
 		
-		gridUserSub.add(buildTopMenu(null, null, dataView), 1, 0);
+		gridUserSub.add(buildTopMenu(null, null, dataView, true), 1, 0);
 		gridUserSub.add(splitPaneQbe, 0, 1, 2, 1);
 
 		// Table View
@@ -437,34 +473,26 @@ public class QBEApp extends Application {
 		TableColumn<Entry, String> fieldColumn = new TableColumn<>("Field");
 		TableColumn<Entry, Boolean> showColumn = new TableColumn<>("Show");
 		TableColumn<Entry, String> criteraColumn = new TableColumn<>("Criteria");
-		TableColumn<Entry, Boolean> lambdaColumn = new TableColumn<>("Lambda");
-		tableColumn.setCellValueFactory(new PropertyValueFactory<Entry, String>("table"));
-		fieldColumn.setCellValueFactory(new PropertyValueFactory<Entry, String>("field"));
-		showColumn.setCellValueFactory(new PropertyValueFactory<Entry, Boolean>("show"));
+        TableColumn<Entry, String> joinColumn = new TableColumn<>("Join");
+		tableColumn.setCellValueFactory(new PropertyValueFactory<>("table"));
+		fieldColumn.setCellValueFactory(new PropertyValueFactory<>("field"));
+		showColumn.setCellValueFactory(new PropertyValueFactory<>("show"));
 		showColumn.setCellFactory(CheckBoxTableCell.forTableColumn(showColumn));
 		showColumn.setEditable(true);
-		criteraColumn.setCellValueFactory(new PropertyValueFactory<Entry, String>("criteria"));
+		criteraColumn.setCellValueFactory(new PropertyValueFactory<>("criteria"));
 		criteraColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-		lambdaColumn.setCellValueFactory(new PropertyValueFactory<Entry, Boolean>("lambda"));
-		lambdaColumn.setCellFactory(CheckBoxTableCell.forTableColumn(lambdaColumn));
-		lambdaColumn.setEditable(true);
+        joinColumn.setCellValueFactory(new PropertyValueFactory<>("join"));
+        joinColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 
-		tableView.getColumns().addAll(expanderColumn, tableColumn, fieldColumn, showColumn, criteraColumn);
+		tableView.getColumns().addAll(expanderColumn, tableColumn, fieldColumn, showColumn, criteraColumn, joinColumn);
 		tableView.setItems(data);
 		tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
 
 		// Label data preview
 		final Label label_1 = new Label("Data Preview");
 		label_1.setId("prompt-text");
 		GridPane.setHgrow(label_1, Priority.ALWAYS);
 		gridUserSub.add(label_1, 0, 2);
-		
-//		GridPane.setVgrow(dataSelectedView, Priority.ALWAYS);
-//		GridPane.setHgrow(dataSelectedView, Priority.ALWAYS);
-//		dataSelectedView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-//		dataSelectedView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-//		dataSelectedView.setItems(dataSelectedViewList);
 
 		hBoxPrevNext = new HBox();
 		hBoxPrevNext.setAlignment(Pos.CENTER_RIGHT);
@@ -474,7 +502,7 @@ public class QBEApp extends Application {
 		nextButton.setId("prevnext");
 		nextButton.setOnAction(e -> {
 			next();
-			setDataView(null, dataView);
+			setDataView(null, dataView, true);
 		});
 		hBoxPrevNext.getChildren().addAll(prevButton, nextButton);
 		GridPane.setHgrow(hBoxPrevNext, Priority.ALWAYS);
@@ -521,7 +549,7 @@ public class QBEApp extends Application {
 		userScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
 	}
 	
-	private HBox buildTopMenu(TextArea textArea, HBox hBoxLambda, TableView<ObservableList> dataView) {
+	private HBox buildTopMenu(TextField textArea, HBox hBoxLambda, TableView<ObservableList> dataView, boolean toCite) {
 		final HBox hBox = new HBox();
 		hBox.setAlignment(Pos.CENTER_RIGHT);
 		final Button runButton = new Button(" Run  ");
@@ -534,10 +562,10 @@ public class QBEApp extends Application {
 			if (data.isEmpty()) return;
 			List<Entry> list = new ArrayList<>();
 			list.addAll(data);
-			if (textArea != null) textArea.appendText(Util.convertToDatalogOriginal(list) + "\n");
+			if (textArea != null) textArea.setText(Util.convertToDatalogOriginal(list) + "\n");
 			lambdasAll.clear();
 			lambdaIndex.clear();
-			lambdaSQL = Util.convertToSQLWithLambda(list);
+			lambdaSQL = Util.convertToSQLWithLambda(list, toCite);
 			datalog = Util.convertToDatalog(list);
 			System.out.println("[DEBUG] lambdaSQL: " + lambdaSQL);
 			lambdas = Util.getLambda(list);
@@ -549,7 +577,7 @@ public class QBEApp extends Application {
 				lambdasAll.add(temp);
 				lambdaIndex.add(0);
 			}
-			setDataView(hBoxLambda, dataView);
+			setDataView(hBoxLambda, dataView, toCite);
 		});
 		clearButton.setOnAction(e -> {
 			data.clear();
@@ -563,7 +591,11 @@ public class QBEApp extends Application {
 			dataView.getColumns().clear();
 			dataViewList.clear();
 			if (gridDba.getChildren().contains(vboxRightCQ)) {
-				stage.setWidth(stage.getWidth()-200);
+				stage.setWidth(stage.getWidth()-220);
+                gridDba.getChildren().remove(vboxRightCQ);
+                Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
+                stage.setX((primScreenBounds.getWidth() - stage.getWidth()) / 2);
+                stage.setY((primScreenBounds.getHeight() - stage.getHeight()) / 2);
 			}
 			this.stage.setScene(loginScene);
 		});
@@ -576,7 +608,8 @@ public class QBEApp extends Application {
 
 	private TextField buildSearchBox(TreeView<TreeNode> treeView) {
 		TextField searchBox = new TextField();
-		searchBox.setMinWidth(200);
+		searchBox.setMinWidth(180);
+        searchBox.setMaxWidth(180);
 		searchBox.setPromptText("Search Table");
 		searchBox.textProperty().addListener(new InvalidationListener() {
 			@Override
@@ -595,9 +628,9 @@ public class QBEApp extends Application {
         
 		// TabPane
 		TabPane tabPane = new TabPane();
-		Tab dataTab = new Tab("View Builder");
-		dataTab.setClosable(false);
-		tabPane.getTabs().setAll(dataTab);
+		dbaDataViewDataTab = new Tab("View Builder");
+		dbaDataViewDataTab.setClosable(false);
+		tabPane.getTabs().setAll(dbaDataViewDataTab);
 		tabPane.setTabClosingPolicy(TabClosingPolicy.SELECTED_TAB);
 		tabPane.getStyleClass().add(TabPane.STYLE_CLASS_FLOATING);
 		GridPane.setHgrow(tabPane, Priority.ALWAYS);
@@ -606,15 +639,16 @@ public class QBEApp extends Application {
 		
 		VBox vboxRight = new VBox();
 		vboxRight.setAlignment(Pos.CENTER);
-		
-		
+        vboxRight.setMinWidth(180);
+        vboxRight.setMaxWidth(180);
+
 		Label labelCv = new Label("Citation Views");
 		labelCv.setId("prompt-text");
 		labelCv.setMinWidth(165);
 		labelCv.setStyle("-fx-font-size: 16px;");
 		
-		ListView<String> listViewCv = new ListView<String>();
-		listViewCv.setMinWidth(200);
+		ListView<String> listViewCv = new ListView<>();
+		listViewCv.setMinWidth(180);
 		listViewCv.setCellFactory(lv -> {
 			ListCell<String> cell = new ListCell<>();
 			ContextMenu contextMenu = new ContextMenu();
@@ -638,20 +672,23 @@ public class QBEApp extends Application {
 			});
 			return cell;
 		});
-		ObservableList<String> listCitationViews = FXCollections.observableArrayList("IUPHAR Database Citation", "Title Citation", "Contributors Citation", "Database Version");
-		listViewCv.setItems(listCitationViews);
+		dbaListCitationViews = FXCollections.observableArrayList();
+		listViewCv.setItems(dbaListCitationViews);
 		
 		TextField tfDataView = new TextField();
 		Label viewNameLabel = new Label("Citation View Name:");
 		
-		Button btDataView = new Button("Add Citation Query");
+		Button btDataView = new Button("Add new");
 		btDataView.setId("buttonGen");
         btDataView.setOnAction(e -> {
-        	stage.setWidth(stage.getWidth()+200);
+        	stage.setWidth(stage.getWidth()+230);
+            Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
+            stage.setX((primScreenBounds.getWidth() - stage.getWidth()) / 2);
+            stage.setY((primScreenBounds.getHeight() - stage.getHeight()) / 2);
         	gridDba.add(vboxRightCQ, 3, 0, 1, 2);
 		});
         
-		Button btDataViewSave = new Button("Save Citation Query");
+		Button btDataViewSave = new Button("Save");
 		btDataViewSave.setId("buttonGen");
 		btDataViewSave.setOnAction(e -> {
 			Query query = null;
@@ -667,7 +704,7 @@ public class QBEApp extends Application {
 		gridDba.add(vboxRight, 2, 0, 1, 2);
 		
 		ListView<String> listViewRightCQ = new ListView<String>();
-		listViewRightCQ.setMinWidth(200);
+		listViewRightCQ.setMinWidth(180);
 		listViewRightCQ.setCellFactory(lv -> {
 			ListCell<String> cell = new ListCell<>();
 			ContextMenu contextMenu = new ContextMenu();
@@ -691,6 +728,12 @@ public class QBEApp extends Application {
 			});
 			return cell;
 		});
+		listViewRightCQ.setOnMouseClicked(event -> {
+			String dv = dbaDataViewDataTab.getText().split(":")[1].trim();
+			String cv = listViewRightCQ.getSelectionModel().getSelectedItem();
+			dbaListCitationViews.add(cv);
+			Database.insertDCTuple(dv, cv);
+		});
 		ObservableList<String> listRightCitationViews = FXCollections.observableArrayList(Database.getDataViews());
 		listViewRightCQ.setItems(listRightCitationViews);
 		
@@ -703,10 +746,15 @@ public class QBEApp extends Application {
 		rightBtCQ.setId("buttonGen");
 		rightBtCQ.setOnAction(e -> {
         	gridDba.getChildren().remove(vboxRightCQ);
-        	stage.setWidth(stage.getWidth()-200);
+        	stage.setWidth(stage.getWidth()-220);
+            Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
+            stage.setX((primScreenBounds.getWidth() - stage.getWidth()) / 2);
+            stage.setY((primScreenBounds.getHeight() - stage.getHeight()) / 2);
 		});
 		// Right side pop-up selection citation queries
 		vboxRightCQ = new VBox();
+		vboxRightCQ.setMaxWidth(180);
+        vboxRightCQ.setMinWidth(180);
 		vboxRightCQ.setAlignment(Pos.CENTER);
 		VBox.setVgrow(listViewRightCQ, Priority.ALWAYS);
 		vboxRightCQ.setStyle("-fx-border-color: black;-fx-border-insets: 4;-fx-border-width: 2;-fx-border-style: dashed;-fx-border-radius: 5;");
@@ -716,10 +764,10 @@ public class QBEApp extends Application {
         gridDbaSub.setPadding(new Insets(2, 5, 2, 5));
         gridDbaSub.setHgap(5);
         gridDbaSub.setVgap(5);
-        dataTab.setContent(gridDbaSub);
+        dbaDataViewDataTab.setContent(gridDbaSub);
 
         
-		final Label label_0 = new Label("View Builder");
+		Label label_0 = new Label("View Builder");
 		label_0.setId("prompt-text");
 		GridPane.setHgrow(label_0, Priority.ALWAYS);
 		gridDbaSub.add(label_0, 0, 0);
@@ -747,27 +795,30 @@ public class QBEApp extends Application {
 		GridPane.setHgrow(dataView, Priority.ALWAYS);
 		dataView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		dataView.setItems(dataViewList);
-		gridDbaSub.add(dataView, 0, 3, 2, 1);
+		gridDbaSub.add(dataView, 0, 4, 2, 1);
 		
 		// Lambda
 		final HBox hBoxLambda = new HBox();
 		hBoxLambda.getChildren().add(new Label("Lambda Terms:  "));
 		hBoxLambda.getStyleClass().add("hBoxLambda");
 		GridPane.setHgrow(hBoxLambda, Priority.ALWAYS);
-		gridDbaSub.add(hBoxLambda, 0, 4);
+		gridDbaSub.add(hBoxLambda, 0, 5);
 		
-		Label datalogLabel = new Label("Datalog Generated:");
-		TextArea datalogTextArea = new TextArea();
-		datalogTextArea.setWrapText(true);
-		final HBox hBox = buildTopMenu(datalogTextArea, hBoxLambda, dataView);
-		final VBox vboxDatalog = new VBox();
+		Label datalogLabel = new Label("Datalog:");
+        TextField datalogTextArea = new TextField();
+        datalogLabel.setFont(Font.font("Courier New", FontWeight.BOLD, 12));
+        datalogTextArea.setFont(Font.font("Courier New", FontWeight.BOLD, 8));
+		final HBox hBox = buildTopMenu(datalogTextArea, hBoxLambda, dataView, false);
+		final HBox vboxDatalog = new HBox();
 		vboxDatalog.setSpacing(5);
-		vboxDatalog.setPadding(new Insets(10, 0, 0, 10));
+		vboxDatalog.setPadding(new Insets(5, 5, 5, 5));
 		vboxDatalog.getChildren().addAll(datalogLabel, datalogTextArea);
-		vboxDatalog.setPadding(new Insets(25, 25, 25, 25));
-		splitPaneQbe.getItems().add(vboxDatalog);
+        vboxDatalog.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(datalogTextArea, Priority.ALWAYS);
+		// splitPaneQbe.getItems().add(vboxDatalog);
 		gridDbaSub.add(hBox, 1, 0);
 		gridDbaSub.add(splitPaneQbe, 0, 1, 2, 1);
+		gridDbaSub.add(vboxDatalog, 0, 2, 2, 1);
 
 		// Table View
 		tableView.setEditable(true);
@@ -779,19 +830,22 @@ public class QBEApp extends Application {
 		TableColumn<Entry, String> fieldColumn = new TableColumn<>("Field");
 		TableColumn<Entry, Boolean> showColumn = new TableColumn<>("Show");
 		TableColumn<Entry, String> criteraColumn = new TableColumn<>("Criteria");
+        TableColumn<Entry, String> joinColumn = new TableColumn<>("Join");
 		TableColumn<Entry, Boolean> lambdaColumn = new TableColumn<>("Lambda");
-		tableColumn.setCellValueFactory(new PropertyValueFactory<Entry, String>("table"));
-		fieldColumn.setCellValueFactory(new PropertyValueFactory<Entry, String>("field"));
-		showColumn.setCellValueFactory(new PropertyValueFactory<Entry, Boolean>("show"));
+		tableColumn.setCellValueFactory(new PropertyValueFactory<>("table"));
+		fieldColumn.setCellValueFactory(new PropertyValueFactory<>("field"));
+		showColumn.setCellValueFactory(new PropertyValueFactory<>("show"));
 		showColumn.setCellFactory(CheckBoxTableCell.forTableColumn(showColumn));
 		showColumn.setEditable(true);
-		criteraColumn.setCellValueFactory(new PropertyValueFactory<Entry, String>("criteria"));
+		criteraColumn.setCellValueFactory(new PropertyValueFactory<>("criteria"));
 		criteraColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-		lambdaColumn.setCellValueFactory(new PropertyValueFactory<Entry, Boolean>("lambda"));
+        joinColumn.setCellValueFactory(new PropertyValueFactory<>("join"));
+        joinColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+		lambdaColumn.setCellValueFactory(new PropertyValueFactory<>("lambda"));
 		lambdaColumn.setCellFactory(CheckBoxTableCell.forTableColumn(lambdaColumn));
 		lambdaColumn.setEditable(true);
 
-		tableView.getColumns().addAll(expanderColumn, tableColumn, fieldColumn, showColumn, criteraColumn, lambdaColumn);
+		tableView.getColumns().addAll(expanderColumn, tableColumn, fieldColumn, showColumn, criteraColumn, joinColumn, lambdaColumn);
 		tableView.setItems(data);
 		tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
@@ -800,19 +854,12 @@ public class QBEApp extends Application {
 		final Label label_1 = new Label("Data Preview");
 		label_1.setId("prompt-text");
 		GridPane.setHgrow(label_1, Priority.ALWAYS);
-		gridDbaSub.add(label_1, 0, 2);
+		gridDbaSub.add(label_1, 0, 3);
 		
 		HBox hboxSq = new HBox();
 		hboxSq.setAlignment(Pos.CENTER_RIGHT);
 		hboxSq.getChildren().add(new Button("Save View Query"));
-		gridDbaSub.add(hboxSq, 1, 2);
-
-//		GridPane.setVgrow(dataSelectedView, Priority.ALWAYS);
-//		GridPane.setHgrow(dataSelectedView, Priority.ALWAYS);
-//		dataSelectedView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-//		dataSelectedView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-//		dataSelectedView.setItems(dataSelectedViewList);
-		
+		gridDbaSub.add(hboxSq, 1, 3);
 
 		hBoxPrevNext = new HBox();
 		hBoxPrevNext.setAlignment(Pos.CENTER_RIGHT);
@@ -822,11 +869,11 @@ public class QBEApp extends Application {
 		nextButton.setId("prevnext");
 		nextButton.setOnAction(e -> {
 			next();
-			setDataView(hBoxLambda, dataView);
+			setDataView(hBoxLambda, dataView, false);
 		});
 		hBoxPrevNext.getChildren().addAll(prevButton, nextButton);
 		GridPane.setHgrow(hBoxPrevNext, Priority.ALWAYS);
-		gridDbaSub.add(hBoxPrevNext, 1, 4);
+		gridDbaSub.add(hBoxPrevNext, 1, 5);
 
 		// ===========================================================================
 		dbaScene = new Scene(gridDba);
@@ -891,21 +938,19 @@ public class QBEApp extends Application {
 		editor.setVgap(5);
 		Entry entry = param.getValue();
 		TextField criteriaField = new TextField(entry.getCriteria());
-		TextField orFiled = new TextField(entry.getOr());
+		TextField joinField = new TextField(entry.getJoin());
 		editor.addRow(0, new Label("Criteria"), criteriaField);
-		editor.addRow(1, new Label("Or"), orFiled);
+		editor.addRow(1, new Label("Join"), joinField);
 		Button saveButton = new Button("Save");
 		saveButton.setOnAction(event -> {
 			entry.setCriteria(criteriaField.getText());
-			entry.setOr(orFiled.getText());
+			entry.setJoin(joinField.getText());
 			param.toggleExpanded();
 		});
 		Button cancelButton = new Button("Cancel");
 		cancelButton.setOnAction(event -> param.toggleExpanded());
 		Button deleteButton = new Button("Delete Row");
-		deleteButton.setOnAction(event -> {
-			data.remove(entry);
-		});
+		deleteButton.setOnAction(event -> data.remove(entry));
 		editor.addRow(2, saveButton, cancelButton, deleteButton);
 		return editor;
 	}
@@ -930,7 +975,8 @@ public class QBEApp extends Application {
 		samplesTreeView.setRoot(root);
 		samplesTreeView.setShowRoot(true);
 		samplesTreeView.getStyleClass().add("samples-tree");
-		samplesTreeView.setMinWidth(200);
+		samplesTreeView.setMinWidth(180);
+        samplesTreeView.setMaxWidth(180);
 		samplesTreeView.setCellFactory(new Callback<TreeView<TreeNode>, TreeCell<TreeNode>>() {
 			@Override
 			public TreeCell<TreeNode> call(TreeView<TreeNode> param) {
@@ -990,7 +1036,7 @@ public class QBEApp extends Application {
 		}
 	}
 
-	private void setDataView(HBox hBoxLambda, TableView<ObservableList> dataView) {
+	private void setDataView(HBox hBoxLambda, TableView<ObservableList> dataView, boolean toCite) {
 		if (lambdaSQL == null) return;
 		
 		try {
@@ -1022,9 +1068,7 @@ public class QBEApp extends Application {
 			ResultSet rs = st.getResultSet();
 			dataViewList.clear();
 			dataView.getColumns().clear();
-			// TODO
-			// dataSelectedView.getColumns().clear();
-			
+
 			final int size = rs.getMetaData().getColumnCount();
 			for (int i = 1; i <= size; i++) {
 				final int j = i - 1;
@@ -1033,25 +1077,13 @@ public class QBEApp extends Application {
 					str = str.substring(str.indexOf("_c_")+3);
 				}
 				TableColumn<ObservableList, String> col = new TableColumn(str);
-//				TableColumn<ObservableList, String> col2 = new TableColumn(rs.getMetaData().getColumnName(i));
 				col.setCellValueFactory(
-						new Callback<TableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
-							public ObservableValue<String> call(TableColumn.CellDataFeatures<ObservableList, String> param) {
-								if (param.getValue() == null || param.getValue().get(j) == null)
-									return new SimpleStringProperty("");
-								return new SimpleStringProperty(param.getValue().get(j).toString());
-							}
-						});
-//				col2.setCellValueFactory(
-//						new Callback<TableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
-//							public ObservableValue<String> call(TableColumn.CellDataFeatures<ObservableList, String> param) {
-//								if (param.getValue() == null || param.getValue().get(j) == null)
-//									return new SimpleStringProperty("");
-//								return new SimpleStringProperty(param.getValue().get(j).toString());
-//							}
-//						});
+						param -> {
+                            if (param.getValue() == null || param.getValue().get(j) == null)
+                                return new SimpleStringProperty("");
+                            return new SimpleStringProperty(param.getValue().get(j).toString());
+                        });
 				dataView.getColumns().addAll(col);
-				// TODO dataSelectedView.getColumns().addAll(col2);
 			}
 			int num_rows = 0;
 			while (rs.next()) {
@@ -1063,22 +1095,15 @@ public class QBEApp extends Application {
 				dataViewList.add(row);
 				num_rows++;
 			}
-			if (true) {
+			if (toCite) {
 				Vector<Vector<String>> citation_strs = new Vector<Vector<String>>();
 				TableColumn citationColomn = new TableColumn("Citation");
-//				TableColumn citationColomn2 = new TableColumn("Citation");
 				Callback<TableColumn, TableCell> cellFactory = new Callback<TableColumn, TableCell>() {
 					@Override
 					public TableCell call(TableColumn p) {
 						return new ComboBoxCell();
 					}
 				};
-//				Callback<TableColumn, TableCell> cellFactory2 = new Callback<TableColumn, TableCell>() {
-//					@Override
-//					public TableCell call(TableColumn p) {
-//						return new ComboBoxCell();
-//					}
-//				};
 				ids.clear();
 				try {
 					System.out.println("[DEBUG] datalog: " + datalog);
@@ -1102,22 +1127,10 @@ public class QBEApp extends Application {
 								return new SimpleStringProperty(list.get(0));
 							}
 						});
-//				citationColomn2.setCellFactory(cellFactory2);
-//				citationColomn2.setCellValueFactory(
-//						new Callback<TableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
-//							public ObservableValue<String> call(TableColumn.CellDataFeatures<ObservableList, String> param) {
-//								if (param.getValue() == null || param.getValue().get(size) == null) return new SimpleStringProperty("");
-//								ObservableList<String> list =  (ObservableList<String>) param.getValue().get(size);
-//								if (list == null || list.size() == 0) return new SimpleStringProperty("");
-//								return new SimpleStringProperty(list.get(0));
-//							}
-//						});
 				dataView.getColumns().addAll(citationColomn);
-				// TODO dataSelectedView.getColumns().addAll(citationColomn2);
 			}
 			dataView.setEditable(true);
 			dataView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-			// TODO dataSelectedView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		} catch (SQLException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -1135,21 +1148,4 @@ public class QBEApp extends Application {
 		}
 	}
 
-//	private void dbaMode(boolean b) {
-//		isDba = b;
-//		vboxDatalog.setVisible(b);
-//		hBoxPrevNext.setVisible(true);
-//		hBoxLambda.setVisible(b);
-//		hBoxGenCitation.setVisible(!b);
-//		splitPaneQbe.getItems().clear();
-//		splitPaneQbe.getItems().add(tableView);
-//		if (b) {
-//			splitPaneQbe.getItems().add(vboxDatalog);
-//			tableView.getColumns().clear();
-//			tableView.getColumns().addAll(expanderColumn, tableColumn, fieldColumn, showColumn, criteraColumn, lambdaColumn);
-//		} else {
-//			tableView.getColumns().clear();
-//			tableView.getColumns().addAll(expanderColumn, tableColumn, fieldColumn, showColumn, criteraColumn);
-//		}
-//	}
 }

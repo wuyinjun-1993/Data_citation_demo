@@ -91,7 +91,7 @@ public class gen_citation1 {
 						
 						for(int k = 0; k<((citation_view_parametered)c_view).lambda_terms.size(); k++)
 						{
-							pst.setString(k + 1, ((citation_view_parametered)c_view).map.get(((citation_view_parametered)c_view).lambda_terms.get(i)));
+							pst.setString(k + 1, ((citation_view_parametered)c_view).map.get(((citation_view_parametered)c_view).lambda_terms.get(k)));
 						}
 						
 						ResultSet r = pst.executeQuery();
@@ -255,7 +255,7 @@ public class gen_citation1 {
 					
 					for(int k = 0; k<((citation_view_parametered)c_view).lambda_terms.size(); k++)
 					{
-						pst.setString(k + 1, ((citation_view_parametered)c_view).map.get(((citation_view_parametered)c_view).lambda_terms.get(i)));
+						pst.setString(k + 1, ((citation_view_parametered)c_view).map.get(((citation_view_parametered)c_view).lambda_terms.get(k)));
 					}
 					
 					ResultSet rs = pst.executeQuery();

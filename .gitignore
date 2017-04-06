@@ -9,6 +9,8 @@ local.properties
 .settings/
 .loadpath
 .recommenders
+out
+.idea
 
 # Eclipse Core
 .project

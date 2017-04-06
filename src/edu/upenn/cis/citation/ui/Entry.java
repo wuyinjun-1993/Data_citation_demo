@@ -12,18 +12,18 @@ public class Entry {
 	private final StringProperty field;
 	private final BooleanProperty show;
 	private final StringProperty criteria;
-	private final StringProperty or;
+	private final StringProperty join;
 	private final BooleanProperty lambda;
 
 
 	public Entry(String fTable, String fField, boolean fShow,
-				 String fCriteria, String fOr, boolean fLambda) {
+				 String fCriteria, String fJoin, boolean fLambda) {
 		super();
 		this.table = new SimpleStringProperty(fTable);
 		this.field = new SimpleStringProperty(fField);;
 		this.show = new SimpleBooleanProperty(fShow);;
 		this.criteria = new SimpleStringProperty(fCriteria);;
-		this.or = new SimpleStringProperty(fOr);
+		this.join = new SimpleStringProperty(fJoin);
 		this.lambda = new SimpleBooleanProperty(fLambda);
 	}
 
@@ -44,8 +44,8 @@ public class Entry {
 		return criteria.get();
 	}
 
-	public String getOr() {
-		return or.get();
+	public String getJoin() {
+		return join.get();
 	}
 
     public boolean getLambda() {
@@ -77,8 +77,8 @@ public class Entry {
 		criteria.set(fCriteria);
 	}
 
-	public void setOr(String fOr) {
-		or.set(fOr);
+	public void setJoin(String fJoin) {
+		join.set(fJoin);
 	}
 
 	public void setLambda(boolean fLambda) {

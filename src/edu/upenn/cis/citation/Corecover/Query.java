@@ -24,11 +24,11 @@ public class Query {
   int     count = 0; // number of equivalent views in the same class
 
   public Vector<Lambda_term> lambda_term = new Vector<Lambda_term>();
-  
+
   public Vector<Conditions> conditions = null;
-  
+
   public boolean web_view = false;
-  
+
   Vector<Lambda_term> get_lambda_term()
   {
 	  return lambda_term;
@@ -51,14 +51,14 @@ public class Query {
     this.head = head;
     this.body = body;
   }
-  
+
   public Query(String name, Subgoal head, Vector body, Vector lambda_term) {
 	    this.name = name;
 	    this.head = head;
 	    this.body = body;
 	    this.lambda_term = lambda_term;
   }
-  
+
   public Query(String name, Subgoal head, Vector body, Vector lambda_term, Vector<Conditions> conditions) {
 	    this.name = name;
 	    this.head = head;
@@ -67,9 +67,9 @@ public class Query {
 	    this.conditions = conditions;
 }
 
-  
-  
-  
+
+
+
   /**
    * generates the body of the query
    */
@@ -114,7 +114,7 @@ public class Query {
 
 
     // generates the subgoals
-    body = new Vector(); 
+    body = new Vector();
     int argCounter = 1;
     int relSize = relations.size();
     int relSubgoalNum = bodySubgoalNum/2;
@@ -147,7 +147,7 @@ public class Query {
       argDom.add(new Argument(argName));
     }
 
-    body = new Vector(); 
+    body = new Vector();
     //    System.out.println();
     // generates the subgoals
     //    int subgoalNum = bodySubgoalNum;
@@ -155,8 +155,8 @@ public class Query {
     Vector rel2 = (Vector)relations.clone();
 
     for (int i = 0; i < bodySubgoalNum; i ++) {
-      //int relIndex = Math.abs(GoodPlan.random.nextInt(relations.size()); 
-      int relIndex = GoodPlan.random.nextInt(rel2.size()); 
+      //int relIndex = Math.abs(GoodPlan.random.nextInt(relations.size());
+      int relIndex = GoodPlan.random.nextInt(rel2.size());
       body.add(new Subgoal(rel2, relIndex, argDom));
       rel2.removeElementAt(relIndex);
     }
@@ -166,7 +166,7 @@ public class Query {
     Vector bodyArgs = new Vector(); // arguments used in the body
     for (int k = 0; k < body.size(); k ++) {
       Subgoal subgoal = (Subgoal) body.elementAt(k);
-      
+
       Vector args = subgoal.getArgs();
       for (int i = 0; i < args.size(); i ++) {
 	// make sure we add the same arg only once
@@ -179,19 +179,19 @@ public class Query {
   }
 
   /**
-   * generates the body of the chain query (con longitud variable) 
+   * generates the body of the chain query (con longitud variable)
    */
   void genBodyChain(Vector relations, int bodySubgoalNum) {
 
     // generates the subgoals
-    body = new Vector(); 
+    body = new Vector();
     int argCounter = 1;
     int relSize = relations.size();
     int relSubgoalNum = GoodPlan.random.nextInt(bodySubgoalNum-1) + 2;
 
     //    for (int i = 0; i < bodySubgoalNum; i ++) {
     for (int i = 0; i < relSubgoalNum; i ++) {
-      int relIndex = GoodPlan.random.nextInt(relSize); 
+      int relIndex = GoodPlan.random.nextInt(relSize);
       //int relIndex = random.nextInt(relSize);
 
       Relation relation = ((Relation) relations.elementAt(relIndex));
@@ -210,12 +210,12 @@ public class Query {
 
 
 /**
-   * generates the body of the chain query (con longitud fija) 
+   * generates the body of the chain query (con longitud fija)
    */
   void genBodyChainFix(Vector relations, int bodySubgoalNum) {
 
     // generates the subgoals
-    body = new Vector(); 
+    body = new Vector();
     int argCounter = 1;
     int relSize = relations.size();
     int relSubgoalNum = GoodPlan.random.nextInt(bodySubgoalNum-1) + 2;
@@ -224,7 +224,7 @@ public class Query {
 
     for (int i = 0; i < bodySubgoalNum; i ++) {
         //for (int i = 0; i < relSubgoalNum; i ++) {
-      int relIndex = GoodPlan.random.nextInt(relSize); 
+      int relIndex = GoodPlan.random.nextInt(relSize);
       //int relIndex = random.nextInt(relSize);
 
       Relation relation = ((Relation) relations.elementAt(relIndex));
@@ -260,12 +260,12 @@ public class Query {
     if (GoodPlan.querySubgoalNum > GoodPlan.relAttrNum + 1)
       UserLib.myerror("Query.genBodyStar(): querySubgoalNum <= relAttrNum!");
 
-    body = new Vector(); 
+    body = new Vector();
 
     // creates the center subgoal
     int argCounter = 1;
     int relSize = relations.size();
-    int relIndex = GoodPlan.random.nextInt(relSize); 
+    int relIndex = GoodPlan.random.nextInt(relSize);
     Relation relation = ((Relation) relations.elementAt(relIndex));
     String subgoalName = relation.getName();
 
@@ -274,13 +274,13 @@ public class Query {
     for (int j = 0; j < relation.getAttrNum(); j ++) {
       String argName = UserLib.getChar(argCounter);
       centerArgs.add(new Argument(argName));
-      argCounter ++;	
+      argCounter ++;
     }
     Subgoal centerSubgoal = new Subgoal(subgoalName, centerArgs);
     body.add(centerSubgoal);
 
     int relSubgoalNum = GoodPlan.random.nextInt(bodySubgoalNum) + 1;
-    
+
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // all the rest subgoals that join with the center subgoal
     // generates the subgoals
@@ -294,13 +294,13 @@ public class Query {
       // the arguments
       Vector args = new Vector();
       // the argument joining with the center subgoal
-      args.add(centerArgs.elementAt(i)); 
+      args.add(centerArgs.elementAt(i));
 
       // the rest
       for (int j = 1; j < relation.getAttrNum(); j ++) {
 	String argName = UserLib.getChar(argCounter);
 	args.add(new Argument(argName));
-	argCounter ++;	
+	argCounter ++;
       }
 
       body.add(new Subgoal(subgoalName, args));
@@ -339,7 +339,7 @@ public class Query {
     Vector headArgs = new Vector();
     // randomly drop arguments
     int relSubgoalNum = bodySubgoalNum/2;
-    
+
     headArgs.add(new Argument("Z0"));
     headArgs.add(new Argument("Z"+(relSubgoalNum+1)));
 
@@ -359,7 +359,7 @@ public class Query {
       int removeIndex = GoodPlan.random.nextInt(headArgs.size());
       headArgs.removeElementAt(removeIndex);
     }
-    
+
     // sets the head, with the query's name as the subgoal's name
     head = new Subgoal(name, headArgs);
   }
@@ -371,8 +371,8 @@ public class Query {
     if (GoodPlan.dropHeadArgNum == -1) {
         GoodPlan.dropHeadArgNum = headArgs.size() / 2;
     }
-    
-    
+
+
 
     // randomly drop arguments, while keeping the head and tail arguments
     if (body.size() > 1)
@@ -385,7 +385,7 @@ public class Query {
 	  UserLib.myerror("Query.genHeadChain(): too few arguments to drop.");
 	headArgs.removeElementAt(removeIndex);
       }
-    
+
     // sets the head, with the query's name as the subgoal's name
     head = new Subgoal(name, headArgs);
   }
@@ -410,7 +410,7 @@ public class Query {
 		UserLib.myerror("Query.genHeadStar(): too few arguments to drop.");
 	    headArgs.removeElementAt(removeIndex);
 	}
-    
+
     // sets the head, with the query's name as the subgoal's name
     head = new Subgoal(name, headArgs);
   }
@@ -457,7 +457,7 @@ public class Query {
   public boolean containsArg(Argument arg) {
     return getBodyArgs().contains(arg);
   }
-  
+
   /**
    * Gets all the head homomorphisms of the variables in the head
    */
@@ -466,7 +466,7 @@ public class Query {
     Vector distVars  = getDistVars();
 
     if (distVars.size() == 0) return headHomos;
-    
+
     Map partialMap = new HashMap();
     //headHomos = UserLib.genAllMappings(distVars, distVars);
     headHomos = UserLib.genPartitionEquMappings(distVars);
@@ -504,7 +504,7 @@ public class Query {
   public int hashCode() {
     return (name.hashCode());
   }
-  
+
   public String toString() {
     // head first
     StringBuffer result = new StringBuffer(name);
@@ -515,14 +515,14 @@ public class Query {
 	result.append(",");
     }
     result.append(") :- ");
-    
+
     // body
     for (int i = 0; i < body.size(); i++) {
       Subgoal subgoal = (Subgoal) body.elementAt(i);
       result.append(subgoal.toString());
       if ( i != body.size() - 1 ) result.append(",");
     }
-    
+
     if(conditions != null)
     {
     	for(int i = 0; i<conditions.size(); i++)
@@ -530,7 +530,7 @@ public class Query {
     		result.append("," + conditions.get(i));
     	}
     }
-    
+
     return result.toString();
   }
 
@@ -540,7 +540,7 @@ public class Query {
    */
   public Query rename() {
     renameCounter ++;
-    
+
     // remembers the map between the old args to the new args
     HashMap renameMap = new HashMap();
 
@@ -617,11 +617,11 @@ public class Query {
       return false;
 
     // tries all sequences
-    Vector srcSubgoalSeq = this.getBody(); 
-    Vector dstSubgoalPermus = UserLib.getAllSeqs(query.getBody(), 
+    Vector srcSubgoalSeq = this.getBody();
+    Vector dstSubgoalPermus = UserLib.getAllSeqs(query.getBody(),
 						 srcSubgoalSeq.size());
 
-    for (Iterator iter = dstSubgoalPermus.iterator(); iter.hasNext();) 
+    for (Iterator iter = dstSubgoalPermus.iterator(); iter.hasNext();)
     {
       Vector dstSubgoalSeq = (Vector) iter.next();
       if (testMapping(srcSubgoalSeq, dstSubgoalSeq, (Mapping) cm.clone()))
@@ -631,26 +631,26 @@ public class Query {
     return false;
   }
 
-  /** 
+  /**
    * Given two sequences of subgoals and a partial mapping, tired to map
    * the two sequences.
    */
-  boolean testMapping(Vector srcSubgoalSeq, Vector dstSubgoalSeq, 
+  boolean testMapping(Vector srcSubgoalSeq, Vector dstSubgoalSeq,
 		      Mapping cm) {
 
     if (srcSubgoalSeq.size() != dstSubgoalSeq.size())
       UserLib.myerror("Query.testMapping(): wrong sequences");
-    
+
     for (int i = 0; i < srcSubgoalSeq.size(); i ++) {
       Subgoal srcSubgoal = (Subgoal) srcSubgoalSeq.elementAt(i);
       Subgoal dstSubgoal = (Subgoal) dstSubgoalSeq.elementAt(i);
       if (srcSubgoal.size() != dstSubgoal.size()) // same size
 	return false;
-      
+
       if (!srcSubgoal.unifiable(dstSubgoal, cm, true)) // care names
 	return false;
     }
-    
+
     return true;
   }
 
@@ -700,7 +700,7 @@ public class Query {
   static void test1() {
     // generates a conjunctive query
     Vector relations = GoodPlan.genRelations();
-    Query query = new Query("testQuery", relations, 
+    Query query = new Query("testQuery", relations,
 			    GoodPlan.chainQuery, GoodPlan.querySubgoalNum);
     System.out.println("Query is:\n" + query.toString());
 
@@ -732,28 +732,28 @@ public class Query {
     static void test2(int repeticiones, int m, int n, String tipo, String queryFile, String viewFile) {
 
 
-        
+
         if (tipo.equals("1") || tipo.equals("7")) {
                 for (int i = 0; i < repeticiones; i++) {
                     genExpTipo1(m, n, queryFile+"_"+i+".txt", viewFile+"_"+i+".txt");
                 }
         }
-            
-    
+
+
         if (tipo.equals("2")) {
                 for (int i = 0; i < repeticiones; i++) {
                     genExpTipo2(m, n, queryFile+"_"+i+".txt", viewFile+"_"+i+".txt");
                 }
         }
-            
+
 
         if (tipo.equals("3") || tipo.equals("8")) {
                 for (int i = 0; i < repeticiones; i++) {
                     genExpTipo3(m, n, queryFile+"_"+i+".txt", viewFile+"_"+i+".txt");
                 }
         }
-            
-    
+
+
         if (tipo.equals("4")) {
                 for (int i = 0; i < repeticiones; i++) {
                     genExpTipo4(m, n, queryFile+"_"+i+".txt", viewFile+"_"+i+".txt");
@@ -877,10 +877,10 @@ public class Query {
                 // Create a new file output stream
                         // connected to "myfile.txt"
                 out = new FileOutputStream(filename);
-                
+
                 // Connect print stream to the output stream
                 p = new PrintStream( out );
-                
+
                 for (int i = 0; i < views.size(); i ++){
                     //                    System.out.println(views.elementAt(i).toString());
                     p.println(views.elementAt(i).toString());

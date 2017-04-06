@@ -36,6 +36,11 @@ public class Util {
             if (e.getCriteria() != null && !e.getCriteria().isEmpty()) {
                 sb.append(e.getTable() + "_c_" + e.getField() + " " + e.getCriteria() + ", ");
             }
+            if (e.getJoin() != null && !e.getJoin().isEmpty()) {
+                String name = e.getJoin();
+                String new_name = name.split("\\.")[0] + "_c_" + name.split("\\.")[1];
+                sb.append(e.getTable() + "_c_"  + e.getField() + "=" + new_name + ", ");
+            }
         }
         sb.delete(sb.length()-2, sb.length());
         return sb.toString();
@@ -68,7 +73,7 @@ public class Util {
         return sb.toString();
     }
 	
-    public static String convertToDatalog2(List<Entry> list) {
+    /* public static String convertToDatalog2(List<Entry> list) {
         if (list == null || list.size() == 0) return "";
         Set<String> tables = new HashSet<>();
         StringBuilder sb = new StringBuilder();
@@ -102,7 +107,7 @@ public class Util {
         }
         sb.delete(sb.length()-2, sb.length());
         return sb.toString();
-    }
+    } */
 
     public static String convertToSQL(List<Entry> list) {
         if (list == null || list.size() == 0) return "";
@@ -132,18 +137,34 @@ public class Util {
         return sb.toString();
     }
 
-    public static String convertToSQLWithLambda(List<Entry> list) {
+    public static String convertToSQLWithLambda(List<Entry> list, boolean toCite) {
         if (list == null || list.size() == 0) return "";
         StringBuilder sb = new StringBuilder();
         Set<String> tables = new HashSet<>();
         List<String> lambdas = new ArrayList<>();
-        List<String> selected = new ArrayList<>(), wheres = new ArrayList<>();
+        List<String> selected = new ArrayList<>(), wheres = new ArrayList<>(), joins = new ArrayList<>();
         for (Entry item : list) {
-            if (item.getShow()) selected.add(item.getTable() + "_c_" + item.getField());
-            if (item.getLambda()) lambdas.add(item.getTable() + "_c_" + item.getField());
-            tables.add(item.getTable() + "_c");
+            if (item.getShow()) {
+                if (toCite) selected.add(item.getTable() + "_c_" + item.getField() + " AS " + item.getTable() + "_" + item.getField());
+                else selected.add(item.getTable() + "." + item.getField() + " AS " + item.getTable() + "_" + item.getField());
+            }
+            if (item.getLambda()) {
+                if (toCite) lambdas.add(item.getTable() + "_c_" + item.getField());
+                else lambdas.add(item.getTable() + "." + item.getField());
+            }
+            if (toCite) tables.add(item.getTable() + "_c");
+            else tables.add(item.getTable());
             if (item.getCriteria() != null && !item.getCriteria().isEmpty()) {
-                wheres.add(item.getTable() + "_c_"  + item.getField() + " " + item.getCriteria());
+                if (toCite) wheres.add(item.getTable() + "_c_"  + item.getField() + " " + item.getCriteria());
+                else wheres.add(item.getTable() + "."  + item.getField() + " " + item.getCriteria());
+            }
+            if (item.getJoin() != null && !item.getJoin().isEmpty()) {
+                if (toCite) {
+                    String name = item.getJoin();
+                    String new_name = name.split("\\.")[0] + "_c_" + name.split("\\.")[1];
+                    joins.add(item.getTable() + "_c_"  + item.getField() + " = " + new_name);
+                }
+                else joins.add(item.getTable() + "."  + item.getField() + " = " + item.getJoin());
             }
         }
         sb.append("SELECT ");
@@ -154,12 +175,13 @@ public class Util {
         sb.append(" FROM ");
         for (String table : tables) sb.append(table + ", ");
         if (sb.charAt(sb.length()-1) ==  ' ') sb.delete(sb.length()-2, sb.length());
-        if (wheres.size() + lambdas.size() > 0) {
+        if (wheres.size() + lambdas.size() + joins.size() > 0) {
             sb.append(" WHERE ");
-            for (String where : wheres) sb.append(where + ", ");
+            for (String where : wheres) sb.append(where + " AND ");
+            for (String join : joins) sb.append(join + " AND ");
             for (String lambda : lambdas) sb.append(lambda + "=? AND ");
             if (lambdas.size() > 0 && sb.charAt(sb.length()-1) ==  ' ') sb.delete(sb.length()-5, sb.length());
-            else sb.delete(sb.length()-2, sb.length());
+            else sb.delete(sb.length()-5, sb.length());
         }
         return sb.toString();
     }

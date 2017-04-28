@@ -18,8 +18,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TabPane.TabClosingPolicy;
@@ -30,9 +30,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Reflection;
 import javafx.scene.layout.*;
-import javafx.scene.paint.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -95,6 +93,9 @@ public class QBEApp extends Application {
 
 	
 	Vector<Vector<citation_view_vector>> c_views = null;
+
+	// Dropdown Table Field
+    ObservableList<String> optionsField = FXCollections.observableArrayList(Database.getTableList());
 
 	/**
 	 * GUI Main Method
@@ -203,9 +204,9 @@ public class QBEApp extends Application {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Succeed");
             alert.setHeaderText(null);
-            alert.setContentText("The database is successfully created");
+            alert.setContentText("The data view is successfully created");
             alert.showAndWait();
-            dbaListCitationViews.add(entered);
+			listDataViews.add(entered);
 		});
 		Button buttonDeleteDataView = new Button("Delete");
 		buttonDeleteDataView.setOnAction(event -> {
@@ -215,9 +216,9 @@ public class QBEApp extends Application {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Succeed");
             alert.setHeaderText(null);
-            alert.setContentText("The database is successfully deleted");
+            alert.setContentText("The data view is successfully deleted");
             alert.showAndWait();
-            dbaListCitationViews.remove(dv);
+			listDataViews.remove(dv);
 		});
 		GridPane.setHgrow(listViewDataViews, Priority.ALWAYS);
 		GridPane.setVgrow(listViewDataViews, Priority.ALWAYS);
@@ -678,8 +679,8 @@ public class QBEApp extends Application {
 		TextField tfDataView = new TextField();
 		Label viewNameLabel = new Label("Citation View Name:");
 		
-		Button btDataView = new Button("Add new");
-		btDataView.setId("buttonGen");
+		Button btDataView = new Button("Add ");
+        btDataView.setFont(Font.font("Courier New", FontWeight.BOLD, 12));
         btDataView.setOnAction(e -> {
         	stage.setWidth(stage.getWidth()+230);
             Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
@@ -689,7 +690,7 @@ public class QBEApp extends Application {
 		});
         
 		Button btDataViewSave = new Button("Save");
-		btDataViewSave.setId("buttonGen");
+        btDataViewSave.setFont(Font.font("Courier New", FontWeight.BOLD, 12));
 		btDataViewSave.setOnAction(e -> {
 			Query query = null;
 			try {
@@ -698,9 +699,12 @@ public class QBEApp extends Application {
 				e1.printStackTrace();
 			}
 		});
-        
+		HBox addSaveHBox = new HBox();
+		addSaveHBox.getChildren().addAll(btDataView, btDataViewSave);
+        addSaveHBox.setAlignment(Pos.CENTER);
+
 		VBox.setVgrow(listViewCv, Priority.ALWAYS);
-		vboxRight.getChildren().addAll(labelCv, listViewCv, viewNameLabel, tfDataView, btDataView, btDataViewSave);
+		vboxRight.getChildren().addAll(labelCv, listViewCv, viewNameLabel, tfDataView, addSaveHBox);
 		gridDba.add(vboxRight, 2, 0, 1, 2);
 		
 		ListView<String> listViewRightCQ = new ListView<String>();
@@ -734,12 +738,12 @@ public class QBEApp extends Application {
 			dbaListCitationViews.add(cv);
 			Database.insertDCTuple(dv, cv);
 		});
-		ObservableList<String> listRightCitationViews = FXCollections.observableArrayList(Database.getDataViews());
+		ObservableList<String> listRightCitationViews = FXCollections.observableArrayList(Database.getCitationViews(null));
 		listViewRightCQ.setItems(listRightCitationViews);
 		
-		Label rightCQLabel = new Label("Citation Queries");
+		Label rightCQLabel = new Label("All Citation Views");
 		rightCQLabel.setId("prompt-text");
-		rightCQLabel.setMinWidth(165);
+		rightCQLabel.setMinWidth(180);
 		rightCQLabel.setStyle("-fx-font-size: 16px;");
 		
 		Button rightBtCQ = new Button("Hide");
@@ -753,12 +757,13 @@ public class QBEApp extends Application {
 		});
 		// Right side pop-up selection citation queries
 		vboxRightCQ = new VBox();
-		vboxRightCQ.setMaxWidth(180);
-        vboxRightCQ.setMinWidth(180);
+		vboxRightCQ.setMaxWidth(190);
+        vboxRightCQ.setMinWidth(190);
 		vboxRightCQ.setAlignment(Pos.CENTER);
 		VBox.setVgrow(listViewRightCQ, Priority.ALWAYS);
 		vboxRightCQ.setStyle("-fx-border-color: black;-fx-border-insets: 4;-fx-border-width: 2;-fx-border-style: dashed;-fx-border-radius: 5;");
 		vboxRightCQ.getChildren().addAll(rightCQLabel, listViewRightCQ, rightBtCQ);
+        vboxRightCQ.setAlignment(Pos.CENTER);
 		
         gridDbaSub = new GridPane();
         gridDbaSub.setPadding(new Insets(2, 5, 2, 5));
@@ -858,7 +863,27 @@ public class QBEApp extends Application {
 		
 		HBox hboxSq = new HBox();
 		hboxSq.setAlignment(Pos.CENTER_RIGHT);
-		hboxSq.getChildren().add(new Button("Save View Query"));
+		Button saveViewButton = new Button("Save View Query");
+        saveViewButton.setOnAction(event -> {
+            TextInputDialog dialog = new TextInputDialog(null);
+            dialog.setTitle("Enter view query name");
+            dialog.setHeaderText(null);
+            Optional<String> result = dialog.showAndWait();
+            String entered;
+            if (result.isPresent()) {
+                entered = result.get();
+            } else {
+                return;
+            }
+            // TODO: Wei
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Succeed");
+            alert.setHeaderText(null);
+            alert.setContentText("The view queries is successfully saved as " + entered);
+            alert.showAndWait();
+        });
+		hboxSq.getChildren().add(saveViewButton);
+
 		gridDbaSub.add(hboxSq, 1, 3);
 
 		hBoxPrevNext = new HBox();
@@ -938,13 +963,22 @@ public class QBEApp extends Application {
 		editor.setVgap(5);
 		Entry entry = param.getValue();
 		TextField criteriaField = new TextField(entry.getCriteria());
-		TextField joinField = new TextField(entry.getJoin());
+		// TextField joinField = new TextField(entry.getJoin());
 		editor.addRow(0, new Label("Criteria"), criteriaField);
-		editor.addRow(1, new Label("Join"), joinField);
+        ObservableList<String> optionsTable = FXCollections.observableArrayList(Database.getTableList());
+        final ComboBox<String> comboBoxTable = new ComboBox(optionsTable);
+        comboBoxTable.setPromptText("Table");
+        comboBoxTable.valueProperty().addListener((ov, t, t1) -> {
+            optionsField.clear();
+            optionsField.addAll(Database.getAttrList(t1));
+        });
+        final ComboBox<String> comboBoxField = new ComboBox(optionsField);
+        comboBoxField.setPromptText("Field");
+		editor.addRow(1, new Label("Join"), comboBoxTable, comboBoxField);
 		Button saveButton = new Button("Save");
 		saveButton.setOnAction(event -> {
 			entry.setCriteria(criteriaField.getText());
-			entry.setJoin(joinField.getText());
+			entry.setJoin(comboBoxTable.getValue() + "." + comboBoxField.getValue());
 			param.toggleExpanded();
 		});
 		Button cancelButton = new Button("Cancel");

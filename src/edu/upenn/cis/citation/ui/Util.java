@@ -47,10 +47,25 @@ public class Util {
     }
 	
 	public static String convertToDatalogOriginal(List<Entry> list) {
+
+	    // TODO: Wei
         if (list == null || list.size() == 0) return "";
         Set<String> tables = new HashSet<>();
         StringBuilder sb = new StringBuilder();
-        sb.append(" ");
+        ArrayList<String> lambda_term = new ArrayList<>();
+        for (Entry entry : list) {
+            if (entry.getLambda()) {
+                lambda_term.add(entry.getField());
+            }
+        }
+        if (lambda_term.size() > 0) {
+            sb.append("λ ");
+            sb.append(lambda_term.get(0));
+        }
+        for (int i = 1; i < lambda_term.size(); i++) {
+            sb.append(", " + lambda_term.get(i));
+        }
+        if (lambda_term.size() > 0) sb.append("  ");
         for (int i = 0; i < list.size(); i++) {
             Entry e = list.get(i);
             tables.add(e.getTable());
@@ -60,7 +75,7 @@ public class Util {
                 sb.delete(sb.length()-2, sb.length());
             }
         }
-        sb.append("):");
+        sb.append(") : - ");
         for (String table : tables) {
             sb.append(table + "(), ");
         }

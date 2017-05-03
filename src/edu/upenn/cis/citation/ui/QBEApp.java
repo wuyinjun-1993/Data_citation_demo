@@ -57,7 +57,7 @@ public class QBEApp extends Application {
 	private ObservableList<String> dbaListCitationViews;
 	
 	// private Scene newScene;
-	private Stage stage, newStage;
+	private Stage stage, citeStage;
 	// private TableView<ObservableList> dataSelectedView = new TableView<>();
 	private ObservableList dataViewList = FXCollections.observableArrayList();
 	// private ObservableList dataSelectedViewList = FXCollections.observableArrayList();
@@ -109,10 +109,7 @@ public class QBEApp extends Application {
 	@Override
 	public void start(Stage stage) {
 		this.stage = stage;
-		// FlowPane newPane = new FlowPane();
-		// this.newScene = new Scene(newPane, 400, 200);
-		this.newStage = new Stage();
-		// this.newStage.setScene(newScene);
+		this.citeStage = new Stage();
 		buildLoginScene();
 		buildQbeSceneDba();
 		buildQbeSceneUser();
@@ -168,7 +165,6 @@ public class QBEApp extends Application {
 		// ListView Data Views
 		ListView<String> listViewDataViews = new ListView<>();
 		ObservableList<String> listDataViews = FXCollections.observableArrayList(Database.getDataViews());
-		// TODO
 		listViewDataViews.setItems(listDataViews);
 
 		listViewDataViews.setOnMouseClicked(event -> {
@@ -383,20 +379,20 @@ public class QBEApp extends Application {
 		btnLogin.setId("btnLogin");
 		text.setId("text");
 		btnLogin.setOnAction(event -> {
-			this.stage.setScene(viewScene);
 			// TODO: add OAuth Authentication
-//			String checkUser = txtUserName.getText().toString();
-//			String checkPw = pf.getText().toString();
-//			if (checkUser.equals("u") && checkPw.equals("p")) {
-//				lblMessage.setText("Congratulations!");
-//				lblMessage.setTextFill(Color.GREEN);
-//			} else {
-//				lblMessage.setText("Incorrect user or pw.");
-//				lblMessage.setTextFill(Color.RED);
-//			}
-//			txtUserName.setText("");
-//			pf.setText("");
-//			this.stage.setScene(dbaScene);
+			String checkUser = txtUserName.getText().toString();
+			String checkPw = pf.getText().toString();
+			if (checkUser.equals("admin") && checkPw.equals("admin")) {
+				lblMessage.setText("Congratulations!");
+				lblMessage.setTextFill(Color.GREEN);
+			} else {
+				lblMessage.setText("Incorrect user or password.");
+				lblMessage.setTextFill(Color.RED);
+				return;
+			}
+			txtUserName.setText("");
+			pf.setText("");
+			this.stage.setScene(viewScene);
 		});
 		// Add HBox and GridPane layout to BorderPane Layout
 		gp.add(hb, 0, 0);
@@ -513,10 +509,6 @@ public class QBEApp extends Application {
 		hBoxGenCitation.setAlignment(Pos.CENTER_RIGHT);
 		Button genButton = new Button("Generate Citation");
 		genButton.setOnAction(e -> {
-// TODO
-//			dataSelectedViewList.clear();
-//			dataSelectedViewList.addAll(dataView.getSelectionModel().getSelectedItems());
-//			dataSelectedView.refresh();
 			System.out.println(dataView.getSelectionModel().getSelectedItems().size());
 			ObservableList<Integer> indices = dataView.getSelectionModel().getSelectedIndices();
 			ids.clear();
@@ -533,14 +525,9 @@ public class QBEApp extends Application {
 			}
 			
 			GridPane gridCg = buildGridCg(listCitations);
-			this.newStage.setScene(new Scene(gridCg, 500, 300));
-			this.newStage.setTitle("Citations");
-			this.newStage.show();
-//			Tab citationTab = new Tab("Citation Generator");
-//			tabPane.getTabs().add(citationTab);
-//			citationTab.setContent(gridCg);
-//			citationTab.setClosable(true);
-//			tabPane.getSelectionModel().select(citationTab);
+			this.citeStage.setScene(new Scene(gridCg, 500, 300));
+			this.citeStage.setTitle("Citations");
+			this.citeStage.show();
 		});
 		genButton.setId("buttonGen");
 		hBoxGenCitation.getChildren().add(genButton);
@@ -910,36 +897,17 @@ public class QBEApp extends Application {
         gridCg.setPadding(new Insets(2, 5, 2, 5));
         gridCg.setHgap(5);
         gridCg.setVgap(5);
-        
-//        final Label label_0 = new Label("Rows Selected");
-//		label_0.setId("prompt-text");
-//		GridPane.setHgrow(label_0, Priority.ALWAYS);
-//		gridCg.add(label_0, 0, 0);
-		
-//		GridPane.setHgrow(dataSelectedView, Priority.ALWAYS);
-//		GridPane.setVgrow(dataSelectedView, Priority.ALWAYS);
-//		gridCg.add(dataSelectedView, 0, 1);
-		
-//		final Label label_1 = new Label("Citations");
-//		label_1.setId("prompt-text");
-//		GridPane.setHgrow(label_1, Priority.ALWAYS);
-//		gridCg.add(label_1, 0, 0);
 		
 		ListView<String> list = new ListView<>();
-		list.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
-			@Override
-			public ListCell<String> call(final ListView<String> list) {
-				return new ListCell<String>() {
-					{
-						Text text = new Text();
-						text.wrappingWidthProperty().bind(list.widthProperty().subtract(15));
-						text.textProperty().bind(itemProperty());
-						setPrefWidth(0);
-						setGraphic(text);
-					}
-				};
-			}
-		});
+		list.setCellFactory(list1 -> new ListCell<String>() {
+            {
+                Text text = new Text();
+                text.wrappingWidthProperty().bind(list1.widthProperty().subtract(15));
+                text.textProperty().bind(itemProperty());
+                setPrefWidth(0);
+                setGraphic(text);
+            }
+        });
 		list.setItems(observableList);
 		GridPane.setHgrow(list, Priority.ALWAYS);
 		GridPane.setVgrow(list, Priority.ALWAYS);

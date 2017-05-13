@@ -1,3 +1,86 @@
+.metadata
+bin/*.class
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+out
+.idea
+
+# Eclipse Core
+.project
+
+# External tool builders
+.externalToolBuilders/
+
+# Locally stored "Eclipse launch configurations"
+*.launch
+
+# PyDev specific (Python IDE for Eclipse)
+*.pydevproject
+
+# CDT-specific (C/C++ Development Tooling)
+.cproject
+
+# JDT-specific (Eclipse Java Development Tools)
+.classpath
+
+# Java annotation processor (APT)
+.factorypath
+
+# PDT-specific (PHP Development Tools)
+.buildpath
+
+# sbteclipse plugin
+.target
+
+# Tern plugin
+.tern-project
+
+# TeXlipse plugin
+.texlipse
+
+# STS (Spring Tool Suite)
+.springBeans
+
+# Code Recommenders
+.recommenders/
+
+# Scala IDE specific (Scala & Java development for Eclipse)
+.cache-main
+.scala_dependencies
+.worksheet
+/Data_citation_demo.iml
 /edu/
 /java_cup/
 /schema_reasoning/
+/IUPHAR_v1.sql
+/_classpath.xml
+/_project.xml
+/database
+/howtodoinjava_demo.xlsx
+/iuphar
+/Parser.cup
+/Parser.lex
+/README
+/jcp.sh
+/log4j2.xml
+/pruebaGen/
+/query-10-2-4-10-10-3-0.5.txt
+/query_class.txt
+/readme.txt
+/real_general_query
+/result-star-0
+/semantic.cache
+/tuple_level1.xls
+/tuple_level2.xlsx
+/view_add_delete.txt
+/view_citation_view.sql
+/views-10-2-4-10-10-3-0.5.txt
+/Data Citation GUI Document.pdf
+/IUPHAR.sql

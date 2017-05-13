@@ -85,7 +85,7 @@ public class Tuple_reasoning2 {
 //		long end_time = System.currentTimeMillis();
 //		
 //		System.out.println(end_time - start_time);
-		String query = "q(family_c_family_id, family_c_name):family_c(), introduction_c(), family_c_family_id = introduction_c_family_id";
+		String query = "q(family_c_family_id, family_c_name):family_c()";
 		
 		Vector<Vector<String>> citation_strs = new Vector<Vector<String>>();
 		
@@ -1476,10 +1476,16 @@ public class Tuple_reasoning2 {
 		{
 			
 			boolean first = true;
-						
+			
+			int rid = 0;
+			
 			while(rs.next())
 			{
 
+				rid ++;
+				
+				System.out.println(rid);
+				
 				String curr_str = new String();
 				
 				Vector<String> vals = new Vector<String>();

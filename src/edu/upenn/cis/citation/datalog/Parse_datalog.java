@@ -164,6 +164,7 @@ public class Parse_datalog {
         Vector<Argument> head_v = new Vector<Argument>();
         
 
+        System.out.println(query);
         
         String []body = query.split(":")[1].split("\\),");
         

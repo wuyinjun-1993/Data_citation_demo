@@ -1,0 +1,11 @@
+Add view:
+
+
+//v is the inserted new view, name is its name
+insert_new_view.add(Query v, String name);
+
+
+delete view:
+
+//the name of deleted view is view_name
+delete_view.delete(String view_name);

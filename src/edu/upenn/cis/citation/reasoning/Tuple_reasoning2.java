@@ -152,7 +152,7 @@ public class Tuple_reasoning2 {
 		return citation_aggs;
 	}
 	
-	static String get_full_query(String query) throws ClassNotFoundException, SQLException
+	public static String get_full_query(String query) throws ClassNotFoundException, SQLException
 	{
 		
 		
@@ -483,9 +483,7 @@ public class Tuple_reasoning2 {
 			                check_equality(view, c, pst);
 			                
 			                view_type_map.put(view.name, true);
-			                
-			                view.web_view = true;
-			                
+			                			                
 			                views.add(view);
 	            			
 	            		}

@@ -66,123 +66,33 @@ public static String db_name = "iuphar_org";
 				subgoal_names.add(r.getString(1));
 			}
 			
-			String q_conditions = "select conditions from view2conditions where view = '" + view_name + "'";
+			Vector<Conditions> conditions = view_operation.get_view_conditions(view_name, c, pst);
 			
-			pst = c.prepareStatement(q_conditions);
-			
-			r = pst.executeQuery();
-			
-			Vector<Conditions> conditions = new Vector<Conditions>();
-			
-			while(r.next())
-			{
-				
-				String condition_str = r.getString(1);
-				
-				String []strs = null;
-				
-				Operation op = null;
-				
-				
-				if(condition_str.contains(op_equal.op))
-				{
-					strs = condition_str.split(op_equal.op);
-					
-					op = new op_equal();
-				}
-				else
-				{
-					if(condition_str.contains(op_less.op))
-					{
-						strs = condition_str.split(op_less.op);
-						
-						op = new op_less();
-					}
-					else
-					{
-						if(condition_str.contains(op_greater.op))
-						{
-							strs = condition_str.split(op_greater.op);
-							
-							op = new op_greater();
-						}
-						else
-						{
-							if(condition_str.contains(op_less_equal.op))
-							{
-								strs = condition_str.split(op_less_equal.op);
-								
-								op = new op_less_equal();
-							}
-							else
-							{
-								if(condition_str.contains(op_greater_equal.op))
-								{
-									strs = condition_str.split(op_greater_equal.op);
-									
-									op = new op_greater_equal();
-								}
-								else
-								{
-									if(condition_str.contains(op_not_equal.op))
-									{
-										strs = condition_str.split(op_not_equal.op);
-										
-										op = new op_not_equal();
-									}
-								}
-							}
-						}
-					}
-					
-				}
-				
-				
-				String str1 = strs[0];
-				
-				String str2 = strs[1];
-				
-
-				String []strs1 = str1.split("_");
-				
-				String subgoal1 = strs1[0] + "_" + strs1[1];
-				
-				String arg1 = str1.trim();//.substring(subgoal1.length() + 1, str1.length());
-				
-				String subgoal2 = new String();
-				
-				String arg2 = new String ();
-				
-				if(str2.contains("'"))
-				{
-					arg2 = str2;
-				}
-				else
-				{
-					String []strs2 = str2.split("_");
-					
-					subgoal2 = strs2[0] + "_" + strs2[1];
-					
-					arg2 = str2.trim();//.substring(subgoal2.length() + 1, str2.length());
-				}
-					
-				Conditions condition = new Conditions(new Argument(arg1), subgoal1, op, new Argument(arg2), subgoal2);
-				
-				conditions.add(condition);
-			}
 			
 			create_views(view_name, subgoal_names, conditions, c, pst);
 		}
+		
+		c.close();
 				
 				
 		
 		
 	}
 	
-	public static void create_views(String view_name, Vector<String> subgoal_names, Vector<Conditions> conditions, Connection c, PreparedStatement pst) throws SQLException
+	public static void create_views(String view_name, Vector<String> subgoal_names, Vector<Conditions> conditions, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
 		
+		boolean close_in_the_end = false;
 		
+		if(c == null)
+		{
+			Class.forName("org.postgresql.Driver");
+		    c = DriverManager
+		        .getConnection(populate_db.db_url,
+		    	        populate_db.usr_name,populate_db.passwd);
+		    
+		    close_in_the_end = true;
+		}
 		
 		
 		
@@ -287,7 +197,7 @@ public static String db_name = "iuphar_org";
 			query = "create view " + view_name + " as select " + col_str + " from " + table_str;
 		else
 			query = "create view " + view_name + " as select " + col_str + " from " + table_str + " where " + condition_str;
-		
+				
 		pst = c.prepareStatement(query);
 		
 		pst.execute();
@@ -299,5 +209,8 @@ public static String db_name = "iuphar_org";
 		pst = c.prepareStatement("alter table " + view_name + "_table add column citation_view text");
 		
 		pst.execute();
+		
+		if(close_in_the_end)
+			c.close();
 	}
 }

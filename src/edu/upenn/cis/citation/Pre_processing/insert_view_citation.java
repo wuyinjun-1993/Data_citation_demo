@@ -73,13 +73,7 @@ public class insert_view_citation {
 		
 		initialize();
 		
-		Connection c = null;
-	      ResultSet rs = null;
-	      PreparedStatement pst = null;
-		Class.forName("org.postgresql.Driver");
-	    c = DriverManager
-	        .getConnection(populate_db.db_url,
-	    	        populate_db.usr_name,populate_db.passwd);
+		
 		
 		String view_name = "v1";
 		
@@ -89,31 +83,40 @@ public class insert_view_citation {
 		
 //		insert_view(view_name, blocks[0], );
 		
-		insert_citation(c, pst, "v1", blocks[0], 2, "c1");
+		connect_view_with_citation_view("v1", blocks[0], 2, "c1");
 		
-		insert_citation(c, pst, "v2", blocks[0], 1, "c2");
+		connect_view_with_citation_view("v2", blocks[0], 1, "c2");
 		
-		insert_citation(c, pst, "v3", blocks[0], 2, "c3");
+		connect_view_with_citation_view("v3", blocks[0], 2, "c3");
 		
-		insert_citation(c, pst, "v4", blocks[0], 1, "c4");
+		connect_view_with_citation_view("v4", blocks[0], 1, "c4");
 		
-		insert_citation(c, pst, "v5", blocks[0], 7, "c5");
+		connect_view_with_citation_view("v5", blocks[0], 7, "c5");
 		
-		insert_citation(c, pst, "v6", blocks[0], 1, "c6");
+		connect_view_with_citation_view("v6", blocks[0], 1, "c6");
 		
-		insert_citation(c, pst, "v6", blocks[0], 3, "c6");
+		connect_view_with_citation_view("v6", blocks[0], 3, "c6");
 		
-		insert_citation(c, pst, "v7", blocks[0], 2, "c7");
+		connect_view_with_citation_view("v7", blocks[0], 2, "c7");
 		
-		insert_citation(c, pst, "v8", blocks[0], 2, "c8");
+		connect_view_with_citation_view("v8", blocks[0], 2, "c8");
 		
-		insert_citation(c, pst, "v9", blocks[0], 7, "c9");
+		connect_view_with_citation_view("v9", blocks[0], 7, "c9");
 		
 		
 	}
 	
-	static void insert_citation(Connection c, PreparedStatement pst, String view_name, String block_name, int query_id, String citation_name) throws SQLException
+	static void connect_view_with_citation_view(String view_name, String block_name, int query_id, String citation_name) throws SQLException, ClassNotFoundException
 	{
+		
+		Connection c = null;
+	      ResultSet rs = null;
+	      PreparedStatement pst = null;
+		Class.forName("org.postgresql.Driver");
+	    c = DriverManager
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
+		
 		
 		boolean exist = check_citation_exist(citation_name, c, pst);
 //		

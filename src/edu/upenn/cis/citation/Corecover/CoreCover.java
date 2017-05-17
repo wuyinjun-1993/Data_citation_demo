@@ -117,7 +117,6 @@ public class CoreCover {
     	  Tuple tuple = (Tuple) iter.next();
           tuple.lambda_terms = view.lambda_term;
           tuple.conditions = view.conditions;
-          tuple.web_view = view.web_view;
           viewTuples.add(tuple);
       }
        // add them to the results

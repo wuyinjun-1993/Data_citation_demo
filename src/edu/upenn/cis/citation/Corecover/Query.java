@@ -26,9 +26,7 @@ public class Query {
   public Vector<Lambda_term> lambda_term = new Vector<Lambda_term>();
 
   public Vector<Conditions> conditions = null;
-
-  public boolean web_view = false;
-
+  
   Vector<Lambda_term> get_lambda_term()
   {
 	  return lambda_term;

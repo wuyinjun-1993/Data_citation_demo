@@ -3,6 +3,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,7 +31,7 @@ import schema_reasoning.Gen_citation1;
 public class populate_db {
 	
 	//psql --host=datacitation.cn7s3bpawoj2.us-east-1.rds.amazonaws.com --port=5432 --username=postgres --password
-	
+	//psql --host=citedb.cx9xmwhyomib.us-east-1.rds.amazonaws.com --port=5432 --username=postgres --dbname=postgres
 	
 	public static String separator = "|";
 	
@@ -38,8 +39,10 @@ public class populate_db {
 
 	public static String[] base_relations = {"gpcr_c","object_c","interaction_c","ligand_c","pathophysiology_c","interaction_affinity_refs_c","gtip_process_c","process_assoc_c","disease_c", "family_c", "introduction_c"};
 
-	public static String db_url = "jdbc:postgresql://datacitation.cn7s3bpawoj2.us-east-1.rds.amazonaws.com:5432/";
-	
+	public static String db_url = "jdbc:postgresql://citedb.cx9xmwhyomib.us-east-1.rds.amazonaws.com:5432/";
+//	public static String db_url = "jdbc:postgresql://localhost:5432/postgres";
+
+
 	public static String usr_name = "postgres";
 	
 	public static String passwd = "12345678";
@@ -47,10 +50,21 @@ public class populate_db {
 	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException
 	{
-	      update();
+	      initial();
+		
+//		Connection c = null;
+//	      PreparedStatement pst = null;
+//		Class.forName("org.postgresql.Driver");
+//	    c = DriverManager
+//	        .getConnection(db_url, usr_name , passwd);
+//		
+//		
+//		delete_view_single_table("v2", "family_c", c, pst);
+		
+		
 	}
 	
-	public static void update() throws SQLException, ClassNotFoundException
+	public static void initial() throws SQLException, ClassNotFoundException
 	{
 		Connection c = null;
 	      PreparedStatement pst = null;
@@ -61,6 +75,127 @@ public class populate_db {
 		populate_db(c, pst);
 		c.close();
 	}
+	
+	public static void update(Query view) throws ClassNotFoundException, SQLException
+	{
+		Connection c = null;
+	      PreparedStatement pst = null;
+		Class.forName("org.postgresql.Driver");
+	    c = DriverManager
+	        .getConnection(db_url, usr_name , passwd);
+//	    add_column(c,pst);
+		populate_db(view, c, pst);
+		c.close();
+	    
+		
+	}
+	
+	public static void delete(String id, Vector<Subgoal> subgoals) throws SQLException, ClassNotFoundException
+	{
+		Connection c = null;
+	      PreparedStatement pst = null;
+		Class.forName("org.postgresql.Driver");
+	    c = DriverManager
+	        .getConnection(db_url, usr_name , passwd);
+//	    add_column(c,pst);
+	    
+	    for(int i = 0; i<subgoals.size(); i++)
+	    {
+	    	delete_view_single_table(id, subgoals.get(i).name, c, pst);
+	    }
+	    
+		c.close();
+	}
+	
+	static void delete_view_single_table(String id, String relation, Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "select * from " + relation + " where citation_view like '%" + id + "%'";
+		
+		pst = c.prepareStatement(query);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		ResultSetMetaData rs_meta = rs.getMetaData();
+		
+		while(rs.next())
+		{
+			int col_num = rs_meta.getColumnCount();
+			
+			String old_citation_view = rs.getString("citation_view");
+			
+			String [] old_citation_views = old_citation_view.split("\\" + separator);
+			
+			String new_citation_view = new String();
+			
+			int num = 0;
+			
+			for(int j = 0; j<old_citation_views.length; j++)
+			{
+				if(!old_citation_views[j].contains(id))
+				{
+					if(num >= 1)
+						new_citation_view += separator;
+					
+					new_citation_view += old_citation_views[j];
+					
+					num ++;
+				}
+			}
+			
+			String update_q = "update " + relation + " set citation_view = '" + new_citation_view + "' where ";
+			
+			String where = new String();
+			
+			for(int i = 0; i< col_num; i++)
+			{
+				String col_name = rs_meta.getColumnLabel(i + 1);
+				
+				String value = rs.getString(col_name);
+				
+				if(value == null || value.isEmpty())
+					continue;
+				
+				if(value.contains("."))
+				{
+					try{
+						float f = Float.valueOf(value);
+						continue;
+					}
+					catch(NumberFormatException e)
+					{
+						
+					}
+				}				
+				
+				
+				
+
+				
+				if(value.contains("'"))
+				{
+					value = value.replaceAll("'", "''");
+				}
+				
+				if(i >= 1)
+					where += " and ";
+				
+				where += col_name + "= '" + value + "'"; 
+			}
+			
+			update_q += where;
+			
+			pst = c.prepareStatement(update_q);
+			
+			pst.execute();
+			
+//			rs_meta.getColumnName(column)
+//			
+//			String update_q = "update " + relation + " set citation_view = '" + 
+//			
+		}
+		
+	}
+	
 	
 	public static HashSet<String> get_table_name(Vector<Query> views)
 	{
@@ -182,30 +317,64 @@ public class populate_db {
 	 	
  		HashMap<String, String> table_name_view = new HashMap<String, String>();
 
-		String get_tables = "select renamed_view, subgoal from web_view_table";
+//		String get_tables = "select renamed_view, subgoal from web_view_table";
 		
-		pst = c.prepareStatement(get_tables);
+//		pst = c.prepareStatement(get_tables);
 		
-		ResultSet r = pst.executeQuery();
+//		ResultSet r = pst.executeQuery();
 		
-		while(r.next())
-		{
-			table_name_view.put(r.getString(2), r.getString(1));
-		}
+//		while(r.next())
+//		{
+//			table_name_view.put(r.getString(2), r.getString(1));
+//		}
 		
 		for(int i = 0; i<views.size();i++)
 		{
 			Query view = views.get(i);
 			
-			Vector<Boolean> web_view = new Vector<Boolean> ();
+//			Vector<Boolean> web_view = new Vector<Boolean> ();
 			
 			
 			
-			Vector<citation_view> citation_view = get_citation_view(view, web_view);
+			Vector<citation_view> citation_view = get_citation_view(view);
 			
 			
-			gen_citation_view_query(citation_view,view, web_view.get(0), table_name_view, c, pst);
+			gen_citation_view_query(citation_view,view, table_name_view, c, pst);
 		}
+	      
+	    
+	}
+	
+	public static void populate_db(Query view, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	{
+//	 	Vector<Query> views = get_views_schema(c, pst);
+//	 	
+ 		HashMap<String, String> table_name_view = new HashMap<String, String>();
+//
+//		String get_tables = "select renamed_view, subgoal from web_view_table";
+//		
+//		pst = c.prepareStatement(get_tables);
+//		
+//		ResultSet r = pst.executeQuery();
+//		
+//		while(r.next())
+//		{
+//			table_name_view.put(r.getString(2), r.getString(1));
+//		}
+//		
+//		for(int i = 0; i<views.size();i++)
+//		{
+//			Query view = views.get(i);
+//			
+//			Vector<Boolean> web_view = new Vector<Boolean> ();
+//			
+//			
+			
+			Vector<citation_view> citation_view = get_citation_view(view);
+			
+			
+			gen_citation_view_query(citation_view,view, table_name_view, c, pst);
+//		}
 	      
 	    
 	}
@@ -417,38 +586,38 @@ public class populate_db {
 		view.conditions = conditions;
 	}
 	
-	public static void gen_citation_view_query(Vector<citation_view> citation_views, Query view, Boolean web_view, HashMap<String, String> table_name_view, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	public static void gen_citation_view_query(Vector<citation_view> citation_views, Query view, HashMap<String, String> table_name_view, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
 //		String citation_view_query = new String();
 		
 //		ResultSet rs = get_citation(view.name + "_table",view.lambda_term);
 		
-		populate(citation_views, view, view.lambda_term,view.name + "_table", view.name, web_view, table_name_view, c,pst);
+		populate(citation_views, view, view.lambda_term,view.name + "_table", view.name, table_name_view, c,pst);
 		
 //		assign_view_query(view, citation_views, view.name, web_view, c, pst);
 		
 	}
 	
-	public static void assign_view_query(Query view, Vector<citation_view> citation_views, String view_name, Boolean web_view, Connection c, PreparedStatement pst) throws SQLException
+	public static void assign_view_query(Query view, Vector<citation_view> citation_views, String view_name, Connection c, PreparedStatement pst) throws SQLException
 	{
 		Vector<Vector<Argument>> lambda_terms = new Vector<Vector<Argument>>();
 		
 		HashMap<String, String> table_name_view = new HashMap<String, String>();
 		
-		if(web_view)
-		{
-			String get_tables = "select renamed_view, subgoal from web_view_table where view = '" + view_name + "'";
-			
-			pst = c.prepareStatement(get_tables);
-			
-			ResultSet r = pst.executeQuery();
-			
-			while(r.next())
-			{
-				table_name_view.put(r.getString(2), r.getString(1));
-			}
-			
-		}
+//		if(web_view)
+//		{
+//			String get_tables = "select renamed_view, subgoal from web_view_table where view = '" + view_name + "'";
+//			
+//			pst = c.prepareStatement(get_tables);
+//			
+//			ResultSet r = pst.executeQuery();
+//			
+//			while(r.next())
+//			{
+//				table_name_view.put(r.getString(2), r.getString(1));
+//			}
+//			
+//		}
 		
 		
 		for(int i = 0; i<view.body.size();i++)
@@ -534,13 +703,13 @@ public class populate_db {
 	    				String curr_citation_view = temp_rs.getString(1);
 	    				
 	    				
-	    				if(web_view)
-	    				{
-	    					String renamed_view = table_name_view.get(subgoal.name);
-	    					
-	    					citation_view = rename_citation_view(citation_view, renamed_view);
-	    					
-	    				}
+//	    				if(web_view)
+//	    				{
+//	    					String renamed_view = table_name_view.get(subgoal.name);
+//	    					
+//	    					citation_view = rename_citation_view(citation_view, renamed_view);
+//	    					
+//	    				}
 	    				
 
 		    			if(curr_citation_view==null)
@@ -609,7 +778,7 @@ public class populate_db {
 	
 	
 	
-	public static void populate(Vector<citation_view> citation_views, Query view, Vector<Lambda_term> lambda_terms , String table, String citation_name, boolean web_view, HashMap<String, String> table_name_view, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	public static void populate(Vector<citation_view> citation_views, Query view, Vector<Lambda_term> lambda_terms , String table, String citation_name, HashMap<String, String> table_name_view, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
 		
 	    String test_col = "SELECT "+"* FROM "+table;
@@ -676,7 +845,7 @@ public class populate_db {
 					Vector<Integer> list = subgoal_lambda_term_map.get(subgoal.name);
 					
 					
-					if(!web_view)
+//					if(!web_view)
 					{
 						for(int k = 0; k<paras.size(); k++)
 						{
@@ -692,12 +861,12 @@ public class populate_db {
 						
 						insert_citation_view = citation_views.get(0).gen_citation_unit(citation_name, paras_subgoal);
 					}
-					else
-					{
-						paras_subgoal = paras;
-						
-						insert_citation_view = citation_views.get(0).gen_citation_unit(table_name_view.get(subgoal.name), paras_subgoal);
-					}
+//					else
+//					{
+//						paras_subgoal = paras;
+//						
+//						insert_citation_view = citation_views.get(0).gen_citation_unit(table_name_view.get(subgoal.name), paras_subgoal);
+//					}
 					
 //					if(!web_view)
 //						insert_citation_view = citation_views.get(0).gen_citation_unit(citation_name, paras_subgoal);
@@ -839,12 +1008,12 @@ public class populate_db {
 					
 					String where_values = new String();
 					
-					if(web_view)
-					{
-						insert_citation_view = citation_views.get(0).gen_citation_unit(table_name_view.get(subgoal.name), null);
-					}
-//						
-					else
+//					if(web_view)
+//					{
+//						insert_citation_view = citation_views.get(0).gen_citation_unit(table_name_view.get(subgoal.name), null);
+//					}
+////						
+//					else
 					{
 						insert_citation_view = citation_views.get(0).gen_citation_unit(citation_name, null);
 					}
@@ -947,7 +1116,7 @@ public class populate_db {
 		}
 	}
 	
-	public static Vector<citation_view> get_citation_view(Query view, Vector<Boolean> web_view) throws ClassNotFoundException, SQLException
+	public static Vector<citation_view> get_citation_view(Query view) throws ClassNotFoundException, SQLException
 	{
 		Connection c = null;
 	      ResultSet rs = null;
@@ -972,21 +1141,21 @@ public class populate_db {
 	    
 	    while(rs.next())
 	    {
-	    	boolean webview = rs.getBoolean(3);
+//	    	boolean webview = rs.getBoolean(3);
 	    	
-	    	web_view.add(webview);
-	    	
-	    	if(webview)
-	    	{
-	    		
-	    		get_view_lambda_terms(view, lambda_terms, c, pst);
-	    		
-//	    		get_view_subgoals(view.name, subgoals, c, pst);
-	    		get_renamed_views(view.name, lambda_terms, citations, c, pst);
-
-	    	}
-	    	
-	    	else
+//	    	web_view.add(webview);
+//	    	
+//	    	if(webview)
+//	    	{
+//	    		
+//	    		get_view_lambda_terms(view, lambda_terms, c, pst);
+//	    		
+////	    		get_view_subgoals(view.name, subgoals, c, pst);
+//	    		get_renamed_views(view.name, lambda_terms, citations, c, pst);
+//
+//	    	}
+//	    	
+//	    	else
 	    	{
 	    		get_view_lambda_terms(view, lambda_terms, c, pst);
     		    

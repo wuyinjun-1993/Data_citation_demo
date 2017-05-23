@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Vector;
 import java.util.concurrent.locks.Condition;
@@ -29,21 +30,23 @@ public class view_operation {
 	{
 //		delete_view("v9");
 		
-//		String query = "v9(ligand_c_ligand_id,interaction_c_object_id, ligand_c_name):ligand_c(), interaction_c(), interaction_c_ligand_id=ligand_c_ligand_id";
-//		
-//		query = Tuple_reasoning2.get_full_query(query);
-//		
-//		Query view = Parse_datalog.parse_query(query);
-//		
-//		Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();
-//		
-//		Lambda_term l_term = new Lambda_term("ligand_c_ligand_id", "ligand_c");
-//		
-//		lambda_terms.add(l_term);
-//		
-//		view.lambda_term = lambda_terms;
-//		
-//		add(view, view.name);
+		String query = "v9(ligand_c_ligand_id,interaction_c_object_id, ligand_c_name):ligand_c(), interaction_c(), interaction_c_ligand_id=ligand_c_ligand_id";
+		
+		query = Tuple_reasoning2.get_full_query(query);
+		
+		Query view = Parse_datalog.parse_query(query);
+		
+		Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();
+		
+		Lambda_term l_term = new Lambda_term("ligand_c_ligand_id", "ligand_c");
+		
+		lambda_terms.add(l_term);
+		
+		view.lambda_term = lambda_terms;
+		
+		add(view, view.name);
+		
+//		initial();
 		
 	}
 	
@@ -130,11 +133,11 @@ public class view_operation {
         
         PreparedStatement pst = null;
         
-        String id = get_view_id(name, c, pst);
+//        String id = get_view_id(name, c, pst);
         
-//        String id = name;
+        String id = name;
         
-        delete_lambda_terms(id, c, pst);
+        boolean has_lambda = delete_lambda_terms(id, c, pst);
         
         Vector<Subgoal> subgoals = get_view_subgoals(id, c, pst);
                 
@@ -148,7 +151,7 @@ public class view_operation {
         
         c.close();
         
-        populate_db.delete(id, subgoals);
+        populate_db.delete(id, subgoals, has_lambda);
 
 	}
 	
@@ -164,14 +167,33 @@ public class view_operation {
 	
 	
 	
-	static void delete_lambda_terms(String id, Connection c, PreparedStatement pst) throws SQLException
+	static boolean delete_lambda_terms(String id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		
-		String query = "delete from view2lambda_term where view = '" + id + "'";
+		
+		String query = "select count(*) from view2lambda_term where view = '" + id + "'";
+		
+		pst = c.prepareStatement(query);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		boolean has_lambda_term = false;
+		
+		if(rs.next())
+		{
+			int num = rs.getInt(1);
+			
+			if(num > 0)
+				has_lambda_term = true;
+		}
+		
+		query = "delete from view2lambda_term where view = '" + id + "'";
 		
 		pst = c.prepareStatement(query);
 		
 		pst.execute();
+		
+		return has_lambda_term;
 		
 	}
 	

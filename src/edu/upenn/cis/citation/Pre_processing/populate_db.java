@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,7 +51,10 @@ public class populate_db {
 	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException
 	{
-	      initial();
+		
+		
+		get_primary_key();
+//	      initial();
 		
 //		Connection c = null;
 //	      PreparedStatement pst = null;
@@ -63,6 +67,99 @@ public class populate_db {
 		
 		
 	}
+	
+	public static void get_primary_key() throws ClassNotFoundException, SQLException
+	{
+		Connection c = null;
+	      PreparedStatement pst = null;
+		Class.forName("org.postgresql.Driver");
+	    c = DriverManager
+	        .getConnection(db_url, usr_name , passwd);
+	    
+	    Vector<String> table_names = get_table_list(c, pst);
+	    
+	    for(int i = 0; i<table_names.size(); i++)
+	    {
+	    	String query = "SELECT a.attname, format_type(a.atttypid, a.atttypmod) AS data_type"
+		    		+ " FROM   pg_index i"
+		    		+ " JOIN   pg_attribute a ON a.attrelid = i.indrelid"
+		    		+ " AND a.attnum = ANY(i.indkey)"
+		    		+ " WHERE  i.indrelid = '"+ table_names.get(i) + "'::regclass"
+		    		+ " AND    i.indisprimary";
+	    	
+//	    	pst = c.prepareStatement(query);
+	    	
+	    	Statement stmt = c.createStatement(
+	    		    ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE
+	    		);
+	    	
+	    	ResultSet rs = stmt.executeQuery(query);
+
+	    	
+//	    	ResultSet rs = pst.executeQuery();
+	    	
+	    	if(!table_names.get(i).endsWith("_c"))
+	    	{
+
+	    		rs.last();
+	    		
+	    		int size = rs.getRow();
+	    		
+	    		rs.beforeFirst();
+	    		
+	    		if(size == 0)
+	    		{
+	    			System.out.println(table_names.get(i));
+	    			
+	    			continue;
+	    		}
+	    		
+//	    		System.out.print(size + " ");
+//	    		
+//	    		System.out.print(table_names.get(i));
+//		    	
+//		    	System.out.print(":");
+//		    	
+//		    	while(rs.next())
+//		    	{
+//		    		System.out.print(" ");
+//		    		
+//		    		System.out.print(rs.getString(1));
+//		    	}
+//		    	
+//		    	System.out.println();
+	    	}
+	    	
+	    	
+	    }
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	}
+	
+	static Vector<String> get_table_list(Connection c, PreparedStatement pst) throws SQLException
+	{
+		Vector<String> table_list = new Vector<String>();
+		
+		String query = "SELECT table_name FROM information_schema.tables WHERE table_schema='public'";
+		
+		pst = c.prepareStatement(query);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		while(rs.next())
+		{
+			table_list.add(rs.getString(1));
+		}
+		
+		return table_list;
+		
+	}
+	
 	
 	public static void initial() throws SQLException, ClassNotFoundException
 	{
@@ -90,7 +187,7 @@ public class populate_db {
 		
 	}
 	
-	public static void delete(String id, Vector<Subgoal> subgoals) throws SQLException, ClassNotFoundException
+	public static void delete(String id, Vector<Subgoal> subgoals, boolean has_lambda) throws SQLException, ClassNotFoundException
 	{
 		Connection c = null;
 	      PreparedStatement pst = null;
@@ -101,92 +198,125 @@ public class populate_db {
 	    
 	    for(int i = 0; i<subgoals.size(); i++)
 	    {
-	    	delete_view_single_table(id, subgoals.get(i).name, c, pst);
+	    	delete_view_single_table(id, subgoals.get(i).name, has_lambda, c, pst);
 	    }
 	    
 		c.close();
 	}
 	
-	static void delete_view_single_table(String id, String relation, Connection c, PreparedStatement pst) throws SQLException
+	static void delete_view_single_table(String id, String relation, boolean has_lambda, Connection c, PreparedStatement pst) throws SQLException
 	{
-		String query = "select * from " + relation + " where citation_view like '%" + id + "%'";
-		
-		pst = c.prepareStatement(query);
-		
-		ResultSet rs = pst.executeQuery();
-		
-		ResultSetMetaData rs_meta = rs.getMetaData();
-		
-		while(rs.next())
-		{
-			int col_num = rs_meta.getColumnCount();
-			
-			String old_citation_view = rs.getString("citation_view");
-			
-			String [] old_citation_views = old_citation_view.split("\\" + separator);
-			
+//		String query = "select * from " + relation + " where citation_view like '%" + id + "%'";
+//		
+//		pst = c.prepareStatement(query);
+//		
+//		ResultSet rs = pst.executeQuery();
+//		
+//		ResultSetMetaData rs_meta = rs.getMetaData();
+//		
+//		while(rs.next())
+		{			
+//			String old_citation_view = rs.getString("citation_view");
+//			
+//			String [] old_citation_views = old_citation_view.split("\\" + separator);
+//			
+//			
+//			
+//			int num = 0;
+//			
+//			for(int j = 0; j<old_citation_views.length; j++)
+//			{
+//				if(!old_citation_views[j].contains(id))
+//				{
+//					if(num >= 1)
+//						new_citation_view += separator;
+//					
+//					new_citation_view += old_citation_views[j];
+//					
+//					num ++;
+//				}
+//			}
+//			
 			String new_citation_view = new String();
 			
-			int num = 0;
-			
-			for(int j = 0; j<old_citation_views.length; j++)
+			if(has_lambda)
 			{
-				if(!old_citation_views[j].contains(id))
-				{
-					if(num >= 1)
-						new_citation_view += separator;
-					
-					new_citation_view += old_citation_views[j];
-					
-					num ++;
-				}
+				new_citation_view = id + "(\\((.*?)\\))";
+			}
+			else
+			{
+				new_citation_view = id;
 			}
 			
-			String update_q = "update " + relation + " set citation_view = '" + new_citation_view + "' where ";
-			
-			String where = new String();
-			
-			for(int i = 0; i< col_num; i++)
-			{
-				String col_name = rs_meta.getColumnLabel(i + 1);
-				
-				String value = rs.getString(col_name);
-				
-				if(value == null || value.isEmpty())
-					continue;
-				
-				if(value.contains("."))
-				{
-					try{
-						float f = Float.valueOf(value);
-						continue;
-					}
-					catch(NumberFormatException e)
-					{
-						
-					}
-				}				
-				
-				
-				
-
-				
-				if(value.contains("'"))
-				{
-					value = value.replaceAll("'", "''");
-				}
-				
-				if(i >= 1)
-					where += " and ";
-				
-				where += col_name + "= '" + value + "'"; 
-			}
-			
-			update_q += where;
+			String update_q = "update " + relation + " set citation_view = regexp_replace(citation_view, '"+ new_citation_view +"','')";
 			
 			pst = c.prepareStatement(update_q);
 			
 			pst.execute();
+			
+			update_q = "update " + relation + " set citation_view = regexp_replace(citation_view, '\\|\\|','|')";
+			
+			System.out.println(update_q);
+			
+			pst = c.prepareStatement(update_q);
+			
+			pst.execute();
+			
+			update_q = "update " + relation + " set citation_view = regexp_replace(citation_view, '^\\|','')";
+			
+			System.out.println(update_q);
+			
+			pst = c.prepareStatement(update_q);
+			
+			pst.execute();
+			
+			update_q = "update " + relation + " set citation_view = regexp_replace(citation_view, '\\|$','')";
+			
+			System.out.println(update_q);
+			
+			pst = c.prepareStatement(update_q);
+			
+			pst.execute();
+			
+//			String where = new String();
+//			
+//			for(int i = 0; i< col_num; i++)
+//			{
+//				String col_name = rs_meta.getColumnLabel(i + 1);
+//				
+//				String value = rs.getString(col_name);
+//				
+//				if(value == null || value.isEmpty())
+//					continue;
+//				
+//				if(value.contains("."))
+//				{
+//					try{
+//						float f = Float.valueOf(value);
+//						continue;
+//					}
+//					catch(NumberFormatException e)
+//					{
+//						
+//					}
+//				}				
+//				
+//				
+//				
+//
+//				
+//				if(value.contains("'"))
+//				{
+//					value = value.replaceAll("'", "''");
+//				}
+//				
+//				if(i >= 1)
+//					where += " and ";
+//				
+//				where += col_name + "= '" + value + "'"; 
+//			}
+//			
+//			update_q += where;
 			
 //			rs_meta.getColumnName(column)
 //			
@@ -586,13 +716,173 @@ public class populate_db {
 		view.conditions = conditions;
 	}
 	
+	
+	static HashMap<String, Vector<Integer>> lambda_subgoal_mapping(Vector<Lambda_term> lambda_terms)
+	{
+		HashMap<String, Vector<Integer>> subgoal_lambda_term_map = new HashMap<String, Vector<Integer>>();
+		
+		for(int k = 0; k<lambda_terms.size(); k++)
+		{
+			String table_name = lambda_terms.get(k).table_name;
+			
+			Vector<Integer> Int_list = subgoal_lambda_term_map.get(table_name);
+			
+			if(Int_list == null)
+			{
+				Int_list = new Vector<Integer>();
+				
+				Int_list.add(k);
+				
+				subgoal_lambda_term_map.put(table_name, Int_list);
+			}
+			
+			else
+			{
+				Int_list.add(k);
+			}
+			
+		}
+		
+		return subgoal_lambda_term_map;
+	}
+	
+	
+//	static void get_insertion_annotation(HashMap<String, Vector<Integer>> subgoal_lambda_term_map)
+//	{
+//		
+//		int num = lambda_terms.size();
+//		String sql = new String();
+//		Vector<String> paras = new Vector<String>();
+//		
+//		for(int i =0;i<num;i++)
+//		{
+//			String lambda_term = rs.getString(lambda_terms.get(i).toString());
+//			if(i >= 1)
+//				sql = sql + " and ";
+//			sql = sql + lambda_terms.get(i) + "='" + lambda_term + "'";		
+//			paras.add(lambda_term);
+//			
+//		}
+//		
+//		Vector<String> paras_subgoal = new Vector<String>();
+//		
+//		Vector<Integer> list = subgoal_lambda_term_map.get(subgoal.name);
+//		
+//		
+//		
+//		for(int k = 0; k<paras.size(); k++)
+//		{
+//			if(list!=null && list.contains(k))
+//			{
+//				paras_subgoal.add(paras.get(k));
+//			}
+//			else
+//			{
+//				paras_subgoal.add("");
+//			}
+//		}
+//		
+//		insert_citation_view = citation_views.get(0).gen_citation_unit(citation_name, paras_subgoal);
+//	}
+	
+	static boolean exist_annotations(String table_name, Connection c, PreparedStatement pst) throws SQLException
+	{
+		
+		boolean annotation_exist = false;
+		
+		String query = "select citation_view from " + table_name;
+		
+		pst = c.prepareStatement(query);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		if(rs.next())
+		{
+			String annotation = rs.getString(1);
+			
+			if(annotation == null || annotation.isEmpty())
+			{
+				annotation_exist = false;
+			}
+			else
+			{
+				annotation_exist = true;
+			}
+		}
+		
+		return annotation_exist;
+	}
+	
 	public static void gen_citation_view_query(Vector<citation_view> citation_views, Query view, HashMap<String, String> table_name_view, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
 //		String citation_view_query = new String();
 		
 //		ResultSet rs = get_citation(view.name + "_table",view.lambda_term);
 		
-		populate(citation_views, view, view.lambda_term,view.name + "_table", view.name, table_name_view, c,pst);
+		HashMap<String, Vector<Integer>> subgoal_lambda_term_map = lambda_subgoal_mapping(view.lambda_term);
+		
+		String insert_annotation = new String();
+		
+		for(int i = 0; i<view.body.size(); i++)
+		{	
+			
+			Subgoal subgoal = (Subgoal)view.body.get(i);
+			
+			String query = "update " + subgoal.name + " set citation_view = "; 
+			
+			boolean annotation_exist = exist_annotations(subgoal.name, c, pst);
+			
+			if(subgoal_lambda_term_map.size() == 0)
+			{
+				
+				if(annotation_exist)
+				{
+					query += "citation_view || '|" + view.name + "'";
+				}
+				else
+				{
+					query += "'" + view.name + "'";
+				}
+			}
+			else
+			{
+				Vector<Integer> int_list = subgoal_lambda_term_map.get(subgoal.name);
+				
+				if(annotation_exist)
+					insert_annotation = "citation_view || '|" + view.name + "('";
+				else
+					insert_annotation = "'" + view.name + "('";
+				
+				for(int k = 0; k< view.lambda_term.size(); k++)
+				{
+					
+					if(k >= 1)
+						insert_annotation += " || ','";
+					
+					if(int_list != null && int_list.contains(k))
+					{
+						insert_annotation += " || " + view.lambda_term.get(k);
+					}
+				}
+				
+				insert_annotation += " || ')'";
+				
+				query += insert_annotation;
+				
+			}
+			
+			System.out.println(query);
+			
+			pst = c.prepareStatement(query);
+			
+			pst.execute();
+			
+		}
+		
+		
+		
+		
+//		populate(citation_views, view, view.lambda_term,view.name + "_table", view.name, table_name_view, c,pst);
 		
 //		assign_view_query(view, citation_views, view.name, web_view, c, pst);
 		
@@ -778,344 +1068,360 @@ public class populate_db {
 	
 	
 	
-	public static void populate(Vector<citation_view> citation_views, Query view, Vector<Lambda_term> lambda_terms , String table, String citation_name, HashMap<String, String> table_name_view, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
-	{
-		
-	    String test_col = "SELECT "+"* FROM "+table;
-	    
-	    pst = c.prepareStatement(test_col);
-	    
-	    ResultSet rs = pst.executeQuery();
-	    
-		if(!lambda_terms.isEmpty())
-		{
-			
-			HashMap<String, Vector<Integer>> subgoal_lambda_term_map = new HashMap<String, Vector<Integer>>();
-			
-			for(int k = 0; k<lambda_terms.size(); k++)
-			{
-				String table_name = lambda_terms.get(k).table_name;
-				
-				Vector<Integer> Int_list = subgoal_lambda_term_map.get(table_name);
-				
-				if(Int_list == null)
-				{
-					Int_list = new Vector<Integer>();
-					
-					Int_list.add(k);
-					
-					subgoal_lambda_term_map.put(table_name, Int_list);
-				}
-				
-				else
-				{
-					Int_list.add(k);
-				}
-				
-			}
-			
-			
-			while(rs.next())
-			{
-				int num = lambda_terms.size();
-				String sql = new String();
-				Vector<String> paras = new Vector<String>();
-				
-				for(int i =0;i<num;i++)
-				{
-					String lambda_term = rs.getString(lambda_terms.get(i).toString());
-					if(i >= 1)
-						sql = sql + " and ";
-					sql = sql + lambda_terms.get(i) + "='" + lambda_term + "'";		
-					paras.add(lambda_term);
-					
-				}
-							
-				String insert_citation_view;
-				
-
-				
-				for(int i = 0; i<view.body.size(); i++)
-				{
-					
-					Subgoal subgoal = (Subgoal) view.body.get(i);
-					
-					Vector<String> paras_subgoal = new Vector<String>();
-					
-					Vector<Integer> list = subgoal_lambda_term_map.get(subgoal.name);
-					
-					
-//					if(!web_view)
-					{
-						for(int k = 0; k<paras.size(); k++)
-						{
-							if(list!=null && list.contains(k))
-							{
-								paras_subgoal.add(paras.get(k));
-							}
-							else
-							{
-								paras_subgoal.add("");
-							}
-						}
-						
-						insert_citation_view = citation_views.get(0).gen_citation_unit(citation_name, paras_subgoal);
-					}
-//					else
-//					{
-//						paras_subgoal = paras;
-//						
-//						insert_citation_view = citation_views.get(0).gen_citation_unit(table_name_view.get(subgoal.name), paras_subgoal);
-//					}
-					
-//					if(!web_view)
-//						insert_citation_view = citation_views.get(0).gen_citation_unit(citation_name, paras_subgoal);
-//					else
-//					{
-//					}					
-					
-					String where_values = new String();
-					
-					
-					for(int k =0; k<subgoal.args.size(); k++)
-					{
-						Argument arg = (Argument) subgoal.args.get(k);
-											
-						String item = rs.getString(arg.name);
-						
-						if(item!= null && item.contains("'"))
-						{
-							item = item.replaceAll("'", "''");
-						}
-						
-//						if(item == null)
-//						{
-//							key_sql = key_sql + args.get(j).name + "= null";
-//						}
-						if(item != null && !item.isEmpty())
-						{
-							if(item.contains("."))
-							{
-								try{
-									float f = Float.valueOf(item);
-								}
-								catch(NumberFormatException e)
-								{
-									if( k >= 1)
-										where_values += " and ";
-									
-									where_values += arg.name + "='" + item + "'";
-								}
-							}
-							else
-							{
-								if( k >= 1)
-									where_values += " and ";
-								
-								where_values += arg.name + "='" + item + "'";
-						
-							}
-					
-							
-//							if( k >= 1)
-//								where_values += " and ";
-//							
-//							where_values += arg.name + "='" + item + "'";
-						}
-						
-						
-					}
-					
-					String curr_citation_sql = "select citation_view from " + subgoal.name + " where " + where_values;
-					
-//					System.out.println(curr_citation_sql);
-					
-					pst = c.prepareStatement(curr_citation_sql);
-					
-					ResultSet r = pst.executeQuery();
-					
-					
-					String citations = null;
-					
-					if(r.next())
-					{
-						citations = r.getString(1);
-						
-					}
-					if(citations !=null)
-					{
-						String[] citation_list = citations.split("\\" + populate_db.separator);
-						
-						Vector<String> curr_citation_vec = new Vector<String>();
-						
-						curr_citation_vec.addAll(Arrays.asList(citation_list));
-						
-						if(!curr_citation_vec.contains(insert_citation_view))
-						{
-							
-							String update_sql = "update " + subgoal.name + " set citation_view='" + citations + populate_db.separator + insert_citation_view + "' where " + where_values;
-						    
-							pst = c.prepareStatement(update_sql);
-						    
-							pst.execute();
-						}
-												
-					}
-					else
-					{
-						String update_sql = "update " + subgoal.name + " set citation_view='" + insert_citation_view + "' where " + where_values;
-					    
-						pst = c.prepareStatement(update_sql);
-					    
-						pst.execute();
-					}
-										
-						
-						
-						
-					
-					
-				}
-				
-//				String curr_citation_view = rs.getString("citation_view");
-//				if(curr_citation_view!=null)
+//	public static void populate(Vector<citation_view> citation_views, Query view, Vector<Lambda_term> lambda_terms , String table, String citation_name, HashMap<String, String> table_name_view, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+//	{
+//		
+//	    String test_col = "SELECT "+"* FROM "+table;
+//	    
+//	    pst = c.prepareStatement(test_col);
+//	    
+//	    ResultSet rs = pst.executeQuery();
+//	    
+//		if(!lambda_terms.isEmpty())
+//		{
+//			
+//			HashMap<String, Vector<Integer>> subgoal_lambda_term_map = new HashMap<String, Vector<Integer>>();
+//			
+//			for(int k = 0; k<lambda_terms.size(); k++)
+//			{
+//				String table_name = lambda_terms.get(k).table_name;
+//				
+//				Vector<Integer> Int_list = subgoal_lambda_term_map.get(table_name);
+//				
+//				if(Int_list == null)
 //				{
-//					curr_citation_view = curr_citation_view + "," + insert_citation_view;
-//				}
-//				else
-//				{
-//					curr_citation_view = insert_citation_view;
+//					Int_list = new Vector<Integer>();
+//					
+//					Int_list.add(k);
+//					
+//					subgoal_lambda_term_map.put(table_name, Int_list);
 //				}
 //				
-				
-				
-			}
-		}
-		else
-		{
-			
-			
-			while(rs.next())
-			{
-				
-				String insert_citation_view;
-				
-
-				
-				for(int i = 0; i<view.body.size(); i++)
-				{
-					Subgoal subgoal = (Subgoal) view.body.get(i);
-					
-					String where_values = new String();
-					
-//					if(web_view)
+//				else
+//				{
+//					Int_list.add(k);
+//				}
+//				
+//			}
+//			
+//			
+//			while(rs.next())
+//			{
+//				int num = lambda_terms.size();
+//				String sql = new String();
+//				Vector<String> paras = new Vector<String>();
+//				
+//				for(int i =0;i<num;i++)
+//				{
+//					String lambda_term = rs.getString(lambda_terms.get(i).toString());
+//					if(i >= 1)
+//						sql = sql + " and ";
+//					sql = sql + lambda_terms.get(i) + "='" + lambda_term + "'";		
+//					paras.add(lambda_term);
+//					
+//				}
+//							
+//				String insert_citation_view;
+//				
+//
+//				
+//				for(int i = 0; i<view.body.size(); i++)
+//				{
+//					
+//					Subgoal subgoal = (Subgoal) view.body.get(i);
+//					
+//					Vector<String> paras_subgoal = new Vector<String>();
+//					
+//					Vector<Integer> list = subgoal_lambda_term_map.get(subgoal.name);
+//					
+//					
+//					
+//					for(int k = 0; k<paras.size(); k++)
 //					{
-//						insert_citation_view = citation_views.get(0).gen_citation_unit(table_name_view.get(subgoal.name), null);
+//						if(list!=null && list.contains(k))
+//						{
+//							paras_subgoal.add(paras.get(k));
+//						}
+//						else
+//						{
+//							paras_subgoal.add("");
+//						}
 //					}
+//					
+//					insert_citation_view = citation_views.get(0).gen_citation_unit(citation_name, paras_subgoal);
+//					
+//			
+//					
+////					String where_values = new String();
+//					
+//					
+////					for(int k =0; k<subgoal.args.size(); k++)
+////					{
+////						Argument arg = (Argument) subgoal.args.get(k);
+////											
+////						String item = rs.getString(arg.name);
 ////						
-//					else
-					{
-						insert_citation_view = citation_views.get(0).gen_citation_unit(citation_name, null);
-					}
-					
-					for(int k =0; k<subgoal.args.size(); k++)
-					{
-						Argument arg = (Argument) subgoal.args.get(k);
-					
-						String item = rs.getString(arg.name);
-						
-						if(item!= null && item.contains("'"))
-						{
-							item = item.replaceAll("'", "''");
-						}
-
-						if(item != null && !item.isEmpty())
-						{
-							
-							if(item.contains("."))
-							{
-								try{
-									float f = Float.valueOf(item);
-								}
-								catch(NumberFormatException e)
-								{
-									if( k >= 1)
-										where_values += " and ";
-									
-									where_values += arg.name + "='" + item + "'";
-								}
-							}
-							else
-							{
-								if( k >= 1)
-									where_values += " and ";
-								
-								where_values += arg.name + "='" + item + "'";
-					
-							}
-							
-							
-							
-							
-						}
-						
-						
-					}
-					
-					
-					String curr_citation_sql = "select citation_view from " + subgoal.name + " where " + where_values;
-					
-
-					
-					pst = c.prepareStatement(curr_citation_sql);
-					
-					ResultSet r = pst.executeQuery();
-					
-					
-					String citations = null;
-					
-					if(r.next())
-					{
-						citations = r.getString(1);
-						
-					}
-					
-					if(citations !=null)
-					{
-						String[] citation_list = citations.split("\\" + populate_db.separator);
-						
-						Vector<String> curr_citation_vec = new Vector<String>();
-						
-						curr_citation_vec.addAll(Arrays.asList(citation_list));
-						
-						if(!curr_citation_vec.contains(insert_citation_view))
-						{
-							
-							String update_sql = "update " + subgoal.name + " set citation_view='" + citations + populate_db.separator + insert_citation_view + "' where " + where_values;
-						    
-							pst = c.prepareStatement(update_sql);
-						    
-							pst.execute();
-						}
-												
-					}
-					else
-					{
-						String update_sql = "update " + subgoal.name + " set citation_view='" + insert_citation_view + "' where " + where_values;
-					    
-						pst = c.prepareStatement(update_sql);
-					    
-						pst.execute();
-					}
-					
-				}
-				
-			}
-						
-			
-		}
-	}
-	
+////						if(item!= null && item.contains("'"))
+////						{
+////							item = item.replaceAll("'", "''");
+////						}
+////						
+//////						if(item == null)
+//////						{
+//////							key_sql = key_sql + args.get(j).name + "= null";
+//////						}
+////						if(item != null && !item.isEmpty())
+////						{
+////							if(item.contains("."))
+////							{
+////								try{
+////									float f = Float.valueOf(item);
+////								}
+////								catch(NumberFormatException e)
+////								{
+////									if( k >= 1)
+////										where_values += " and ";
+////									
+////									where_values += arg.name + "='" + item + "'";
+////								}
+////							}
+////							else
+////							{
+////								if( k >= 1)
+////									where_values += " and ";
+////								
+////								where_values += arg.name + "='" + item + "'";
+////						
+////							}
+////					
+////							
+//////							if( k >= 1)
+//////								where_values += " and ";
+//////							
+//////							where_values += arg.name + "='" + item + "'";
+////						}
+////						
+////						
+////					}
+//					
+//					String curr_citation_sql = "select citation_view from " + subgoal.name;// + " where " + where_values;
+//					
+//					pst = c.prepareStatement(curr_citation_sql);
+//					
+//					ResultSet r = pst.executeQuery();
+//					
+//					if(r.next())
+//					{
+//						if(r.getString(1).isEmpty() || rs.getString(1) == null)
+//						{
+//							curr_citation_sql = "update citation_view set name = name || '" + insert_citation_view + "'";
+//						}
+//						else
+//						{
+//							curr_citation_sql = "update citation_view set name = name || '|" + insert_citation_view + "'";
+//						}
+//					}
+//					
+////					System.out.println(curr_citation_sql);
+//					
+//					pst = c.prepareStatement(curr_citation_sql);
+//					
+//					pst.execute();
+//					
+//					
+////					String citations = null;
+////					
+////					if(r.next())
+////					{
+////						citations = r.getString(1);
+////						
+////					}
+////					if(citations !=null)
+////					{
+////						String[] citation_list = citations.split("\\" + populate_db.separator);
+////						
+////						Vector<String> curr_citation_vec = new Vector<String>();
+////						
+////						curr_citation_vec.addAll(Arrays.asList(citation_list));
+////						
+////						if(!curr_citation_vec.contains(insert_citation_view))
+////						{
+////							
+////							String update_sql = "update " + subgoal.name + " set citation_view='" + citations + populate_db.separator + insert_citation_view + "' where " + where_values;
+////						    
+////							pst = c.prepareStatement(update_sql);
+////						    
+////							pst.execute();
+////						}
+////												
+////					}
+////					else
+////					{
+////						String update_sql = "update " + subgoal.name + " set citation_view='" + insert_citation_view + "' where " + where_values;
+////					    
+////						pst = c.prepareStatement(update_sql);
+////					    
+////						pst.execute();
+////					}
+//										
+//						
+//						
+//						
+//					
+//					
+//				}
+//				
+////				String curr_citation_view = rs.getString("citation_view");
+////				if(curr_citation_view!=null)
+////				{
+////					curr_citation_view = curr_citation_view + "," + insert_citation_view;
+////				}
+////				else
+////				{
+////					curr_citation_view = insert_citation_view;
+////				}
+////				
+//				
+//				
+//			}
+//		}
+//		else
+//		{
+//			
+//			
+//			while(rs.next())
+//			{
+//				
+//				String insert_citation_view;
+//				
+//
+//				
+//				for(int i = 0; i<view.body.size(); i++)
+//				{
+//					Subgoal subgoal = (Subgoal) view.body.get(i);
+//										
+//					insert_citation_view = citation_views.get(0).gen_citation_unit(citation_name, null);
+//					
+//					
+////					for(int k =0; k<subgoal.args.size(); k++)
+////					{
+////						Argument arg = (Argument) subgoal.args.get(k);
+////					
+////						String item = rs.getString(arg.name);
+////						
+////						if(item!= null && item.contains("'"))
+////						{
+////							item = item.replaceAll("'", "''");
+////						}
+////
+////						if(item != null && !item.isEmpty())
+////						{
+////							
+////							if(item.contains("."))
+////							{
+////								try{
+////									float f = Float.valueOf(item);
+////								}
+////								catch(NumberFormatException e)
+////								{
+////									if( k >= 1)
+////										where_values += " and ";
+////									
+////									where_values += arg.name + "='" + item + "'";
+////								}
+////							}
+////							else
+////							{
+////								if( k >= 1)
+////									where_values += " and ";
+////								
+////								where_values += arg.name + "='" + item + "'";
+////					
+////							}
+////							
+////							
+////							
+////							
+////						}
+////						
+////						
+////					}
+//					
+//					
+//					String curr_citation_sql = "select citation_view from " + subgoal.name;
+//					
+//					pst = c.prepareStatement(curr_citation_sql);
+//					
+//					ResultSet r = pst.executeQuery();
+//					
+//					if(r.next())
+//					{
+//						if(r.getString(1).isEmpty() || rs.getString(1) == null)
+//						{
+//							curr_citation_sql = "update citation_view set name = name || '" + insert_citation_view + "'";
+//						}
+//						else
+//						{
+//							curr_citation_sql = "update citation_view set name = name || '|" + insert_citation_view + "'";
+//						}
+//					}
+//					
+////					System.out.println(curr_citation_sql);
+//					
+//					pst = c.prepareStatement(curr_citation_sql);
+//					
+//					pst.execute();
+//
+//					
+////					pst = c.prepareStatement(curr_citation_sql);
+////					
+////					ResultSet r = pst.executeQuery();
+////					
+////					
+////					String citations = null;
+////					
+////					if(r.next())
+////					{
+////						citations = r.getString(1);
+////						
+////					}
+////					
+////					if(citations !=null)
+////					{
+////						String[] citation_list = citations.split("\\" + populate_db.separator);
+////						
+////						Vector<String> curr_citation_vec = new Vector<String>();
+////						
+////						curr_citation_vec.addAll(Arrays.asList(citation_list));
+////						
+////						if(!curr_citation_vec.contains(insert_citation_view))
+////						{
+////							
+////							String update_sql = "update " + subgoal.name + " set citation_view='" + citations + populate_db.separator + insert_citation_view + "' where " + where_values;
+////						    
+////							pst = c.prepareStatement(update_sql);
+////						    
+////							pst.execute();
+////						}
+////												
+////					}
+////					else
+////					{
+////						String update_sql = "update " + subgoal.name + " set citation_view='" + insert_citation_view + "' where " + where_values;
+////					    
+////						pst = c.prepareStatement(update_sql);
+////					    
+////						pst.execute();
+////					}
+//					
+//				}
+//				
+//			}
+//						
+//			
+//		}
+//	}
+//	
 	public static Vector<citation_view> get_citation_view(Query view) throws ClassNotFoundException, SQLException
 	{
 		Connection c = null;

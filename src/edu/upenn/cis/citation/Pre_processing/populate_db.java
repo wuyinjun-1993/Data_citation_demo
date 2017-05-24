@@ -355,7 +355,7 @@ public class populate_db {
 //			String table_name = iter.next();
 	    	String table_name = base_relations[k];
 	    	
-	    	String [] col_name = {"citation_view", "web_view_vec"};
+	    	String [] col_name = {"citation_view"};
 	    	
 	    	for(int p = 0; p<col_name.length; p++)
 	    	{

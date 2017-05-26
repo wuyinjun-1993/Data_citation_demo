@@ -164,7 +164,7 @@ public class Parse_datalog {
         Vector<Argument> head_v = new Vector<Argument>();
         
 
-        System.out.println(query);
+//        System.out.println(query);
         
         String []body = query.split(":")[1].split("\\),");
         
@@ -221,6 +221,8 @@ public class Parse_datalog {
 	            	}
 	            	else
 	            	{
+//	            		System.out.println(body_var[j] + ":::" + col_names.get(j));
+	            		
 	            		orig_arg_names.put(body_var[j].trim(), col_names.get(j));
 	            		body_v.add(new Argument(body_var[j].trim(), col_names.get(j)));
 	            	}
@@ -281,8 +283,6 @@ public class Parse_datalog {
 	    
 	    if(col_names.contains("citation_view"))
 	    	col_names.remove("citation_view");
-	    if(col_names.contains("web_view_vec"))
-	    	col_names.remove("web_view_vec");
 	    
 	    
 	    c.close();

@@ -19,10 +19,11 @@ import edu.upenn.cis.citation.Operation.op_greater_equal;
 import edu.upenn.cis.citation.Operation.op_less;
 import edu.upenn.cis.citation.Operation.op_less_equal;
 import edu.upenn.cis.citation.Operation.op_not_equal;
+import edu.upenn.cis.citation.datalog.Parse_datalog;
 
 public class Query_operation {
 	
-	public static Query get_view(String name) throws SQLException, ClassNotFoundException
+	public static Query get_view(String id) throws SQLException, ClassNotFoundException
 	{
 		Class.forName("org.postgresql.Driver");
         Connection c = DriverManager
@@ -33,7 +34,9 @@ public class Query_operation {
         
         Vector<Argument> head_var = new Vector<Argument>();
         
-        String id = get_id_head_vars(name, head_var, c, pst);
+//        String id = get_id_head_vars(name, head_var, c, pst);
+
+        head_var = get_head_vars(id, c, pst);
         
         Vector<Conditions> conditions = get_query_conditions(id, c, pst);
         
@@ -231,6 +234,35 @@ public class Query_operation {
 			
 	}
 	
+	static Vector<Argument> get_head_vars(String id, Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "select head_variables from query2head_variables where query_id = '" + id + "'";
+		
+		pst = c.prepareStatement(query);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		String head_var_str = new String();
+		
+		if(rs.next())
+		{			
+			head_var_str = rs.getString(1).trim();
+		}
+		
+		String [] head_var_strs = head_var_str.split(",");
+		
+		Vector<Argument> head_var = new Vector<Argument>();
+		
+		for(int i = 0; i<head_var_strs.length; i++)
+		{
+			Argument arg = new Argument(head_var_strs[i].trim());
+			
+			head_var.add(arg);
+		}
+		
+		return head_var;
+	}
+	
 	static Vector<Conditions> get_query_conditions(String id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String q_conditions = "select conditions from query2conditions where query_id = '" + id + "'";
@@ -335,13 +367,15 @@ public class Query_operation {
 				
 			Conditions condition = new Conditions(new Argument(arg1), subgoal1, op, new Argument(arg2), subgoal2);
 			
+			System.out.println(condition);
+			
 			conditions.add(condition);
 		}
 		return conditions;
 		
 	}
 	
-	static Vector<Subgoal> get_query_subgoals(String name, Connection c, PreparedStatement pst) throws SQLException
+	static Vector<Subgoal> get_query_subgoals(String name, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
 		String q_subgoals = "select subgoal_names from query2subgoal where query_id = '" + name + "'";
 		
@@ -355,7 +389,14 @@ public class Query_operation {
 		{
 			String subgoal_name = r.getString(1);
 			
+//			Vector<String> arg_strs = Parse_datalog.get_columns(subgoal_name);
+			
 			Vector<Argument> args = new Vector<Argument>();
+			
+//			for(int k = 0; k<arg_strs.size(); k++)
+//			{
+//				args.add(new Argument(arg_strs.get(k), subgoal_name));
+//			}
 			
 			Subgoal subgoal = new Subgoal(subgoal_name, args);
 			

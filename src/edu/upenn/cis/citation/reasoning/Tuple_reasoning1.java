@@ -66,7 +66,7 @@ public class Tuple_reasoning1 {
 	{
 
 
-		String query = "q(object_c_name):object_c(), object_c_in_gtip = 'true'";
+		String query = "q(name):object(), in_gtip = 'true'";
 		
 		Vector<Vector<String>> citation_strs = new Vector<Vector<String>>();
 		
@@ -128,6 +128,8 @@ public class Tuple_reasoning1 {
 	public static Vector<Vector<citation_view_vector>> tuple_reasoning(String query, Vector<Vector<String>> citation_strs) throws ClassNotFoundException, SQLException, IOException, InterruptedException
 	{
 		query = get_full_query(query);
+		
+		System.out.println(query);
 				
 		Vector<Vector<citation_view_vector>> citation_views = gen_citation_main(query, citation_strs);
 		
@@ -161,7 +163,7 @@ public class Tuple_reasoning1 {
 				
 				subgoal_str += subgoals[i] + "(";
 				
-				Vector<String> args = get_args(subgoals[i]);
+				Vector<String> args = Parse_datalog.get_columns(subgoals[i]);
 				
 				for(int k = 0; k<args.size(); k++)
 				{
@@ -648,10 +650,10 @@ public class Tuple_reasoning1 {
 		
 	}
 	
-	public static Vector<Query> pre_processing(Vector<String> subgoal_names, Query q, Connection c, PreparedStatement pst) throws SQLException
+	public static Vector<Query> pre_processing(Vector<String> subgoal_names, Query q, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
 		
-		Vector<Query> views = get_views_schema();
+		Vector<Query> views = populate_db.get_views_schema(c, pst);
 
 		
 	    q = q.minimize();
@@ -701,13 +703,13 @@ public class Tuple_reasoning1 {
 	    {
 	    	Tuple tuple = (Tuple) iter.next();
 	    	
-	    	String c_name_query = "select citation_view_name from citation_view where view = '" + tuple.name + "'";
+//	    	String c_name_query = "select citation_view_name from citation_view where view = '" + tuple.name + "'";
+//	    	
+//	    	pst = c.prepareStatement(c_name_query);
+//	    	
+//	    	ResultSet rs = pst.executeQuery();
 	    	
-	    	pst = c.prepareStatement(c_name_query);
-	    	
-	    	ResultSet rs = pst.executeQuery();
-	    	
-	    	if(rs.next())
+//	    	if(rs.next())
 	    	{
 	    		map.put(tuple.name, tuple);
 	    		view_citation_map.put(tuple.name, tuple.name);
@@ -824,6 +826,8 @@ public class Tuple_reasoning1 {
 		pre_processing(subgoal_names, alt_q ,c,pst);
 		
 		Vector<Vector<citation_view_vector>> citation_views = get_citation_views(q, c, pst, valid_subgoal_id, citation_strs);
+		
+		c.close();
 		
 		return citation_views;
 		

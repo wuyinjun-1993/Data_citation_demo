@@ -17,6 +17,8 @@ public class Argument {
   
   public String origin_name = null;
   
+  public String table_name;
+  
   Argument(String name, boolean isConstant) {
     if (name == null) {
       UserLib.myerror("Argument:constructor, name == null");

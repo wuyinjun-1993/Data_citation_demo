@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.Vector;
 
 import edu.upenn.cis.citation.Corecover.Argument;
@@ -40,7 +41,10 @@ public class populate_db {
 
 	public static String[] base_relations = {"gpcr_c","object_c","interaction_c","ligand_c","pathophysiology_c","interaction_affinity_refs_c","gtip_process_c","process_assoc_c","disease_c", "family_c", "introduction_c"};
 
-	public static String db_url = "jdbc:postgresql://citedb.cx9xmwhyomib.us-east-1.rds.amazonaws.com:5432/";
+	public static String[] base_tables = {"gpcr","object","interaction","ligand","pathophysiology","interaction_affinity_refs","gtip_process","process_assoc","disease", "family", "introduction"};
+
+	
+	public static String db_url = "jdbc:postgresql://citedb.cx9xmwhyomib.us-east-1.rds.amazonaws.com:5432/iuphar";
 //	public static String db_url = "jdbc:postgresql://localhost:5432/postgres";
 
 
@@ -48,43 +52,44 @@ public class populate_db {
 	
 	public static String passwd = "12345678";
 	
+	public static String suffix = "_c";
+	
 	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException
 	{
 		
 		
-		get_primary_key();
 //	      initial();
 		
-//		Connection c = null;
-//	      PreparedStatement pst = null;
-//		Class.forName("org.postgresql.Driver");
-//	    c = DriverManager
-//	        .getConnection(db_url, usr_name , passwd);
-//		
-//		
-//		delete_view_single_table("v2", "family_c", c, pst);
-		
-		
-	}
-	
-	public static void get_primary_key() throws ClassNotFoundException, SQLException
-	{
 		Connection c = null;
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");
 	    c = DriverManager
 	        .getConnection(db_url, usr_name , passwd);
+//		
+//		
+//		delete_view_single_table("v2", "family_c", c, pst);
+		
+//	    delete_views(c, pst);
 	    
-	    Vector<String> table_names = get_table_list(c, pst);
+		
+		initial();
+		
+		
+	}
+	
+	public static HashMap<String, String> get_primary_key_type(String table_name, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	{
 	    
-	    for(int i = 0; i<table_names.size(); i++)
-	    {
+//	    Vector<String> table_names = get_table_list(c, pst);
+	    
+//	    for(int i = 0; i<table_names.size(); i++)
+//	    {
 	    	String query = "SELECT a.attname, format_type(a.atttypid, a.atttypmod) AS data_type"
 		    		+ " FROM   pg_index i"
 		    		+ " JOIN   pg_attribute a ON a.attrelid = i.indrelid"
 		    		+ " AND a.attnum = ANY(i.indkey)"
-		    		+ " WHERE  i.indrelid = '"+ table_names.get(i) + "'::regclass"
+		    		+ " WHERE  i.indrelid = '"+ table_name + "'::regclass"
 		    		+ " AND    i.indisprimary";
 	    	
 //	    	pst = c.prepareStatement(query);
@@ -94,44 +99,52 @@ public class populate_db {
 	    		);
 	    	
 	    	ResultSet rs = stmt.executeQuery(query);
-
+	    	
+	    	HashMap<String, String> primary_keys = new HashMap<String, String>();
+	    	
+	    	while(rs.next())
+	    	{
+	    		primary_keys.put(rs.getString(1), rs.getString(2));
+	    	}
+	    	
+	    	return primary_keys;
 	    	
 //	    	ResultSet rs = pst.executeQuery();
 	    	
-	    	if(!table_names.get(i).endsWith("_c"))
-	    	{
-
-	    		rs.last();
-	    		
-	    		int size = rs.getRow();
-	    		
-	    		rs.beforeFirst();
-	    		
-	    		if(size == 0)
-	    		{
-	    			System.out.println(table_names.get(i));
-	    			
-	    			continue;
-	    		}
-	    		
-//	    		System.out.print(size + " ");
+//	    	if(!table_names.get(i).endsWith("_c"))
+//	    	{
+//
+//	    		rs.last();
 //	    		
-//	    		System.out.print(table_names.get(i));
-//		    	
-//		    	System.out.print(":");
-//		    	
-//		    	while(rs.next())
-//		    	{
-//		    		System.out.print(" ");
-//		    		
-//		    		System.out.print(rs.getString(1));
-//		    	}
-//		    	
-//		    	System.out.println();
-	    	}
+//	    		int size = rs.getRow();
+//	    		
+//	    		rs.beforeFirst();
+//	    		
+//	    		if(size == 0)
+//	    		{
+//	    			System.out.println(table_names.get(i));
+//	    			
+//	    			continue;
+//	    		}
+//	    		
+////	    		System.out.print(size + " ");
+////	    		
+////	    		System.out.print(table_names.get(i));
+////		    	
+////		    	System.out.print(":");
+////		    	
+////		    	while(rs.next())
+////		    	{
+////		    		System.out.print(" ");
+////		    		
+////		    		System.out.print(rs.getString(1));
+////		    	}
+////		    	
+////		    	System.out.println();
+//	    	}
 	    	
 	    	
-	    }
+//	    }
 	    
 	    
 	    
@@ -140,6 +153,83 @@ public class populate_db {
 	    
 	    
 	}
+	
+	public static Vector<String> get_primary_key(String table_name, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	{
+	    
+//	    Vector<String> table_names = get_table_list(c, pst);
+	    
+//	    for(int i = 0; i<table_names.size(); i++)
+//	    {
+	    	String query = "SELECT a.attname"
+		    		+ " FROM   pg_index i"
+		    		+ " JOIN   pg_attribute a ON a.attrelid = i.indrelid"
+		    		+ " AND a.attnum = ANY(i.indkey)"
+		    		+ " WHERE  i.indrelid = '"+ table_name + "'::regclass"
+		    		+ " AND    i.indisprimary";
+	    	
+//	    	pst = c.prepareStatement(query);
+	    	
+	    	Statement stmt = c.createStatement(
+	    		    ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE
+	    		);
+	    	
+	    	ResultSet rs = stmt.executeQuery(query);
+	    	
+	    	Vector<String> primary_keys = new Vector<String>();
+	    	
+	    	while(rs.next())
+	    	{
+	    		primary_keys.add(rs.getString(1));
+	    	}
+	    	
+	    	return primary_keys;
+	    	
+//	    	ResultSet rs = pst.executeQuery();
+	    	
+//	    	if(!table_names.get(i).endsWith("_c"))
+//	    	{
+//
+//	    		rs.last();
+//	    		
+//	    		int size = rs.getRow();
+//	    		
+//	    		rs.beforeFirst();
+//	    		
+//	    		if(size == 0)
+//	    		{
+//	    			System.out.println(table_names.get(i));
+//	    			
+//	    			continue;
+//	    		}
+//	    		
+////	    		System.out.print(size + " ");
+////	    		
+////	    		System.out.print(table_names.get(i));
+////		    	
+////		    	System.out.print(":");
+////		    	
+////		    	while(rs.next())
+////		    	{
+////		    		System.out.print(" ");
+////		    		
+////		    		System.out.print(rs.getString(1));
+////		    	}
+////		    	
+////		    	System.out.println();
+//	    	}
+	    	
+	    	
+//	    }
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	}
+	
 	
 	static Vector<String> get_table_list(Connection c, PreparedStatement pst) throws SQLException
 	{
@@ -160,6 +250,89 @@ public class populate_db {
 		
 	}
 	
+	static void delete_views(Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	{
+		Vector<Query> views = get_views_schema(c, pst);
+		
+		for(int i = 0; i<views.size(); i++)
+		{
+			String query = "drop table " + views.get(i).name + "_table";
+			
+			pst = c.prepareStatement(query);
+			
+			pst.execute();
+			
+			query = "drop view " + views.get(i).name;
+			
+			pst = c.prepareStatement(query);
+			
+			pst.execute();
+		}
+		
+	}
+	
+	
+	static void renew_table(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	{
+		for(int i = 0; i<base_tables.length; i++)
+		{
+			
+			String query = "drop table " + base_tables[i] + suffix;
+			
+			pst = c.prepareStatement(query);
+			
+			pst.execute();
+			
+			HashMap<String, String> primary_keys = get_primary_key_type(base_tables[i], c, pst);
+			
+			Set<String> keys = primary_keys.keySet();
+			
+			query = "create table " + base_tables[i] + suffix + "(";
+			
+			int num = 0;
+			
+			String primary_key_string = new String();
+			
+			for(Iterator iter = keys.iterator();iter.hasNext();)
+			{				
+				String key = (String) iter.next();
+				
+				query += key + " " + primary_keys.get(key) + ",";
+				
+				if(num >= 1)
+					primary_key_string += ",";
+				
+				primary_key_string += key;
+				
+				num ++;
+				
+			}
+			
+			query += "citation_view text, ";
+			
+			query += "primary key (" + primary_key_string + "), foreign key (" + primary_key_string + ") references " + base_relations[i] + "(" + primary_key_string + ") on update cascade )";
+			
+			System.out.println(query);
+			
+			pst = c.prepareStatement(query);
+			
+			pst.execute();
+			
+			initial_new_table(base_tables[i], c, pst, primary_key_string);
+			
+			
+		}
+	}
+	
+	static void initial_new_table(String table_name, Connection c, PreparedStatement pst, String primary_key_string) throws SQLException
+	{
+		
+		String query = "insert into " + table_name + suffix + "(" + primary_key_string + ") select " + primary_key_string + " from " + table_name;
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+	}
 	
 	public static void initial() throws SQLException, ClassNotFoundException
 	{
@@ -168,7 +341,9 @@ public class populate_db {
 		Class.forName("org.postgresql.Driver");
 	    c = DriverManager
 	        .getConnection(db_url, usr_name , passwd);
-		add_column(c,pst);
+//		add_column(c,pst);
+	    renew_table(c, pst);
+	    
 		populate_db(c, pst);
 		c.close();
 	}
@@ -181,6 +356,8 @@ public class populate_db {
 	    c = DriverManager
 	        .getConnection(db_url, usr_name , passwd);
 //	    add_column(c,pst);
+		renew_table(c, pst);
+
 		populate_db(view, c, pst);
 		c.close();
 	    
@@ -591,38 +768,38 @@ public class populate_db {
 	}
 	
 	
-	public static String get_subgoal_str(String view_name, Vector<String> subgoal_names, Connection c, PreparedStatement pst) throws SQLException
-	{		
-		
-		Vector<String> col_names = new Vector<String>();
-		
+	public static String get_subgoal_str(String view_name, Vector<String> subgoal_names, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	{				
 		String subgoals = new String();
 		
 		for(int i = 0; i<subgoal_names.size(); i++)
 		{
-			String query_table_col = "select arguments from subgoal_arguments where subgoal_names = '" + subgoal_names.get(i) + "'";
 			
-			pst = c.prepareStatement(query_table_col);
+			Vector<String> col_names = Parse_datalog.get_columns(subgoal_names.get(i));
 			
-			ResultSet rs = pst.executeQuery();
+//			String query_table_col = "select arguments from subgoal_arguments where subgoal_names = '" + subgoal_names.get(i) + "'";
+//			
+//			pst = c.prepareStatement(query_table_col);
+//			
+//			ResultSet rs = pst.executeQuery();
 			
-			if(rs.next())
-			{
+//			if(rs.next())
+//			{
 				
-				String [] cols = rs.getString(1).split(",");
-				
-				String col_str = new String();
+//				String [] cols = rs.getString(1).split(",");
+//				
+//				String col_str = new String();
 				
 				String subgoal_str = subgoal_names.get(i) + "(";
 				
 				
-				for(int j = 0; j<cols.length; j++)
+				for(int j = 0; j<col_names.size(); j++)
 				{
 					
 					if(j >= 1)
 						subgoal_str += ",";
 					
-					subgoal_str += cols[j];
+					subgoal_str += subgoal_names.get(i) + "_" + col_names.get(j);
 					
 				}
 				
@@ -633,7 +810,7 @@ public class populate_db {
 				
 				subgoals += subgoal_str;
 				
-			}
+//			}
 		}
 		
 //		String col_str = new String();
@@ -828,52 +1005,86 @@ public class populate_db {
 			
 			Subgoal subgoal = (Subgoal)view.body.get(i);
 			
-			String query = "update " + subgoal.name + " set citation_view = "; 
+			Vector<String> primary_keys = get_primary_key(subgoal.name, c, pst);
 			
-			boolean annotation_exist = exist_annotations(subgoal.name, c, pst);
+			String query_base = "update " + subgoal.name + suffix + " set citation_view = "; 
+			
+			String query1 = query_base;
+			
+			String query2 = query_base;
+			
+//			boolean annotation_exist = exist_annotations(subgoal.name + suffix, c, pst);
 			
 			if(subgoal_lambda_term_map.size() == 0)
 			{
 				
-				if(annotation_exist)
-				{
-					query += "citation_view || '|" + view.name + "'";
-				}
-				else
-				{
-					query += "'" + view.name + "'";
-				}
+//				if(annotation_exist)
+//				{
+					query1 += "citation_view || '|" + view.name + "'";
+//				}
+//				else
+//				{
+					query2 += "'" + view.name + "'";
+//				}
 			}
 			else
 			{
 				Vector<Integer> int_list = subgoal_lambda_term_map.get(subgoal.name);
 				
-				if(annotation_exist)
-					insert_annotation = "citation_view || '|" + view.name + "('";
-				else
-					insert_annotation = "'" + view.name + "('";
+//				if(annotation_exist)
+					query1 += "citation_view || '|" + view.name + "('";
+//				else
+					query2 += "'" + view.name + "('";
 				
 				for(int k = 0; k< view.lambda_term.size(); k++)
 				{
 					
 					if(k >= 1)
-						insert_annotation += " || ','";
+					{
+						query1 += " || ','";
+						
+						query2 += " || ','";
+					}
 					
 					if(int_list != null && int_list.contains(k))
 					{
-						insert_annotation += " || " + view.lambda_term.get(k);
+						query1 += " || " + "f." + view.lambda_term.get(k).name.substring(subgoal.name.length() + 1, view.lambda_term.get(k).name.length());
+						
+						query2 += " || " + "f." + view.lambda_term.get(k).name.substring(subgoal.name.length() + 1, view.lambda_term.get(k).name.length());
 					}
 				}
 				
-				insert_annotation += " || ')'";
+				query1 += " || ')'";
 				
-				query += insert_annotation;
+				query2 += " || ')'";
+				
+//				query += insert_annotation;
 				
 			}
 			
-			System.out.println(query);
+			query1 += " from ( select * from " + subgoal.name + ") as f where citation_view is not null";
 			
-			pst = c.prepareStatement(query);
+			query2 += " from ( select * from " + subgoal.name + ") as f where citation_view is null";
+			
+			for(int k = 0; k<primary_keys.size(); k++)
+			{
+				query1 += " and f." + primary_keys.get(k) + " = " + subgoal.name + suffix + "." + primary_keys.get(k);
+				
+				query2 += " and f." + primary_keys.get(k) + " = " + subgoal.name + suffix + "." + primary_keys.get(k);
+			}
+			
+			
+			
+			
+			System.out.println(query1);
+			
+			System.out.println(query2);
+			
+			pst = c.prepareStatement(query1);
+			
+			pst.execute();
+			
+			pst = c.prepareStatement(query2);
 			
 			pst.execute();
 			

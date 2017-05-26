@@ -53,7 +53,7 @@ public class view_operation {
 	public static void initial() throws ClassNotFoundException, SQLException
 	{
 		
-		create_view.check_create_views();
+//		create_view.check_create_views();
 		
 		populate_db.initial();
 	}
@@ -71,7 +71,7 @@ public class view_operation {
 			subgoal_names.add(subgoals.get(i).name);
 		}
 		
-		create_view.create_views(id, subgoal_names, v.conditions, null, null);
+//		create_view.create_views(id, subgoal_names, v.conditions, null, null);
 		
 		populate_db.update(v);
 

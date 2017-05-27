@@ -173,49 +173,49 @@ public class GoodPlan {
     showStat();
   }
 
-    static Query parse_query(String query)
-    {
-        
-        String head = query.split(":")[0];
-        
-        String head_name=head.split("\\(")[0];
-        
-        String []head_var=head.split("\\(")[1].split("\\)")[0].split(",");
-        
-        Vector<Argument> head_v = new Vector<Argument>();
-        
-        for(int i=0;i<head_var.length;i++)
-        {
-        	head_v.add(new Argument(head_var[i]));
-        }
-        
-        Subgoal head_subgoal = new Subgoal(head_name, head_v);
-        
-        String []body = query.split(":")[1].split("\\),");
-        
-        body[body.length-1]=body[body.length-1].split("\\)")[0];
-        
-        Vector<Subgoal> body_subgoals = new Vector<Subgoal>(body.length);
-        
-        for(int i=0; i<body.length; i++)
-        {
-        	String body_name=body[i].split("\\(")[0];
-            
-            String []body_var=body[i].split("\\(")[1].split(",");
-            
-            Vector<Argument> body_v = new Vector<Argument>();
-            
-            for(int j=0;j<body_var.length;j++)
-            {
-            	body_v.add(new Argument(body_var[j]));
-            }
-            
-            Subgoal body_subgoal = new Subgoal(body_name, body_v);
-            
-            body_subgoals.add(body_subgoal);
-        }
-        return new Query(head_name, head_subgoal, body_subgoals);
-    }
+//    static Query parse_query(String query)
+//    {
+//        
+//        String head = query.split(":")[0];
+//        
+//        String head_name=head.split("\\(")[0];
+//        
+//        String []head_var=head.split("\\(")[1].split("\\)")[0].split(",");
+//        
+//        Vector<Argument> head_v = new Vector<Argument>();
+//        
+//        for(int i=0;i<head_var.length;i++)
+//        {
+//        	head_v.add(new Argument(head_var[i]));
+//        }
+//        
+//        Subgoal head_subgoal = new Subgoal(head_name, head_v);
+//        
+//        String []body = query.split(":")[1].split("\\),");
+//        
+//        body[body.length-1]=body[body.length-1].split("\\)")[0];
+//        
+//        Vector<Subgoal> body_subgoals = new Vector<Subgoal>(body.length);
+//        
+//        for(int i=0; i<body.length; i++)
+//        {
+//        	String body_name=body[i].split("\\(")[0];
+//            
+//            String []body_var=body[i].split("\\(")[1].split(",");
+//            
+//            Vector<Argument> body_v = new Vector<Argument>();
+//            
+//            for(int j=0;j<body_var.length;j++)
+//            {
+//            	body_v.add(new Argument(body_var[j]));
+//            }
+//            
+//            Subgoal body_subgoal = new Subgoal(body_name, body_v);
+//            
+//            body_subgoals.add(body_subgoal);
+//        }
+//        return new Query(head_name, head_subgoal, body_subgoals);
+//    }
 
     static void doOneTestYoli2() {
 
@@ -236,7 +236,7 @@ public class GoodPlan {
     
     Vector dummyquery = new Vector();
     
-    dummyquery.add(parse_query(query_str));
+//    dummyquery.add(parse_query(query_str));
     
     Query query = (Query)dummyquery.elementAt(0);
 //    Vector views = readViews(viewFile);
@@ -244,7 +244,7 @@ public class GoodPlan {
     
     for(int i=0;i<view_strs.length;i++)
     {
-    	views.add(parse_query(view_strs[i]));
+//    	views.add(parse_query(view_strs[i]));
     }
     
     
@@ -486,76 +486,76 @@ public class GoodPlan {
   }
   
   static void unitTest() {
-    test1();
-    test2();
-    test3();
+//    test1();
+//    test2();
+//    test3();
   }
   
   // create a query: q(M,C)     :- car(M,d0), loc(d0,C,C)
   // create a view:  v(M,D,C,E) :- car(M,D),  loc(D,C,E)
   // ONLY one rewriting: q(M,C) :- v(M_1,d0,C,C),v(M,d0,C_2,E_2)
-  static void test1() {
-    // create a relation
-    Vector relations = new Vector();
-    String  name   = "r";  // relation name
-    Vector  schema = new Vector();  // a vector of attributes
-    schema = new Vector();
-    schema.add(new Attribute("M"));
-    schema.add(new Attribute("D"));
-    schema.add(new Attribute("C"));
-    relations.add(new Relation(name, schema));
-    
-    // create a view:  v(M,D,C,E) :- car(M,D), loc(D,C,E)
-    Vector views = new Vector();
-    String viewName = "v";
-
-    Vector viewHeadArgs = new Vector();  // head: v(M,D,C,E)
-    viewHeadArgs.add(new Argument("M"));
-    viewHeadArgs.add(new Argument("D"));
-    viewHeadArgs.add(new Argument("C"));
-    viewHeadArgs.add(new Argument("E"));
-    Subgoal viewHead = new Subgoal(viewName, viewHeadArgs);
-
-    Vector viewBody     = new Vector();
-    Vector subgoalArgs  = new Vector();
-    subgoalArgs.add(new Argument("M")); // car(M,D)
-    subgoalArgs.add(new Argument("D"));
-    viewBody.add(new Subgoal("car", subgoalArgs));
-    
-    subgoalArgs      = new Vector();
-    subgoalArgs.add(new Argument("D")); // loc(D,C,E)
-    subgoalArgs.add(new Argument("C"));
-    subgoalArgs.add(new Argument("E"));
-    viewBody.add(new Subgoal("loc", subgoalArgs));
-    
-    views.add(new Query(viewName, viewHead, viewBody));
-    
-    // create a query: q(M,C) :- car(M,d0), loc(d0,C,C)
-    String queryName = "q";
-
-    Vector queryHeadArgs  = new Vector();
-    queryHeadArgs.add(new Argument("M"));  // head: q(M,C)
-    queryHeadArgs.add(new Argument("C"));
-    Subgoal queryHead = new Subgoal(queryName, queryHeadArgs);
-    
-    Vector queryBody      = new Vector();
-    subgoalArgs  = new Vector();
-    subgoalArgs.add(new Argument("M")); // car(M,d0)
-    subgoalArgs.add(new Argument("d0"));
-    queryBody.add(new Subgoal("car", subgoalArgs));
-    
-    subgoalArgs      = new Vector();
-    subgoalArgs.add(new Argument("d0")); // loc(d0,C,C)
-    subgoalArgs.add(new Argument("C"));
-    subgoalArgs.add(new Argument("C"));
-    queryBody.add(new Subgoal("loc", subgoalArgs));
-    Query query = new Query(queryName, queryHead, queryBody);
-
-    showSetting(relations, views);
-    
-    genPlan(query, views);
-    return;
-  }
+//  static void test1() {
+//    // create a relation
+//    Vector relations = new Vector();
+//    String  name   = "r";  // relation name
+//    Vector  schema = new Vector();  // a vector of attributes
+//    schema = new Vector();
+//    schema.add(new Attribute("M"));
+//    schema.add(new Attribute("D"));
+//    schema.add(new Attribute("C"));
+//    relations.add(new Relation(name, schema));
+//    
+//    // create a view:  v(M,D,C,E) :- car(M,D), loc(D,C,E)
+//    Vector views = new Vector();
+//    String viewName = "v";
+//
+//    Vector viewHeadArgs = new Vector();  // head: v(M,D,C,E)
+//    viewHeadArgs.add(new Argument("M"));
+//    viewHeadArgs.add(new Argument("D"));
+//    viewHeadArgs.add(new Argument("C"));
+//    viewHeadArgs.add(new Argument("E"));
+//    Subgoal viewHead = new Subgoal(viewName, viewHeadArgs);
+//
+//    Vector viewBody     = new Vector();
+//    Vector subgoalArgs  = new Vector();
+//    subgoalArgs.add(new Argument("M")); // car(M,D)
+//    subgoalArgs.add(new Argument("D"));
+//    viewBody.add(new Subgoal("car", subgoalArgs));
+//    
+//    subgoalArgs      = new Vector();
+//    subgoalArgs.add(new Argument("D")); // loc(D,C,E)
+//    subgoalArgs.add(new Argument("C"));
+//    subgoalArgs.add(new Argument("E"));
+//    viewBody.add(new Subgoal("loc", subgoalArgs));
+//    
+//    views.add(new Query(viewName, viewHead, viewBody));
+//    
+//    // create a query: q(M,C) :- car(M,d0), loc(d0,C,C)
+//    String queryName = "q";
+//
+//    Vector queryHeadArgs  = new Vector();
+//    queryHeadArgs.add(new Argument("M"));  // head: q(M,C)
+//    queryHeadArgs.add(new Argument("C"));
+//    Subgoal queryHead = new Subgoal(queryName, queryHeadArgs);
+//    
+//    Vector queryBody      = new Vector();
+//    subgoalArgs  = new Vector();
+//    subgoalArgs.add(new Argument("M")); // car(M,d0)
+//    subgoalArgs.add(new Argument("d0"));
+//    queryBody.add(new Subgoal("car", subgoalArgs));
+//    
+//    subgoalArgs      = new Vector();
+//    subgoalArgs.add(new Argument("d0")); // loc(d0,C,C)
+//    subgoalArgs.add(new Argument("C"));
+//    subgoalArgs.add(new Argument("C"));
+//    queryBody.add(new Subgoal("loc", subgoalArgs));
+//    Query query = new Query(queryName, queryHead, queryBody);
+//
+//    showSetting(relations, views);
+//    
+//    genPlan(query, views);
+//    return;
+//  }
 
   /*
     Q(X1):-b(Y5,Y4),b(Y5,Y2),b(Y5,Y3),b(Y3,Y2),b(Y4,Y1),a(Y1,X1),a(Y2,X1),a(Y1,Y2)
@@ -564,223 +564,223 @@ public class GoodPlan {
    v2(B1,B2):- a(B1,B1),a(B1,B2)
    There are 8 rewritings.
    */
-  static void test2() {
-    // create two relations
-    Vector relations = new Vector();
-    String  name   = "b";           // b(X,Y)
-    Vector  schema = new Vector();  
-    schema.add(new Attribute("X"));
-    schema.add(new Attribute("Y"));
-    relations.add(new Relation(name, schema));
-
-    name   = "a"; 
-    schema = new Vector(); 
-    schema.add(new Attribute("Z")); // a(Z,W)
-    schema.add(new Attribute("W"));
-    relations.add(new Relation(name, schema));
-
-    // create a view:  v1(A1,A2):- b(A1,Z1),b(Z1,A2),b(A1,A2)
-    Vector views = new Vector();
-
-    String viewName = "v1";
-    Vector viewHeadArgs = new Vector();  // head: v1(A1,A2)
-    viewHeadArgs.add(new Argument("A1"));
-    viewHeadArgs.add(new Argument("A2"));  
-    Subgoal viewHead = new Subgoal(viewName, viewHeadArgs);
-    
-    Vector viewBody     = new Vector();
-    Vector subgoalArgs  = new Vector();
-    subgoalArgs.add(new Argument("A1"));
-    subgoalArgs.add(new Argument("Z1")); // b(A1,Z1)
-    viewBody.add(new Subgoal("b", subgoalArgs));
-    
-    subgoalArgs      = new Vector();
-    subgoalArgs.add(new Argument("Z1")); // b(Z1,A2)
-    subgoalArgs.add(new Argument("A2"));
-    viewBody.add(new Subgoal("b", subgoalArgs));
-
-    subgoalArgs      = new Vector();
-    subgoalArgs.add(new Argument("A1")); // b(A1,A2)
-    subgoalArgs.add(new Argument("A2"));
-    viewBody.add(new Subgoal("b", subgoalArgs));
-
-    views.add(new Query(viewName, viewHead, viewBody));
-
-    // create a view:  v2(B1,B2):- a(B1,B1),a(B1,B2)
-    viewName = "v2";
-    viewHeadArgs = new Vector();  // head: v2(B1,B2)
-    viewHeadArgs.add(new Argument("B1"));
-    viewHeadArgs.add(new Argument("B2"));
-    viewHead = new Subgoal(viewName, viewHeadArgs);
-    
-    viewBody     = new Vector();
-    subgoalArgs  = new Vector();
-    subgoalArgs.add(new Argument("B1"));
-    subgoalArgs.add(new Argument("B1")); // a(B1,B1)
-    viewBody.add(new Subgoal("a", subgoalArgs));
-    
-    subgoalArgs      = new Vector();
-    subgoalArgs.add(new Argument("B1")); // a(B1,B2)
-    subgoalArgs.add(new Argument("B2"));
-    viewBody.add(new Subgoal("a", subgoalArgs));
-
-    views.add(new Query(viewName, viewHead, viewBody));
-
-    // create a query:    Q(X1):-b(Y5,Y4),b(Y5,Y2),b(Y5,Y3),b(Y3,Y2),b(Y4,Y1),a(Y1,X1),a(Y2,X1),a(Y1,Y2)
-    //String queryName  = ((Relation) relations.elementAt(0)).getName();
-    String queryName = "q";
-
-    Vector queryHeadArgs  = new Vector();
-    queryHeadArgs.add(new Argument("X1"));  // Q(X1)
-    //queryHeadArgs.add(new Argument("Y3"));  // Q(Y3) !!!!
-    Subgoal queryHead = new Subgoal(queryName, queryHeadArgs);
-
-    Vector queryBody      = new Vector();
-    subgoalArgs  = new Vector();
-    subgoalArgs.add(new Argument("Y5")); // b(Y5,Y4)
-    subgoalArgs.add(new Argument("Y4"));
-    queryBody.add(new Subgoal("b", subgoalArgs));
-
-    subgoalArgs      = new Vector();
-    subgoalArgs.add(new Argument("Y5"));
-    subgoalArgs.add(new Argument("Y2"));  // b(Y5,Y2),
-    queryBody.add(new Subgoal("b", subgoalArgs));
-
-    subgoalArgs      = new Vector();
-    subgoalArgs.add(new Argument("Y5"));
-    subgoalArgs.add(new Argument("Y3"));  // b(Y5,Y3)
-    queryBody.add(new Subgoal("b", subgoalArgs));
-
-    subgoalArgs      = new Vector();
-    subgoalArgs.add(new Argument("Y3"));
-    subgoalArgs.add(new Argument("Y2"));  // b(Y3,Y2),
-    queryBody.add(new Subgoal("b", subgoalArgs));
-
-    subgoalArgs      = new Vector();
-    subgoalArgs.add(new Argument("Y4"));
-    subgoalArgs.add(new Argument("Y1"));  // b(Y4,Y1)
-    queryBody.add(new Subgoal("b", subgoalArgs));
-
-    subgoalArgs      = new Vector();
-    subgoalArgs.add(new Argument("Y1"));
-    subgoalArgs.add(new Argument("X1"));  // a(Y1,X1)
-    queryBody.add(new Subgoal("a", subgoalArgs));
-
-    subgoalArgs      = new Vector();
-    subgoalArgs.add(new Argument("Y2"));
-    subgoalArgs.add(new Argument("X1"));  // a(Y2,X1)
-    queryBody.add(new Subgoal("a", subgoalArgs));
-
-    subgoalArgs      = new Vector();
-    subgoalArgs.add(new Argument("Y1"));
-    subgoalArgs.add(new Argument("Y2"));  // a(Y1,Y2)
-    queryBody.add(new Subgoal("a", subgoalArgs));
-
-    Query query = new Query(queryName, queryHead, queryBody);
-
-    showSetting(relations, views);
-    genPlan(query, views);
-    return;
-  }
-
-  //  Query: q(U)    :- a(U,U),c(U,X),b(X,X)
-  //  Views: v1(A,B) :- a(A,A),       b(B,B)
-  //         v2(C,D) :-        c(C,D),b(D,D)
-  //  Rewriting:  q(U):- v1(U,X),v2(U,X) 
-  static void test3() {
-    // create a relation
-    Vector relations = new Vector();
-    String  name   = "a";  // relation name
-    Vector  schema = new Vector();  // a vector of attributes
-    schema = new Vector();
-    schema.add(new Attribute("A")); // a(A,B)
-    schema.add(new Attribute("B"));
-    relations.add(new Relation(name, schema));
-
-    name   = "b";  // relation name
-    schema = new Vector();  // a vector of attributes
-    schema = new Vector();
-    schema.add(new Attribute("A")); // b(A,B)
-    schema.add(new Attribute("B"));
-    relations.add(new Relation(name, schema));
-
-    name   = "c";  // relation name
-    schema = new Vector();  // a vector of attributes
-    schema = new Vector();
-    schema.add(new Attribute("A")); // c(A,B)
-    schema.add(new Attribute("B"));
-    relations.add(new Relation(name, schema));
-    
-    // create a view:  v1(A,B) :- a(A,A), b(B,B)
-    Vector views = new Vector();
-    String viewName = "v1";
-
-    Vector viewHeadArgs = new Vector();  // head: v1(A,B)
-    viewHeadArgs.add(new Argument("A"));
-    viewHeadArgs.add(new Argument("B"));
-    Subgoal viewHead = new Subgoal(viewName, viewHeadArgs);
-
-    Vector viewBody     = new Vector();
-    Vector subgoalArgs  = new Vector();
-    subgoalArgs.add(new Argument("A")); // a(A,A)
-    subgoalArgs.add(new Argument("A"));
-    viewBody.add(new Subgoal("a", subgoalArgs));
-    
-    subgoalArgs      = new Vector();
-    subgoalArgs.add(new Argument("B")); // b(B,B)
-    subgoalArgs.add(new Argument("B"));
-    viewBody.add(new Subgoal("b", subgoalArgs));
-    
-    views.add(new Query(viewName, viewHead, viewBody));
-    
-    // create 2nd view:  v2(C,D) :- c(C,D),b(D,D)
-    viewName = "v2";
-    viewHeadArgs = new Vector();  // head: v2(C,D)
-    viewHeadArgs.add(new Argument("C"));
-    viewHeadArgs.add(new Argument("D"));
-    viewHead = new Subgoal(viewName, viewHeadArgs);
-
-    viewBody     = new Vector();
-    subgoalArgs  = new Vector();
-    subgoalArgs.add(new Argument("C")); // c(C,D)
-    subgoalArgs.add(new Argument("D"));
-    viewBody.add(new Subgoal("c", subgoalArgs));
-    
-    subgoalArgs      = new Vector();
-    subgoalArgs.add(new Argument("D")); // b(D,D)
-    subgoalArgs.add(new Argument("D"));
-    viewBody.add(new Subgoal("b", subgoalArgs));
-    
-    views.add(new Query(viewName, viewHead, viewBody));
-
-    //  create Query: q(U)    :- a(U,U),c(U,X),b(X,X)
-    String queryName = "q";
-
-    Vector queryHeadArgs  = new Vector();
-    queryHeadArgs.add(new Argument("U"));  // head: q(U)
-    Subgoal queryHead = new Subgoal(queryName, queryHeadArgs);
-    
-    Vector queryBody      = new Vector();
-    subgoalArgs  = new Vector();
-    subgoalArgs.add(new Argument("U")); // a(U,U)
-    subgoalArgs.add(new Argument("U"));
-    queryBody.add(new Subgoal("a", subgoalArgs));
-    
-    subgoalArgs      = new Vector();
-    subgoalArgs.add(new Argument("U")); // c(U,X),b(X,X)
-    subgoalArgs.add(new Argument("X"));
-    queryBody.add(new Subgoal("c", subgoalArgs));
-
-    subgoalArgs      = new Vector();
-    subgoalArgs.add(new Argument("X")); // b(X,X)
-    subgoalArgs.add(new Argument("X"));
-    queryBody.add(new Subgoal("b", subgoalArgs));
-    Query query = new Query(queryName, queryHead, queryBody);
-
-    showSetting(relations, views);
-    genPlan(query, views);
-    return;
-  }
+//  static void test2() {
+//    // create two relations
+//    Vector relations = new Vector();
+//    String  name   = "b";           // b(X,Y)
+//    Vector  schema = new Vector();  
+//    schema.add(new Attribute("X"));
+//    schema.add(new Attribute("Y"));
+//    relations.add(new Relation(name, schema));
+//
+//    name   = "a"; 
+//    schema = new Vector(); 
+//    schema.add(new Attribute("Z")); // a(Z,W)
+//    schema.add(new Attribute("W"));
+//    relations.add(new Relation(name, schema));
+//
+//    // create a view:  v1(A1,A2):- b(A1,Z1),b(Z1,A2),b(A1,A2)
+//    Vector views = new Vector();
+//
+//    String viewName = "v1";
+//    Vector viewHeadArgs = new Vector();  // head: v1(A1,A2)
+//    viewHeadArgs.add(new Argument("A1"));
+//    viewHeadArgs.add(new Argument("A2"));  
+//    Subgoal viewHead = new Subgoal(viewName, viewHeadArgs);
+//    
+//    Vector viewBody     = new Vector();
+//    Vector subgoalArgs  = new Vector();
+//    subgoalArgs.add(new Argument("A1"));
+//    subgoalArgs.add(new Argument("Z1")); // b(A1,Z1)
+//    viewBody.add(new Subgoal("b", subgoalArgs));
+//    
+//    subgoalArgs      = new Vector();
+//    subgoalArgs.add(new Argument("Z1")); // b(Z1,A2)
+//    subgoalArgs.add(new Argument("A2"));
+//    viewBody.add(new Subgoal("b", subgoalArgs));
+//
+//    subgoalArgs      = new Vector();
+//    subgoalArgs.add(new Argument("A1")); // b(A1,A2)
+//    subgoalArgs.add(new Argument("A2"));
+//    viewBody.add(new Subgoal("b", subgoalArgs));
+//
+//    views.add(new Query(viewName, viewHead, viewBody));
+//
+//    // create a view:  v2(B1,B2):- a(B1,B1),a(B1,B2)
+//    viewName = "v2";
+//    viewHeadArgs = new Vector();  // head: v2(B1,B2)
+//    viewHeadArgs.add(new Argument("B1"));
+//    viewHeadArgs.add(new Argument("B2"));
+//    viewHead = new Subgoal(viewName, viewHeadArgs);
+//    
+//    viewBody     = new Vector();
+//    subgoalArgs  = new Vector();
+//    subgoalArgs.add(new Argument("B1"));
+//    subgoalArgs.add(new Argument("B1")); // a(B1,B1)
+//    viewBody.add(new Subgoal("a", subgoalArgs));
+//    
+//    subgoalArgs      = new Vector();
+//    subgoalArgs.add(new Argument("B1")); // a(B1,B2)
+//    subgoalArgs.add(new Argument("B2"));
+//    viewBody.add(new Subgoal("a", subgoalArgs));
+//
+//    views.add(new Query(viewName, viewHead, viewBody));
+//
+//    // create a query:    Q(X1):-b(Y5,Y4),b(Y5,Y2),b(Y5,Y3),b(Y3,Y2),b(Y4,Y1),a(Y1,X1),a(Y2,X1),a(Y1,Y2)
+//    //String queryName  = ((Relation) relations.elementAt(0)).getName();
+//    String queryName = "q";
+//
+//    Vector queryHeadArgs  = new Vector();
+//    queryHeadArgs.add(new Argument("X1"));  // Q(X1)
+//    //queryHeadArgs.add(new Argument("Y3"));  // Q(Y3) !!!!
+//    Subgoal queryHead = new Subgoal(queryName, queryHeadArgs);
+//
+//    Vector queryBody      = new Vector();
+//    subgoalArgs  = new Vector();
+//    subgoalArgs.add(new Argument("Y5")); // b(Y5,Y4)
+//    subgoalArgs.add(new Argument("Y4"));
+//    queryBody.add(new Subgoal("b", subgoalArgs));
+//
+//    subgoalArgs      = new Vector();
+//    subgoalArgs.add(new Argument("Y5"));
+//    subgoalArgs.add(new Argument("Y2"));  // b(Y5,Y2),
+//    queryBody.add(new Subgoal("b", subgoalArgs));
+//
+//    subgoalArgs      = new Vector();
+//    subgoalArgs.add(new Argument("Y5"));
+//    subgoalArgs.add(new Argument("Y3"));  // b(Y5,Y3)
+//    queryBody.add(new Subgoal("b", subgoalArgs));
+//
+//    subgoalArgs      = new Vector();
+//    subgoalArgs.add(new Argument("Y3"));
+//    subgoalArgs.add(new Argument("Y2"));  // b(Y3,Y2),
+//    queryBody.add(new Subgoal("b", subgoalArgs));
+//
+//    subgoalArgs      = new Vector();
+//    subgoalArgs.add(new Argument("Y4"));
+//    subgoalArgs.add(new Argument("Y1"));  // b(Y4,Y1)
+//    queryBody.add(new Subgoal("b", subgoalArgs));
+//
+//    subgoalArgs      = new Vector();
+//    subgoalArgs.add(new Argument("Y1"));
+//    subgoalArgs.add(new Argument("X1"));  // a(Y1,X1)
+//    queryBody.add(new Subgoal("a", subgoalArgs));
+//
+//    subgoalArgs      = new Vector();
+//    subgoalArgs.add(new Argument("Y2"));
+//    subgoalArgs.add(new Argument("X1"));  // a(Y2,X1)
+//    queryBody.add(new Subgoal("a", subgoalArgs));
+//
+//    subgoalArgs      = new Vector();
+//    subgoalArgs.add(new Argument("Y1"));
+//    subgoalArgs.add(new Argument("Y2"));  // a(Y1,Y2)
+//    queryBody.add(new Subgoal("a", subgoalArgs));
+//
+//    Query query = new Query(queryName, queryHead, queryBody);
+//
+//    showSetting(relations, views);
+//    genPlan(query, views);
+//    return;
+//  }
+//
+//  //  Query: q(U)    :- a(U,U),c(U,X),b(X,X)
+//  //  Views: v1(A,B) :- a(A,A),       b(B,B)
+//  //         v2(C,D) :-        c(C,D),b(D,D)
+//  //  Rewriting:  q(U):- v1(U,X),v2(U,X) 
+//  static void test3() {
+//    // create a relation
+//    Vector relations = new Vector();
+//    String  name   = "a";  // relation name
+//    Vector  schema = new Vector();  // a vector of attributes
+//    schema = new Vector();
+//    schema.add(new Attribute("A")); // a(A,B)
+//    schema.add(new Attribute("B"));
+//    relations.add(new Relation(name, schema));
+//
+//    name   = "b";  // relation name
+//    schema = new Vector();  // a vector of attributes
+//    schema = new Vector();
+//    schema.add(new Attribute("A")); // b(A,B)
+//    schema.add(new Attribute("B"));
+//    relations.add(new Relation(name, schema));
+//
+//    name   = "c";  // relation name
+//    schema = new Vector();  // a vector of attributes
+//    schema = new Vector();
+//    schema.add(new Attribute("A")); // c(A,B)
+//    schema.add(new Attribute("B"));
+//    relations.add(new Relation(name, schema));
+//    
+//    // create a view:  v1(A,B) :- a(A,A), b(B,B)
+//    Vector views = new Vector();
+//    String viewName = "v1";
+//
+//    Vector viewHeadArgs = new Vector();  // head: v1(A,B)
+//    viewHeadArgs.add(new Argument("A"));
+//    viewHeadArgs.add(new Argument("B"));
+//    Subgoal viewHead = new Subgoal(viewName, viewHeadArgs);
+//
+//    Vector viewBody     = new Vector();
+//    Vector subgoalArgs  = new Vector();
+//    subgoalArgs.add(new Argument("A")); // a(A,A)
+//    subgoalArgs.add(new Argument("A"));
+//    viewBody.add(new Subgoal("a", subgoalArgs));
+//    
+//    subgoalArgs      = new Vector();
+//    subgoalArgs.add(new Argument("B")); // b(B,B)
+//    subgoalArgs.add(new Argument("B"));
+//    viewBody.add(new Subgoal("b", subgoalArgs));
+//    
+//    views.add(new Query(viewName, viewHead, viewBody));
+//    
+//    // create 2nd view:  v2(C,D) :- c(C,D),b(D,D)
+//    viewName = "v2";
+//    viewHeadArgs = new Vector();  // head: v2(C,D)
+//    viewHeadArgs.add(new Argument("C"));
+//    viewHeadArgs.add(new Argument("D"));
+//    viewHead = new Subgoal(viewName, viewHeadArgs);
+//
+//    viewBody     = new Vector();
+//    subgoalArgs  = new Vector();
+//    subgoalArgs.add(new Argument("C")); // c(C,D)
+//    subgoalArgs.add(new Argument("D"));
+//    viewBody.add(new Subgoal("c", subgoalArgs));
+//    
+//    subgoalArgs      = new Vector();
+//    subgoalArgs.add(new Argument("D")); // b(D,D)
+//    subgoalArgs.add(new Argument("D"));
+//    viewBody.add(new Subgoal("b", subgoalArgs));
+//    
+//    views.add(new Query(viewName, viewHead, viewBody));
+//
+//    //  create Query: q(U)    :- a(U,U),c(U,X),b(X,X)
+//    String queryName = "q";
+//
+//    Vector queryHeadArgs  = new Vector();
+//    queryHeadArgs.add(new Argument("U"));  // head: q(U)
+//    Subgoal queryHead = new Subgoal(queryName, queryHeadArgs);
+//    
+//    Vector queryBody      = new Vector();
+//    subgoalArgs  = new Vector();
+//    subgoalArgs.add(new Argument("U")); // a(U,U)
+//    subgoalArgs.add(new Argument("U"));
+//    queryBody.add(new Subgoal("a", subgoalArgs));
+//    
+//    subgoalArgs      = new Vector();
+//    subgoalArgs.add(new Argument("U")); // c(U,X),b(X,X)
+//    subgoalArgs.add(new Argument("X"));
+//    queryBody.add(new Subgoal("c", subgoalArgs));
+//
+//    subgoalArgs      = new Vector();
+//    subgoalArgs.add(new Argument("X")); // b(X,X)
+//    subgoalArgs.add(new Argument("X"));
+//    queryBody.add(new Subgoal("b", subgoalArgs));
+//    Query query = new Query(queryName, queryHead, queryBody);
+//
+//    showSetting(relations, views);
+//    genPlan(query, views);
+//    return;
+//  }
 
 
     static Vector readViews(String filename){

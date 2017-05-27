@@ -102,7 +102,7 @@ class Relation {
 
       // yields one tuple
       resTuples.add(new Tuple(name, resTupleArgs, 
-			      tuple.getMapping(), tuple.getMapSubgoals()));
+			      tuple.getMapping(), tuple.getMapping_str(), tuple.getMapSubgoals()));
     }
     
     return new Relation(this.getName(), resSchema, resTuples);

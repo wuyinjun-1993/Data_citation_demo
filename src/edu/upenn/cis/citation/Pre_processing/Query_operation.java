@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Vector;
 
 import edu.upenn.cis.citation.Corecover.Argument;
@@ -38,15 +39,17 @@ public class Query_operation {
 
         head_var = get_head_vars(id, c, pst);
         
+        HashMap<String, String> subgoal_name_mapping = new HashMap<String, String> ();
+        
         Vector<Conditions> conditions = get_query_conditions(id, c, pst);
         
-        Vector<Subgoal> subgoals = get_query_subgoals(id, c, pst);
+        Vector<Subgoal> subgoals = get_query_subgoals(id, subgoal_name_mapping, c, pst);
         
         Vector<Lambda_term> lambda_terms = get_query_lambda_terms(id, c, pst);
         
         Subgoal head = new Subgoal(id, head_var);
         
-        Query view = new Query(id, head, subgoals,lambda_terms, conditions);
+        Query view = new Query(id, head, subgoals,lambda_terms, conditions, subgoal_name_mapping);
         
         
         c.close();
@@ -375,9 +378,9 @@ public class Query_operation {
 		
 	}
 	
-	static Vector<Subgoal> get_query_subgoals(String name, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	static Vector<Subgoal> get_query_subgoals(String name, HashMap<String, String> subgoal_name_mapping, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
-		String q_subgoals = "select subgoal_names from query2subgoal where query_id = '" + name + "'";
+		String q_subgoals = "select subgoal_names, subgoal_origin_names from query2subgoal where query_id = '" + name + "'";
 		
 		pst = c.prepareStatement(q_subgoals);
 		
@@ -389,7 +392,11 @@ public class Query_operation {
 		{
 			String subgoal_name = r.getString(1);
 			
+			String subgoal_origin_name = r.getString(2);
+			
 //			Vector<String> arg_strs = Parse_datalog.get_columns(subgoal_name);
+			
+			subgoal_name_mapping.put(subgoal_name, subgoal_origin_name);
 			
 			Vector<Argument> args = new Vector<Argument>();
 			

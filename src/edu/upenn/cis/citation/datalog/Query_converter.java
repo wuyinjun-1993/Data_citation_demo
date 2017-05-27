@@ -20,6 +20,7 @@ import edu.upenn.cis.citation.Corecover.Lambda_term;
 import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Corecover.Subgoal;
 import edu.upenn.cis.citation.Operation.Conditions;
+import edu.upenn.cis.citation.Pre_processing.Query_operation;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
@@ -44,57 +45,57 @@ public class Query_converter {
 		
 		String str = "Q(f):family(f, n, tx), introduction(f, ty)";
 		
-		Query query = Parse_datalog.parse_query(str);//sql2datalog("select * from family_c ,introduction_c where type = 'gpcr' and family_id= '2'");
-		
-		String q = datalog2sql(query);
-		
-		System.out.println(query.toString());
-		
-		System.out.println(q);
+//		Query query = Parse_datalog.parse_query(str);//sql2datalog("select * from family_c ,introduction_c where type = 'gpcr' and family_id= '2'");
+//		
+//		String q = datalog2sql(query);
+//		
+//		System.out.println(query.toString());
+//		
+//		System.out.println(q);
 	}
 	
 	
-	public static Query sql2datalog(String sql) throws JSQLParserException, ClassNotFoundException, SQLException
-	{
-		String statement= sql; 
-		
-        CCJSqlParserManager parserManager = new CCJSqlParserManager();
-        
-        Select select=(Select) parserManager.parse(new StringReader(statement));
-        
-        String query_name = "Q";
-        
-        Vector<Argument> query_arg = new Vector<Argument>();
-        
-        Vector<Subgoal> subgoals = new Vector<Subgoal>();
-        
-        PlainSelect plain=(PlainSelect)select.getSelectBody();    
-        
-        final List<String> columnList = new ArrayList<String>();
-        
-        final List<String> values = new ArrayList<String>();
-        
-        
-        gen_conditions(plain, columnList, values);
-        
-        TablesNamesFinder tablesNamesFinder = new TablesNamesFinder();
-        
-		List<String> tableList = tablesNamesFinder.getTableList(select);
-		
-        for(int i = 0; i<tableList.size(); i++)
-        {
-        	subgoals.add(gen_subgoal(tableList.get(i), columnList, values));
-        }
-        
-        gen_select_item(plain, tableList, query_arg,columnList, values);
-        
-        Subgoal head = new Subgoal(query_name, query_arg);
-		
-        Query query = new Query(query_name, head, subgoals);
-        
-        return query;
-        
-	}
+//	public static Query sql2datalog(String sql) throws JSQLParserException, ClassNotFoundException, SQLException
+//	{
+//		String statement= sql; 
+//		
+//        CCJSqlParserManager parserManager = new CCJSqlParserManager();
+//        
+//        Select select=(Select) parserManager.parse(new StringReader(statement));
+//        
+//        String query_name = "Q";
+//        
+//        Vector<Argument> query_arg = new Vector<Argument>();
+//        
+//        Vector<Subgoal> subgoals = new Vector<Subgoal>();
+//        
+//        PlainSelect plain=(PlainSelect)select.getSelectBody();    
+//        
+//        final List<String> columnList = new ArrayList<String>();
+//        
+//        final List<String> values = new ArrayList<String>();
+//        
+//        
+//        gen_conditions(plain, columnList, values);
+//        
+//        TablesNamesFinder tablesNamesFinder = new TablesNamesFinder();
+//        
+//		List<String> tableList = tablesNamesFinder.getTableList(select);
+//		
+//        for(int i = 0; i<tableList.size(); i++)
+//        {
+//        	subgoals.add(gen_subgoal(tableList.get(i), columnList, values));
+//        }
+//        
+//        gen_select_item(plain, tableList, query_arg,columnList, values);
+//        
+//        Subgoal head = new Subgoal(query_name, query_arg);
+//		
+//        Query query = new Query(query_name, head, subgoals);
+//        
+//        return query;
+//        
+//	}
 	
 	static void gen_conditions(PlainSelect plain, List<String> columnList, List<String> values)
 	{
@@ -116,33 +117,33 @@ public class Query_converter {
         });
 	}
 	
-	static void gen_select_item(PlainSelect plain, List<String> tableList, Vector<Argument> query_arg, List<String> columnList, List<String> values) throws ClassNotFoundException, SQLException
-	{
-        String str = plain.getSelectItems().toString();
-        
-        int len = str.length();
-        
-        str = str.substring(1, len - 1);
-        
-        Vector<String> sel_col = new Vector<String>();
-        
-        sel_col.addAll(Arrays.asList(str.split(",")));
-              
-        pre_process(sel_col, tableList);
-        
-        for(int i=0;i<sel_col.size();i++)
-        {
-           String item = sel_col.get(i);
-        	
-           if(columnList.contains(item))
-           {
-        	   query_arg.add(new Argument("'" + values.get(columnList.indexOf(item)) + "'", item));
-           }
-           else
-        	   query_arg.add(new Argument(item));
-           
-        }
-	}
+//	static void gen_select_item(PlainSelect plain, List<String> tableList, Vector<Argument> query_arg, List<String> columnList, List<String> values) throws ClassNotFoundException, SQLException
+//	{
+//        String str = plain.getSelectItems().toString();
+//        
+//        int len = str.length();
+//        
+//        str = str.substring(1, len - 1);
+//        
+//        Vector<String> sel_col = new Vector<String>();
+//        
+//        sel_col.addAll(Arrays.asList(str.split(",")));
+//              
+//        pre_process(sel_col, tableList);
+//        
+//        for(int i=0;i<sel_col.size();i++)
+//        {
+//           String item = sel_col.get(i);
+//        	
+//           if(columnList.contains(item))
+//           {
+//        	   query_arg.add(new Argument("'" + values.get(columnList.indexOf(item)) + "'", item));
+//           }
+//           else
+//        	   query_arg.add(new Argument(item));
+//           
+//        }
+//	}
 	
 	static void pre_process(Vector<String> selectitems, List<String> tableList) throws ClassNotFoundException, SQLException
 	{
@@ -187,59 +188,59 @@ public class Query_converter {
 		}
 	}
 	
-	public static Subgoal gen_subgoal(String table_name, List<String> columnList, List<String> values) throws ClassNotFoundException, SQLException
-	{
-		Connection c = null;
-		
-	    ResultSet rs = null;
-	    
-	    PreparedStatement pst = null;
-	    
-		Class.forName("org.postgresql.Driver");
-		
-	    c = DriverManager
-	        .getConnection(populate_db.db_url,
-	    	        populate_db.usr_name,populate_db.passwd);
-	    
-	    String schema_query = "SELECT column_name FROM information_schema.columns WHERE table_name = '"+ table_name + "'";
-	    
-	    pst = c.prepareStatement(schema_query);
-	    
-	    rs = pst.executeQuery();
-	    
-	    Subgoal subgoal = null;
-	    
-	    Vector<Argument> args = new Vector<Argument>();
-	    
-	    int size = rs.getFetchSize();
-	    	    
-	    int num = 0;
-	    
-	    while(rs.next())
-	    {
-	    	
-	    	String column_name = rs.getString(1);
-	    	
-	    	if(columnList.contains(column_name))
-	    	{
-	    		args.add(new Argument("'"+ values.get(columnList.indexOf(column_name)) + "'", column_name));
-	    	}
-	    	
-	    	else
-	    		args.add(new Argument(column_name));
-	    	
-	    	num ++;
-	    	
-	    }
-	    
-	    args.remove(num - 1);
-	    
-	    subgoal = new Subgoal(table_name, args);
-	    
-	    return subgoal;
-	    
-	}
-	
+//	public static Subgoal gen_subgoal(String table_name, List<String> columnList, List<String> values) throws ClassNotFoundException, SQLException
+//	{
+//		Connection c = null;
+//		
+//	    ResultSet rs = null;
+//	    
+//	    PreparedStatement pst = null;
+//	    
+//		Class.forName("org.postgresql.Driver");
+//		
+//	    c = DriverManager
+//	        .getConnection(populate_db.db_url,
+//	    	        populate_db.usr_name,populate_db.passwd);
+//	    
+//	    String schema_query = "SELECT column_name FROM information_schema.columns WHERE table_name = '"+ table_name + "'";
+//	    
+//	    pst = c.prepareStatement(schema_query);
+//	    
+//	    rs = pst.executeQuery();
+//	    
+//	    Subgoal subgoal = null;
+//	    
+//	    Vector<Argument> args = new Vector<Argument>();
+//	    
+//	    int size = rs.getFetchSize();
+//	    	    
+//	    int num = 0;
+//	    
+//	    while(rs.next())
+//	    {
+//	    	
+//	    	String column_name = rs.getString(1);
+//	    	
+//	    	if(columnList.contains(column_name))
+//	    	{
+//	    		args.add(new Argument("'"+ values.get(columnList.indexOf(column_name)) + "'", column_name));
+//	    	}
+//	    	
+//	    	else
+//	    		args.add(new Argument(column_name));
+//	    	
+//	    	num ++;
+//	    	
+//	    }
+//	    
+//	    args.remove(num - 1);
+//	    
+//	    subgoal = new Subgoal(table_name, args);
+//	    
+//	    return subgoal;
+//	    
+//	}
+//	
 	
 	static String gen_condition_citation_query(Query query)
 	{
@@ -1192,6 +1193,126 @@ public class Query_converter {
 		return sql;
 	}
 		
+	
+	static String get_sel_item(Query q)
+	{
+		String str = new String();
+		
+		for(int i = 0; i<q.head.size(); i++)
+		{
+			Argument arg = (Argument) q.head.args.get(i);
+			
+			if(i >= 1)
+				str += ",";
+			
+			str = arg.relation_name + "." + arg.name;
+			
+		}
+		return str;
+	}
+	
+	static String get_sel_citation_unit(Query q)
+	{
+		String str = new String ();
+		
+		for(int i = 0; i<q.body.size(); i++)
+		{
+			if(i >= 1)
+				str += ",";
+			
+			Subgoal subgoal = (Subgoal)q.body.get(i);
+			
+			str += q.subgoal_name_mapping.get(subgoal.name) + populate_db.suffix + ".citation_view";
+			
+		}
+		
+		return str;
+	}
+	
+	static String get_relations(Query q)
+	{
+		String str = new String();
+		
+		for(int i = 0; i<q.body.size(); i++)
+		{
+			if(i >= 1)
+				str += ",";
+			
+			Subgoal subgoal = (Subgoal) q.body.get(i);
+			
+			str += q.subgoal_name_mapping.get(subgoal.name) + " " + subgoal.name;
+		}
+		
+		return str;
+		
+	}
+	
+	static String get_condition(Query q)
+	{
+		String str = new String();
+		
+		for(int i = 0; i<q.body.size(); i++)
+		{
+			if(i >= 1)
+				str += " and ";
+			
+			str += q.conditions.get(i).subgoal1 + "." + q.conditions.get(i).arg1 + q.conditions.get(i).op;
+			
+			if(q.conditions.get(i).subgoal2 == null || q.conditions.get(i).subgoal2.isEmpty())
+			{
+				str += q.conditions.get(i).arg2;
+			}
+			else
+			{
+				str += q.conditions.get(i).subgoal2 + "." + q.conditions.get(i).arg2;
+			}
+		}
+		
+		return str;
+	}
+	
+	static String get_citation_condition(Query q, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	{
+		String str = new String();
+		
+		int num = 0;
+		
+		for(int i = 0; i<q.body.size(); i++)
+		{
+			
+			Subgoal subgoal = (Subgoal) q.body.get(i);
+			
+			Vector<String> primary_keys = populate_db.get_primary_key(subgoal.name, c, pst);
+			
+			for(int k = 0; k<primary_keys.size(); k++)
+			{
+				
+				if(num >= 1)
+					str += " and ";
+				
+				str += subgoal.name + "." + primary_keys.get(k) + " = " + q.subgoal_name_mapping.get(subgoal.name) + populate_db.suffix + "." + primary_keys.get(k);
+				
+				num ++;
+			}
+			
+		}
+		
+		return str;
+	}
+	
+	static String get_predicates(Query q, Vector<Conditions> valid_conditions)
+	{
+		
+		String str = new String();
+		
+		for(int i = 0; i<valid_conditions.size(); i++)
+		{
+			if(i >= 1)
+				str += ",";
+			
+		}
+	}
+	
 	public static String datalog2sql_citation(Query query, Vector<Conditions> valid_conditions, Vector<Conditions> condition_seq, HashMap<String, HashSet<String>> return_vals, HashMap<String, Vector<Integer>> table_pos_map, boolean view, Vector<int[]> condition_seq_id, Vector<Integer> valid_subgoal_id) throws SQLException, ClassNotFoundException
 	{
 				
@@ -1206,6 +1327,8 @@ public class Query_converter {
 	    c = DriverManager
 	        .getConnection(populate_db.db_url,
 	    	        populate_db.usr_name,populate_db.passwd);
+	    
+	    
 		
 		String sql = new String();
 		

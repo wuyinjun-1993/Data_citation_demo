@@ -84,6 +84,15 @@ public class Mapping {
 
     map.put(srcArg, dstArg);
   }
+  
+  public void put(String srcArg, String dstArg)
+  {
+	  if (map.get(srcArg) != null)
+	      UserLib.myerror("Mapping.put(), srcArg already exists.");
+
+	    map.put(srcArg, dstArg);
+
+  }
 
   /**
    * Extends this mapping: for the variables in args that are not
@@ -129,6 +138,11 @@ public class Mapping {
     Argument dst = (Argument) map.get(srcArg);
     return dst;
   }
+  
+  public String apply(String srcArg) {
+	    String dst = (String) map.get(srcArg);
+	    return dst;
+	  }
 
   /**
    * Applies the mapping on a subgoal to get a new subgoal

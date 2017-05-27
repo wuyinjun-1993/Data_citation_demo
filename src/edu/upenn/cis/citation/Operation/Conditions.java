@@ -35,9 +35,9 @@ public class Conditions {
 		String str = arg1.name;
 		
 		if(arg2.isConst())
-			return subgoal1 + "." + str + op + arg2;
+			return subgoal1 + "_" + str + op + arg2;
 		else
-			return subgoal1 + "." + str + op + subgoal2 + "." + arg2;
+			return subgoal1 + "_" + str + op + subgoal2 + "_" + arg2;
 	}
 	
 	

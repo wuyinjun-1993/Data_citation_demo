@@ -10,11 +10,18 @@ import java.util.*;
 public class Subgoal {
   public String name = null;  // subgoal name
   public Vector args = null;  // a list of arguments
+//  public String origin_name = null;
 
   public Subgoal(String name, Vector args) {
     this.name = name;
     this.args = args;
   }
+  
+//  public Subgoal(String name, Vector args) {
+//	    this.name = name;
+//	    this.args = args;
+////	    this.origin_name = origin_name;
+//	  }
 
   Subgoal(Vector relations, int relIndex, Vector argDom) {
 

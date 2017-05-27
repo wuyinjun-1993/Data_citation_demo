@@ -364,7 +364,7 @@ public class populate_db {
 		
 	}
 	
-	public static void delete(String id, Vector<Subgoal> subgoals, boolean has_lambda) throws SQLException, ClassNotFoundException
+	public static void delete(String id, Vector<Subgoal> subgoals, HashMap<String, String> subgoal_name_mapping, boolean has_lambda) throws SQLException, ClassNotFoundException
 	{
 		Connection c = null;
 	      PreparedStatement pst = null;
@@ -375,7 +375,7 @@ public class populate_db {
 	    
 	    for(int i = 0; i<subgoals.size(); i++)
 	    {
-	    	delete_view_single_table(id, subgoals.get(i).name, has_lambda, c, pst);
+	    	delete_view_single_table(id, subgoal_name_mapping.get(subgoals.get(i).name), has_lambda, c, pst);
 	    }
 	    
 		c.close();
@@ -686,8 +686,6 @@ public class populate_db {
 	    
 	}
 	
-	
-	
 	public static Vector<Query> get_views_schema(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
 		String query= "select * from view_table";
@@ -699,62 +697,62 @@ public class populate_db {
 		Vector<Query> views = new Vector<Query>();
 		
 		while(rs.next())
-		{
-			String view = new String();
-			
+		{			
 			String view_name = rs.getString(1);
 			
-			String q_subgoals = "select subgoal_names from view2subgoals where view = '" + view_name + "'";
+			Query v = view_operation.get_view_by_id(view_name);
 			
-			String head_vars = rs.getString(2);
-			
-			
-			
-			pst = c.prepareStatement(q_subgoals);
-			
-			ResultSet r = pst.executeQuery();
-			
-			Vector<String> subgoal_names = new Vector<String>();
-			
-			while(r.next())
-			{
-				subgoal_names.add(r.getString(1));
-			}
-			
-			String subgoal_str = get_subgoal_str(view_name, subgoal_names, c, pst);
-			
-			
-			view = view_name + "(" + head_vars + "):";
-			
-			view += subgoal_str; 
-			
-			
-			String q_conditions = "select conditions from view2conditions where view = '" + view_name + "'";
-			
-			pst = c.prepareStatement(q_conditions);
-			
-			r = pst.executeQuery();
-			
-			Vector<Conditions> conditions = new Vector<Conditions>();
-			
-			String condition_str = new String();
-			
-			while(r.next())
-			{
-				
-				condition_str += "," + r.getString(1);
-				
-				
-				
-
-			}
-			
-			view += condition_str;
-			
-			Query v = Parse_datalog.parse_query(view);
-			
-			v.lambda_term = Gen_citation1.get_lambda_terms(view_name, c, pst);
-			Gen_citation1.check_equality(v);
+//			String q_subgoals = "select subgoal_names from view2subgoals where view = '" + view_name + "'";
+//			
+//			String head_vars = rs.getString(2);
+//			
+//			
+//			
+//			pst = c.prepareStatement(q_subgoals);
+//			
+//			ResultSet r = pst.executeQuery();
+//			
+//			Vector<String> subgoal_names = new Vector<String>();
+//			
+//			while(r.next())
+//			{
+//				subgoal_names.add(r.getString(1));
+//			}
+//			
+//			String subgoal_str = get_subgoal_str(view_name, subgoal_names, c, pst);
+//			
+//			
+//			view = view_name + "(" + head_vars + "):";
+//			
+//			view += subgoal_str; 
+//			
+//			
+//			String q_conditions = "select conditions from view2conditions where view = '" + view_name + "'";
+//			
+//			pst = c.prepareStatement(q_conditions);
+//			
+//			r = pst.executeQuery();
+//			
+//			Vector<Conditions> conditions = new Vector<Conditions>();
+//			
+//			String condition_str = new String();
+//			
+//			while(r.next())
+//			{
+//				
+//				condition_str += "," + r.getString(1);
+//				
+//				
+//				
+//
+//			}
+//			
+//			view += condition_str;
+//			
+//			Query v = Parse_datalog.parse_query(view);
+//			
+//			v.lambda_term = Gen_citation1.get_lambda_terms(view_name, c, pst);
+//			Gen_citation1.check_equality(v);
 			
 			views.add(v);
 			

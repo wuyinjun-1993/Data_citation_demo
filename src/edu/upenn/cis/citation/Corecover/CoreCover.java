@@ -8,6 +8,8 @@ package edu.upenn.cis.citation.Corecover;
 
 import java.util.*;
 
+import edu.upenn.cis.citation.Operation.Conditions;
+
 public class CoreCover {
 
   public static int numVTs = 0;
@@ -100,7 +102,7 @@ public class CoreCover {
       tuples.add(tuple);  // we treat each subgoal as a "tuple"
     }
 
-    return new Database(tuples);
+    return new Database(tuples, query.subgoal_name_mapping);
   }
     
  /**
@@ -111,17 +113,82 @@ public class CoreCover {
     for (int i = 0; i < views.size(); i ++) {
       Query view = (Query) views.elementAt(i);
 
+      System.out.println(view);
+      
       Relation rel = canDb.execQuery(view);
       
       for (Iterator iter = rel.getTuples().iterator(); iter.hasNext();) {
     	  Tuple tuple = (Tuple) iter.next();
-          tuple.lambda_terms = view.lambda_term;
-          tuple.conditions = view.conditions;
+    	  
+    	  set_tuple_lambda_term(tuple, view);
+
+    	  set_tuple_conditions(tuple, view);
+    	  
           viewTuples.add(tuple);
       }
        // add them to the results
     }
     return viewTuples;
+  }
+  
+  static void set_tuple_lambda_term(Tuple tuple, Query view)
+  {
+	  Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();
+	  
+	  for(int i = 0; i<view.lambda_term.size(); i++)
+	  {
+		  String curr_lambda_name = tuple.phi_str.apply(view.lambda_term.get(i).name);
+		  
+		  String curr_table_name = curr_lambda_name.substring(0, curr_lambda_name.indexOf("_"));
+		  
+		  Lambda_term l_term = new Lambda_term(curr_lambda_name, curr_table_name);
+		  
+		  lambda_terms.add(l_term);
+	  }
+	  
+	  tuple.lambda_terms = lambda_terms;
+  }
+  
+  static void set_tuple_conditions(Tuple tuple, Query view)
+  {
+	  Vector<Conditions> conditions = new Vector<Conditions>();
+	  
+	  for(int i = 0; i<view.conditions.size(); i++)
+	  {
+		  String curr_arg1 = tuple.phi_str.apply(view.conditions.get(i).subgoal1 + "_" + view.conditions.get(i).arg1.name);
+		  
+		  String subgoal1 = curr_arg1.substring(0, curr_arg1.indexOf("_"));
+		  
+		  curr_arg1 = curr_arg1.substring(curr_arg1.indexOf("_") + 1, curr_arg1.length());
+		  
+		  String curr_arg2 = new String();
+		  
+		  String subgoal2 = new String();
+		  
+		  Conditions condition = null;
+		  
+		  if(view.conditions.get(i).arg2.isConst())
+		  {
+			  curr_arg2 = view.conditions.get(i).arg2.name;
+			  
+			  condition = new Conditions(new Argument(curr_arg1, subgoal1), subgoal1, view.conditions.get(i).op, new Argument(curr_arg2), subgoal2);
+		  }
+		  else
+		  {
+			  curr_arg2 = tuple.phi_str.apply(view.conditions.get(i).subgoal2 + "_" + view.conditions.get(i).arg2.name);
+			  
+			  subgoal2 = curr_arg2.substring(0, curr_arg2.indexOf("_"));
+			  
+			  curr_arg2 = curr_arg2.substring(curr_arg2.indexOf("_") + 1, curr_arg2.length());
+			  
+			  condition = new Conditions(new Argument(curr_arg1, subgoal1), subgoal1, view.conditions.get(i).op, new Argument(curr_arg2, subgoal2), subgoal2);
+		  }
+		  
+		  conditions.add(condition);
+		  
+	  }
+	  
+	  tuple.conditions = conditions;
   }
   
   public static HashSet computeViewTuples(Database canDb, Vector views, Query query) {

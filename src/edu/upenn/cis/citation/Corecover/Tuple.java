@@ -133,6 +133,23 @@ public class Tuple {
   public HashSet getCore() {
     return core;
   }
+  
+  public HashSet get_relations()
+  {
+	  
+	  HashSet relations = new HashSet ();
+	  
+	  HashSet subgoals = getTargetSubgoals();
+	  
+	  for(Iterator iter = subgoals.iterator(); iter.hasNext();)
+	  {
+		  Subgoal subgoal = (Subgoal)iter.next();
+		  
+		  relations.add(subgoal.name);
+	  }
+	  
+	  return relations;
+  }
 
   /**
    * gets the target query subgoals under the mapping 

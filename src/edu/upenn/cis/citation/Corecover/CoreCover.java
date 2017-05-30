@@ -553,8 +553,11 @@ public class CoreCover {
 
     // if the union of the tuple-cores doesn't cover all query subgoals,
     // just return no rewriting
-    if (!unionCoverSubgoals(viewTuples, query))
-	return rewritings;
+    HashSet covered_relations = get_CoverSubgoals(viewTuples, query);
+
+    
+//    if (!unionCoverSubgoals(viewTuples, query))
+//	return rewritings;
 
     // scans the subsets from the smallest one to the largest one
     boolean found = false;
@@ -568,23 +571,23 @@ public class CoreCover {
       // considers subsets with the current size 
       //System.out.println("# of view tuples = " + viewTuples.size() +
       //" size = " + size);
-//    	if(curr_rewritings.size() == 0)
-//    	{
-    		gen_rewriting(viewTuples, size, query, rewritings, curr_rewritings);
-//    	}
-//    	else
-//    	{
-//    		
-//    		HashSet curr_rewritings_all = new HashSet();
-//    		
-//    		for(Iterator iter = curr_rewritings.iterator();iter.hasNext();)
-//    		{
-//    			HashSet curr_rewriting = (HashSet) iter.next();
-//    			curr_rewritings_all.addAll(curr_rewriting);
-//    			
-//    		}
-//			gen_rewriting(gen_complementary_set(viewTuples, curr_rewritings_all), size, query, rewritings, curr_rewritings);
-//    	}
+    	if(curr_rewritings.size() == 0)
+    	{
+    		gen_rewriting(viewTuples, size, covered_relations, query, rewritings, curr_rewritings);
+    	}
+    	else
+    	{
+    		
+    		HashSet curr_rewritings_all = new HashSet();
+    		
+    		for(Iterator iter = curr_rewritings.iterator();iter.hasNext();)
+    		{
+    			HashSet curr_rewriting = (HashSet) iter.next();
+    			curr_rewritings_all.addAll(curr_rewriting);
+    			
+    		}
+			gen_rewriting(gen_complementary_set(viewTuples, curr_rewritings_all), size, covered_relations, query, rewritings, curr_rewritings);
+    	}
 
 //      if (found) {
 //    	  rewritings.add(min_rewriting);
@@ -605,29 +608,24 @@ public class CoreCover {
 	  return rs;
   }
   
-  static void gen_rewriting(HashSet viewTuples, int size, Query query, HashSet rewritings, HashSet curr_rewritings)
+  static void gen_rewriting(HashSet viewTuples, int size, HashSet covered_relations, Query query, HashSet rewritings, HashSet curr_rewritings)
   {
       HashSet tupleSubsets = UserLib.genSubsets(viewTuples, size);
       //System.out.println("# of tupleSubsets = " + tupleSubsets.size());
 
+      
       for (Iterator iter = tupleSubsets.iterator(); iter.hasNext();) 
       {
 	// for this "i"^th around, we consider only subsets with size i 
 	HashSet tupleSubset = (HashSet) iter.next();
 	if (tupleSubset.size() != size) 
 	  UserLib.myerror("CoreCover.coverQuerySubgoals(), error!");
+	
+	
+	
 
-	if (unionCoverSubgoals(tupleSubset, query))  {// found one
-		
-	  double cost = 0;
-	  
-	  Object[] tuples = tupleSubset.toArray();
-	  
-	  for(int k = 0;k<tuples.length; k++)
-	  {
-		  Tuple t = (Tuple)tuples[k];
-		  cost += t.cost;
-	  }
+	if (unionCoverSubgoals(tupleSubset, covered_relations))  
+	{// found one
 	  
 //	  if(cost < min_cost)
 //	  {
@@ -635,7 +633,7 @@ public class CoreCover {
 //		  min_cost = cost;
 //	  }
 	  
-//	  if(!curr_rewritings.contains(tupleSubset))
+	  if(!curr_rewritings.contains(tupleSubset))
 	  {
 		  rewritings.add(new Rewriting(tupleSubset, query));
 		  
@@ -671,6 +669,31 @@ public class CoreCover {
 
     return coreUnion.containsAll(query.getBody());
   }
+  
+  static boolean unionCoverSubgoals(HashSet tupleSubset, HashSet query) {
+	    HashSet coreUnion = new HashSet();
+	    for (Iterator iter2 = tupleSubset.iterator(); iter2.hasNext();) {
+	      Tuple viewTuple = (Tuple) iter2.next();
+	      HashSet core = viewTuple.get_relations();
+	      coreUnion.addAll(core);
+	    }
+
+	    return coreUnion.containsAll(query);
+	  }
+  
+  static HashSet get_CoverSubgoals(HashSet tupleSubset, Query query) {
+	    HashSet coreUnion = new HashSet();
+	    for (Iterator iter2 = tupleSubset.iterator(); iter2.hasNext();) {
+	      Tuple viewTuple = (Tuple) iter2.next();
+//	      HashSet core = viewTuple.getCore();
+	      HashSet relations = viewTuple.get_relations();
+//	      coreUnion.addAll(core);
+	      coreUnion.addAll(relations);
+	      
+	    }
+
+	    return coreUnion;
+	  }
 
   /**
    * Checks if a rewriting has a used a subset of view tuples in tupleSubset.

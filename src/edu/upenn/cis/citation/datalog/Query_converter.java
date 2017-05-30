@@ -1076,9 +1076,7 @@ public class Query_converter {
 	}
 	
 	public static String datalog2sql_citation_query(Query query) throws SQLException, ClassNotFoundException
-	{
-		String sel_item = new String();
-		
+	{		
 		Connection c = null;
 		
 	    PreparedStatement pst = null;
@@ -1091,27 +1089,40 @@ public class Query_converter {
 		
 		String sql = new String();
 		
-		HashMap<String, Vector<String[]>> arg_name_map = new HashMap<String, Vector<String[]>>();
-						
-		String where = gen_condition_citation_query(query);
-				
-		String citation_table = ;
-				
-//		String citation_provenance = str_l[3];
+		String sel_item = get_sel_item(query);	
 		
-		for(int i = 0; i<query.head.args.size(); i++)
-		{
-			Argument arg = (Argument)query.head.args.get(i);
-			
-			if(i >= 1)
-				sel_item += ",";
-			
-////			Vector<String[]> table_names = arg_name_map.get(arg.name);
-//			sel_item += table_names.get(0)[0] + "." + table_names.get(0)[1];
-				
-		}
+//		String citation_unit = get_sel_citation_unit(query);
 		
-		sql = "select distinct " + sel_item + " from " + citation_table + where ;//+ group_by_web_view;
+//		String sel_lambda_terms = get_lambda_str(query, lambda_terms);
+		
+//		String [] condition_str = get_condition_boolean_value(query, query.conditions);
+		
+//		System.out.println("c1:::" + condition_str[0]);
+//		
+//		System.out.println("c2::::"+ condition_str[1]);
+		
+		String citation_table = get_relations_without_citation_table(query);
+		
+		String condition = get_condition(query);
+		
+//		String citation_condition = get_citation_condition(query, c, pst);
+		
+		sql = "select " + sel_item;
+		
+//		if(sel_lambda_terms != null && !sel_lambda_terms.isEmpty())
+//			sql += "," + sel_lambda_terms;	
+//		if(condition_str[0] != null && !condition_str[0].isEmpty())
+//			sql += "," + condition_str[0];
+		
+		sql += " from " + citation_table;// + " where " +  citation_condition;
+		
+		if(condition != null && !condition.isEmpty())
+			sql += " where " + condition;
+		
+//		if(condition_str[1] != null && !condition_str[1].isEmpty())
+//			sql += " order by " + condition_str[1]; 
+		
+//		System.out.println("sql:::" + sql);
 		
 		c.close();
 		
@@ -1198,6 +1209,8 @@ public class Query_converter {
 	{
 		String str = new String();
 		
+//		System.out.println("head::" + q.head);
+		
 		for(int i = 0; i<q.head.size(); i++)
 		{
 			Argument arg = (Argument) q.head.args.get(i);
@@ -1205,7 +1218,7 @@ public class Query_converter {
 			if(i >= 1)
 				str += ",";
 			
-			str = arg.relation_name + "." + arg.name;
+			str += arg.relation_name + "." + arg.name.substring(arg.name.indexOf("_") + 1, arg.name.length());
 			
 		}
 		return str;
@@ -1222,14 +1235,14 @@ public class Query_converter {
 			
 			Subgoal subgoal = (Subgoal)q.body.get(i);
 			
-			str += q.subgoal_name_mapping.get(subgoal.name) + populate_db.suffix + ".citation_view";
+			str += subgoal.name + populate_db.suffix + ".citation_view";
 			
 		}
 		
 		return str;
 	}
 	
-	static String get_relations(Query q)
+	static String get_relations_with_citation_table(Query q)
 	{
 		String str = new String();
 		
@@ -1241,6 +1254,28 @@ public class Query_converter {
 			Subgoal subgoal = (Subgoal) q.body.get(i);
 			
 			str += q.subgoal_name_mapping.get(subgoal.name) + " " + subgoal.name;
+			
+			str += "," + q.subgoal_name_mapping.get(subgoal.name) + populate_db.suffix + " " + subgoal.name + populate_db.suffix; 
+		}
+		
+		return str;
+		
+	}
+	
+	static String get_relations_without_citation_table(Query q)
+	{
+		String str = new String();
+		
+		for(int i = 0; i<q.body.size(); i++)
+		{
+			if(i >= 1)
+				str += ",";
+			
+			Subgoal subgoal = (Subgoal) q.body.get(i);
+			
+			str += q.subgoal_name_mapping.get(subgoal.name) + " " + subgoal.name;
+			
+//			str += "," + q.subgoal_name_mapping.get(subgoal.name) + populate_db.suffix + " " + subgoal.name + populate_db.suffix; 
 		}
 		
 		return str;
@@ -1251,7 +1286,7 @@ public class Query_converter {
 	{
 		String str = new String();
 		
-		for(int i = 0; i<q.body.size(); i++)
+		for(int i = 0; i<q.conditions.size(); i++)
 		{
 			if(i >= 1)
 				str += " and ";
@@ -1282,7 +1317,7 @@ public class Query_converter {
 			
 			Subgoal subgoal = (Subgoal) q.body.get(i);
 			
-			Vector<String> primary_keys = populate_db.get_primary_key(subgoal.name, c, pst);
+			Vector<String> primary_keys = populate_db.get_primary_key(q.subgoal_name_mapping.get(subgoal.name), c, pst);
 			
 			for(int k = 0; k<primary_keys.size(); k++)
 			{
@@ -1290,7 +1325,7 @@ public class Query_converter {
 				if(num >= 1)
 					str += " and ";
 				
-				str += subgoal.name + "." + primary_keys.get(k) + " = " + q.subgoal_name_mapping.get(subgoal.name) + populate_db.suffix + "." + primary_keys.get(k);
+				str += subgoal.name + "." + primary_keys.get(k) + " = " + subgoal.name + populate_db.suffix + "." + primary_keys.get(k);
 				
 				num ++;
 			}
@@ -1300,23 +1335,60 @@ public class Query_converter {
 		return str;
 	}
 	
-	static String get_predicates(Query q, Vector<Conditions> valid_conditions)
+	static String[] get_condition_boolean_value(Query q, Vector<Conditions> valid_conditions)
 	{
 		
-		String str = new String();
+		String [] str = new String[2];
+		
+		str[0] = new String();
+		
+		str[1] = new String();
+		
+		int condition_num = 0;
 		
 		for(int i = 0; i<valid_conditions.size(); i++)
 		{
 			if(i >= 1)
-				str += ",";
+			{
+				str[0] += ",";
+				str[1] += ",";
+			}
 			
+			if(valid_conditions.get(i).subgoal2 == null || valid_conditions.get(i).subgoal2.isEmpty())
+				str[0] += "(" + valid_conditions.get(i).subgoal1 + "." + valid_conditions.get(i).arg1 + valid_conditions.get(i).op + valid_conditions.get(i).arg2 + ") as condition" + condition_num;
+			else
+				str[0] += "(" + valid_conditions.get(i).subgoal1 + "." + valid_conditions.get(i).arg1 + valid_conditions.get(i).op + valid_conditions.get(i).subgoal2 + "." + valid_conditions.get(i).arg2 + ") as condition" + condition_num;
+			
+			str[1] += "condition" + condition_num + " desc";
+			
+			condition_num ++;
+
 		}
+		
+		return str;
 	}
 	
-	public static String datalog2sql_citation(Query query, Vector<Conditions> valid_conditions, Vector<Conditions> condition_seq, HashMap<String, HashSet<String>> return_vals, HashMap<String, Vector<Integer>> table_pos_map, boolean view, Vector<int[]> condition_seq_id, Vector<Integer> valid_subgoal_id) throws SQLException, ClassNotFoundException
+	static String get_lambda_str(Query v, Vector<Lambda_term> lambda_terms)
+	{
+		String str = new String();
+		
+		for(int i = 0; i<lambda_terms.size(); i++)
+		{
+			if(i >= 1)
+				str += ",";
+			
+			String name = lambda_terms.get(i).name;
+			
+			str += lambda_terms.get(i).table_name + "." + name.substring(name.indexOf("_") + 1, name.length());
+		}
+		
+		return str;
+	}
+	
+	public static String datalog2sql_citation(Query query, Vector<Lambda_term> lambda_terms, Vector<Conditions> valid_conditions, HashMap<String, HashSet<String>> return_vals, HashMap<String, Vector<Integer>> table_pos_map, boolean view, Vector<int[]> condition_seq_id, Vector<Integer> valid_subgoal_id) throws SQLException, ClassNotFoundException
 	{
 				
-		String sel_item = new String();
+//		String sel_item = new String();
 				
 		Connection c = null;
 		
@@ -1332,222 +1404,252 @@ public class Query_converter {
 		
 		String sql = new String();
 		
-		HashMap<String, Vector<String[]>> arg_name_map = new HashMap<String, Vector<String[]>>();
 		
-		HashMap<String, Vector<String>> table_name_map = new HashMap<String, Vector<String>>();
-		
-		HashMap<String, Integer> table_seq_map = new HashMap<String, Integer>();
-		
-		String[] str_l = gen_condition(query, arg_name_map, table_name_map, view, table_seq_map, valid_subgoal_id,c ,pst);
-		
-		String where = str_l[0];
-		
-		String citation_table = str_l[1];
-		
-		String citation_unit = str_l[2];
-		
-		String citation_condition = str_l[3];
-		
-//		String citation_provenance = str_l[3];
-		
-		for(int i = 0; i<query.head.args.size(); i++)
-		{
-			Argument arg = (Argument)query.head.args.get(i);
-			
-			if(i >= 1)
-				sel_item += ",";
-			
-			Vector<String[]> table_names = arg_name_map.get(arg.name);
-			
-			System.out.println(arg.name);
-			
-			sel_item += table_names.get(0)[0] + "." + table_names.get(0)[1];
-				
-		}
-		
-		String conditions = new String();
-		
-		String condition_order = new String();
-		
-		int condition_num = 0;
-		
-		for(int i = 0; i<valid_conditions.size(); i++)
-		{
-			Vector<String> table1 = table_name_map.get(valid_conditions.get(i).subgoal1);
-			
-			Vector<String> table2 = table_name_map.get(valid_conditions.get(i).subgoal2);
-			
-			Argument a1 = valid_conditions.get(i).arg1;
-			
-			Argument a2 = valid_conditions.get(i).arg2;
-			
-			String op = valid_conditions.get(i).op.toString();
-			
-			if(valid_conditions.get(i).subgoal1 != valid_conditions.get(i).subgoal2)
-			{
-				for(int j = 0; j<table1.size(); j++)
-				{
-					
-					String t1 = table1.get(j);
-					
-					for(int k = 0; k<table2.size(); k++)
-					{
-						String t2 = table2.get(k);
-						
-						condition_seq.add(valid_conditions.get(i));
-						
-						int [] ids = new int[2];
-						
-						ids[0] = table_seq_map.get(t1);
-												
-						if(t2 != null && !t2.isEmpty())
-						{
-							ids[1] = table_seq_map.get(t2);
-//							condition_seq.lastElement().id2 
-						}
-						else
-							ids[1] = -1;
-						condition_seq_id.add(ids);
-						
-						
-						if(a2.isConst())
-							conditions += ", (" + t1 + "." + a1.origin_name + op + a2.name + ") as condition" + condition_num;
-						else
-							conditions += ", (" + t1 + "." + a1.origin_name + op + t2 + "." + a2.origin_name + ") as condition" + condition_num;
-						
-						if(condition_num >= 1)
-							condition_order += ",";
-						
-						condition_order += "condition" + condition_num + " desc";
-						
-						condition_num ++;
-						
-					}
-				}
-			}
-			
-			else
-			{
-				for(int j = 0; j<table1.size(); j++)
-				{
-					
-					String t1 = table1.get(j);
-					
-					String t2 = table2.get(j);
-					
-					condition_seq.add(valid_conditions.get(i));
-					
-					int [] ids = new int[2];
-					
-					ids[0] = table_seq_map.get(t1);
-											
-					if(t2 != null && !t2.isEmpty())
-					{
-						ids[1] = table_seq_map.get(t2);
-//						condition_seq.lastElement().id2 
-					}
-					else
-						ids[1] = -1;
-					condition_seq_id.add(ids);
-					
-					if(a2.isConst())
-						conditions += ", (" + t1 + "." + a1.origin_name + op + a2.name + ") as condition" + condition_num;
-					else
-						conditions += ", (" + t1 + "." + a1.origin_name + op + t2 + "." + a2.origin_name + ") as condition" + condition_num;
-					
-					if(condition_num >= 1)
-						condition_order += ",";
-					
-					condition_order += "condition" + condition_num + " desc";
-					
-					condition_num ++;
-					
-					
-				}
-			}
-			
-			
-		}
-		
-		
-		String sel_lambda_terms = new String();
-
-		
-		Set table_set = return_vals.keySet();
-		
-//		HashMap<String, HashSet<String>> return_vals
-		
-		int pos = 0;
-		
-		for(Iterator iter = table_set.iterator(); iter.hasNext();)
-		{
-			String curr_table_name = (String)iter.next();
-			
-			Vector<String> table_name_alias = table_name_map.get(curr_table_name);
-			
-			HashSet<String> lambda_term_names = return_vals.get(curr_table_name);
-			
-			
-			
-			
-			for(int k = 0; k<table_name_alias.size(); k++)
-			{
-				Vector<Integer> int_list = table_pos_map.get(curr_table_name);
-				
-				if(int_list == null)
-				{
-					int_list = new Vector<Integer>();
-					
-					int_list.add(pos);
-					
-					table_pos_map.put(curr_table_name, int_list);
-				}
-				
-				else
-				{
-					int_list.add(pos);
-				}
-				
-				for(Iterator it = lambda_term_names.iterator(); it.hasNext();)
-				{
-					String lambda_term = (String)it.next();
-										
-					sel_lambda_terms += "," + table_name_alias.get(k) + "." + lambda_term.substring(lambda_term.indexOf("_") + 1, lambda_term.length());
-					
-					System.out.println("lambda::" + sel_lambda_terms);
-																				
-					pos++;
-					
-				}
-				
-				
-			}
-			
-		}
-		
-		
-		if(condition_num >= 1)
-		{
-			condition_order = " order by " + condition_order;
-			
-//			if(!group_by_web_view.isEmpty())
-//			{
-//				group_by_web_view = "," + group_by_web_view;
-//			}
-//		}
-//		else
+//		HashMap<String, Vector<String[]>> arg_name_map = new HashMap<String, Vector<String[]>>();
+//		
+//		HashMap<String, Vector<String>> table_name_map = new HashMap<String, Vector<String>>();
+//		
+//		HashMap<String, Integer> table_seq_map = new HashMap<String, Integer>();
+//		
+//		String[] str_l = gen_condition(query, arg_name_map, table_name_map, view, table_seq_map, valid_subgoal_id,c ,pst);
+//		
+//		String where = str_l[0];
+//		
+//		String citation_table = str_l[1];
+//		
+//		String citation_unit = str_l[2];
+//		
+//		String citation_condition = str_l[3];
+//		
+////		String citation_provenance = str_l[3];
+//		
+//		for(int i = 0; i<query.head.args.size(); i++)
 //		{
-//			if(!group_by_web_view.isEmpty())
+//			Argument arg = (Argument)query.head.args.get(i);
+//			
+//			if(i >= 1)
+//				sel_item += ",";
+//			
+//			Vector<String[]> table_names = arg_name_map.get(arg.name);
+//			
+//			System.out.println(arg.name);
+//			
+//			sel_item += table_names.get(0)[0] + "." + table_names.get(0)[1];
+//				
+//		}
+//		
+//		String conditions = new String();
+//		
+//		String condition_order = new String();
+//		
+//		int condition_num = 0;
+//		
+//		for(int i = 0; i<valid_conditions.size(); i++)
+//		{
+//			Vector<String> table1 = table_name_map.get(valid_conditions.get(i).subgoal1);
+//			
+//			Vector<String> table2 = table_name_map.get(valid_conditions.get(i).subgoal2);
+//			
+//			Argument a1 = valid_conditions.get(i).arg1;
+//			
+//			Argument a2 = valid_conditions.get(i).arg2;
+//			
+//			String op = valid_conditions.get(i).op.toString();
+//			
+//			if(valid_conditions.get(i).subgoal1 != valid_conditions.get(i).subgoal2)
 //			{
-//				group_by_web_view = " order by " + group_by_web_view;
+//				for(int j = 0; j<table1.size(); j++)
+//				{
+//					
+//					String t1 = table1.get(j);
+//					
+//					for(int k = 0; k<table2.size(); k++)
+//					{
+//						String t2 = table2.get(k);
+//						
+//						condition_seq.add(valid_conditions.get(i));
+//						
+//						int [] ids = new int[2];
+//						
+//						ids[0] = table_seq_map.get(t1);
+//												
+//						if(t2 != null && !t2.isEmpty())
+//						{
+//							ids[1] = table_seq_map.get(t2);
+////							condition_seq.lastElement().id2 
+//						}
+//						else
+//							ids[1] = -1;
+//						condition_seq_id.add(ids);
+//						
+//						
+//						if(a2.isConst())
+//							conditions += ", (" + t1 + "." + a1.origin_name + op + a2.name + ") as condition" + condition_num;
+//						else
+//							conditions += ", (" + t1 + "." + a1.origin_name + op + t2 + "." + a2.origin_name + ") as condition" + condition_num;
+//						
+//						if(condition_num >= 1)
+//							condition_order += ",";
+//						
+//						condition_order += "condition" + condition_num + " desc";
+//						
+//						condition_num ++;
+//						
+//					}
+//				}
 //			}
-			
-		}
+//			
+//			else
+//			{
+//				for(int j = 0; j<table1.size(); j++)
+//				{
+//					
+//					String t1 = table1.get(j);
+//					
+//					String t2 = table2.get(j);
+//					
+//					condition_seq.add(valid_conditions.get(i));
+//					
+//					int [] ids = new int[2];
+//					
+//					ids[0] = table_seq_map.get(t1);
+//											
+//					if(t2 != null && !t2.isEmpty())
+//					{
+//						ids[1] = table_seq_map.get(t2);
+////						condition_seq.lastElement().id2 
+//					}
+//					else
+//						ids[1] = -1;
+//					condition_seq_id.add(ids);
+//					
+//					if(a2.isConst())
+//						conditions += ", (" + t1 + "." + a1.origin_name + op + a2.name + ") as condition" + condition_num;
+//					else
+//						conditions += ", (" + t1 + "." + a1.origin_name + op + t2 + "." + a2.origin_name + ") as condition" + condition_num;
+//					
+//					if(condition_num >= 1)
+//						condition_order += ",";
+//					
+//					condition_order += "condition" + condition_num + " desc";
+//					
+//					condition_num ++;
+//					
+//					
+//				}
+//			}
+//			
+//			
+//		}
+//		
+//		
+//		String sel_lambda_terms = new String();
+//
+//		
+//		Set table_set = return_vals.keySet();
+//		
+////		HashMap<String, HashSet<String>> return_vals
+//		
+//		int pos = 0;
+//		
+//		for(Iterator iter = table_set.iterator(); iter.hasNext();)
+//		{
+//			String curr_table_name = (String)iter.next();
+//			
+//			Vector<String> table_name_alias = table_name_map.get(curr_table_name);
+//			
+//			HashSet<String> lambda_term_names = return_vals.get(curr_table_name);
+//			
+//			
+//			
+//			
+//			for(int k = 0; k<table_name_alias.size(); k++)
+//			{
+//				Vector<Integer> int_list = table_pos_map.get(curr_table_name);
+//				
+//				if(int_list == null)
+//				{
+//					int_list = new Vector<Integer>();
+//					
+//					int_list.add(pos);
+//					
+//					table_pos_map.put(curr_table_name, int_list);
+//				}
+//				
+//				else
+//				{
+//					int_list.add(pos);
+//				}
+//				
+//				for(Iterator it = lambda_term_names.iterator(); it.hasNext();)
+//				{
+//					String lambda_term = (String)it.next();
+//										
+//					sel_lambda_terms += "," + table_name_alias.get(k) + "." + lambda_term.substring(lambda_term.indexOf("_") + 1, lambda_term.length());
+//					
+//					System.out.println("lambda::" + sel_lambda_terms);
+//																				
+//					pos++;
+//					
+//				}
+//				
+//				
+//			}
+//			
+//		}
+//		
+//		
+//		if(condition_num >= 1)
+//		{
+//			condition_order = " order by " + condition_order;
+//			
+////			if(!group_by_web_view.isEmpty())
+////			{
+////				group_by_web_view = "," + group_by_web_view;
+////			}
+////		}
+////		else
+////		{
+////			if(!group_by_web_view.isEmpty())
+////			{
+////				group_by_web_view = " order by " + group_by_web_view;
+////			}
+//			
+//		}
+		
+
+		String sel_item = get_sel_item(query);
+		
+		String citation_unit = get_sel_citation_unit(query);
+		
+		String sel_lambda_terms = get_lambda_str(query, lambda_terms);
+		
+		String [] condition_str = get_condition_boolean_value(query, valid_conditions);
 		
 		
-		sql = "select " + sel_item + "," + citation_unit + sel_lambda_terms + conditions +  " from " + citation_table + where + " and " + citation_condition + condition_order ;//+ group_by_web_view;
+		String citation_table = get_relations_with_citation_table(query);
 		
-		System.out.println(sql);
+		String condition = get_condition(query);
+		
+		String citation_condition = get_citation_condition(query, c, pst);
+		
+		sql = "select " + sel_item + "," + citation_unit;
+		
+		if(sel_lambda_terms != null && !sel_lambda_terms.isEmpty())
+			sql += "," + sel_lambda_terms;
+		
+		if(condition_str[0] != null && !condition_str[0].isEmpty())
+			sql += "," + condition_str[0];
+		
+		sql += " from " + citation_table + " where " +  citation_condition;
+		
+		if(condition != null && !condition.isEmpty())
+			sql += " and " + condition;
+		
+		if(condition_str[1] != null && !condition_str[1].isEmpty())
+			sql += " order by " + condition_str[1]; 
+		
+//		System.out.println("sql:::" + sql);
 		
 		c.close();
 		

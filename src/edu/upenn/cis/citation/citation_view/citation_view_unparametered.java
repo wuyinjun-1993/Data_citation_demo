@@ -7,9 +7,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Vector;
 
 import edu.upenn.cis.citation.Corecover.Query;
+import edu.upenn.cis.citation.Corecover.Subgoal;
+import edu.upenn.cis.citation.Corecover.Tuple;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.datalog.Parse_datalog;
 import edu.upenn.cis.citation.datalog.Query_converter;
@@ -20,26 +24,41 @@ public class citation_view_unparametered extends citation_view{
 //	public boolean lambda;	
 	public Vector<String> table_names = new Vector<String>();
 	
-	public citation_view_unparametered(String name) throws ClassNotFoundException, SQLException
+	public citation_view_unparametered(String name, Tuple tuple) throws ClassNotFoundException, SQLException
 	{
 		this.name = name;
 		
-		Connection c = null;
+		set_table_name(tuple);
 		
-	    PreparedStatement pst = null;
-	      
-		Class.forName("org.postgresql.Driver");
+//		Connection c = null;
+//		
+//	    PreparedStatement pst = null;
+//	      
+//		Class.forName("org.postgresql.Driver");
+//		
+//	    c = DriverManager
+//	        .getConnection(populate_db.db_url,
+//	    	        populate_db.usr_name,populate_db.passwd);
 		
-	    c = DriverManager
-	        .getConnection(populate_db.db_url,
-	    	        populate_db.usr_name,populate_db.passwd);
-		
-		gen_table_names(c, pst);
+//		gen_table_names(c, pst);
 		
 //		gen_index();
 	    
-	    c.close();
+//	    c.close();
 //		lambda = false;
+	}
+	
+	void set_table_name(Tuple tuple)
+	{
+		
+		HashSet<Subgoal> subgoals = tuple.getTargetSubgoals();
+		
+		for(Iterator iter = subgoals.iterator(); iter.hasNext();)
+		{
+			Subgoal subgoal = (Subgoal)iter.next();
+			
+			table_names.add(subgoal.name);
+		}
 	}
 	
 	public citation_view_unparametered(String name, Vector<String> table_names) throws ClassNotFoundException, SQLException
@@ -212,7 +231,7 @@ public class citation_view_unparametered extends citation_view{
 	    
 	    String query4citation = this.name + "(" + head_variables + "):" + body;
 	    
-	    Query query = Parse_datalog.parse_query(query4citation);
+	    Query query = null;//Parse_datalog.parse_query(query4citation);
 	    
 //	    assign_paras(query);
 	    

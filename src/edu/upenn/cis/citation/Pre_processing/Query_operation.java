@@ -258,12 +258,28 @@ public class Query_operation {
 		
 		for(int i = 0; i<head_var_strs.length; i++)
 		{
-			Argument arg = new Argument(head_var_strs[i].trim());
+			
+			String []values = split_relation_attr_name(head_var_strs[i]);
+			
+			Argument arg = new Argument(head_var_strs[i].trim(), values[0]);
 			
 			head_var.add(arg);
 		}
 		
 		return head_var;
+	}
+	
+	static String[] split_relation_attr_name(String head_var_str)
+	{
+		head_var_str = head_var_str.trim();
+		
+		String relation_name = head_var_str.substring(0, head_var_str.indexOf("_"));
+		
+		String attr_name = head_var_str.substring(head_var_str.indexOf("_") + 1, head_var_str.length());
+		
+		String [] values = {relation_name, attr_name};
+		
+		return values;
 	}
 	
 	static Vector<Conditions> get_query_conditions(String id, Connection c, PreparedStatement pst) throws SQLException
@@ -344,33 +360,33 @@ public class Query_operation {
 			
 			String str2 = strs[1];
 			
+			String relation_name1 = str1.substring(0, str1.indexOf("_"));
+			
+			String relation_name2 = new String();
+			
+			String arg1 = str1.substring(str1.indexOf("_") + 1, str1.length()).trim();
 
-			String []strs1 = str1.split("_");
-			
-			String subgoal1 = strs1[0] + "_" + strs1[1];
-			
-			String arg1 = str1.trim();//.substring(subgoal1.length() + 1, str1.length());
-			
-			String subgoal2 = new String();
-			
 			String arg2 = new String ();
+			
+			Conditions condition;
 			
 			if(str2.contains("'"))
 			{
-				arg2 = str2;
+				arg2 = str2.trim();
+				
+				condition = new Conditions(new Argument(arg1, relation_name1), relation_name1, op, new Argument(arg2), relation_name2);
 			}
 			else
 			{
-				String []strs2 = str2.split("_");
+				arg2 = str2.substring(str2.indexOf("_") + 1, str2.length()).trim();
 				
-				subgoal2 = strs2[0] + "_" + strs2[1];
+//				subgoal2 = strs2[0] + "_" + strs2[1];
 				
-				arg2 = str2.trim();//.substring(subgoal2.length() + 1, str2.length());
+				relation_name2 = str2.substring(0, str2.indexOf("_"));
+				
+				condition = new Conditions(new Argument(arg1, relation_name1), relation_name1, op, new Argument(arg2, relation_name2), relation_name2);
+
 			}
-				
-			Conditions condition = new Conditions(new Argument(arg1), subgoal1, op, new Argument(arg2), subgoal2);
-			
-			System.out.println(condition);
 			
 			conditions.add(condition);
 		}

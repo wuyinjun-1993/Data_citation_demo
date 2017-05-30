@@ -113,7 +113,7 @@ public class CoreCover {
     for (int i = 0; i < views.size(); i ++) {
       Query view = (Query) views.elementAt(i);
 
-      System.out.println(view);
+//      System.out.println(view);
       
       Relation rel = canDb.execQuery(view);
       

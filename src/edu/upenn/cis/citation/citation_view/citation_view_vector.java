@@ -17,8 +17,8 @@ public class citation_view_vector {
 	
 	public Vector<String> index_vec;
 	
-	public HashSet<String> view_strs;
-	
+	public HashSet<String> table_names;
+		
 	public String index_str;
 	
 	public citation_view_vector()
@@ -27,7 +27,7 @@ public class citation_view_vector {
 		
 		index_vec = new Vector<String>();
 		
-		view_strs = new HashSet<String>();
+		table_names = new HashSet<String>();
 		
 	}
 	
@@ -36,7 +36,7 @@ public class citation_view_vector {
 		
 		index_vec = new Vector<String>();
 		
-		view_strs = new HashSet<String>();
+		table_names = new HashSet<String>();
 		
 		c_vec = new Vector<citation_view>();
 		
@@ -45,11 +45,11 @@ public class citation_view_vector {
 		for(int i = 0; i<vec.size(); i++)
 		{
 			
-			if(!view_strs.contains(vec.get(i).toString()))
+			if(!table_names.containsAll(vec.get(i).get_table_names()))
 			{
-				view_strs.add(vec.get(i).toString());
+				table_names.addAll(vec.get(i).get_table_names());
 				
-				insert_sort(index_vec, vec.get(i).get_index());
+				insert_sort(index_vec, vec.get(i).toString());
 				
 				c_vec.add(vec.get(i));
 				
@@ -70,16 +70,16 @@ public class citation_view_vector {
 		Vector<citation_view> vec_new = (Vector<citation_view>) c_vec.clone();
 				
 		Vector<String> index_new = (Vector<String>) index_vec.clone();
-				
-		HashSet<String> tuple_cores_new = (HashSet<String>) view_strs.clone();
+//				
+		HashSet<String> table_names_new = (HashSet<String>) table_names.clone();
 		
 		String index_str_new = new String();
 		
-		if(!tuple_cores_new.contains(c.toString()))
+		if(!table_names_new.containsAll(c.get_table_names()))
 		{
-			tuple_cores_new.add(c.toString());
+			table_names_new.addAll(c.get_table_names());
 			
-			insert_sort(index_new, c.get_index());
+			insert_sort(index_new, c.toString());
 			
 			vec_new.add(c);
 			
@@ -91,7 +91,7 @@ public class citation_view_vector {
 			index_str_new += index_new.get(i);
 		}
 		
-		citation_view_vector c_v = new citation_view_vector(vec_new, index_new, tuple_cores_new);
+		citation_view_vector c_v = new citation_view_vector(vec_new, index_new, table_names_new);
 		
 		c_v.index_str = index_str_new;
 		
@@ -148,13 +148,14 @@ public class citation_view_vector {
 		
 	}
 	
-	public citation_view_vector(Vector<citation_view> vec, Vector<String> index_vec, HashSet<String> tuple_cores){
+	public citation_view_vector(Vector<citation_view> vec, Vector<String> index_vec, HashSet<String> table_names){
 		
 		this.c_vec = vec;
 		
 		this.index_vec = index_vec;
 		
-		this.view_strs = tuple_cores;
+		this.table_names = table_names;
+//		this.view_strs = tuple_cores;
 		
 	}
 	
@@ -166,9 +167,9 @@ public class citation_view_vector {
 		
 		index_vec = new Vector<String>();
 		
-		view_strs = new HashSet<String>();
+		table_names = new HashSet<String>();
 		
-		view_strs.add(c.toString());
+		table_names.add(c.toString());
 		
 		index_vec.add(c.get_index());
 		
@@ -200,9 +201,9 @@ public class citation_view_vector {
 		
 		index_new.addAll(vec2.index_vec);
 		
-		HashSet<String> tuple_cores_new = (HashSet<String>) vec1.view_strs.clone();
+		HashSet<String> tuple_cores_new = (HashSet<String>) vec1.table_names.clone();
 		
-		tuple_cores_new.addAll(vec2.view_strs);
+		tuple_cores_new.addAll(vec2.table_names);
 		
 		return new citation_view_vector(vec_new, index_new, tuple_cores_new);
 		
@@ -246,7 +247,7 @@ public class citation_view_vector {
 			c_v.index_vec.add(index_vec.get(i));
 		}
 		
-		c_v.view_strs.addAll(view_strs);
+		c_v.table_names.addAll(table_names);
 		
 		c_v.index_str = index_str;
 		

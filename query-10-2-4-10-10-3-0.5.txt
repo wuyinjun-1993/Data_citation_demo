@@ -1,1 +1,0 @@
-q(name) :- a(x,z),a(z,z),b(z,y)

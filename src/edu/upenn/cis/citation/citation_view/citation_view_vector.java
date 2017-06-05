@@ -21,6 +21,8 @@ public class citation_view_vector {
 		
 	public String index_str;
 	
+	public String table_name_str;
+	
 	public citation_view_vector()
 	{
 		c_vec = new Vector<citation_view>();
@@ -36,9 +38,13 @@ public class citation_view_vector {
 		
 		index_vec = new Vector<String>();
 		
+//		Vector<String> curr_table_name_str = new Vector<String>();
+		
 		table_names = new HashSet<String>();
 		
 		c_vec = new Vector<citation_view>();
+		
+		table_name_str = new String();
 		
 		index_str = new String();
 		
@@ -50,7 +56,7 @@ public class citation_view_vector {
 				table_names.addAll(vec.get(i).get_table_names());
 				
 				insert_sort(index_vec, vec.get(i).toString());
-				
+								
 				c_vec.add(vec.get(i));
 				
 			}
@@ -60,6 +66,8 @@ public class citation_view_vector {
 		for(int i = 0; i< index_vec.size(); i++)
 		{
 			index_str += index_vec.get(i);
+			
+			table_name_str += index_vec.get(i).replaceFirst("\\(.*\\)", "");
 		}
 		
 	}
@@ -75,6 +83,8 @@ public class citation_view_vector {
 		
 		String index_str_new = new String();
 		
+		String table_name_str_new = new String();
+		
 		if(!table_names_new.containsAll(c.get_table_names()))
 		{
 			table_names_new.addAll(c.get_table_names());
@@ -89,11 +99,17 @@ public class citation_view_vector {
 		for(int i = 0; i< index_new.size(); i++)
 		{
 			index_str_new += index_new.get(i);
+			
+			String str = index_new.get(i).replaceFirst("\\(.*\\)", "");
+						
+			table_name_str_new += str;
 		}
 		
 		citation_view_vector c_v = new citation_view_vector(vec_new, index_new, table_names_new);
 		
 		c_v.index_str = index_str_new;
+		
+		c_v.table_name_str = table_name_str_new;
 		
 		return c_v;
 	}
@@ -250,6 +266,8 @@ public class citation_view_vector {
 		c_v.table_names.addAll(table_names);
 		
 		c_v.index_str = index_str;
+		
+		c_v.table_name_str = table_name_str;
 		
 		return c_v;
 		

@@ -663,7 +663,7 @@ public class Tuple_reasoning2 {
 		{			
 			Tuple tuple = (Tuple)iter.next();
 			
-			System.out.println(tuple);
+//			System.out.println(tuple);
 			
 			if(check_head_mapping(tuple.getArgs(), q) || check_condition_mapping(tuple.getArgs(), q))
 			{
@@ -701,12 +701,12 @@ public class Tuple_reasoning2 {
 			{
 				Conditions condition = q.conditions.get(j);
 				
-				System.out.print(args.get(i) + ":::" + condition.subgoal1 + "_" + condition.arg1);
+//				System.out.print(args.get(i) + ":::" + condition.subgoal1 + "_" + condition.arg1);
 				
-				if(!condition.arg2.isConst())
-					System.out.print(condition.subgoal2 + "_" + condition.arg2);
-				
-				System.out.println();
+//				if(!condition.arg2.isConst())
+//					System.out.print(condition.subgoal2 + "_" + condition.arg2);
+//				
+//				System.out.println();
 				
 				if(args.get(i).toString().equals(condition.subgoal1 + "_" + condition.arg1) || (condition.subgoal2 != null && condition.subgoal2.isEmpty() && args.get(i).toString().equals(condition.subgoal2 + "_" + condition.arg2)))
 				{
@@ -1370,31 +1370,30 @@ public class Tuple_reasoning2 {
 			
 			citation_view_vector c_combination = c_combinations.get(i);
 			
-			for(int j = i + 1; j<c_combinations.size(); j++)
+			for(int j = 0; j<c_combinations.size(); j++)
 			{
 //				String string = (String) iterator.next();
 				
 //				if(str!=string)
-//				if(i != j)
+				if(i != j)
 				{
 					citation_view_vector curr_combination = c_combinations.get(j);
 					
 					if((c_combination.index_vec.containsAll(curr_combination.index_vec) && c_combination.index_vec.size() > curr_combination.index_vec.size()) || (c_combination.index_vec.equals(curr_combination.index_vec)))
 					{
-						contains = true;
+						c_combinations.remove(i);
+						
+						i--;
 						
 						break;
 					}
 				}
 				
 			}
-			
-			if(!contains)
-				update_combinations.add(c_combination);
 		}
 		
 				
-		return update_combinations;
+		return c_combinations;
 	}
 	
 	static void remove_invalid_web_view(HashSet curr_views, int pos2, int col_num, ResultSet rs) throws SQLException
@@ -1592,7 +1591,7 @@ public class Tuple_reasoning2 {
 					
 //					remove_invalid_web_view(curr_views, pos1, col_num,  rs);
 					
-					System.out.println(curr_str);
+//					System.out.println(curr_str);
 					
 					
 					Vector<citation_view_vector> c_vec = reasoning_single_tuple(curr_views, query, start_pos, rs);
@@ -1624,7 +1623,7 @@ public class Tuple_reasoning2 {
 					
 					Vector<citation_view_vector> update_c_view = update_valid_citation_combination(insert_c_view, rs);
 					
-					output_vec_com(update_c_view);
+//					output_vec_com(update_c_view);
 					
 					c_views.add(update_c_view);
 					
@@ -1749,7 +1748,7 @@ public class Tuple_reasoning2 {
 			if(i >= 1)
 				System.out.print(",");
 			
-			System.out.print(c_unit_combinaton.get(i));
+			System.out.print("view_combination:::" + c_unit_combinaton.get(i));
 		}
 		System.out.println();
 	}
@@ -1781,6 +1780,12 @@ public class Tuple_reasoning2 {
 				}
 				
 			}
+			
+			c_vec = new citation_view_vector(c_vec.c_vec);
+			
+			insert_c_view.remove(i);
+			
+			insert_c_view.add(i, c_vec);
 		}
 		
 //		Vector<citation_view_vector> update_c_views = new Vector<citation_view_vector>();

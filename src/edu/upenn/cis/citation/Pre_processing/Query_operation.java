@@ -24,6 +24,149 @@ import edu.upenn.cis.citation.datalog.Parse_datalog;
 
 public class Query_operation {
 	
+	
+	public static void main(String [] args) throws ClassNotFoundException, SQLException
+	{
+		Query q = gen_sample_view();
+		
+		System.out.println(q);
+		
+		add(q, "q10");
+		
+//		delete_query_by_id("q10");
+		
+	}
+	
+	public static void delete_query_by_id(String id) throws SQLException, ClassNotFoundException
+	{
+		Class.forName("org.postgresql.Driver");
+        Connection c = DriverManager
+           .getConnection(populate_db.db_url,
+       	        populate_db.usr_name,populate_db.passwd);
+        
+        PreparedStatement pst = null;
+        
+//        String id = get_view_id(name, c, pst);
+        
+//        String id = name;
+        
+        boolean has_lambda = delete_lambda_terms(id, c, pst);
+        
+        HashMap<String, String> subgoal_name_mapping = new HashMap<String, String>();
+        
+        Vector<Subgoal> subgoals = get_view_subgoals(id, subgoal_name_mapping, c, pst);
+                
+        delete_subgoals(id, c, pst);
+        
+        delete_conditions(id, c, pst);
+        
+        delete_citation_view(id, c, pst);
+        
+        delete_head_variables(id, c, pst);
+        
+        c.close();
+        
+//        populate_db.delete(id, subgoals, subgoal_name_mapping, has_lambda);
+
+	}
+	
+	static Vector<Subgoal> get_view_subgoals(String name, HashMap<String, String> subgoal_name_mapping, Connection c, PreparedStatement pst) throws SQLException
+	{
+		String q_subgoals = "select subgoal_names, subgoal_origin_names from query2subgoal where query_id = '" + name + "'";
+		
+		pst = c.prepareStatement(q_subgoals);
+		
+		ResultSet r = pst.executeQuery();
+		
+		Vector<Subgoal> subgoal_names = new Vector<Subgoal>();
+		
+		while(r.next())
+		{
+			String subgoal_name = r.getString(1);
+			
+			String subgoal_origin_name = r.getString(2);
+			
+			Vector<Argument> args = new Vector<Argument>();
+			
+			subgoal_name_mapping.put(subgoal_name, subgoal_origin_name);
+			
+			Subgoal subgoal = new Subgoal(subgoal_name, args);
+			
+			subgoal_names.add(subgoal);
+		}
+		
+		return subgoal_names;
+	}
+	
+	static void delete_citation_view(String id, Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "delete from citation2query where query_id = '" + id + "'";
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+		
+	}
+	
+	static boolean delete_lambda_terms(String id, Connection c, PreparedStatement pst) throws SQLException
+	{
+		
+		
+		String query = "select count(*) from query2lambda_term where query_id = '" + id + "'";
+		
+		pst = c.prepareStatement(query);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		boolean has_lambda_term = false;
+		
+		if(rs.next())
+		{
+			int num = rs.getInt(1);
+			
+			if(num > 0)
+				has_lambda_term = true;
+		}
+		
+		query = "delete from query2lambda_term where query_id = '" + id + "'";
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+		
+		return has_lambda_term;
+		
+	}
+	
+	static void delete_conditions(String id, Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "delete from query2conditions where query_id = '" + id + "'";
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+	}
+	
+	static void delete_subgoals(String id, Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "delete from query2subgoal where query_id = '" + id + "'";
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+	}
+	
+	static void delete_head_variables(String id, Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "delete from query2head_variables where query_id = '" + id + "'";
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+	}
+	
+	
+	
 	public static Query get_view(String id) throws SQLException, ClassNotFoundException
 	{
 		Class.forName("org.postgresql.Driver");
@@ -57,6 +200,79 @@ public class Query_operation {
         return view;
 	}
 	
+	
+	static Query gen_sample_view() throws ClassNotFoundException, SQLException
+	{
+//		Vector<Argument> head_args = new Vector<Argument>();
+////		
+//		head_args.add(new Argument("family_type", "family"));
+//		
+//		Subgoal head = new Subgoal("q", head_args);
+		
+		Vector<Subgoal> subgoals = new Vector<Subgoal>();
+		
+//		Vector<Argument> args1 = view_operation.get_full_schema("family", "family", c, pst);
+//		
+//		Vector<Argument> args2 = view_operation.get_full_schema("family1", "family", c, pst);
+//		
+		Vector<Argument> args3 = new Vector<Argument> ();//view_operation.get_full_schema("introduction", "introduction", c, pst);
+		
+//		subgoals.add(new Subgoal("family", args1));
+		
+//		subgoals.add(new Subgoal("family1", args2));
+				
+//		subgoals.add(new Subgoal("introduction", args3));
+//		
+//		Vector<Conditions> conditions = new Vector<Conditions>();
+		
+//		conditions.add(new Conditions(new Argument("family_id", "family"), "family", new op_less_equal(), new Argument("5"), new String()));
+//		
+//		conditions.add(new Conditions(new Argument("family_id", "family1"), "family1", new op_less_equal(), new Argument("5"), new String()));
+//		
+//		conditions.add(new Conditions(new Argument("family_id", "introduction"), "introduction", new op_less_equal(), new Argument("5"), new String()));
+		
+//		conditions.add(new Conditions(new Argument("in_gtip", "object"), "object", new op_equal(), new Argument("'true'"), new String()));
+		
+		HashMap<String, String> subgoal_name_mapping = new HashMap<String, String>();
+				
+		subgoal_name_mapping.put("contributor", "contributor");
+		
+		subgoal_name_mapping.put("contributor2intro", "contributor2intro");
+		
+		subgoal_name_mapping.put("introduction", "introduction");
+
+		Vector<String []> head_vars = new Vector<String []>();
+		
+		String [] head_v1 = {"first_names", "contributor"};
+		
+		String [] head_v2 = {"surname", "contributor"};
+		
+		head_vars.add(head_v1);
+		
+		head_vars.add(head_v2);
+		
+		Vector<String []> condition_str = new Vector<String []>();
+		
+		Vector<String []> lambda_term_str = new Vector<String []>();
+		
+		String [] l_str = {"family_id", "introduction"};
+		
+		lambda_term_str.add(l_str);
+		
+		String [] c_str1 = {"contributor_id", "contributor2intro", "=", "contributor_id", "contributor"};
+		
+		String [] c_str2 = {"family_id", "contributor2intro", "=", "family_id", "introduction"};
+		
+		condition_str.add(c_str1);
+		
+		condition_str.add(c_str2);
+		
+//		Query q = new Query("q", head, subgoals, new Vector<Lambda_term>(), conditions, subgoal_name_mapping);
+//		
+//		System.out.println(q);
+						
+		return Gen_query.gen_query("q10", subgoal_name_mapping, head_vars, condition_str, lambda_term_str);
+	}
 	
 	public static void add(Query v, String name) throws ClassNotFoundException, SQLException
 	{
@@ -150,7 +366,7 @@ public class Query_operation {
 		{
 			Subgoal subgoal = (Subgoal)q.body.get(i);
 			
-			String query = "insert into query2subgoal values ('q" + seq + "','" + subgoal.name + "')";
+			String query = "insert into query2subgoal values ('q" + seq + "','" + subgoal.name + "','" + q.subgoal_name_mapping.get(subgoal.name) +"')";
 			
 			pst = c.prepareStatement(query);
 			
@@ -196,7 +412,7 @@ public class Query_operation {
 	{
 		for(int i = 0; i<q.conditions.size(); i++)
 		{			
-			String query = "insert into query2conditions values ('q" + seq + "','" + q.conditions.get(i).arg1.name + q.conditions.get(i).op.get_op_name() + q.conditions.get(i).arg2.name + "')";
+			String query = "insert into query2conditions values ('q" + seq + "','" + q.conditions.get(i).toString() + "')";
 			
 			pst = c.prepareStatement(query);
 			

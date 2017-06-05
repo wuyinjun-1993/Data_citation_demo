@@ -356,7 +356,7 @@ public class populate_db {
 	    c = DriverManager
 	        .getConnection(db_url, usr_name , passwd);
 //	    add_column(c,pst);
-		renew_table(c, pst);
+//		renew_table(c, pst);
 
 		populate_db(view, c, pst);
 		c.close();
@@ -425,13 +425,7 @@ public class populate_db {
 				new_citation_view = id;
 			}
 			
-			String update_q = "update " + relation + " set citation_view = regexp_replace(citation_view, '"+ new_citation_view +"','')";
-			
-			pst = c.prepareStatement(update_q);
-			
-			pst.execute();
-			
-			update_q = "update " + relation + " set citation_view = regexp_replace(citation_view, '\\|\\|','|')";
+			String update_q = "update " + relation + populate_db.suffix + " set citation_view = regexp_replace(citation_view, '"+ new_citation_view +"','')";
 			
 			System.out.println(update_q);
 			
@@ -439,7 +433,7 @@ public class populate_db {
 			
 			pst.execute();
 			
-			update_q = "update " + relation + " set citation_view = regexp_replace(citation_view, '^\\|','')";
+			update_q = "update " + relation + populate_db.suffix + " set citation_view = regexp_replace(citation_view, '\\|\\|','|')";
 			
 			System.out.println(update_q);
 			
@@ -447,7 +441,15 @@ public class populate_db {
 			
 			pst.execute();
 			
-			update_q = "update " + relation + " set citation_view = regexp_replace(citation_view, '\\|$','')";
+			update_q = "update " + relation + populate_db.suffix + " set citation_view = regexp_replace(citation_view, '^\\|','')";
+			
+			System.out.println(update_q);
+			
+			pst = c.prepareStatement(update_q);
+			
+			pst.execute();
+			
+			update_q = "update " + relation + populate_db.suffix + " set citation_view = regexp_replace(citation_view, '\\|$','')";
 			
 			System.out.println(update_q);
 			
@@ -1006,7 +1008,7 @@ public class populate_db {
 			Vector<String> primary_keys = get_primary_key(subgoal.name, c, pst);
 			
 			String query_base = "update " + subgoal.name + suffix + " set citation_view = "; 
-			
+						
 			String query1 = query_base;
 			
 			String query2 = query_base;

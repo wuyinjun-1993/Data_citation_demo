@@ -571,22 +571,26 @@ public class CoreCover {
       // considers subsets with the current size 
       //System.out.println("# of view tuples = " + viewTuples.size() +
       //" size = " + size);
+    	
+        HashSet tupleSubsets = UserLib.genSubsets(viewTuples, size);
+
+    	
     	if(curr_rewritings.size() == 0)
     	{
-    		gen_rewriting(viewTuples, size, covered_relations, query, rewritings, curr_rewritings);
+    		gen_rewriting(tupleSubsets, size, covered_relations, query, rewritings, curr_rewritings);
     	}
     	else
     	{
     		
-    		HashSet curr_rewritings_all = new HashSet();
-    		
-    		for(Iterator iter = curr_rewritings.iterator();iter.hasNext();)
-    		{
-    			HashSet curr_rewriting = (HashSet) iter.next();
-    			curr_rewritings_all.addAll(curr_rewriting);
-    			
-    		}
-			gen_rewriting(gen_complementary_set(viewTuples, curr_rewritings_all), size, covered_relations, query, rewritings, curr_rewritings);
+//    		HashSet curr_rewritings_all = new HashSet();
+//    		
+//    		for(Iterator iter = curr_rewritings.iterator();iter.hasNext();)
+//    		{
+//    			HashSet curr_rewriting = (HashSet) iter.next();
+//    			curr_rewritings_all.addAll(curr_rewriting);
+//    			
+//    		}
+			gen_rewriting(gen_complementary_set(tupleSubsets, curr_rewritings), size, covered_relations, query, rewritings, curr_rewritings);
     	}
 
 //      if (found) {
@@ -601,16 +605,40 @@ public class CoreCover {
   
   static HashSet gen_complementary_set(HashSet viewTuples, HashSet curr_rewriting)
   {
-	  HashSet rs = (HashSet) viewTuples.clone();
+	  HashSet rs = new HashSet();
 	  
-	  rs.removeAll(curr_rewriting);
+	  for(Iterator iter1 = viewTuples.iterator(); iter1.hasNext();)
+	  {
+		  HashSet t1 = (HashSet)iter1.next();
+		  
+		  int num = 0;
+		  
+//		  System.out.println(t1);
+		  
+		  for(Iterator iter2 = curr_rewriting.iterator(); iter2.hasNext();)
+		  {
+			  HashSet t2 = (HashSet) iter2.next();
+			  
+			  if(t1.contains(t2))
+			  {
+				  System.out.println("contained");
+				  
+				  break;
+			  }
+			  num++;
+		  }
+		  
+		  if(num >= curr_rewriting.size())
+			  rs.add(t1);
+	  }
+	  
+//	  rs.removeAll(curr_rewriting);
 	  
 	  return rs;
   }
   
-  static void gen_rewriting(HashSet viewTuples, int size, HashSet covered_relations, Query query, HashSet rewritings, HashSet curr_rewritings)
+  static void gen_rewriting(HashSet tupleSubsets, int size, HashSet covered_relations, Query query, HashSet rewritings, HashSet curr_rewritings)
   {
-      HashSet tupleSubsets = UserLib.genSubsets(viewTuples, size);
       //System.out.println("# of tupleSubsets = " + tupleSubsets.size());
 
       

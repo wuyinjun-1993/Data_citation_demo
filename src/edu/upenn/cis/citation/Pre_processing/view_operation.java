@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.locks.Condition;
 
@@ -29,7 +31,7 @@ public class view_operation {
 	
 	public static void main(String [] args) throws ClassNotFoundException, SQLException
 	{
-//		delete_view("v9");
+//		delete_view_by_id("v10");
 		
 //		String query = "v9(ligand_c_ligand_id,interaction_c_object_id, ligand_c_name):ligand_c(), interaction_c(), interaction_c_ligand_id=ligand_c_ligand_id";
 //		
@@ -49,13 +51,75 @@ public class view_operation {
 		
 //		initial();
 		
-		Query q = get_view_by_id("v7");
+		
+		
+		Query q = gen_sample_view();
+		
+		add(q, "v10");
 		
 		System.out.println(q);
 		
 		
 	}
 	
+	static Query gen_sample_view() throws ClassNotFoundException, SQLException
+	{
+		Vector<Argument> head_args = new Vector<Argument>();
+//		
+		head_args.add(new Argument("family_type", "family"));
+		
+		Subgoal head = new Subgoal("q", head_args);
+		
+		Vector<Subgoal> subgoals = new Vector<Subgoal>();
+		
+//		Vector<Argument> args1 = view_operation.get_full_schema("family", "family", c, pst);
+//		
+//		Vector<Argument> args2 = view_operation.get_full_schema("family1", "family", c, pst);
+//		
+		Vector<Argument> args3 = new Vector<Argument> ();//view_operation.get_full_schema("introduction", "introduction", c, pst);
+		
+//		subgoals.add(new Subgoal("family", args1));
+		
+//		subgoals.add(new Subgoal("family1", args2));
+				
+		subgoals.add(new Subgoal("introduction", args3));
+		
+		Vector<Conditions> conditions = new Vector<Conditions>();
+		
+//		conditions.add(new Conditions(new Argument("family_id", "family"), "family", new op_less_equal(), new Argument("5"), new String()));
+//		
+//		conditions.add(new Conditions(new Argument("family_id", "family1"), "family1", new op_less_equal(), new Argument("5"), new String()));
+//		
+//		conditions.add(new Conditions(new Argument("family_id", "introduction"), "introduction", new op_less_equal(), new Argument("5"), new String()));
+		
+//		conditions.add(new Conditions(new Argument("in_gtip", "object"), "object", new op_equal(), new Argument("'true'"), new String()));
+		
+		HashMap<String, String> subgoal_name_mapping = new HashMap<String, String>();
+				
+		subgoal_name_mapping.put("introduction", "introduction");
+
+		Vector<String []> head_vars = new Vector<String []>();
+		
+		String [] head_v = {"family_id", "introduction"};
+		
+		head_vars.add(head_v);
+		
+		Vector<String []> condition_str = new Vector<String []>();
+		
+		Vector<String []> lambda_term_str = new Vector<String []>();
+		
+		String [] l_str = {"family_id", "introduction"};
+		
+		lambda_term_str.add(l_str);
+		
+//		Query q = new Query("q", head, subgoals, new Vector<Lambda_term>(), conditions, subgoal_name_mapping);
+//		
+//		System.out.println(q);
+						
+		return Gen_query.gen_query("v10", subgoal_name_mapping, head_vars, condition_str, lambda_term_str);
+	}
+	
+		
 	public static void initial() throws ClassNotFoundException, SQLException
 	{
 		
@@ -161,7 +225,40 @@ public class view_operation {
 		return id;
 	}
 	
-	public static void delete_view(String name) throws SQLException, ClassNotFoundException
+	public static void delete_view_by_name(String name) throws SQLException, ClassNotFoundException
+	{
+		Class.forName("org.postgresql.Driver");
+        Connection c = DriverManager
+           .getConnection(populate_db.db_url,
+       	        populate_db.usr_name,populate_db.passwd);
+        
+        PreparedStatement pst = null;
+        
+        String id = get_view_id(name, c, pst);
+        
+//        String id = name;
+        
+        boolean has_lambda = delete_lambda_terms(id, c, pst);
+        
+        HashMap<String, String> subgoal_name_mapping = new HashMap<String, String>();
+        
+        Vector<Subgoal> subgoals = get_view_subgoals(id, subgoal_name_mapping, c, pst);
+                
+        delete_subgoals(id, c, pst);
+        
+        delete_conditions(id, c, pst);
+        
+        delete_citation_view(id, c, pst);
+        
+        delete_view_table(id, c, pst);
+        
+        c.close();
+        
+        populate_db.delete(id, subgoals, subgoal_name_mapping, has_lambda);
+
+	}
+	
+	public static void delete_view_by_id(String id) throws SQLException, ClassNotFoundException
 	{
 		Class.forName("org.postgresql.Driver");
         Connection c = DriverManager
@@ -171,8 +268,6 @@ public class view_operation {
         PreparedStatement pst = null;
         
 //        String id = get_view_id(name, c, pst);
-        
-        String id = name;
         
         boolean has_lambda = delete_lambda_terms(id, c, pst);
         
@@ -655,7 +750,7 @@ public class view_operation {
 		{
 			Subgoal subgoal = (Subgoal)view.body.get(i);
 			
-			String query = "insert into view2subgoals values ('v" + seq + "','" + subgoal.name + "')";
+			String query = "insert into view2subgoals values ('v" + seq + "','" + subgoal.name + "','" + view.subgoal_name_mapping.get(subgoal.name) + "')";
 			
 			pst = c.prepareStatement(query);
 			
@@ -701,7 +796,7 @@ public class view_operation {
 	{
 		for(int i = 0; i<view.conditions.size(); i++)
 		{			
-			String query = "insert into view2conditions values ('v" + seq + "','" + view.conditions.get(i).arg1.name + view.conditions.get(i).op.get_op_name() + view.conditions.get(i).arg2.name + "')";
+			String query = "insert into view2conditions values ('v" + seq + "','" + view.conditions.get(i).toString() + "')";
 			
 			pst = c.prepareStatement(query);
 			

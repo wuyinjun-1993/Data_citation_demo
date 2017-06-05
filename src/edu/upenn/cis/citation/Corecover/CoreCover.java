@@ -8,6 +8,8 @@ package edu.upenn.cis.citation.Corecover;
 
 import java.util.*;
 
+import edu.upenn.cis.citation.Operation.Conditions;
+
 public class CoreCover {
 
   public static int numVTs = 0;
@@ -100,7 +102,7 @@ public class CoreCover {
       tuples.add(tuple);  // we treat each subgoal as a "tuple"
     }
 
-    return new Database(tuples);
+    return new Database(tuples, query.subgoal_name_mapping);
   }
     
  /**
@@ -111,18 +113,82 @@ public class CoreCover {
     for (int i = 0; i < views.size(); i ++) {
       Query view = (Query) views.elementAt(i);
 
+//      System.out.println(view);
+      
       Relation rel = canDb.execQuery(view);
       
       for (Iterator iter = rel.getTuples().iterator(); iter.hasNext();) {
     	  Tuple tuple = (Tuple) iter.next();
-          tuple.lambda_terms = view.lambda_term;
-          tuple.conditions = view.conditions;
-          tuple.web_view = view.web_view;
+    	  
+    	  set_tuple_lambda_term(tuple, view);
+
+    	  set_tuple_conditions(tuple, view);
+    	  
           viewTuples.add(tuple);
       }
        // add them to the results
     }
     return viewTuples;
+  }
+  
+  static void set_tuple_lambda_term(Tuple tuple, Query view)
+  {
+	  Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();
+	  
+	  for(int i = 0; i<view.lambda_term.size(); i++)
+	  {
+		  String curr_lambda_name = tuple.phi_str.apply(view.lambda_term.get(i).name);
+		  
+		  String curr_table_name = curr_lambda_name.substring(0, curr_lambda_name.indexOf("_"));
+		  
+		  Lambda_term l_term = new Lambda_term(curr_lambda_name, curr_table_name);
+		  
+		  lambda_terms.add(l_term);
+	  }
+	  
+	  tuple.lambda_terms = lambda_terms;
+  }
+  
+  static void set_tuple_conditions(Tuple tuple, Query view)
+  {
+	  Vector<Conditions> conditions = new Vector<Conditions>();
+	  
+	  for(int i = 0; i<view.conditions.size(); i++)
+	  {
+		  String curr_arg1 = tuple.phi_str.apply(view.conditions.get(i).subgoal1 + "_" + view.conditions.get(i).arg1.name);
+		  
+		  String subgoal1 = curr_arg1.substring(0, curr_arg1.indexOf("_"));
+		  
+		  curr_arg1 = curr_arg1.substring(curr_arg1.indexOf("_") + 1, curr_arg1.length());
+		  
+		  String curr_arg2 = new String();
+		  
+		  String subgoal2 = new String();
+		  
+		  Conditions condition = null;
+		  
+		  if(view.conditions.get(i).arg2.isConst())
+		  {
+			  curr_arg2 = view.conditions.get(i).arg2.name;
+			  
+			  condition = new Conditions(new Argument(curr_arg1, subgoal1), subgoal1, view.conditions.get(i).op, new Argument(curr_arg2), subgoal2);
+		  }
+		  else
+		  {
+			  curr_arg2 = tuple.phi_str.apply(view.conditions.get(i).subgoal2 + "_" + view.conditions.get(i).arg2.name);
+			  
+			  subgoal2 = curr_arg2.substring(0, curr_arg2.indexOf("_"));
+			  
+			  curr_arg2 = curr_arg2.substring(curr_arg2.indexOf("_") + 1, curr_arg2.length());
+			  
+			  condition = new Conditions(new Argument(curr_arg1, subgoal1), subgoal1, view.conditions.get(i).op, new Argument(curr_arg2, subgoal2), subgoal2);
+		  }
+		  
+		  conditions.add(condition);
+		  
+	  }
+	  
+	  tuple.conditions = conditions;
   }
   
   public static HashSet computeViewTuples(Database canDb, Vector views, Query query) {
@@ -487,8 +553,11 @@ public class CoreCover {
 
     // if the union of the tuple-cores doesn't cover all query subgoals,
     // just return no rewriting
-    if (!unionCoverSubgoals(viewTuples, query))
-	return rewritings;
+    HashSet covered_relations = get_CoverSubgoals(viewTuples, query);
+
+    
+//    if (!unionCoverSubgoals(viewTuples, query))
+//	return rewritings;
 
     // scans the subsets from the smallest one to the largest one
     boolean found = false;
@@ -502,13 +571,17 @@ public class CoreCover {
       // considers subsets with the current size 
       //System.out.println("# of view tuples = " + viewTuples.size() +
       //" size = " + size);
-//    	if(curr_rewritings.size() == 0)
-//    	{
-    		gen_rewriting(viewTuples, size, query, rewritings, curr_rewritings);
-//    	}
-//    	else
-//    	{
-//    		
+    	
+        HashSet tupleSubsets = UserLib.genSubsets(viewTuples, size);
+
+    	
+    	if(curr_rewritings.size() == 0)
+    	{
+    		gen_rewriting(tupleSubsets, size, covered_relations, query, rewritings, curr_rewritings);
+    	}
+    	else
+    	{
+    		
 //    		HashSet curr_rewritings_all = new HashSet();
 //    		
 //    		for(Iterator iter = curr_rewritings.iterator();iter.hasNext();)
@@ -517,8 +590,8 @@ public class CoreCover {
 //    			curr_rewritings_all.addAll(curr_rewriting);
 //    			
 //    		}
-//			gen_rewriting(gen_complementary_set(viewTuples, curr_rewritings_all), size, query, rewritings, curr_rewritings);
-//    	}
+			gen_rewriting(gen_complementary_set(tupleSubsets, curr_rewritings), size, covered_relations, query, rewritings, curr_rewritings);
+    	}
 
 //      if (found) {
 //    	  rewritings.add(min_rewriting);
@@ -532,36 +605,55 @@ public class CoreCover {
   
   static HashSet gen_complementary_set(HashSet viewTuples, HashSet curr_rewriting)
   {
-	  HashSet rs = (HashSet) viewTuples.clone();
+	  HashSet rs = new HashSet();
 	  
-	  rs.removeAll(curr_rewriting);
+	  for(Iterator iter1 = viewTuples.iterator(); iter1.hasNext();)
+	  {
+		  HashSet t1 = (HashSet)iter1.next();
+		  
+		  int num = 0;
+		  
+//		  System.out.println(t1);
+		  
+		  for(Iterator iter2 = curr_rewriting.iterator(); iter2.hasNext();)
+		  {
+			  HashSet t2 = (HashSet) iter2.next();
+			  
+			  if(t1.contains(t2))
+			  {
+				  System.out.println("contained");
+				  
+				  break;
+			  }
+			  num++;
+		  }
+		  
+		  if(num >= curr_rewriting.size())
+			  rs.add(t1);
+	  }
+	  
+//	  rs.removeAll(curr_rewriting);
 	  
 	  return rs;
   }
   
-  static void gen_rewriting(HashSet viewTuples, int size, Query query, HashSet rewritings, HashSet curr_rewritings)
+  static void gen_rewriting(HashSet tupleSubsets, int size, HashSet covered_relations, Query query, HashSet rewritings, HashSet curr_rewritings)
   {
-      HashSet tupleSubsets = UserLib.genSubsets(viewTuples, size);
       //System.out.println("# of tupleSubsets = " + tupleSubsets.size());
 
+      
       for (Iterator iter = tupleSubsets.iterator(); iter.hasNext();) 
       {
 	// for this "i"^th around, we consider only subsets with size i 
 	HashSet tupleSubset = (HashSet) iter.next();
 	if (tupleSubset.size() != size) 
 	  UserLib.myerror("CoreCover.coverQuerySubgoals(), error!");
+	
+	
+	
 
-	if (unionCoverSubgoals(tupleSubset, query))  {// found one
-		
-	  double cost = 0;
-	  
-	  Object[] tuples = tupleSubset.toArray();
-	  
-	  for(int k = 0;k<tuples.length; k++)
-	  {
-		  Tuple t = (Tuple)tuples[k];
-		  cost += t.cost;
-	  }
+	if (unionCoverSubgoals(tupleSubset, covered_relations))  
+	{// found one
 	  
 //	  if(cost < min_cost)
 //	  {
@@ -569,7 +661,7 @@ public class CoreCover {
 //		  min_cost = cost;
 //	  }
 	  
-//	  if(!curr_rewritings.contains(tupleSubset))
+	  if(!curr_rewritings.contains(tupleSubset))
 	  {
 		  rewritings.add(new Rewriting(tupleSubset, query));
 		  
@@ -605,6 +697,31 @@ public class CoreCover {
 
     return coreUnion.containsAll(query.getBody());
   }
+  
+  static boolean unionCoverSubgoals(HashSet tupleSubset, HashSet query) {
+	    HashSet coreUnion = new HashSet();
+	    for (Iterator iter2 = tupleSubset.iterator(); iter2.hasNext();) {
+	      Tuple viewTuple = (Tuple) iter2.next();
+	      HashSet core = viewTuple.get_relations();
+	      coreUnion.addAll(core);
+	    }
+
+	    return coreUnion.containsAll(query);
+	  }
+  
+  static HashSet get_CoverSubgoals(HashSet tupleSubset, Query query) {
+	    HashSet coreUnion = new HashSet();
+	    for (Iterator iter2 = tupleSubset.iterator(); iter2.hasNext();) {
+	      Tuple viewTuple = (Tuple) iter2.next();
+//	      HashSet core = viewTuple.getCore();
+	      HashSet relations = viewTuple.get_relations();
+//	      coreUnion.addAll(core);
+	      coreUnion.addAll(relations);
+	      
+	    }
+
+	    return coreUnion;
+	  }
 
   /**
    * Checks if a rewriting has a used a subset of view tuples in tupleSubset.

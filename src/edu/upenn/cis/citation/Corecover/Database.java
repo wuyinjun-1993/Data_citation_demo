@@ -10,9 +10,12 @@ import java.util.*;
 public class Database {
   
   HashSet tuples = null;
+
+  HashMap<String, String> subgoal_name_mappings = null;
   
-  Database(HashSet tuples) {
+  Database(HashSet tuples, HashMap<String, String> subgoal_name_mappings) {
     this.tuples = tuples;
+    this.subgoal_name_mappings = subgoal_name_mappings;
   }
   
   /**
@@ -66,7 +69,7 @@ public class Database {
     for (Iterator iter = tuples.iterator(); iter.hasNext();) {
       Tuple tuple = (Tuple) iter.next();
 
-      if (!subgoal.getName().equals(tuple.getName())) 
+      if (!subgoal.getName().equals(subgoal_name_mappings.get(tuple.getName()))) 
 	continue; // should have the same name
 
       Vector tupleArgs   = tuple.getArgs();
@@ -78,6 +81,7 @@ public class Database {
       Vector  resTupleArgs = new Vector();
       boolean unifiable = true;
       Mapping phi       = new Mapping();
+      Mapping phi_str = new Mapping();
       for (int i = 0; i < subgoalArgs.size(); i ++) {
 	Argument tupleArg   = (Argument) tupleArgs.elementAt(i);
 	Argument subgoalArg = (Argument) subgoalArgs.elementAt(i);
@@ -92,10 +96,13 @@ public class Database {
 	}
 
 	// the subgoalArg is a variable
+	
 	Argument image = (Argument) phi.apply(subgoalArg);
 	if (image == null) { // not mapped.  adds the pair
 	  phi.put(subgoalArg, tupleArg);
-
+	  
+	  phi_str.put(subgoalArg.name, tupleArg.name);
+	  
 	  resTupleArgs.add(tupleArg);  // adds the first occurance to the tuple
 	  continue;
 	}
@@ -110,7 +117,7 @@ public class Database {
 	HashMap mapSubgoals = new HashMap();
 	mapSubgoals.put(subgoal, tuple.getSubgoal()); // subgoal mapped
 	resTuples.add(new Tuple(subgoal.getName(), 
-				resTupleArgs, phi, mapSubgoals));
+				resTupleArgs, phi, phi_str, mapSubgoals));
       }
     }
     
@@ -232,13 +239,20 @@ public class Database {
     map.putAll(map2);
     Mapping phi = new Mapping(map);
 
+    // union the two phi's
+    HashMap map1_str = (HashMap) tuple1.getMapping_str().getMap();
+    HashMap map2_str = (HashMap) tuple2.getMapping_str().getMap();
+    HashMap map_str  = (HashMap) map1_str.clone();
+    map_str.putAll(map2_str);
+    Mapping phi_str = new Mapping(map_str);
+    
     // union the two mapSubgoals's
     HashMap mapSubgoals1 = (HashMap) tuple1.getMapSubgoals();
     HashMap mapSubgoals2 = (HashMap) tuple2.getMapSubgoals();
     HashMap mapSubgoals  = (HashMap) mapSubgoals1.clone();
     mapSubgoals.putAll(mapSubgoals2);
 
-    return new Tuple(resName, resTupleArgs, phi, mapSubgoals);
+    return new Tuple(resName, resTupleArgs, phi, phi_str, mapSubgoals);
   }
 
   public String toString() {

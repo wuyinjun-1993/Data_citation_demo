@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Vector;
 import com.sun.org.apache.xml.internal.dtm.ref.DTMDefaultBaseIterators.ParentIterator;
 
@@ -19,10 +21,12 @@ public class citation_view_parametered extends citation_view{
 	public String name = new String ();
 	
 	public Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();
+	
+	public Query view;
 		
 //	public Vector<String> parameters = new Vector<String>();
 	
-	public HashMap<Lambda_term, String> map = new HashMap<Lambda_term, String>();
+	public HashMap<String, String> map = new HashMap<String, String>();
 	
 	public Vector<String> table_names = new Vector<String>();
 		
@@ -253,32 +257,36 @@ public class citation_view_parametered extends citation_view{
 	}
 	
 	
-	public citation_view_parametered(String name, Vector<String> lambda_terms) throws ClassNotFoundException, SQLException {
-		
-		Connection c = null;
-		
-	    PreparedStatement pst = null;
-	      
-		Class.forName("org.postgresql.Driver");
-		
-	    c = DriverManager
-	        .getConnection(populate_db.db_url,
-	    	        populate_db.usr_name,populate_db.passwd);
+	public citation_view_parametered(String name, Query view, Tuple tuple, Vector<String> lambda_term_values) throws ClassNotFoundException, SQLException 
+	{
 		
 		this.name = name;
 		
-		for(int i = 0; i<lambda_terms.size(); i++)
-		{
-			this.lambda_terms.add(new Lambda_term(lambda_terms.get(i)));
-		}
+		this.lambda_terms = tuple.lambda_terms;
 		
+		this.view = view;
+		
+		put_paramters(lambda_term_values);
+		
+		set_table_names(tuple);
 		
 //		gen_index();
 			    
-		gen_table_names(c,pst);
-		
-	    c.close();
+//		gen_table_names(c,pst);
 //		get_queries();
+	}
+	 
+	void set_table_names(Tuple tuple)
+	{
+		
+		HashSet<Subgoal> subgoals = tuple.getTargetSubgoals();
+		
+		for(Iterator iter = subgoals.iterator(); iter.hasNext();)
+		{
+			Subgoal subgoal = (Subgoal)iter.next();
+			
+			table_names.add(subgoal.name);
+		}
 	}
 	
 	public citation_view_parametered(String name, Vector<String> lambda_terms, Vector<String> table_names) throws ClassNotFoundException, SQLException {
@@ -319,7 +327,7 @@ public class citation_view_parametered extends citation_view{
 		
 		for(int i = 0; i<lambda_terms.size(); i++)
 		{
-			map.put(lambda_terms.get(i), para.get(i));
+			map.put(lambda_terms.get(i).toString(), para.get(i));
 		}
 	}
 	//TODO: consider more complicated queries
@@ -382,7 +390,7 @@ public class citation_view_parametered extends citation_view{
 	    
 	    String query4citation = this.name + "(" + head_variables + "):" + body;
 	    
-	    Query query = Parse_datalog.parse_query(query4citation);
+	    Query query = null;//Parse_datalog.parse_query(query4citation);
 	    
 	    assign_paras(query);
 	    
@@ -481,7 +489,7 @@ public class citation_view_parametered extends citation_view{
 		
 		for(int i = 0; i<lambda_terms.size();i++)
 		{
-			str = str + map.get(lambda_terms.get(i));
+			str = str + map.get(lambda_terms.get(i).toString());
 			
 			if(i < lambda_terms.size() - 1)				
 				str = str + ",";
@@ -523,7 +531,7 @@ public class citation_view_parametered extends citation_view{
 		
 //		if(this.lambda_terms.contains(para))
 //		{
-			map.put(new Lambda_term(para), value);
+			map.put(para, value);
 //		}
 		
 	}
@@ -534,7 +542,7 @@ public class citation_view_parametered extends citation_view{
 		
 //		if(this.lambda_terms.contains(para))
 		{
-			map.put(para, value);
+			map.put(para.toString(), value);
 		}
 		
 	}
@@ -557,9 +565,11 @@ public class citation_view_parametered extends citation_view{
 		
 		c_v.name = this.name;
 		
-		c_v.map = (HashMap<Lambda_term, String>) this.map.clone();
+		c_v.map = (HashMap<String, String>) this.map.clone();
 		
 		c_v.table_names = this.table_names;
+		
+		c_v.view = this.view;
 		
 		return c_v;
 	}

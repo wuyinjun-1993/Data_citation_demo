@@ -17,7 +17,11 @@ public class Argument {
   
   public String origin_name = null;
   
-  Argument(String name, boolean isConstant) {
+  public String relation_name = null; //not the original name
+  
+//  public String origin_relation_name = null;
+  
+  Argument(String name, String relation_name, boolean isConstant) {
     if (name == null) {
       UserLib.myerror("Argument:constructor, name == null");
     }
@@ -32,14 +36,21 @@ public class Argument {
         type = CONST;
 
     this.name = name;
+    
+    this.relation_name = relation_name;
   }
 
-  public Argument(String name) {
-      this(name, false);
+  public Argument(String name, String relation_name) {
+      this(name, relation_name, false);
   }
   
-  public Argument(String name, String lambda_term) {
-      this(name);
+  public Argument(String name)
+  {
+	  this(name, null, true);
+  }
+  
+  public Argument(String name, String relation_name, String lambda_term) {
+      this(name, relation_name);
       
       this.origin_name = lambda_term;
   }
@@ -95,7 +106,7 @@ public class Argument {
     if (argMap.containsKey(this))
       return ((Argument) argMap.get(this));
     
-    return new Argument(name + "_" + newId); // a new name
+    return new Argument(relation_name, name + "_" + newId); // a new name
   }
 
   public String getName() {

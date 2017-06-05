@@ -35,9 +35,9 @@ public class Conditions {
 		String str = arg1.name;
 		
 		if(arg2.isConst())
-			return subgoal1 + "." + str + op + arg2;
+			return subgoal1 + "_" + str + op + arg2;
 		else
-			return subgoal1 + "." + str + op + subgoal2 + "." + arg2;
+			return subgoal1 + "_" + str + op + subgoal2 + "_" + arg2;
 	}
 	
 	
@@ -128,12 +128,21 @@ public class Conditions {
 	
 	public static boolean compare(Conditions c1, Conditions c2)
 	{
-		if((c1.arg1.origin_name.equals(c2.arg1.origin_name) && c1.arg2.origin_name.equals(c2.arg2.origin_name) && c1.subgoal1.equals(c2.subgoal1) && c1.subgoal2.equals(c2.subgoal2) ))
+//		if((c1.arg1.origin_name.equals(c2.arg1.origin_name) && c1.arg2.origin_name.equals(c2.arg2.origin_name) && c1.subgoal1.equals(c2.subgoal1) && c1.subgoal2.equals(c2.subgoal2) ))
+		if(c1.toString().equals(c2.toString()))
 		 return true;
 		
-		if((c1.arg2.origin_name.equals(c2.arg1.origin_name) && c1.arg1.origin_name.equals(c2.arg2.origin_name) && c1.subgoal2.equals(c2.subgoal1) && c1.subgoal1.equals(c2.subgoal2) ))
+//		if((c1.arg2.origin_name.equals(c2.arg1.origin_name) && c1.arg1.origin_name.equals(c2.arg2.origin_name) && c1.subgoal2.equals(c2.subgoal1) && c1.subgoal1.equals(c2.subgoal2) ))
+		if(c1.toString().equals(reverse_condition(c2).toString()))
 			 return true;
 		return false;
+	}
+	
+	static Conditions reverse_condition(Conditions c)
+	{
+		Operation op = c.op.negation();
+		
+		return new Conditions(c.arg2, c.subgoal2, op, c.arg1, c.subgoal1);
 	}
 
 	

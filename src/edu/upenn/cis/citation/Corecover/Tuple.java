@@ -14,6 +14,8 @@ public class Tuple {
   Vector args = null;  // a list of arguments
   Mapping phi = null;  // mapping from query args to the database deriving
 		       // the tuple
+  
+  Mapping phi_str = null;
   public Subgoal subgoal = null; // the subgoal that produces this tuple in canDb.
   public HashMap mapSubgoals = null;
   public Query   query = null;
@@ -25,7 +27,7 @@ public class Tuple {
 
   HashSet equTuples = new HashSet(); // set of view tuples with the same tuple-core
   
-  Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();
+  public Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();
   
   double cost = 1;
 
@@ -75,6 +77,14 @@ public class Tuple {
     this.mapSubgoals = mapSubgoals;
   }
 
+  Tuple(String name, Vector args, Mapping phi, Mapping phi_str, HashMap mapSubgoals) {
+	    this.name = name;
+	    this.args = args;
+	    this.phi  = phi;
+	    this.phi_str = phi_str;
+	    this.mapSubgoals = mapSubgoals;
+	  }
+  
   public String getName() {
     return name;
   }
@@ -86,6 +96,10 @@ public class Tuple {
   public Mapping getMapping() {
     return phi;
   }
+  
+  public Mapping getMapping_str() {
+	    return phi_str;
+	  }
 
   public Query getQuery() {
     return query;
@@ -118,6 +132,23 @@ public class Tuple {
 
   public HashSet getCore() {
     return core;
+  }
+  
+  public HashSet get_relations()
+  {
+	  
+	  HashSet relations = new HashSet ();
+	  
+	  HashSet subgoals = getTargetSubgoals();
+	  
+	  for(Iterator iter = subgoals.iterator(); iter.hasNext();)
+	  {
+		  Subgoal subgoal = (Subgoal)iter.next();
+		  
+		  relations.add(subgoal.name);
+	  }
+	  
+	  return relations;
   }
 
   /**

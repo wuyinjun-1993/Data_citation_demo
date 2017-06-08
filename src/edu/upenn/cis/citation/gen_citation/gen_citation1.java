@@ -367,7 +367,7 @@ public class gen_citation1 {
 		
 		for(int k = 0; k<query_ids.size(); k++)
 		{
-			Query q = Query_operation.get_view(query_ids.get(k));
+			Query q = Query_operation.get_query(query_ids.get(k));
 			
 //			System.out.println(q);
 			
@@ -586,7 +586,7 @@ public class gen_citation1 {
 		
 		for(int k = 0; k<query_ids.size(); k++)
 		{
-			Query q = Query_operation.get_view(query_ids.get(k));
+			Query q = Query_operation.get_query(query_ids.get(k));
 			
 //			System.out.println(q);
 			

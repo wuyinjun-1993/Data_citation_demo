@@ -1005,9 +1005,9 @@ public class populate_db {
 			
 			Subgoal subgoal = (Subgoal)view.body.get(i);
 			
-			Vector<String> primary_keys = get_primary_key(subgoal.name, c, pst);
+			Vector<String> primary_keys = get_primary_key(view.subgoal_name_mapping.get(subgoal.name), c, pst);
 			
-			String query_base = "update " + subgoal.name + suffix + " set citation_view = "; 
+			String query_base = "update " + view.subgoal_name_mapping.get(subgoal.name) + suffix + " set citation_view = "; 
 						
 			String query1 = query_base;
 			
@@ -1062,15 +1062,15 @@ public class populate_db {
 				
 			}
 			
-			query1 += " from ( select * from " + subgoal.name + ") as f where citation_view is not null";
+			query1 += " from ( select * from " + view.subgoal_name_mapping.get(subgoal.name) + ") as f where citation_view is not null";
 			
-			query2 += " from ( select * from " + subgoal.name + ") as f where citation_view is null";
+			query2 += " from ( select * from " + view.subgoal_name_mapping.get(subgoal.name) + ") as f where citation_view is null";
 			
 			for(int k = 0; k<primary_keys.size(); k++)
 			{
-				query1 += " and f." + primary_keys.get(k) + " = " + subgoal.name + suffix + "." + primary_keys.get(k);
+				query1 += " and f." + primary_keys.get(k) + " = " + view.subgoal_name_mapping.get(subgoal.name) + suffix + "." + primary_keys.get(k);
 				
-				query2 += " and f." + primary_keys.get(k) + " = " + subgoal.name + suffix + "." + primary_keys.get(k);
+				query2 += " and f." + primary_keys.get(k) + " = " + view.subgoal_name_mapping.get(subgoal.name) + suffix + "." + primary_keys.get(k);
 			}
 			
 			

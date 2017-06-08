@@ -214,15 +214,15 @@ public class Util {
     public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException, InterruptedException {
     	Vector<Vector<String>> citation_strs = new Vector<Vector<String>>();
     	String datalog = "q(family_c_family_id, family_c_name):family_c()";
-		try {
-			System.out.println("[DEBUG] datalog: " + datalog);
-			Vector<Vector<citation_view_vector>> c_views = Tuple_reasoning2.tuple_reasoning(datalog, citation_strs);
-			// Vector<String> agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views);
-			// Vector<String> subset_agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views, ids);
-			// System.out.println("[!!!!!!] " + subset_agg_citations);
-		} catch (ClassNotFoundException | SQLException | IOException | InterruptedException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			System.out.println("[DEBUG] datalog: " + datalog);
+////			Vector<Vector<citation_view_vector>> c_views = Tuple_reasoning2.tuple_reasoning(datalog, citation_strs);
+//			// Vector<String> agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views);
+//			// Vector<String> subset_agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views, ids);
+//			// System.out.println("[!!!!!!] " + subset_agg_citations);
+//		} catch (ClassNotFoundException | SQLException | IOException | InterruptedException e) {
+//			e.printStackTrace();
+//		}
 		for (Vector<String> v : citation_strs) System.out.println(Math.max(v.get(0).length(), v.get(1).length()));
 	}
 

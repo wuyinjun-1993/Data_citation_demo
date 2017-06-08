@@ -24,6 +24,38 @@ import edu.upenn.cis.citation.Operation.op_not_equal;
 
 public class Gen_query {
 	
+	public static void main(String [] args) throws ClassNotFoundException, SQLException
+	{
+		Query view = view_operation.get_view_by_id("v4");
+		
+		HashMap<String, String> relation_mapping = new HashMap<String, String>(); 
+		
+		Vector<String[]> head_vars = new Vector<String[]>(); 
+		
+		Vector<String []> condition_str = new Vector<String []>();
+		
+		Vector<String[]> lambda_term_str = new Vector<String []> ();
+		
+		get_query_info(view, relation_mapping, head_vars, condition_str, lambda_term_str);
+		
+		Query view_2 = gen_query("v4'", relation_mapping, head_vars, condition_str, lambda_term_str);
+		
+		System.out.println(view);
+		
+		for(int i = 0; i<view.lambda_term.size(); i++)
+		{
+			System.out.println(view.lambda_term.get(i));
+		}
+		
+		System.out.println(view_2);
+		
+		for(int i = 0; i<view_2.lambda_term.size(); i++)
+		{
+			System.out.println(view_2.lambda_term.get(i));
+		}
+		
+	}
+	
 	static Vector<Conditions> gen_conditions(Vector<String []> condition_str)
 	{
 		
@@ -86,6 +118,31 @@ public class Gen_query {
 		return conditions;
 	}
 	
+	static void gen_conditions_str(Vector<Conditions> conditions, Vector<String []> conditions_strs)
+	{
+		
+		for(int i = 0; i<conditions.size(); i++)
+		{
+			
+			Conditions condition = conditions.get(i);
+			
+			String [] condition_strs = new String[5];
+			
+			condition_strs[2] = condition.op.toString();
+			
+			condition_strs[0] = condition.arg1.name;
+			
+			condition_strs[1] = condition.arg1.relation_name;
+			
+			condition_strs[3] = condition.arg2.name;
+			
+			condition_strs[4] = condition.arg2.relation_name;
+			
+			conditions_strs.add(condition_strs);
+		}
+				
+	}
+	
 	static Vector<Lambda_term> gen_lambda_terms(Vector<String []> lambda_term_str)
 	{
 		Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();
@@ -98,6 +155,21 @@ public class Gen_query {
 		}
 		
 		return lambda_terms;
+	}
+	
+	static void gen_lambda_terms_str(Vector<Lambda_term> lambda_terms, Vector<String []> lambda_terms_str)
+	{
+		
+		for(int i = 0; i<lambda_terms.size(); i++)
+		{
+			String [] lambda_term_str = new String [2];
+			
+			lambda_term_str[0] = lambda_terms.get(i).name.substring(lambda_terms.get(i).name.indexOf("_") + 1, lambda_terms.get(i).name.length());
+			
+			lambda_term_str[1] = lambda_terms.get(i).table_name;
+			
+			lambda_terms_str.add(lambda_term_str);
+		}
 	}
 	
 	static Vector<Subgoal> gen_subgoals(HashMap<String, String> relation_mapping)
@@ -137,7 +209,7 @@ public class Gen_query {
         
         for(int i = 0; i<head_vars.size(); i++)
         {
-        	Argument h_var = new Argument(head_vars.get(i)[1].trim() + "_" + head_vars.get(i)[0].trim(), head_vars.get(i)[1].trim());
+        	Argument h_var = new Argument(head_vars.get(i)[0].trim() + "_" + head_vars.get(i)[1].trim(), head_vars.get(i)[0].trim());
         	
         	head_args.add(h_var);
         }
@@ -159,6 +231,48 @@ public class Gen_query {
 		
 		
 	}
+	
+	
+	//each element in head_var array contains two elements (real_table_name and var_name), each element in condition array contains 5 elements (var_name1, relation_name1, operation_name, var_name2, relation_name2), each element in lambda_terms array contains 2 elements (var_name and relation name) 
 
+	
+	public static void get_query_info(Query query, HashMap<String, String> relation_mapping, Vector<String[]> head_vars, Vector<String []> condition_str, Vector<String[]> lambda_term_str)
+	{
+		
+		Set<String> key_set = query.subgoal_name_mapping.keySet();
+
+		for(Iterator key_set_iter = key_set.iterator(); key_set_iter.hasNext();)
+		{
+			String key = (String) key_set_iter.next();
+			
+			relation_mapping.put(key, query.subgoal_name_mapping.get(key));
+		}
+		
+		for(int i = 0; i<query.head.args.size(); i++)
+		{
+			
+			Argument arg = (Argument)query.head.args.get(i);
+			
+			String rel_name = arg.relation_name;
+			
+			String arg_name = arg.name.substring(arg.name.indexOf("_") + 1, arg.name.length());
+			
+			String [] rel_args = {rel_name, arg_name};
+			
+			head_vars.add(rel_args);
+		}
+		
+		gen_conditions_str(query.conditions, condition_str);
+		
+		gen_lambda_terms_str(query.lambda_term, lambda_term_str);
+        
+//        
+//		
+		
+		
+	}
+
+	
+	
 
 }

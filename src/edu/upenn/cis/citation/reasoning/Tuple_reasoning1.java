@@ -95,7 +95,7 @@ public class Tuple_reasoning1 {
 //		
 		Vector<Vector<String>> citation_strs = new Vector<Vector<String>>();
 		
-		Vector<Vector<citation_view_vector>> c_views = tuple_reasoning(q, citation_strs);
+		Vector<Vector<citation_view_vector>> c_views = Tuple_reasoning2_opt.tuple_reasoning(q, citation_strs);
 		
 		Vector<Vector<citation_view_vector>> c_views1 = Tuple_reasoning2.tuple_reasoning(q, citation_strs);
 		
@@ -184,23 +184,23 @@ public class Tuple_reasoning1 {
 		
 		Vector<Argument> args1 = view_operation.get_full_schema("family", "family", c, pst);
 		
-		Vector<Argument> args2 = view_operation.get_full_schema("family1", "family", c, pst);
+//		Vector<Argument> args2 = view_operation.get_full_schema("family1", "family", c, pst);
 		
 		Vector<Argument> args3 = view_operation.get_full_schema("introduction", "introduction", c, pst);
 		
 		subgoals.add(new Subgoal("family", args1));
 		
-		subgoals.add(new Subgoal("family1", args2));
+//		subgoals.add(new Subgoal("family1", args2));
 				
 		subgoals.add(new Subgoal("introduction", args3));
 		
 		Vector<Conditions> conditions = new Vector<Conditions>();
 		
-		conditions.add(new Conditions(new Argument("family_id", "family"), "family", new op_less_equal(), new Argument("5"), new String()));
+//		conditions.add(new Conditions(new Argument("family_id", "family"), "family", new op_less_equal(), new Argument("5"), new String()));
 //		
-		conditions.add(new Conditions(new Argument("family_id", "family1"), "family1", new op_less_equal(), new Argument("5"), new String()));
+//		conditions.add(new Conditions(new Argument("family_id", "family1"), "family1", new op_less_equal(), new Argument("5"), new String()));
 //		
-		conditions.add(new Conditions(new Argument("family_id", "introduction"), "introduction", new op_less_equal(), new Argument("5"), new String()));
+//		conditions.add(new Conditions(new Argument("family_id", "introduction"), "introduction", new op_less_equal(), new Argument("5"), new String()));
 		
 //		conditions.add(new Conditions(new Argument("in_gtip", "object"), "object", new op_equal(), new Argument("'true'"), new String()));
 		
@@ -208,7 +208,7 @@ public class Tuple_reasoning1 {
 		
 		subgoal_name_mapping.put("family", "family");
 		
-		subgoal_name_mapping.put("family1", "family");
+//		subgoal_name_mapping.put("family1", "family");
 				
 		subgoal_name_mapping.put("introduction", "introduction");
 		

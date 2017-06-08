@@ -575,12 +575,12 @@ public class CoreCover {
         HashSet tupleSubsets = UserLib.genSubsets(viewTuples, size);
 
     	
-    	if(curr_rewritings.size() == 0)
+//    	if(curr_rewritings.size() == 0)
     	{
     		gen_rewriting(tupleSubsets, size, covered_relations, query, rewritings, curr_rewritings);
     	}
-    	else
-    	{
+//    	else
+//    	{
     		
 //    		HashSet curr_rewritings_all = new HashSet();
 //    		
@@ -590,8 +590,8 @@ public class CoreCover {
 //    			curr_rewritings_all.addAll(curr_rewriting);
 //    			
 //    		}
-			gen_rewriting(gen_complementary_set(tupleSubsets, curr_rewritings), size, covered_relations, query, rewritings, curr_rewritings);
-    	}
+//			gen_rewriting(gen_complementary_set(tupleSubsets, curr_rewritings), size, covered_relations, query, rewritings, curr_rewritings);
+//    	}
 
 //      if (found) {
 //    	  rewritings.add(min_rewriting);
@@ -602,6 +602,82 @@ public class CoreCover {
 
     return rewritings;
   }
+  
+  public static HashSet coverQuerySubgoals(HashSet viewTuples, Query query, boolean opt) {
+	    HashSet rewritings = new HashSet();
+	    
+	    HashSet curr_rewritings = new HashSet();
+	    
+	    // considers all the subsets in the descending order
+	    //HashSet tupleSubsets = UserLib.genSubsets(viewTuples);
+	    //UserLib.myprintln("after UserLib.genSubsets()");
+
+	    sizeGMR = 0;
+	    numMR   = 0;
+	    numGMR  = 0;
+
+	    int upperBound = query.body.size();
+//	    if (upperBound >= query.getSubgoalNum()) // according to LMSS95
+//	      upperBound = query.getSubgoalNum();
+
+	    // if the union of the tuple-cores doesn't cover all query subgoals,
+	    // just return no rewriting
+	    HashSet covered_relations = get_CoverSubgoals(viewTuples, query);
+
+	    
+//	    if (!unionCoverSubgoals(viewTuples, query))
+//		return rewritings;
+
+	    // scans the subsets from the smallest one to the largest one
+	    boolean found = false;
+	    
+	    
+	    double min_cost = Double.MAX_VALUE;
+	    Rewriting min_rewriting = null;
+	    
+	    HashSet non_covering = new HashSet();
+	    
+	    for (int size = 1; (size <= upperBound); size ++) 
+	    {
+	      // considers subsets with the current size 
+	      //System.out.println("# of view tuples = " + viewTuples.size() +
+	      //" size = " + size);
+	    	
+	    	
+	        HashSet non_redundant_set = UserLib.genSubsets(viewTuples, size, rewritings, non_covering);
+	        
+	        non_covering = new HashSet();
+
+	    	
+//	    	if(curr_rewritings.size() == 0)
+	    	{
+	    		gen_rewriting(non_redundant_set, size, covered_relations, query, rewritings, curr_rewritings, non_covering);
+	    	}
+//	    	else
+//	    	{
+	    		
+//	    		HashSet curr_rewritings_all = new HashSet();
+//	    		
+//	    		for(Iterator iter = curr_rewritings.iterator();iter.hasNext();)
+//	    		{
+//	    			HashSet curr_rewriting = (HashSet) iter.next();
+//	    			curr_rewritings_all.addAll(curr_rewriting);
+//	    			
+//	    		}
+//				gen_rewriting(gen_complementary_set(tupleSubsets, curr_rewritings), size, covered_relations, query, rewritings, curr_rewritings);
+//	    	}
+
+//	      if (found) {
+//	    	  rewritings.add(min_rewriting);
+//		endTime = System.currentTimeMillis();
+//		timeAllGMR = endTime - startTime;
+//	      }
+	    }
+
+	    return rewritings;
+	  }
+
+  
   
   static HashSet gen_complementary_set(HashSet viewTuples, HashSet curr_rewriting)
   {
@@ -681,6 +757,59 @@ public class CoreCover {
 //	  }
 //
 //	  found = true;
+	}
+      }
+  }
+  
+  
+  static void gen_rewriting(HashSet tupleSubsets, int size, HashSet covered_relations, Query query, HashSet rewritings, HashSet curr_rewritings, HashSet non_covering)
+  {
+      //System.out.println("# of tupleSubsets = " + tupleSubsets.size());
+
+      
+      for (Iterator iter = tupleSubsets.iterator(); iter.hasNext();) 
+      {
+	// for this "i"^th around, we consider only subsets with size i 
+	HashSet tupleSubset = (HashSet) iter.next();
+	if (tupleSubset.size() != size) 
+	  UserLib.myerror("CoreCover.coverQuerySubgoals(), error!");
+	
+	
+	
+
+	if (unionCoverSubgoals(tupleSubset, covered_relations))  
+	{// found one
+	  
+//	  if(cost < min_cost)
+//	  {
+//		  min_rewriting = new Rewriting(tupleSubset, query);
+//		  min_cost = cost;
+//	  }
+	  
+	  if(!curr_rewritings.contains(tupleSubset))
+	  {
+		  rewritings.add(new Rewriting(tupleSubset, query));
+		  
+		  curr_rewritings.add(tupleSubset);
+		
+		  sizeGMR = size;
+		  numGMR ++;
+		  numMR ++;
+	  }
+	  /*System.out.println("\n tupleSubset " + tupleSubset +
+			     " query = " + query + "\n");*/
+	  
+	  // time when the 1st GMR is generated
+//	  if (!found) {
+//	    endTime = System.currentTimeMillis();
+//	    timeFirstGMR = endTime - startTime;
+//	  }
+//
+//	  found = true;
+	}
+	else
+	{
+		non_covering.add(tupleSubset);
 	}
       }
   }

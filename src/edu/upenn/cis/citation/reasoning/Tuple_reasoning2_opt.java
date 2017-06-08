@@ -36,7 +36,7 @@ import edu.upenn.cis.citation.gen_citation.gen_citation1;
 import edu.upenn.cis.citation.output.output2excel;
 import sun.util.resources.cldr.ur.CurrencyNames_ur;
 
-public class Tuple_reasoning2 {
+public class Tuple_reasoning2_opt {
 	
 	
 	static HashMap<String, Query> view_mapping = new HashMap<String, Query>();
@@ -109,13 +109,13 @@ public class Tuple_reasoning2 {
 		
 		Vector<Vector<String>> citation_strs = new Vector<Vector<String>>();
 		
-		Vector<Vector<citation_view_vector>> c_views = Tuple_reasoning2.tuple_reasoning(q, citation_strs);
+		Vector<Vector<citation_view_vector>> c_views = Tuple_reasoning2_opt.tuple_reasoning(q, citation_strs);
 		
-		Vector<String> agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views);
+		Vector<String> agg_citations = Tuple_reasoning2_opt.tuple_gen_agg_citations(c_views);
 		
 		Vector<Integer> ids = new Vector<Integer>();
 		
-		Vector<String> subset_agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views, ids);
+		Vector<String> subset_agg_citations = Tuple_reasoning2_opt.tuple_gen_agg_citations(c_views, ids);
 
 	}
 	
@@ -1286,7 +1286,7 @@ public class Tuple_reasoning2 {
 	
 	static Vector<citation_view_vector> reasoning_single_tuple(HashSet views, Query query, Vector<Integer> start_pos, ResultSet rs) throws ClassNotFoundException, SQLException
 	{
-		HashSet<Rewriting> rewritings = CoreCover.coverQuerySubgoals(views, query);
+		HashSet<Rewriting> rewritings = CoreCover.coverQuerySubgoals(views, query, true);
 		
 		Vector<citation_view_vector> c_view_vec = new Vector<citation_view_vector>();
 		
@@ -1650,6 +1650,8 @@ public class Tuple_reasoning2 {
 			
 			while(rs.next())
 			{
+
+//				rid ++;
 				
 //				System.out.println(rid);
 				

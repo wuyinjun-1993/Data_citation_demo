@@ -1,7 +1,7 @@
 package edu.upenn.cis.citation.ui;
 
 import edu.upenn.cis.citation.Corecover.Query;
-import edu.upenn.cis.citation.Pre_processing.insert_new_view;
+//import edu.upenn.cis.citation.Pre_processing.insert_new_view;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.dao.Database;
 import edu.upenn.cis.citation.reasoning.Tuple_reasoning2;
@@ -680,11 +680,11 @@ public class QBEApp extends Application {
         btDataViewSave.setFont(Font.font("Courier New", FontWeight.BOLD, 12));
 		btDataViewSave.setOnAction(e -> {
 			Query query = null;
-			try {
-				insert_new_view.add(query, "");
-			} catch (ClassNotFoundException | SQLException e1) {
-				e1.printStackTrace();
-			}
+//			try {
+////				insert_new_view.add(query, "");
+//			} catch (ClassNotFoundException | SQLException e1) {
+//				e1.printStackTrace();
+//			}
 		});
 		HBox addSaveHBox = new HBox();
 		addSaveHBox.getChildren().addAll(btDataView, btDataViewSave);
@@ -1107,14 +1107,14 @@ public class QBEApp extends Application {
 					}
 				};
 				ids.clear();
-				try {
-					System.out.println("[DEBUG] datalog: " + datalog);
-					  c_views = Tuple_reasoning2.tuple_reasoning(datalog, citation_strs);
-					  // Vector<String> agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views);
-					  // Vector<String> subset_agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views, ids);
-				} catch (ClassNotFoundException | SQLException | IOException | InterruptedException e) {
-					e.printStackTrace();
-				}
+//				try {
+//					System.out.println("[DEBUG] datalog: " + datalog);
+////					  c_views = Tuple_reasoning2.tuple_reasoning(datalog, citation_strs);
+//					  // Vector<String> agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views);
+//					  // Vector<String> subset_agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views, ids);
+//				} catch (ClassNotFoundException | SQLException | IOException | InterruptedException e) {
+//					e.printStackTrace();
+//				}
 				for (int i = 0; i < dataViewList.size(); i++) {
 					ObservableList<String> lambdaData = FXCollections.observableArrayList(citation_strs.get(i));
 					((ObservableList) dataViewList.get(i)).add(lambdaData);

@@ -75,10 +75,12 @@ public class view_operation {
 //		Vector<Argument> args1 = view_operation.get_full_schema("family", "family", c, pst);
 //		
 //		Vector<Argument> args2 = view_operation.get_full_schema("family1", "family", c, pst);
+		
+		Vector<Argument> args1 = new Vector<Argument>();
 //		
 		Vector<Argument> args3 = new Vector<Argument> ();//view_operation.get_full_schema("introduction", "introduction", c, pst);
 		
-//		subgoals.add(new Subgoal("family", args1));
+//		subgoals.add(new Subgoal("introduction1", args1));
 		
 //		subgoals.add(new Subgoal("family1", args2));
 				
@@ -97,12 +99,18 @@ public class view_operation {
 		HashMap<String, String> subgoal_name_mapping = new HashMap<String, String>();
 				
 		subgoal_name_mapping.put("introduction", "introduction");
+		
+//		subgoal_name_mapping.put("introduction1", "introduction");
 
 		Vector<String []> head_vars = new Vector<String []>();
 		
 		String [] head_v = {"family_id", "introduction"};
 		
+//		String [] head_v1 = {"family_id", "introduction1"};
+		
 		head_vars.add(head_v);
+		
+//		head_vars.add(head_v1);
 		
 		Vector<String []> condition_str = new Vector<String []>();
 		

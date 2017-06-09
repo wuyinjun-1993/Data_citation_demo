@@ -1389,11 +1389,15 @@ public class Tuple_reasoning2_opt {
 					
 					if((c_combination.index_vec.containsAll(curr_combination.index_vec) && c_combination.index_vec.size() > curr_combination.index_vec.size()) || (c_combination.index_vec.equals(curr_combination.index_vec)))
 					{
-						c_combinations.remove(i);
 						
-						i--;
-						
-						break;
+						if(c_combination.table_names.equals(curr_combination.table_names))
+						{
+							c_combinations.remove(i);
+							
+							i--;
+							
+							break;
+						}
 					}
 				}
 				
@@ -1519,7 +1523,7 @@ public class Tuple_reasoning2_opt {
 	{
 		pst = c.prepareStatement(sql);
 		
-		System.out.println(sql);
+//		System.out.println(sql);
 		
 		ResultSet rs = pst.executeQuery();
 		
@@ -1609,7 +1613,7 @@ public class Tuple_reasoning2_opt {
 
 					old_value = curr_str;
 					
-					output_vec_com(c_vec);
+//					output_vec_com(c_vec);
 					
 					c_views.add(c_vec);
 					
@@ -1687,7 +1691,7 @@ public class Tuple_reasoning2_opt {
 					
 					Vector<citation_view_vector> curr_c_views = reasoning_single_tuple(curr_views, query, start_pos, rs);
 											
-					output_vec_com(curr_c_views);
+//					output_vec_com(curr_c_views);
 					
 					c_views.add(curr_c_views);
 					

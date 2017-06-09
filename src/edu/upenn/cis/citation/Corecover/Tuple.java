@@ -176,23 +176,30 @@ public class Tuple {
    * @return <code>true(false)</code> if this item is the same(not same) as 
    * the argument.
    */
-  public boolean equals(Object tuple){
-    Tuple t = (Tuple) tuple;
-
-    // same name
-    if (!this.getName().equals(t.getName())) return false;
-
-    Vector tArgs = t.getArgs();
-    if (args.size() != tArgs.size()) return false;
-
-    for (int i = 0; i < args.size(); i ++) {
-	Argument arg  = (Argument) args.elementAt(i);
-	Argument tArg = (Argument) tArgs.elementAt(i);
-	if (!arg.equals(tArg)) return false;
-    }
-
-    return true;
-  }
+//  public boolean equals(Object tuple){
+//    Tuple t = (Tuple) tuple;
+//
+//    // same name
+//    if (!this.getName().equals(t.getName())) return false;
+//
+//    Vector tArgs = t.getArgs();
+//    if (args.size() != tArgs.size()) return false;
+//
+//    for (int i = 0; i < args.size(); i ++) {
+//	Argument arg  = (Argument) args.elementAt(i);
+//	Argument tArg = (Argument) tArgs.elementAt(i);
+//	if (!arg.equals(tArg)) return false;
+//    }
+//    
+//    String phi_str1 = phi.toString();
+//    
+//    String phi_str2 = t.phi.toString();
+//    
+//    if(!phi_str1.equals(phi_str2))
+//    	return false;
+//
+//    return true;
+//  }
 
   /**
    *

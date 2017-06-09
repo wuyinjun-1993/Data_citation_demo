@@ -28,7 +28,6 @@ import edu.upenn.cis.citation.Operation.op_not_equal;
 import edu.upenn.cis.citation.citation_view.*;
 import edu.upenn.cis.citation.datalog.Parse_datalog;
 import edu.upenn.cis.citation.datalog.Query_converter;
-import schema_reasoning.Gen_citation1;
 
 public class populate_db {
 	
@@ -36,8 +35,6 @@ public class populate_db {
 	//psql --host=citedb.cx9xmwhyomib.us-east-1.rds.amazonaws.com --port=5432 --username=postgres --dbname=postgres
 	
 	public static String separator = "|";
-	
-	public static String db_name = "iuphar_org";
 
 	public static String[] base_relations = {"gpcr_c","object_c","interaction_c","ligand_c","pathophysiology_c","interaction_affinity_refs_c","gtip_process_c","process_assoc_c","disease_c", "family_c", "introduction_c"};
 
@@ -522,60 +519,6 @@ public class populate_db {
 		return subgoals;
 	}
 	
-	public static void add_column(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
-	{
-//		HashSet<String> table_names = get_table_name(Gen_citation1.get_views_schema());
-	      ResultSet rs = null;
-
-//		for(Iterator<String> iter = table_names.iterator();iter.hasNext();)
-	      
-	    for(int k = 0; k<base_relations.length; k++)
-		{
-//			String table_name = iter.next();
-	    	String table_name = base_relations[k];
-	    	
-	    	String [] col_name = {"citation_view"};
-	    	
-	    	for(int p = 0; p<col_name.length; p++)
-	    	{
-	    		String test_col = "SELECT column_name FROM information_schema.columns WHERE table_name='" + table_name + "' and column_name='"+ col_name[p]+ "'";
-			    pst = c.prepareStatement(test_col);
-			    rs = pst.executeQuery();
-			    
-			    if(rs.next())
-			    {
-			    	if(rs.getRow()!=0)
-			    	{
-			    		String remove_sql = "alter table "+ table_name +" drop column " + col_name[p];
-			    		
-			    		pst = c.prepareStatement(remove_sql);
-			    		
-			    		pst.execute();
-			    	}
-			    	String add_col = "ALTER TABLE "+ table_name +" ADD COLUMN "+ col_name[p] +" text";
-		    	    pst = c.prepareStatement(add_col);
-		    	    pst.execute();
-			    }
-			    else
-			    {
-			    	String add_col = "ALTER TABLE "+ table_name +" ADD COLUMN "+ col_name[p]+ " text";
-		    	    pst = c.prepareStatement(add_col);
-		    	    pst.execute();
-			    }
-	    	}
-	    	
-//	    	initialize(table_name, c, pst);
-			
-		}
-	    
-	 	Vector<Query> views = Gen_citation1.get_views_schema();
-	 	
-	 	for(int i = 0; i<views.size(); i++)
-	 	{
-	 		add_column_view(views.get(i), c, pst);
-	 	}
-	 	
-	}
 	
 	static void initialize(String table_name, Connection c, PreparedStatement pst) throws SQLException
 	{

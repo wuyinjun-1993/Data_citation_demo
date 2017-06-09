@@ -195,6 +195,38 @@ public class Gen_query {
 	}
 	
 	
+	static Vector<Subgoal> gen_subgoals_full(HashMap<String, String> relation_mapping) throws SQLException, ClassNotFoundException
+	{
+		
+		Class.forName("org.postgresql.Driver");
+        Connection c = DriverManager
+           .getConnection(populate_db.db_url,
+       	        populate_db.usr_name,populate_db.passwd);
+		
+        PreparedStatement pst = null;
+		
+		Set<String> keys = relation_mapping.keySet();
+		
+		Vector<Subgoal> subgoals = new Vector<Subgoal>();
+		
+		for(Iterator iter = keys.iterator(); iter.hasNext();)
+		{
+			String relation_name = (String)iter.next();
+			
+			String origin_name = relation_mapping.get(relation_name);
+			
+			Vector<Argument> args = view_operation.get_full_schema(relation_name, origin_name, c, pst);
+			
+			Subgoal subgoal = new Subgoal(relation_name, args);
+			
+			subgoals.add(subgoal);
+		}
+		
+		c.close();
+		
+		return subgoals;
+	}
+	
 	//each element in head_var array contains two elements (real_table_name and var_name), each element in condition array contains 5 elements (var_name1, relation_name1, operation_name, var_name2, relation_name2), each element in lambda_terms array contains 2 elements (var_name and relation name) 
 	public static Query gen_query(String name, HashMap<String, String> relation_mapping, Vector<String[]> head_vars, Vector<String []> condition_str, Vector<String[]> lambda_term_str) throws SQLException, ClassNotFoundException
 	{
@@ -209,7 +241,7 @@ public class Gen_query {
         
         for(int i = 0; i<head_vars.size(); i++)
         {
-        	Argument h_var = new Argument(head_vars.get(i)[0].trim() + "_" + head_vars.get(i)[1].trim(), head_vars.get(i)[0].trim());
+        	Argument h_var = new Argument(head_vars.get(i)[1].trim() + "_" + head_vars.get(i)[0].trim(), head_vars.get(i)[1].trim());
         	
         	head_args.add(h_var);
         }
@@ -221,6 +253,42 @@ public class Gen_query {
         Vector<Lambda_term> lambda_terms = gen_lambda_terms(lambda_term_str);
         
         Vector<Subgoal> subgoals = gen_subgoals(relation_mapping);
+        
+        Query q = new Query(name, head_subgoal, subgoals, lambda_terms, conditions, relation_mapping);
+        
+        return q;
+        
+//        
+//		
+		
+		
+	}
+	
+	public static Query gen_query_full(String name, HashMap<String, String> relation_mapping, Vector<String[]> head_vars, Vector<String []> condition_str, Vector<String[]> lambda_term_str) throws SQLException, ClassNotFoundException
+	{
+		Class.forName("org.postgresql.Driver");
+        Connection c = DriverManager
+           .getConnection(populate_db.db_url,
+       	        populate_db.usr_name,populate_db.passwd);
+		
+        PreparedStatement pst = null;
+        
+        Vector<Argument> head_args = new Vector<Argument>();
+        
+        for(int i = 0; i<head_vars.size(); i++)
+        {
+        	Argument h_var = new Argument(head_vars.get(i)[1].trim() + "_" + head_vars.get(i)[0].trim(), head_vars.get(i)[1].trim());
+        	
+        	head_args.add(h_var);
+        }
+        
+        Subgoal head_subgoal = new Subgoal(name, head_args);
+        
+        Vector<Conditions> conditions = gen_conditions(condition_str);
+        
+        Vector<Lambda_term> lambda_terms = gen_lambda_terms(lambda_term_str);
+        
+        Vector<Subgoal> subgoals = gen_subgoals_full(relation_mapping);
         
         Query q = new Query(name, head_subgoal, subgoals, lambda_terms, conditions, relation_mapping);
         
@@ -257,7 +325,7 @@ public class Gen_query {
 			
 			String arg_name = arg.name.substring(arg.name.indexOf("_") + 1, arg.name.length());
 			
-			String [] rel_args = {rel_name, arg_name};
+			String [] rel_args = {arg_name, rel_name};
 			
 			head_vars.add(rel_args);
 		}

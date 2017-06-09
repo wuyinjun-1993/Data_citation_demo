@@ -33,6 +33,23 @@ public class citation_view_vector {
 		
 	}
 	
+	public static void main(String [] args)
+	{
+		HashSet<String> h1 = new HashSet<String>();
+		
+		HashSet<String> h2 = new HashSet<String>();
+		
+		h1.add("123");
+		
+		h1.add("456");
+		
+		h2.add("123");
+		
+		System.out.println(h1.equals(h2));
+		
+		
+	}
+	
 	public citation_view_vector(Vector<citation_view> vec){
 		
 		
@@ -241,13 +258,7 @@ public class citation_view_vector {
 		
 		return str;
 	}
-	
-	public static void main(String [] args)
-	{
-		
-		
-		
-	}
+
 	
 	public citation_view_vector clone()
 	{

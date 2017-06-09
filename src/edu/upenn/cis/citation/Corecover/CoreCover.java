@@ -109,7 +109,7 @@ public class CoreCover {
   * given a canonical db and a set of views, computes the view tuples
   */
   public static HashSet computeViewTuples(Database canDb, Vector views) {
-    HashSet viewTuples = new HashSet();
+	HashSet viewTuples = new HashSet();
     for (int i = 0; i < views.size(); i ++) {
       Query view = (Query) views.elementAt(i);
 
@@ -536,9 +536,7 @@ public class CoreCover {
 
   public static HashSet coverQuerySubgoals(HashSet viewTuples, Query query) {
     HashSet rewritings = new HashSet();
-    
-    HashSet curr_rewritings = new HashSet();
-    
+        
     // considers all the subsets in the descending order
     //HashSet tupleSubsets = UserLib.genSubsets(viewTuples);
     //UserLib.myprintln("after UserLib.genSubsets()");
@@ -576,9 +574,7 @@ public class CoreCover {
 
     	
 //    	if(curr_rewritings.size() == 0)
-    	{
-    		gen_rewriting(tupleSubsets, size, covered_relations, query, rewritings, curr_rewritings);
-    	}
+    		gen_rewriting(tupleSubsets, size, covered_relations, query, rewritings);
 //    	else
 //    	{
     		
@@ -605,9 +601,7 @@ public class CoreCover {
   
   public static HashSet coverQuerySubgoals(HashSet viewTuples, Query query, boolean opt) {
 	    HashSet rewritings = new HashSet();
-	    
-	    HashSet curr_rewritings = new HashSet();
-	    
+	    	    
 	    // considers all the subsets in the descending order
 	    //HashSet tupleSubsets = UserLib.genSubsets(viewTuples);
 	    //UserLib.myprintln("after UserLib.genSubsets()");
@@ -646,13 +640,16 @@ public class CoreCover {
 	    	
 	        HashSet non_redundant_set = UserLib.genSubsets(viewTuples, size, rewritings, non_covering);
 	        
-	        non_covering = new HashSet();
+	        non_covering.clear();
 
 	    	
 //	    	if(curr_rewritings.size() == 0)
-	    	{
-	    		gen_rewriting(non_redundant_set, size, covered_relations, query, rewritings, curr_rewritings, non_covering);
-	    	}
+//	    	{
+	    		gen_rewriting(non_redundant_set, size, covered_relations, query, rewritings, non_covering);
+	    		
+	    		if(non_covering.isEmpty())
+	    			break;
+//	    	}
 //	    	else
 //	    	{
 	    		
@@ -713,7 +710,7 @@ public class CoreCover {
 	  return rs;
   }
   
-  static void gen_rewriting(HashSet tupleSubsets, int size, HashSet covered_relations, Query query, HashSet rewritings, HashSet curr_rewritings)
+  static void gen_rewriting(HashSet tupleSubsets, int size, HashSet covered_relations, Query query, HashSet rewritings)
   {
       //System.out.println("# of tupleSubsets = " + tupleSubsets.size());
 
@@ -737,15 +734,15 @@ public class CoreCover {
 //		  min_cost = cost;
 //	  }
 	  
-	  if(!curr_rewritings.contains(tupleSubset))
+//	  if(!curr_rewritings.contains(tupleSubset))
 	  {
 		  rewritings.add(new Rewriting(tupleSubset, query));
 		  
-		  curr_rewritings.add(tupleSubset);
-		
-		  sizeGMR = size;
-		  numGMR ++;
-		  numMR ++;
+//		  curr_rewritings.add(tupleSubset);
+//		
+//		  sizeGMR = size;
+//		  numGMR ++;
+//		  numMR ++;
 	  }
 	  /*System.out.println("\n tupleSubset " + tupleSubset +
 			     " query = " + query + "\n");*/
@@ -762,7 +759,7 @@ public class CoreCover {
   }
   
   
-  static void gen_rewriting(HashSet tupleSubsets, int size, HashSet covered_relations, Query query, HashSet rewritings, HashSet curr_rewritings, HashSet non_covering)
+  static void gen_rewriting(HashSet tupleSubsets, int size, HashSet covered_relations, Query query, HashSet rewritings, HashSet non_covering)
   {
       //System.out.println("# of tupleSubsets = " + tupleSubsets.size());
 
@@ -786,16 +783,18 @@ public class CoreCover {
 //		  min_cost = cost;
 //	  }
 	  
-	  if(!curr_rewritings.contains(tupleSubset))
-	  {
-		  rewritings.add(new Rewriting(tupleSubset, query));
-		  
-		  curr_rewritings.add(tupleSubset);
+		rewritings.add(new Rewriting(tupleSubset, query));
 		
-		  sizeGMR = size;
-		  numGMR ++;
-		  numMR ++;
-	  }
+//	  if(!curr_rewritings.contains(tupleSubset))
+//	  {
+//		  
+//		  
+//		  curr_rewritings.add(tupleSubset);
+//		
+//		  sizeGMR = size;
+//		  numGMR ++;
+//		  numMR ++;
+//	  }
 	  /*System.out.println("\n tupleSubset " + tupleSubset +
 			     " query = " + query + "\n");*/
 	  

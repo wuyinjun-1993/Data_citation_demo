@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.util.Vector;
 
 import edu.upenn.cis.citation.Corecover.Query;
-import schema_reasoning.Gen_citation1;
 
 public class populate_web_view_vec {
 	

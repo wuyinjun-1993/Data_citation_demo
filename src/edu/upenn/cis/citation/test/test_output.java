@@ -27,7 +27,7 @@ public class test_output {
 		
 		//use the tuple level reasoning algorithm to generate the citations, the citations for each tuple will be output to a excel file. The name of the excel file will be specified by the variable file_name. The default file name will be tuple_level.xlsx, which is located in the project directory.
 		
-		Vector<Vector<citation_view_vector>> c_views = Tuple_reasoning1.tuple_reasoning(query, citation_strs, head_vals, file_name);
+//		Vector<Vector<citation_view_vector>> c_views = Tuple_reasoning1.tuple_reasoning(query, citation_strs, head_vals, file_name);
 		
 		
 		

@@ -28,5 +28,10 @@ public class op_less_equal extends Operation{
 		// TODO Auto-generated method stub
 		return new op_greater();
 	}
+	@Override
+	public int hashCode() {
+		// TODO Auto-generated method stub
+		return this.op.hashCode();
+	}
 
 }

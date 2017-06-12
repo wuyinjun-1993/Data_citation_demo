@@ -28,5 +28,11 @@ public class op_not_equal extends Operation{
 		// TODO Auto-generated method stub
 		return new op_equal();
 	}
+	
+	@Override
+	public int hashCode() {
+		// TODO Auto-generated method stub
+		return this.op.hashCode();
+	}
 
 }

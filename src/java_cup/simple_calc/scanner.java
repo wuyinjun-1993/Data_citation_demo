@@ -60,4 +60,4 @@ public class scanner implements java_cup.runtime.Scanner {
 	    break;
 	  }
     }
-};
+}

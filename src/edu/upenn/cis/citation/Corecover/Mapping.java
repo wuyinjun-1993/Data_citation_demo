@@ -32,7 +32,7 @@ public class Mapping {
   public Object clone() {
     HashMap newMap = new HashMap();
 
-    Set entrySet = (Set) map.entrySet();
+    Set entrySet = map.entrySet();
     for (Iterator iter = entrySet.iterator(); iter.hasNext();) {
       Map.Entry mapEntry = (Map.Entry) iter.next();
       Argument srcArg = (Argument) mapEntry.getKey();
@@ -49,7 +49,7 @@ public class Mapping {
   public Vector getSrcArgs() {
     Vector srcArgs = new Vector();
 
-    Set entrySet = (Set) map.entrySet();
+    Set entrySet = map.entrySet();
     for (Iterator iter = entrySet.iterator(); iter.hasNext();) {
       Map.Entry mapEntry = (Map.Entry) iter.next();
       Argument srcArg = (Argument) mapEntry.getKey();
@@ -65,7 +65,7 @@ public class Mapping {
   public Vector getDstArgs() {
     Vector dstArgs = new Vector();
 
-    Set entrySet = (Set) map.entrySet();
+    Set entrySet = map.entrySet();
     for (Iterator iter = entrySet.iterator(); iter.hasNext();) {
       Map.Entry mapEntry = (Map.Entry) iter.next();
       Argument dstArg = (Argument) mapEntry.getValue();
@@ -204,7 +204,7 @@ public class Mapping {
   public Mapping rename(Map renameMap) {
     // changes the mapping
     Map    newMap = new HashMap();
-    Set entrySet  = (Set) map.entrySet();
+    Set entrySet  = map.entrySet();
     for (Iterator iter = entrySet.iterator(); iter.hasNext();) {
       Map.Entry mapEntry = (Map.Entry) iter.next();
       Argument srcArg = (Argument) mapEntry.getKey();
@@ -239,7 +239,7 @@ public class Mapping {
   public String toString() {
     StringBuffer result = new StringBuffer();
 
-    Set entrySet = (Set) map.entrySet();
+    Set entrySet = map.entrySet();
     for (Iterator iter = entrySet.iterator(); iter.hasNext();) {
       Map.Entry mapEntry = (Map.Entry) iter.next();
       Argument srcArg = (Argument) mapEntry.getKey();

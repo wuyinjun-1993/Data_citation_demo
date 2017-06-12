@@ -194,10 +194,7 @@ public class Gen_citation1 {
 				break;
 		}
 
-		if(i < c1.size())
-			return true;
-		else
-			return false;
+		return i < c1.size();
 	}
 
 	public static String get_index(Vector<citation_view> c_combination)

@@ -455,7 +455,7 @@ public class UserLib {
     System.out.println("vector = " + v);
     
     // tests genSubsets
-    HashSet subsets = (HashSet) genSubsets(v);
+    HashSet subsets = genSubsets(v);
     System.out.println("Subsets are:" + subsets);
 
     // tests genPartitions

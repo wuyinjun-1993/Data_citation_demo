@@ -1,41 +1,22 @@
 package edu.upenn.cis.citation.reasoning;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.Vector;
-import static org.junit.Assert.*;
-
-
 import edu.upenn.cis.citation.Corecover.*;
-import edu.upenn.cis.citation.Operation.Conditions;
-import edu.upenn.cis.citation.Operation.Operation;
-import edu.upenn.cis.citation.Operation.op_equal;
-import edu.upenn.cis.citation.Operation.op_greater;
-import edu.upenn.cis.citation.Operation.op_greater_equal;
-import edu.upenn.cis.citation.Operation.op_less;
-import edu.upenn.cis.citation.Operation.op_less_equal;
-import edu.upenn.cis.citation.Operation.op_not_equal;
+import edu.upenn.cis.citation.Operation.*;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.Pre_processing.view_operation;
 import edu.upenn.cis.citation.aggregation.Aggregation1;
-import edu.upenn.cis.citation.citation_view.*;
+import edu.upenn.cis.citation.citation_view.citation_view;
+import edu.upenn.cis.citation.citation_view.citation_view_parametered;
+import edu.upenn.cis.citation.citation_view.citation_view_unparametered;
+import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.datalog.Parse_datalog;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.gen_citation.gen_citation1;
-import edu.upenn.cis.citation.output.output2excel;
-import sun.util.resources.cldr.ur.CurrencyNames_ur;
+
+import java.io.IOException;
+import java.sql.*;
+import java.util.*;
+
+import static org.junit.Assert.*;
 
 public class Tuple_reasoning1 {
 	

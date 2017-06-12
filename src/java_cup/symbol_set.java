@@ -195,7 +195,7 @@ public class symbol_set {
 
       /* hash together codes from at most first 5 elements */
       for (e = all(), cnt=0 ; e.hasMoreElements() && cnt<5; cnt++)
-	result ^= ((symbol)e.nextElement()).hashCode();
+	result ^= e.nextElement().hashCode();
 
       return result;
     }

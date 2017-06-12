@@ -88,7 +88,7 @@ class MiniCon {
     UserLib.myprintln("calling formMCDs(), view = " + view);
     HashSet mcds = new HashSet();
 
-    Vector querySubgoals = (Vector) query.getBody();
+    Vector querySubgoals = query.getBody();
 
     // generates all subsets of the query subgoals except the given one
     HashSet querySubsets = UserLib.genSubsets(querySubgoals);
@@ -190,7 +190,7 @@ class MiniCon {
     }
 
     // clones the view's body
-    Vector viewSubgoals = (Vector) view.getBody();
+    Vector viewSubgoals = view.getBody();
     // generates all subsets of the view subgoals except the given one
     HashSet viewSubsets = UserLib.genSubsets(viewSubgoals);
     //System.out.println("viewSubsets = " + viewSubsets);
@@ -378,7 +378,7 @@ class MiniCon {
 		       "view = " + view);*/
 
     Map map = phi.getMap();
-    Set entrySet = (Set) map.entrySet();
+    Set entrySet = map.entrySet();
     for (Iterator iter = entrySet.iterator(); iter.hasNext();) {
       Map.Entry mapEntry = (Map.Entry) iter.next();
       Argument  queryArg = (Argument) mapEntry.getKey();
@@ -495,7 +495,7 @@ class MiniCon {
     // in the case of X1->Y1, Y1->Y2, we need to propogate the mappings to
     // the tail
     Mapping pec = new Mapping();
-    Set keySet = (Set) ec.getMap().keySet();
+    Set keySet = ec.getMap().keySet();
     for (Iterator iter = keySet.iterator(); iter.hasNext();) {
       Argument headArg = (Argument) iter.next();
       Argument tailArg = ec.getTail(headArg);  // finds the tail for this srcArg

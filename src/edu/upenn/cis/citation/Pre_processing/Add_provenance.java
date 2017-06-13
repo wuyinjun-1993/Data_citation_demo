@@ -14,29 +14,11 @@ import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.datalog.Parse_datalog;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.reasoning.*;
-import schema_reasoning.Gen_citation1;
 
 public class Add_provenance {
 	
 	public static void main(String[] args) throws ClassNotFoundException, SQLException
 	{
-		add_provenance_table();
-		
-		add_provenance_views();
-	}
-	
-	public static void add_provenance_views() throws ClassNotFoundException, SQLException
-	{
-		Vector<Query> views =  Gen_citation1.get_views_schema();
-		
-		for(int i = 0; i<views.size(); i++)
-		{
-			add_column(views.get(i).name + "_table");
-			
-			String query = Query_converter.datalog2sql_provenance(views.get(i), false);
-			
-			add_provenance_view(views.get(i), query);
-		}
 		
 	}
 	
@@ -95,27 +77,7 @@ public class Add_provenance {
 	    }
 	}
 	
-	public static void add_provenance_table() throws ClassNotFoundException, SQLException
-	{
-		HashSet<String> table_names = populate_db.get_table_name(Gen_citation1.get_views_schema());
-		
-		int label = 0;
-		
-		for(Iterator iter = table_names.iterator();iter.hasNext();)
-		{
-			String str = (String) iter.next();
-			
-			add_column(str);
-			
-			Vector<String> col_names = Parse_datalog.get_columns(str);
-			
-			label = add_provenance_table(str, label, col_names);
-			
-		}
-		
-		
-		
-	}
+	
 	
 	
 	public static int add_provenance_table(String table_name, int label, Vector<String> col_names) throws ClassNotFoundException, SQLException

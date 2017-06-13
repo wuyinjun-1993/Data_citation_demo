@@ -109,6 +109,8 @@ public class Tuple_reasoning2 {
 		
 		Vector<Vector<String>> citation_strs = new Vector<Vector<String>>();
 		
+		Vector<Vector<String>> head_vals = new Vector<Vector<String>>();
+		
 		Vector<Vector<citation_view_vector>> c_views = Tuple_reasoning2.tuple_reasoning(q, citation_strs);
 		
 		Vector<String> agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views);
@@ -132,6 +134,8 @@ public class Tuple_reasoning2 {
 		
 		head_args.add(new Argument("family_type", "family"));
 		
+		head_args.add(new Argument("introduction_family_id", "introduction"));
+				
 		Subgoal head = new Subgoal("q", head_args);
 		
 		Vector<Subgoal> subgoals = new Vector<Subgoal>();
@@ -142,11 +146,15 @@ public class Tuple_reasoning2 {
 		
 		Vector<Argument> args3 = view_operation.get_full_schema("introduction", "introduction", c, pst);
 		
+//		Vector<Argument> args4 = view_operation.get_full_schema("introduction1", "introduction", c, pst);
+		
 		subgoals.add(new Subgoal("family", args1));
 		
 		subgoals.add(new Subgoal("family1", args2));
 				
 		subgoals.add(new Subgoal("introduction", args3));
+		
+//		subgoals.add(new Subgoal("introduction1", args4));
 		
 		Vector<Conditions> conditions = new Vector<Conditions>();
 		
@@ -165,6 +173,8 @@ public class Tuple_reasoning2 {
 		subgoal_name_mapping.put("family1", "family");
 				
 		subgoal_name_mapping.put("introduction", "introduction");
+		
+//		subgoal_name_mapping.put("introduction1", "introduction");
 		
 		Query q = new Query("q", head, subgoals, new Vector<Lambda_term>(), conditions, subgoal_name_mapping);
 		
@@ -1370,6 +1380,12 @@ public class Tuple_reasoning2 {
 			
 			citation_view_vector c_combination = c_combinations.get(i);
 			
+			if(c_combination.toString().equals("v6(2)*v2*v10(1)*v10(1)"))
+			{
+				int y= 0;
+				y++;
+			}
+			
 			for(int j = 0; j<c_combinations.size(); j++)
 			{
 //				String string = (String) iterator.next();
@@ -1381,11 +1397,14 @@ public class Tuple_reasoning2 {
 					
 					if((c_combination.index_vec.containsAll(curr_combination.index_vec) && c_combination.index_vec.size() > curr_combination.index_vec.size()) || (c_combination.index_vec.equals(curr_combination.index_vec)))
 					{
-						c_combinations.remove(i);
-						
-						i--;
-						
-						break;
+						if(c_combination.table_names.equals(curr_combination.table_names))
+						{
+							c_combinations.remove(i);
+							
+							i--;
+							
+							break;
+						}
 					}
 				}
 				
@@ -1511,6 +1530,8 @@ public class Tuple_reasoning2 {
 	{
 		pst = c.prepareStatement(sql);
 		
+//		System.out.println(sql);
+		
 		ResultSet rs = pst.executeQuery();
 		
 		ResultSetMetaData r = rs.getMetaData();
@@ -1599,7 +1620,7 @@ public class Tuple_reasoning2 {
 
 					old_value = curr_str;
 					
-					output_vec_com(c_vec);
+//					output_vec_com(c_vec);
 					
 					c_views.add(c_vec);
 					
@@ -1640,10 +1661,8 @@ public class Tuple_reasoning2 {
 			
 			while(rs.next())
 			{
-
-				rid ++;
 				
-				System.out.println(rid);
+//				System.out.println(rid);
 				
 				String curr_str = new String();
 				
@@ -1677,7 +1696,7 @@ public class Tuple_reasoning2 {
 					
 					Vector<citation_view_vector> curr_c_views = reasoning_single_tuple(curr_views, query, start_pos, rs);
 											
-					output_vec_com(curr_c_views);
+//					output_vec_com(curr_c_views);
 					
 					c_views.add(curr_c_views);
 					

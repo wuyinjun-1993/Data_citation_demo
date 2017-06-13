@@ -29,7 +29,7 @@ public class Database {
       Subgoal subgoal = query.getSubgoal(i);
       
       // processes the subgoal on the db
-      Relation subgoalRel = processSubgoal(subgoal);
+      Relation subgoalRel = processSubgoal(subgoal, query);
 
       // process the join
       sr = join(sr, subgoalRel, query.getName());
@@ -123,6 +123,85 @@ public class Database {
     
     return new Relation(resName, resSchema, resTuples);
   }
+
+
+  
+  Relation processSubgoal(Subgoal subgoal, Query view) {
+	    String resName = subgoal.getName() + "_tmp";  
+
+	    // computes the schema
+	    Vector resSchema     = new Vector();
+	    Vector subgoalSchema = subgoal.getArgs();
+	    for (int i = 0; i < subgoalSchema.size(); i ++) {
+	      Argument arg = (Argument) subgoalSchema.elementAt(i);
+	      if (arg.isConst()) {
+		continue;    // ignores constants
+	      }
+	      if (resSchema.contains(arg)) {
+		continue; // removes duplicates
+	      }
+	      resSchema.add(arg);
+	    }
+
+	    // finds tuples that can be unified with this subgoal
+	    HashSet resTuples = new HashSet();
+	    for (Iterator iter = tuples.iterator(); iter.hasNext();) {
+	      Tuple tuple = (Tuple) iter.next();
+
+	      if (!view.subgoal_name_mapping.get(subgoal.getName()).equals(subgoal_name_mappings.get(tuple.getName()))) 
+		continue; // should have the same name
+
+	      Vector tupleArgs   = tuple.getArgs();
+	      Vector subgoalArgs = subgoal.getArgs();
+	      if (tupleArgs.size() != subgoalArgs.size()) 
+		UserLib.myerror("Database.processSubgoal(), wrong args!");
+
+	      // tries to unify this subgoal with the tuple
+	      Vector  resTupleArgs = new Vector();
+	      boolean unifiable = true;
+	      Mapping phi       = new Mapping();
+	      Mapping phi_str = new Mapping();
+	      for (int i = 0; i < subgoalArgs.size(); i ++) {
+		Argument tupleArg   = (Argument) tupleArgs.elementAt(i);
+		Argument subgoalArg = (Argument) subgoalArgs.elementAt(i);
+
+		// cannot map a constant to a different constant 
+		if (subgoalArg.isConst()) {
+		  if (!subgoalArg.equals(tupleArg)) {
+		    unifiable = false;
+		    break;
+		  } 
+		  else continue; // ignores constants in the final tuple
+		}
+
+		// the subgoalArg is a variable
+		
+		Argument image = (Argument) phi.apply(subgoalArg);
+		if (image == null) { // not mapped.  adds the pair
+		  phi.put(subgoalArg, tupleArg);
+		  
+		  phi_str.put(subgoalArg.name, tupleArg.name);
+		  
+		  resTupleArgs.add(tupleArg);  // adds the first occurance to the tuple
+		  continue;
+		}
+
+		if (image.equals(tupleArg)) continue;
+		
+		unifiable = false;  // mapped to a different value
+		break;
+	      }
+
+	      if (unifiable) {
+		HashMap mapSubgoals = new HashMap();
+		mapSubgoals.put(subgoal, tuple.getSubgoal()); // subgoal mapped
+		resTuples.add(new Tuple(subgoal.getName(), 
+					resTupleArgs, phi, phi_str, mapSubgoals));
+	      }
+	    }
+	    
+	    return new Relation(resName, resSchema, resTuples);
+	  }
 
 
   /**

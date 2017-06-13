@@ -97,7 +97,7 @@ public class output2excel {
 		
 		for(int i = 0; i<c_views.get(0).size();i++)
 		{			
-			String name = "citation_view_" + i;
+			String name = "covering_set_" + i;
 			
 			Cell cell = row.createCell(2*i + q.head.args.size());
 			

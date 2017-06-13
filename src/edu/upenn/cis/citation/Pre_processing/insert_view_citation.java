@@ -13,7 +13,6 @@ import edu.upenn.cis.citation.Corecover.Lambda_term;
 import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Corecover.Subgoal;
 import edu.upenn.cis.citation.datalog.Parse_datalog;
-import java_cup.non_terminal;
 
 public class insert_view_citation {
 	

@@ -573,6 +573,18 @@ public class citation_view_parametered extends citation_view{
 		
 		return c_v;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		// TODO Auto-generated method stub
+		
+		citation_view c = (citation_view) o;
+		
+		if(c.toString().equals(this.toString()))
+			return true;
+		
+		return false;
+	}
 	
 
 }

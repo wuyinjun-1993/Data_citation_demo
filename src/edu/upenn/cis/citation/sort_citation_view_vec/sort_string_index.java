@@ -8,26 +8,30 @@ public class sort_string_index {
 	public static <T> int binary_search(Vector<T> list, T item, binary_compare bc)
 	{
 		
-		int pos = list.size()/2;
+//		int pos = list.size()/2;
 		
 		int start = 0;
 		
-		int end = list.size();
+		int end = list.size() - 1;
 		
-		while(start < end - 1)
+		int pos = (start + end) /2;
+		
+		while(start < end)
 		{
 			
-			int cmp_v = bc.compare(list.get(pos), item); 
+			
+			
+			int cmp_v = bc.compare(item, list.get(pos)); 
 			
 			if(cmp_v < 0)
 			{
-				end = pos;
+				end = pos - 1;
 			}
 			else
 			{
 				if(cmp_v > 0)
 				{
-					start = pos;
+					start = pos + 1;
 				}
 				else
 					break;
@@ -36,6 +40,15 @@ public class sort_string_index {
 			pos = (start + end) /2;
 			
 		}
+		
+		int cmp_v = bc.compare(item, list.get(pos)); 
+		
+		if(cmp_v > 0)
+		{
+			pos = pos + 1;
+		}
+		
+		
 		
 		return pos;
 	}

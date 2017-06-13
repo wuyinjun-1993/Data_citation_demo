@@ -1335,7 +1335,7 @@ public class Query_converter {
 		return str;
 	}
 	
-	static String[] get_condition_boolean_value(Query q, Vector<Conditions> valid_conditions)
+	static String[] get_condition_boolean_value(Query q, HashSet<Conditions> valid_conditions)
 	{
 		
 		String [] str = new String[2];
@@ -1346,23 +1346,29 @@ public class Query_converter {
 		
 		int condition_num = 0;
 		
-		for(int i = 0; i<valid_conditions.size(); i++)
+//		for(int i = 0; i<valid_conditions.size(); i++)
+		int i = 0;
+		
+		for(Iterator iter = valid_conditions.iterator(); iter.hasNext();)
 		{
+			Conditions condition = (Conditions) iter.next();
+			
 			if(i >= 1)
 			{
 				str[0] += ",";
 				str[1] += ",";
 			}
 			
-			if(valid_conditions.get(i).subgoal2 == null || valid_conditions.get(i).subgoal2.isEmpty())
-				str[0] += "(" + valid_conditions.get(i).subgoal1 + "." + valid_conditions.get(i).arg1 + valid_conditions.get(i).op + valid_conditions.get(i).arg2 + ") as condition" + condition_num;
+			if(condition.subgoal2 == null || condition.subgoal2.isEmpty())
+				str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + condition.op + condition.arg2 + ") as condition" + condition_num;
 			else
-				str[0] += "(" + valid_conditions.get(i).subgoal1 + "." + valid_conditions.get(i).arg1 + valid_conditions.get(i).op + valid_conditions.get(i).subgoal2 + "." + valid_conditions.get(i).arg2 + ") as condition" + condition_num;
+				str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + condition.op + condition.subgoal2 + "." + condition.arg2 + ") as condition" + condition_num;
 			
 			str[1] += "condition" + condition_num + " desc";
 			
 			condition_num ++;
 
+			i++;
 		}
 		
 		return str;
@@ -1385,7 +1391,7 @@ public class Query_converter {
 		return str;
 	}
 	
-	public static String datalog2sql_citation(Query query, Vector<Lambda_term> lambda_terms, Vector<Conditions> valid_conditions, HashMap<String, HashSet<String>> return_vals, HashMap<String, Vector<Integer>> table_pos_map, boolean view, Vector<int[]> condition_seq_id, Vector<Integer> valid_subgoal_id) throws SQLException, ClassNotFoundException
+	public static String datalog2sql_citation(Query query, Vector<Lambda_term> lambda_terms, HashSet<Conditions> valid_conditions, HashMap<String, HashSet<String>> return_vals, HashMap<String, Vector<Integer>> table_pos_map, boolean view, Vector<int[]> condition_seq_id, Vector<Integer> valid_subgoal_id) throws SQLException, ClassNotFoundException
 	{
 				
 //		String sel_item = new String();
@@ -1656,7 +1662,7 @@ public class Query_converter {
 		return sql;
 	}
 	
-	public static String datalog2sql_citation2(Query query, Vector<Conditions> valid_conditions, Vector<Lambda_term> lambda_terms) throws SQLException, ClassNotFoundException
+	public static String datalog2sql_citation2(Query query, HashSet<Conditions> valid_conditions, Vector<Lambda_term> lambda_terms) throws SQLException, ClassNotFoundException
 	{
 				
 		String sel_item = new String();

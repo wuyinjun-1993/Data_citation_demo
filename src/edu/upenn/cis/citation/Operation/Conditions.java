@@ -14,7 +14,7 @@ public class Conditions {
 	
 	public Argument arg2;
 		
-	public String subgoal2;
+	public String subgoal2 = new String();
 	
 	public Operation op;
 	
@@ -200,6 +200,27 @@ public class Conditions {
 		
 		
 		
+	}
+	
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		
+		Conditions condition = (Conditions) obj;
+		
+		if(this.arg1.name.equals(condition.arg1.name) && this.arg1.relation_name.equals(condition.arg1.relation_name) 
+				&& this.arg2.name.equals(condition.arg2.name) && this.arg2.relation_name.equals(condition.arg2.relation_name) 
+				&& this.subgoal1.equals(condition.subgoal1) && this.subgoal2.equals(condition.subgoal2) && this.op.get_op_name().equals(condition.op.get_op_name()))
+			return true;
+		
+		return false;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return this.arg1.hashCode() * 10000 + this.subgoal1.hashCode()*1000 + this.op.hashCode()*100 + this.arg2.hashCode()*10 + this.subgoal2.hashCode();
 	}
 	
 }

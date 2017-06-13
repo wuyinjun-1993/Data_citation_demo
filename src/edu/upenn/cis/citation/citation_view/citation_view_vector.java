@@ -11,6 +11,9 @@ import java.util.Vector;
 import edu.upenn.cis.citation.sort_citation_view_vec.binary_compare;
 import edu.upenn.cis.citation.sort_citation_view_vec.sort_string_index;
 
+
+import static org.junit.Assert.*;
+
 public class citation_view_vector {
 	
 	public Vector<citation_view> c_vec;
@@ -92,6 +95,12 @@ public class citation_view_vector {
 	public citation_view_vector merge(citation_view c)
 	{
 		
+		if(c.toString().equals("v6(2)") && index_vec.toString().equals("[v4(2), v6(2)]"))
+		{
+			int y = 0;
+			y++;
+		}
+		
 		Vector<citation_view> vec_new = (Vector<citation_view>) c_vec.clone();
 				
 		Vector<String> index_new = (Vector<String>) index_vec.clone();
@@ -107,6 +116,14 @@ public class citation_view_vector {
 			table_names_new.addAll(c.get_table_names());
 			
 			insert_sort(index_new, c.toString());
+			
+			for(int j = 1; j<index_new.size(); j++)
+			{
+				if(index_new.get(j).compareTo(index_new.get(j - 1))< 0)
+				{
+					assertEquals(1, 0);
+				}
+			}
 			
 			vec_new.add(c);
 			
@@ -284,6 +301,57 @@ public class citation_view_vector {
 		
 		
 		
+	}
+	
+	@Override
+	public boolean equals(Object o)
+	{
+		citation_view_vector c_vec = (citation_view_vector) o;
+		
+		if(c_vec.c_vec.size() != this.c_vec.size())
+			return false;
+		
+		for(int i = 0; i < c_vec.c_vec.size(); i++)
+		{
+			citation_view c1 = c_vec.c_vec.get(i);
+			
+			int j = 0;
+			
+			for(j = 0; j< this.c_vec.size(); j++)
+			{
+				citation_view c2 = this.c_vec.get(j);
+				
+				if(c1.equals(c2))
+					break;
+			}
+			
+			if(j < this.c_vec.size())
+				continue;
+			else
+				return false;
+		}
+		
+		for(int i = 0; i < this.c_vec.size(); i++)
+		{
+			citation_view c1 = this.c_vec.get(i);
+			
+			int j = 0;
+			
+			for(j = 0; j< c_vec.c_vec.size(); j++)
+			{
+				citation_view c2 = c_vec.c_vec.get(j);
+				
+				if(c1.equals(c2))
+					break;
+			}
+			
+			if(j < c_vec.c_vec.size())
+				continue;
+			else
+				return false;
+		}
+		
+		return true;
 	}
 
 }

@@ -27,5 +27,8 @@ public abstract class citation_view {
 	public abstract boolean has_lambda_term();
 	
 	public abstract citation_view clone();
+	
+	@Override
+	public abstract boolean equals(Object o);
 
 }

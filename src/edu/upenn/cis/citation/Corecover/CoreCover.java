@@ -115,6 +115,12 @@ public class CoreCover {
 
 //      System.out.println(view);
       
+      if(view.name.equals("v6"))
+      {
+    	  int y = 0;
+    	  y++;
+      }
+      
       Relation rel = canDb.execQuery(view);
       
       for (Iterator iter = rel.getTuples().iterator(); iter.hasNext();) {

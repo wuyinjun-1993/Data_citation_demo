@@ -11,6 +11,9 @@ public abstract class Operation {
 
 	public abstract Operation negation();
 	
+	@Override
+	public abstract int hashCode();
+	
 //	public static final String op_equal = "=";
 //	
 //	public static final String op_greater = ">";

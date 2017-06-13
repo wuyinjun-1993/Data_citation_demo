@@ -29,4 +29,9 @@ public class op_greater_equal extends Operation{
 		return new op_less();
 	}
 
+	@Override
+	public int hashCode() {
+		// TODO Auto-generated method stub
+		return this.op.hashCode();
+	}
 }

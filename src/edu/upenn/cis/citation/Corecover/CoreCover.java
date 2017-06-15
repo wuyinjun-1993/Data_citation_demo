@@ -637,6 +637,8 @@ public class CoreCover {
 	    
 	    HashSet non_covering = new HashSet();
 	    
+	    HashSet covering_set_size = new HashSet<>();
+	    
 	    for (int size = 1; (size <= upperBound); size ++) 
 	    {
 	      // considers subsets with the current size 
@@ -644,14 +646,16 @@ public class CoreCover {
 	      //" size = " + size);
 	    	
 	    	
-	        HashSet non_redundant_set = UserLib.genSubsets(viewTuples, size, rewritings, non_covering);
+	        HashSet non_redundant_set = UserLib.genSubsets(viewTuples, size, rewritings, non_covering, covering_set_size);
 	        
 	        non_covering.clear();
+	        
+//	        covering_set_size.clear();
 
 	    	
 //	    	if(curr_rewritings.size() == 0)
 //	    	{
-	    		gen_rewriting(non_redundant_set, size, covered_relations, query, rewritings, non_covering);
+	    		gen_rewriting(non_redundant_set, size, covered_relations, query, rewritings, non_covering, covering_set_size);
 	    		
 	    		if(non_covering.isEmpty())
 	    			break;
@@ -765,7 +769,7 @@ public class CoreCover {
   }
   
   
-  static void gen_rewriting(HashSet tupleSubsets, int size, HashSet covered_relations, Query query, HashSet rewritings, HashSet non_covering)
+  static void gen_rewriting(HashSet tupleSubsets, int size, HashSet covered_relations, Query query, HashSet rewritings, HashSet non_covering, HashSet covering_set_size)
   {
       //System.out.println("# of tupleSubsets = " + tupleSubsets.size());
 
@@ -782,7 +786,7 @@ public class CoreCover {
 
 	if (unionCoverSubgoals(tupleSubset, covered_relations))  
 	{// found one
-	  
+		covering_set_size.add(tupleSubset);
 //	  if(cost < min_cost)
 //	  {
 //		  min_rewriting = new Rewriting(tupleSubset, query);

@@ -342,7 +342,7 @@ public class lalr_item_set {
 	  //   that means equal sets will have inequal hashcodes, which
 	  //   we're not allowed (by contract) to do.  So hash them all.
           for (e = all(), cnt=0 ; e.hasMoreElements() /*&& cnt<5*/; cnt++)
-	    result ^= ((lalr_item)e.nextElement()).hashCode();
+	    result ^= e.nextElement().hashCode();
 
 	  hashcode_cache = new Integer(result);
 	}
@@ -360,7 +360,7 @@ public class lalr_item_set {
       result.append("{\n");
       for (Enumeration e=all(); e.hasMoreElements(); ) 
  	{
- 	  result.append("  " + (lalr_item)e.nextElement() + "\n");
+ 	  result.append("  " + e.nextElement() + "\n");
  	}
        result.append("}");
 

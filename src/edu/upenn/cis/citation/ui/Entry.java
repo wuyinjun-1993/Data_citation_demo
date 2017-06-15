@@ -20,10 +20,10 @@ public class Entry {
 				 String fCriteria, String fJoin, boolean fLambda) {
 		super();
 		this.table = new SimpleStringProperty(fTable);
-		this.field = new SimpleStringProperty(fField);;
-		this.show = new SimpleBooleanProperty(fShow);;
-		this.criteria = new SimpleStringProperty(fCriteria);;
-		this.join = new SimpleStringProperty(fJoin);
+		this.field = new SimpleStringProperty(fField);
+        this.show = new SimpleBooleanProperty(fShow);
+        this.criteria = new SimpleStringProperty(fCriteria);
+        this.join = new SimpleStringProperty(fJoin);
 		this.lambda = new SimpleBooleanProperty(fLambda);
 	}
 

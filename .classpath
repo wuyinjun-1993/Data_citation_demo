@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="lib/controlsfx-8.40.12.jar"/>
+	<classpathentry kind="lib" path="lib/controlsfx-samples-8.40.12.jar"/>
+	<classpathentry kind="lib" path="lib/dom4j-2.0.0-RC1.jar"/>
+	<classpathentry kind="lib" path="lib/jdbc-postgresql.jar"/>
+	<classpathentry kind="lib" path="lib/JSqlParser.jar"/>
+	<classpathentry kind="lib" path="lib/junit-jupiter-api-5.0.0-M4.jar"/>
+	<classpathentry kind="lib" path="lib/log4j.jar"/>
+	<classpathentry kind="lib" path="lib/opentest4j-1.0.0-M2.jar"/>
+	<classpathentry kind="lib" path="lib/poi-3.9.jar"/>
+	<classpathentry kind="lib" path="lib/poi-ooxml-3.5-beta5.jar"/>
+	<classpathentry kind="lib" path="lib/poi-ooxml-schemas-3.12-beta1.jar"/>
+	<classpathentry kind="lib" path="lib/postgresql-9.4.1212.jre6.jar"/>
+	<classpathentry kind="lib" path="lib/xmlbeans-2.3.0.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="out/production/Data_citation_demo"/>
+</classpath>

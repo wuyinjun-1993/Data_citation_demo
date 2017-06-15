@@ -44,7 +44,7 @@ class ComboBoxCell extends TableCell<ObservableList, String> {
 	public void cancelEdit() {
 		super.cancelEdit();
 
-		setText((String) getItem());
+		setText(getItem());
 		setGraphic(null);
 	}
 

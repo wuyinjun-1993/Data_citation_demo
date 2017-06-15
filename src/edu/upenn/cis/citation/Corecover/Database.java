@@ -97,7 +97,7 @@ public class Database {
 
 	// the subgoalArg is a variable
 	
-	Argument image = (Argument) phi.apply(subgoalArg);
+	Argument image = phi.apply(subgoalArg);
 	if (image == null) { // not mapped.  adds the pair
 	  phi.put(subgoalArg, tupleArg);
 	  
@@ -217,8 +217,8 @@ public class Database {
     //System.out.println("rel2 = " + rel2 );
 
     // computes the schema
-    Vector schema1   = (Vector) rel1.getSchema();
-    Vector schema2   = (Vector) rel2.getSchema();
+    Vector schema1   = rel1.getSchema();
+    Vector schema2   = rel2.getSchema();
     Vector resSchema = new Vector();
 
     for (int i = 0; i < schema1.size(); i ++) {
@@ -288,7 +288,7 @@ public class Database {
       }
       
       // checks if the equality condition is satisfied
-      if (!argValue.equals((Argument)tuple2Args.elementAt(pos)))
+      if (!argValue.equals(tuple2Args.elementAt(pos)))
 	return null;
 
       resTupleArgs.add(argValue);
@@ -307,7 +307,7 @@ public class Database {
       }
       
       // there is an equality comparison, double checks they are equal
-      if (!argValue.equals((Argument)tuple1Args.elementAt(pos))) 
+      if (!argValue.equals(tuple1Args.elementAt(pos)))
 	UserLib.myerror("Database.join(), wrong args!");
     }
 
@@ -326,8 +326,8 @@ public class Database {
     Mapping phi_str = new Mapping(map_str);
     
     // union the two mapSubgoals's
-    HashMap mapSubgoals1 = (HashMap) tuple1.getMapSubgoals();
-    HashMap mapSubgoals2 = (HashMap) tuple2.getMapSubgoals();
+    HashMap mapSubgoals1 = tuple1.getMapSubgoals();
+    HashMap mapSubgoals2 = tuple2.getMapSubgoals();
     HashMap mapSubgoals  = (HashMap) mapSubgoals1.clone();
     mapSubgoals.putAll(mapSubgoals2);
 

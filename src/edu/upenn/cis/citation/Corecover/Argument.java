@@ -69,7 +69,7 @@ public class Argument {
       return false;
 
     // two vars, checks the target of this arg in phi
-    Argument image = (Argument) phi.apply(this);
+    Argument image = phi.apply(this);
     if (image == null) { // not mapped.  
       phi.put(this, arg); // adds the pair
       return true;  

@@ -1,6 +1,9 @@
 package edu.upenn.cis.citation.ui;
 
 import edu.upenn.cis.citation.Corecover.Query;
+import edu.upenn.cis.citation.Pre_processing.Gen_query;
+import edu.upenn.cis.citation.Pre_processing.populate_db;
+import edu.upenn.cis.citation.Pre_processing.view_operation;
 //import edu.upenn.cis.citation.Pre_processing.insert_new_view;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.dao.Database;
@@ -9,14 +12,18 @@ import javafx.application.Application;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -24,24 +31,33 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Reflection;
+import javafx.scene.Group;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+
 import org.controlsfx.control.table.TableRowExpanderColumn;
 
+import com.sun.javafx.geom.RectangularShape;
+
 import java.awt.*;
+//import java.awt.TextArea;
 import java.io.IOException;
+import java.io.ObjectInputStream.GetField;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.*;
@@ -50,8 +66,8 @@ import java.util.List;
 
 public class QBEApp extends Application {
 
-	private Scene viewScene;
 	private Scene loginScene;
+	private Scene viewScene;
 
 	private Tab dbaDataViewDataTab;
 	private ObservableList<String> dbaListCitationViews;
@@ -67,6 +83,10 @@ public class QBEApp extends Application {
 	List<String> lambdas = new ArrayList<>();
 
 	VBox vboxRightCQ = new VBox();
+	final TableView<ObservableList> dataView = new TableView(); 
+	// dataview shown after run in dba and user
+	final HBox hBoxLambda = new HBox();
+	// lambda vbox shown after run in dba and user
 	
 	// User
 	private Scene userScene;
@@ -82,8 +102,11 @@ public class QBEApp extends Application {
 	List<List<String>> lambdasAll = new ArrayList<>();
 	String lambdaSQL = null;
 	String datalog = null;
+	String dv = ""; // The name of edited view
+	TextArea datalogTextArea = new TextArea();
 	List<Integer> lambdaIndex = new ArrayList<>();
 	Vector<Integer> ids = new Vector<>();
+	int count = 0;
 
 	HBox hBoxPrevNext, hBoxGenCitation;
 	//
@@ -96,6 +119,7 @@ public class QBEApp extends Application {
 
 	// Dropdown Table Field
     ObservableList<String> optionsField = FXCollections.observableArrayList(Database.getTableList());
+private Object String;
 
 	/**
 	 * GUI Main Method
@@ -111,168 +135,21 @@ public class QBEApp extends Application {
 		this.stage = stage;
 		this.citeStage = new Stage();
 		buildLoginScene();
-		buildQbeSceneDba();
-		buildQbeSceneUser();
+		buildDbaScene();
+		buildUserScene();
 		buildViewScene();
 		stage.setScene(loginScene);
-		stage.setMinWidth(300);
-		stage.setMinHeight(300);
+		stage.setMinWidth(400);
+		stage.setMinHeight(400);
 		// set width / height values to be 75% of users screen resolution
 		Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-		stage.setWidth(screenBounds.getWidth() * 0.8);
-		stage.setHeight(screenBounds.getHeight() * 0.75);
+		stage.setWidth(screenBounds.getWidth() * 0.9);
+		stage.setHeight(screenBounds.getHeight() * 0.85);
 		stage.show();
 	}
-
-	private void buildViewScene() {
-        HBox hbox = new HBox();
-        TextField textFieldDataViewDataLog = new TextField();
-        DropShadow dropShadow = new DropShadow();
-        dropShadow.setOffsetX(5);
-        dropShadow.setOffsetY(5);
-		Text textDataLog = new Text("DataLog: ");
-        textDataLog.setId("text");
-        textDataLog.setFont(Font.font("Courier New", FontWeight.BOLD, 18));
-        textDataLog.setFill(Color.WHITE);
-        textDataLog.setEffect(dropShadow);
-        hbox.getChildren().addAll(textDataLog, textFieldDataViewDataLog);
-        HBox.setHgrow(textFieldDataViewDataLog, Priority.ALWAYS);
-        hbox.setAlignment(Pos.CENTER);
-
-		// Adding HBox
-		HBox hb = new HBox();
-		hb.setPadding(new Insets(20, 20, 20, 30));
-		DropShadow dropShadow_2 = new DropShadow();
-        dropShadow_2.setOffsetX(5);
-        dropShadow_2.setOffsetY(5);
-		Text text = new Text("Citation Management");
-		text.setId("text");
-		text.setFont(Font.font("Courier New", FontWeight.BOLD, 28));
-		text.setEffect(dropShadow_2);
-		hb.getChildren().add(text);
-
-		// Reflection for gridPane
-		BorderPane bp = new BorderPane();
-		bp.setId("bp");
-		bp.setPadding(new Insets(10, 50, 50, 50));
-		// GridPane data views
-		GridPane gridPaneDataViews = new GridPane();
-		gridPaneDataViews.setPadding(new Insets(20, 20, 20, 20));
-		gridPaneDataViews.setAlignment(Pos.CENTER);
-		gridPaneDataViews.setHgap(5);
-		gridPaneDataViews.setVgap(5);
-		Label lableDataviews = new Label("Data Views");
-		// ListView Data Views
-		ListView<String> listViewDataViews = new ListView<>();
-		ObservableList<String> listDataViews = FXCollections.observableArrayList(Database.getDataViews());
-		listViewDataViews.setItems(listDataViews);
-
-		listViewDataViews.setOnMouseClicked(event -> {
-            String dv = listViewDataViews.getSelectionModel().getSelectedItem();
-            if (dv == null) return;
-            String dataViewDataLog = Database.getDataViewDataLog(dv);
-            if (!hbox.isVisible()) hbox.setVisible(true);
-            textFieldDataViewDataLog.setText(dataViewDataLog);
-        });
-
-        Button buttonEditDataView = new Button("Edit");
-        buttonEditDataView.setOnAction(event -> {
-            String dv = listViewDataViews.getSelectionModel().getSelectedItem();
-            hbox.setVisible(false);
-            if (dv == null) return;
-            dbaDataViewDataTab.setText("Data View: " + dv);
-            dbaListCitationViews.setAll(Database.getCitationViews(dbaDataViewDataTab.getText().split(":")[1].trim()));
-            stage.setScene(dbaScene);
-        });
-		Button buttonAddDataView = new Button("Add");
-		buttonAddDataView.setOnAction(event -> {
-            TextInputDialog dialog = new TextInputDialog(null);
-            dialog.setTitle("Enter Data View Name");
-            dialog.setHeaderText(null);
-            Optional<String> result = dialog.showAndWait();
-            String entered;
-            if (result.isPresent()) {
-                entered = result.get();
-            } else {
-                return;
-            }
-			Database.createDataViewByName(entered);
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Succeed");
-            alert.setHeaderText(null);
-            alert.setContentText("The data view is successfully created");
-            alert.showAndWait();
-			listDataViews.add(entered);
-		});
-		Button buttonDeleteDataView = new Button("Delete");
-		buttonDeleteDataView.setOnAction(event -> {
-            String dv = listViewDataViews.getSelectionModel().getSelectedItem();
-            dbaListCitationViews.remove(dv);
-            Database.deleteDataViewByName(dv);
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Succeed");
-            alert.setHeaderText(null);
-            alert.setContentText("The data view is successfully deleted");
-            alert.showAndWait();
-			listDataViews.remove(dv);
-		});
-		GridPane.setHgrow(listViewDataViews, Priority.ALWAYS);
-		GridPane.setVgrow(listViewDataViews, Priority.ALWAYS);
-		gridPaneDataViews.add(lableDataviews, 0, 0, 3, 1);
-		gridPaneDataViews.add(listViewDataViews, 0, 1, 3, 1);
-        gridPaneDataViews.add(buttonEditDataView, 0, 2);
-		gridPaneDataViews.add(buttonAddDataView, 1, 2);
-		gridPaneDataViews.add(buttonDeleteDataView, 2, 2);
-		Reflection r1 = new Reflection();
-		r1.setFraction(0.7f);
-		gridPaneDataViews.setEffect(r1);
-		gridPaneDataViews.setId("bproot");
-
-		// GridPane citation views
-		GridPane gridPaneCitationViews = new GridPane();
-		gridPaneCitationViews.setPadding(new Insets(20, 20, 20, 20));
-		gridPaneCitationViews.setAlignment(Pos.CENTER);
-		gridPaneCitationViews.setHgap(5);
-		gridPaneCitationViews.setVgap(5);
-		Label lableCitationViews = new Label("Citation Views");
-		// ListView Citation Views
-		ListView<String> listViewCitationView = new ListView<>();
-		ObservableList<String> listCitationViews = FXCollections.observableArrayList(Database.getCitationViews(null));
-		listViewCitationView.setItems(listCitationViews);
-		Button buttonAddCitationView = new Button("Add Citation View");
-		buttonAddCitationView.setOnAction(event -> {
-			this.stage.setScene(dbaScene);
-		});
-		Button buttonDeleteCitationView = new Button("Delete Citation View");
-		buttonDeleteCitationView.setOnAction(event -> {
-			this.stage.setScene(dbaScene);
-		});
-		GridPane.setHgrow(listViewCitationView, Priority.ALWAYS);
-		GridPane.setVgrow(listViewCitationView, Priority.ALWAYS);
-		gridPaneCitationViews.setAlignment(Pos.CENTER);
-		gridPaneCitationViews.setPadding(new Insets(10, 10, 10, 10));
-		gridPaneCitationViews.add(lableCitationViews, 0, 0);
-		gridPaneCitationViews.add(listViewCitationView, 0, 1, 2, 1);
-		gridPaneCitationViews.add(buttonAddCitationView, 0, 2);
-		gridPaneCitationViews.add(buttonDeleteCitationView, 1, 2);
-		Reflection r2 = new Reflection();
-		r2.setFraction(0.7f);
-		gridPaneCitationViews.setEffect(r2);
-		gridPaneCitationViews.setId("bproot");
-
-		SplitPane splitPane = new SplitPane();
-		splitPane.setId("root");
-		splitPane.getItems().add(gridPaneDataViews);
-		splitPane.getItems().add(gridPaneCitationViews);
-		// Add HBox and GridPane layout to BorderPane Layout
-		bp.setTop(hb);
-		bp.setCenter(splitPane);
-        hbox.setVisible(false);
-		bp.setBottom(hbox);
-		viewScene = new Scene(bp);
-		viewScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
-	}
-
+	
+    /* ===================================================================
+     * Build the Login Scene */
 	private void buildLoginScene() {		
 		GridPane gp = new GridPane();
 		gp.setPadding(new Insets(10, 50, 50, 50));
@@ -394,7 +271,7 @@ public class QBEApp extends Application {
 			pf.setText("");
 			this.stage.setScene(viewScene);
 		});
-		// Add HBox and GridPane layout to BorderPane Layout
+		// Add HBox and GridPane layout to BorderPane(id is bp) Layout
 		gp.add(hb, 0, 0);
 		hbox.getChildren().addAll(gridPane, gridPane2);
 		gp.add(hbox, 0, 1);
@@ -402,9 +279,231 @@ public class QBEApp extends Application {
 		loginScene = new Scene(gp);
 		loginScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
 	}
-
 	
-	private void buildQbeSceneUser() {
+	/* ===================================================================
+	 * Build the View scene 
+	 * Show all data view and citation views */
+	private void buildViewScene() {
+        HBox hbox = new HBox();
+        TextField textFieldDataViewDataLog = new TextField();
+        DropShadow dropShadow = new DropShadow();
+        dropShadow.setOffsetX(5);
+        dropShadow.setOffsetY(5);
+		Text textDataLog = new Text("DataLog: ");
+        textDataLog.setId("text");
+        textDataLog.setFont(Font.font("Courier New", FontWeight.BOLD, 18));
+        textDataLog.setFill(Color.WHITE);
+        textDataLog.setEffect(dropShadow);
+        hbox.getChildren().addAll(textDataLog, textFieldDataViewDataLog);
+        HBox.setHgrow(textFieldDataViewDataLog, Priority.ALWAYS);
+        hbox.setAlignment(Pos.CENTER);
+
+		// Adding HBox
+		HBox hb = new HBox();
+		hb.setPadding(new Insets(20, 20, 20, 30));
+		DropShadow dropShadow_2 = new DropShadow();
+        dropShadow_2.setOffsetX(5);
+        dropShadow_2.setOffsetY(5);
+		Text text = new Text("Citation Management");
+		text.setId("text");
+		text.setFont(Font.font("Courier New", FontWeight.BOLD, 28));
+		text.setEffect(dropShadow_2);
+		hb.getChildren().add(text);
+
+		// Reflection for gridPane
+		BorderPane bp = new BorderPane();
+		bp.setId("bp");
+		bp.setPadding(new Insets(10, 50, 50, 50));
+		// GridPane data views
+		GridPane gridPaneDataViews = new GridPane();
+		gridPaneDataViews.setPadding(new Insets(20, 20, 20, 20));
+		gridPaneDataViews.setAlignment(Pos.CENTER);
+		gridPaneDataViews.setHgap(5);
+		gridPaneDataViews.setVgap(5);
+		Label lableDataviews = new Label("Data Views");
+		// ListView Data Views
+		ListView<String> listViewDataViews = new ListView<>();
+		ObservableList<String> listDataViews = FXCollections.observableArrayList(Database.getDataViews());
+		listViewDataViews.setItems(listDataViews);
+
+		listViewDataViews.setOnMouseClicked(event -> {
+            String dv = listViewDataViews.getSelectionModel().getSelectedItem();
+            if (dv == null) return;
+            String dataViewDataLog = Database.getDataViewDataLog(dv);
+//            Query dataViewDatalog = view_operation.get_view_by_name(dv);
+            if (!hbox.isVisible()) hbox.setVisible(true);
+            textFieldDataViewDataLog.setText(dataViewDataLog);
+            
+            hbox.setLayoutX(10);
+            hbox.setLayoutY(10);
+           
+        });
+
+        Button buttonEditDataView = new Button("Edit");
+        buttonEditDataView.setOnAction(event -> {
+            dv = listViewDataViews.getSelectionModel().getSelectedItem();
+            hbox.setVisible(false);
+            if (dv == null) return;
+            dbaDataViewDataTab.setText("Data View: " + dv);
+            dbaListCitationViews.setAll(Database.getCitationViews(dbaDataViewDataTab.getText().split(":")[1].trim()));
+			Query currentQuery;
+			try {
+				// show view info in dba scene
+				currentQuery = view_operation.get_view_by_id(dv);
+				HashMap<String, String> relation_mapping = new HashMap<String, String>();
+	            Vector<String[]> head_vars = new Vector<String[]>();
+	            Vector<String[]> condition_str = new Vector<String[]>();
+	            Vector<String[]> lambda_term_str = new Vector<String[]>();
+	            Gen_query.get_query_info(currentQuery, relation_mapping, head_vars, condition_str, lambda_term_str);
+	            String vars = "";
+	            System.out.println(currentQuery);
+	            for (String key : relation_mapping.keySet()) {
+	            	for (int i = 0; i < head_vars.size(); i++) {
+	            		if (head_vars.get(i)[1].equals(key)) {
+	            			vars = head_vars.get(i)[0];
+	            		}
+	            		data.add(new Entry(key, vars, true, "", "", false));
+	            	}  			
+	            }
+	            List<Entry> list = new ArrayList<>();
+				list.addAll(data);
+				if (datalogTextArea != null) datalogTextArea.setText(Util.convertToDatalogOriginal(list) + "\n");
+				lambdasAll.clear();
+				lambdaIndex.clear();
+				lambdaSQL = Util.convertToSQLWithLambda(list, false);//toCite is false
+				datalog = Util.convertToDatalog(list);
+				System.out.println("[DEBUG] lambdaSQL: " + lambdaSQL);
+				lambdas = Util.getLambda(list);
+				for (String lambda : lambdas) {
+					System.out.println(lambda);
+					String table = lambda.substring(0, lambda.indexOf('.'));
+					String field = lambda.substring(lambda.indexOf('.') + 1);
+					List<String> temp = Database.getDistincts(table, field);
+					lambdasAll.add(temp);
+					lambdaIndex.add(0);
+				}
+				setDataView(hBoxLambda, dataView, false);
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.out.println("data view edit error");
+			}
+			stage.setScene(dbaScene);
+        });
+		Button buttonAddDataView = new Button("Add");
+		buttonAddDataView.setOnAction(event -> {
+//            TextInputDialog dialog = new TextInputDialog(null);
+//            dialog.setTitle("Enter Data View Name");
+//            dialog.setHeaderText(null);
+//            Optional<String> result = dialog.showAndWait();
+//            String entered;
+//            if (result.isPresent()) {
+//                entered = result.get();
+//            } else {
+//                return;
+//            }
+			count ++;
+			String randomName = new java.lang.String();
+			randomName = "Untitled" + count;
+			
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Succeed");
+            alert.setHeaderText(null);
+            alert.setContentText("The data view " + randomName + " is successfully created");
+            alert.showAndWait();
+			listDataViews.add(randomName);
+			try {
+				HashMap<String, String> relation_mapping = new HashMap<String, String>();
+				Vector<String[]> head_vars = new Vector<String[]>();
+				Vector<String []> condition_str = new Vector<String[]>();
+				Vector<String[]> lambda_term_str = new Vector<String[]>();
+				Query emptyQuery = Gen_query.gen_query(randomName, relation_mapping, head_vars, condition_str, lambda_term_str);
+				view_operation.add(emptyQuery, randomName);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+            dbaDataViewDataTab.setText("Data View: " + randomName);
+            dbaListCitationViews.setAll(Database.getCitationViews(dbaDataViewDataTab.getText().split(":")[1].trim()));
+            stage.setScene(dbaScene);
+		});
+		Button buttonDeleteDataView = new Button("Delete");
+		buttonDeleteDataView.setOnAction(event -> {
+            String dv = listViewDataViews.getSelectionModel().getSelectedItem();
+            dbaListCitationViews.remove(dv);
+//            Database.deleteDataViewByName(dv);
+            try {
+				view_operation.delete_view_by_id(dv);
+			} catch (Exception e) {
+				System.out.println("view delete error");
+				e.printStackTrace();
+			}
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Succeed");
+            alert.setHeaderText(null);
+            alert.setContentText("The data view is successfully deleted");
+            alert.showAndWait();
+			listDataViews.remove(dv);
+		});
+		GridPane.setHgrow(listViewDataViews, Priority.ALWAYS);
+		GridPane.setVgrow(listViewDataViews, Priority.ALWAYS);
+		gridPaneDataViews.add(lableDataviews, 0, 0, 3, 1);
+		gridPaneDataViews.add(listViewDataViews, 0, 1, 3, 1);
+        gridPaneDataViews.add(buttonEditDataView, 0, 2);
+		gridPaneDataViews.add(buttonAddDataView, 1, 2);
+		gridPaneDataViews.add(buttonDeleteDataView, 2, 2);
+		Reflection r1 = new Reflection();
+		r1.setFraction(0.7f);
+		gridPaneDataViews.setEffect(r1);
+		gridPaneDataViews.setId("bproot");
+
+		// GridPane citation views
+		GridPane gridPaneCitationViews = new GridPane();
+		gridPaneCitationViews.setPadding(new Insets(20, 20, 20, 20));
+		gridPaneCitationViews.setAlignment(Pos.CENTER);
+		gridPaneCitationViews.setHgap(5);
+		gridPaneCitationViews.setVgap(5);
+		Label lableCitationViews = new Label("Citation Views");
+		// ListView Citation Views
+		ListView<String> listViewCitationView = new ListView<>();
+		ObservableList<String> listCitationViews = FXCollections.observableArrayList(Database.getCitationViews(null));
+		listViewCitationView.setItems(listCitationViews);
+		Button buttonAddCitationView = new Button("Add Citation View");
+		buttonAddCitationView.setOnAction(event -> {
+			this.stage.setScene(dbaScene);
+		});
+		Button buttonDeleteCitationView = new Button("Delete Citation View");
+		buttonDeleteCitationView.setOnAction(event -> {
+			this.stage.setScene(dbaScene);
+		});
+		GridPane.setHgrow(listViewCitationView, Priority.ALWAYS);
+		GridPane.setVgrow(listViewCitationView, Priority.ALWAYS);
+		gridPaneCitationViews.setAlignment(Pos.CENTER);
+		gridPaneCitationViews.setPadding(new Insets(10, 10, 10, 10));
+		gridPaneCitationViews.add(lableCitationViews, 0, 0);
+		gridPaneCitationViews.add(listViewCitationView, 0, 1, 2, 1);
+		gridPaneCitationViews.add(buttonAddCitationView, 0, 2);
+		gridPaneCitationViews.add(buttonDeleteCitationView, 1, 2);
+		Reflection r2 = new Reflection();
+		r2.setFraction(0.7f);
+		gridPaneCitationViews.setEffect(r2);
+		gridPaneCitationViews.setId("bproot");
+
+		SplitPane splitPane = new SplitPane();
+		splitPane.setId("root");
+		splitPane.getItems().add(gridPaneDataViews);
+		splitPane.getItems().add(gridPaneCitationViews);
+		// Add HBox and GridPane layout to BorderPane Layout
+		bp.setTop(hb);
+		bp.setCenter(splitPane);
+        hbox.setVisible(false);
+//		bp.setBottom(hbox);
+		viewScene = new Scene(bp);
+		viewScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
+	}
+
+	/* ===================================================================
+	 * Build the User scene
+	 */
+	private void buildUserScene() {
 		gridUser = new GridPane();
 		gridUser.setPadding(new Insets(5, 10, 10, 10));
         gridUser.setHgap(10);
@@ -532,12 +631,11 @@ public class QBEApp extends Application {
 		genButton.setId("buttonGen");
 		hBoxGenCitation.getChildren().add(genButton);
 		gridUserSub.add(hBoxGenCitation, 1, 2);
-		// ===========================================================================
 		userScene = new Scene(gridUser);
 		userScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
 	}
 	
-	private HBox buildTopMenu(TextField textArea, HBox hBoxLambda, TableView<ObservableList> dataView, boolean toCite) {
+	private HBox buildTopMenu(TextArea textArea, HBox hBoxLambda, TableView<ObservableList> dataView, boolean toCite) {
 		final HBox hBox = new HBox();
 		hBox.setAlignment(Pos.CENTER_RIGHT);
 		final Button runButton = new Button(" Run  ");
@@ -566,6 +664,7 @@ public class QBEApp extends Application {
 				lambdaIndex.add(0);
 			}
 			setDataView(hBoxLambda, dataView, toCite);
+			
 		});
 		clearButton.setOnAction(e -> {
 			data.clear();
@@ -608,7 +707,10 @@ public class QBEApp extends Application {
 		return searchBox;
 	}
 
-	private void buildQbeSceneDba() {
+	/* ===================================================================
+	 * Build the Dba scene
+	 */
+	private void buildDbaScene() {
 		gridDba = new GridPane();
         gridDba.setPadding(new Insets(5, 10, 10, 10));
         gridDba.setHgap(10);
@@ -680,6 +782,11 @@ public class QBEApp extends Application {
         btDataViewSave.setFont(Font.font("Courier New", FontWeight.BOLD, 12));
 		btDataViewSave.setOnAction(e -> {
 			Query query = null;
+			try {
+				view_operation.add(query, "");
+			} catch (ClassNotFoundException | SQLException e1) {
+				e1.printStackTrace();
+			}
 //			try {
 ////				insert_new_view.add(query, "");
 //			} catch (ClassNotFoundException | SQLException e1) {
@@ -782,7 +889,7 @@ public class QBEApp extends Application {
 		GridPane.setVgrow(splitPaneQbe, Priority.ALWAYS);
 		splitPaneQbe.getItems().add(tableView);
 		
-		final TableView<ObservableList> dataView = new TableView();
+//		final TableView<ObservableList> dataView = new TableView();
 		GridPane.setVgrow(dataView, Priority.ALWAYS);
 		GridPane.setHgrow(dataView, Priority.ALWAYS);
 		dataView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -790,16 +897,17 @@ public class QBEApp extends Application {
 		gridDbaSub.add(dataView, 0, 4, 2, 1);
 		
 		// Lambda
-		final HBox hBoxLambda = new HBox();
+//		final HBox hBoxLambda = new HBox();
 		hBoxLambda.getChildren().add(new Label("Lambda Terms:  "));
 		hBoxLambda.getStyleClass().add("hBoxLambda");
 		GridPane.setHgrow(hBoxLambda, Priority.ALWAYS);
 		gridDbaSub.add(hBoxLambda, 0, 5);
 		
 		Label datalogLabel = new Label("Datalog:");
-        TextField datalogTextArea = new TextField();
-        datalogLabel.setFont(Font.font("Courier New", FontWeight.BOLD, 12));
-        datalogTextArea.setFont(Font.font("Courier New", FontWeight.BOLD, 8));
+//        TextField datalogTextArea = new TextField();
+        datalogLabel.setFont(Font.font("Courier New", FontWeight.BOLD, 16));
+        datalogTextArea.setFont(Font.font("Courier New", FontWeight.BLACK, 12));
+        datalogTextArea.setWrapText(true);
 		final HBox hBox = buildTopMenu(datalogTextArea, hBoxLambda, dataView, false);
 		final HBox vboxDatalog = new HBox();
 		vboxDatalog.setSpacing(5);
@@ -827,7 +935,11 @@ public class QBEApp extends Application {
 		tableColumn.setCellValueFactory(new PropertyValueFactory<>("table"));
 		fieldColumn.setCellValueFactory(new PropertyValueFactory<>("field"));
 		showColumn.setCellValueFactory(new PropertyValueFactory<>("show"));
-		showColumn.setCellFactory(CheckBoxTableCell.forTableColumn(showColumn));
+		
+//		CheckBoxTableCell<Entry, Boolean> check = new CheckBoxTableCell<>();
+//		check.setAlignment(Pos.BASELINE_LEFT);
+		showColumn.setCellFactory(MyCheckBoxTableCell.forTableColumn(showColumn));
+//		showColumn.setCellValueFactory(CheckBoxTableCell.setAlignment(Pos.TOP_CENTER));
 		showColumn.setEditable(true);
 		criteraColumn.setCellValueFactory(new PropertyValueFactory<>("criteria"));
 		criteraColumn.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -841,7 +953,6 @@ public class QBEApp extends Application {
 		tableView.setItems(data);
 		tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-
 		// Label data preview
 		final Label label_1 = new Label("Data Preview");
 		label_1.setId("prompt-text");
@@ -852,21 +963,67 @@ public class QBEApp extends Application {
 		hboxSq.setAlignment(Pos.CENTER_RIGHT);
 		Button saveViewButton = new Button("Save View Query");
         saveViewButton.setOnAction(event -> {
-            TextInputDialog dialog = new TextInputDialog(null);
-            dialog.setTitle("Enter view query name");
+        	// Edited: Yan
+        	try {
+				view_operation.delete_view_by_id(dv);
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+            TextInputDialog dialog = new TextInputDialog(dv);
+            dialog.setContentText("Please enter the view query name:");
             dialog.setHeaderText(null);
             Optional<String> result = dialog.showAndWait();
-            String entered;
             if (result.isPresent()) {
-                entered = result.get();
+                dv = result.get();
             } else {
                 return;
             }
-            // TODO: Wei
+            if (data.isEmpty()) return;
+			List<Entry> list = new ArrayList<>();
+			list.addAll(data);
+			
+			HashMap<String, String> relation_mapping = new HashMap<String, String>();
+			Vector<String[]> head_vars = new Vector<String[]>();
+			Vector<String []> condition_str = new Vector<String[]>();
+			Vector<String[]> lambda_term_str = new Vector<String[]>();
+	        for (Entry e : list) {
+	        	String table = e.getTable();
+	        	String field = e.getField();
+	        	relation_mapping.put(table, table);
+	        	String[] arg = {field, table};
+	        	if (e.getShow()) {
+	        		head_vars.add(arg);
+	        	}
+	        	if (e.getCriteria() != null && !e.getCriteria().isEmpty()) {
+	        		String[] criteria = e.getCriteria().split("");
+	        		String[] condition = {field, table, "'" + criteria[0] + "'", criteria[1], ""};
+	        		condition_str.add(condition);
+	        	}
+	            if (e.getJoin() != null && !e.getJoin().isEmpty()) {
+	                String[] join = e.getJoin().split(""); //correspond to the setjoin() in createEditor()
+	                String[] condition1  = {field, table, "'" + join[0] + "'", join[3], join[1]};
+	                condition_str.add(condition1);
+	            }
+	            if (e.getLambda() == true) {
+	        		lambda_term_str.add(arg);
+	        	}
+	        }
+			
+			Query generatedQuery = null;
+			try {
+				generatedQuery = Gen_query.gen_query(dv, relation_mapping, head_vars, condition_str, lambda_term_str);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+            try {
+				view_operation.add(generatedQuery,dv);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Succeed");
             alert.setHeaderText(null);
-            alert.setContentText("The view queries is successfully saved as " + entered);
+            alert.setContentText("The view queries is successfully saved as " + dv);
             alert.showAndWait();
         });
 		hboxSq.getChildren().add(saveViewButton);
@@ -887,11 +1044,13 @@ public class QBEApp extends Application {
 		GridPane.setHgrow(hBoxPrevNext, Priority.ALWAYS);
 		gridDbaSub.add(hBoxPrevNext, 1, 5);
 
-		// ===========================================================================
 		dbaScene = new Scene(gridDba);
 		dbaScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
 	}
 
+	/* ===================================================================
+	 * Supplement methods
+	 */
 	private GridPane buildGridCg(ObservableList<String> observableList) {
 		GridPane gridCg = new GridPane();
         gridCg.setPadding(new Insets(2, 5, 2, 5));
@@ -930,11 +1089,29 @@ public class QBEApp extends Application {
 		editor.setHgap(10);
 		editor.setVgap(5);
 		Entry entry = param.getValue();
-		TextField criteriaField = new TextField(entry.getCriteria());
-		// TextField joinField = new TextField(entry.getJoin());
-		editor.addRow(0, new Label("Criteria"), criteriaField);
-        ObservableList<String> optionsTable = FXCollections.observableArrayList(Database.getTableList());
-        final ComboBox<String> comboBoxTable = new ComboBox(optionsTable);
+//		TextField criteriaField = new TextField(entry.getCriteria());
+//		// TextField joinField = new TextField(entry.getJoin());
+//		editor.addRow(0, new Label("Criteria"), criteriaField);
+//        ObservableList<String> optionsTable = FXCollections.observableArrayList(Database.getTableList());
+		/* Edited: Yan
+		 * Create criteria comboBox
+		 * Keep criteria and join both a string 
+		 */
+		final ComboBox comboBoxComparator = new ComboBox();
+		comboBoxComparator.getItems().addAll("=","<>",">","<",">=","<=");
+		comboBoxComparator.setValue(null);
+		TextField comparatorValue = new TextField();
+		Button addCriteria = new Button();
+		HBox hb = new HBox();
+		hb.setSpacing(5);
+		hb.getChildren().addAll(new Label("Criteria: "), comboBoxComparator, comparatorValue);
+		editor.addRow(0,hb);
+		
+		final ComboBox comboBoxComparator1 = new ComboBox();
+		comboBoxComparator1.getItems().addAll("=","<>",">","<",">=","<=");
+		comboBoxComparator1.setValue(null);
+		ObservableList<String> optionsTable = FXCollections.observableArrayList(Database.getTableList());
+		final ComboBox<String> comboBoxTable = new ComboBox(optionsTable);
         comboBoxTable.setPromptText("Table");
         comboBoxTable.valueProperty().addListener((ov, t, t1) -> {
             optionsField.clear();
@@ -942,18 +1119,31 @@ public class QBEApp extends Application {
         });
         final ComboBox<String> comboBoxField = new ComboBox(optionsField);
         comboBoxField.setPromptText("Field");
-		editor.addRow(1, new Label("Join"), comboBoxTable, comboBoxField);
+        HBox hb1 = new HBox();
+        hb1.setSpacing(5);
+        hb1.getChildren().addAll(new Label("Join: "), comboBoxComparator1, comboBoxTable, comboBoxField);
+		editor.addRow(1,hb1);
 		Button saveButton = new Button("Save");
 		saveButton.setOnAction(event -> {
-			entry.setCriteria(criteriaField.getText());
-			entry.setJoin(comboBoxTable.getValue() + "." + comboBoxField.getValue());
+			//entry.setCriteria(criteriaField.getText());
+			if(comboBoxComparator.getValue() != null && !comboBoxComparator.getValue().toString().isEmpty()) {
+				entry.setCriteria(comboBoxComparator.getValue() + comparatorValue.getText());
+			}
+			if(comboBoxComparator1.getValue() != null && !comboBoxComparator1.getValue().toString().isEmpty()) {
+				entry.setJoin(comboBoxComparator.getValue() + comboBoxTable.getValue() + "." + comboBoxField.getValue());
+			}
+			comboBoxComparator.setValue(null);
+			comboBoxComparator1.setValue(null);
 			param.toggleExpanded();
 		});
 		Button cancelButton = new Button("Cancel");
 		cancelButton.setOnAction(event -> param.toggleExpanded());
 		Button deleteButton = new Button("Delete Row");
 		deleteButton.setOnAction(event -> data.remove(entry));
-		editor.addRow(2, saveButton, cancelButton, deleteButton);
+		HBox hb2 = new HBox();
+		hb2.setSpacing(5);
+		hb2.getChildren().addAll(saveButton, cancelButton, deleteButton);
+		editor.addRow(2,hb2);
 		return editor;
 	}
 
@@ -1044,7 +1234,7 @@ public class QBEApp extends Application {
 		try {
 			Connection conn;
 			Class.forName("org.postgresql.Driver");
-			conn = DriverManager.getConnection(Database.DB_ADDR, Database.DB_USERNAME, Database.DB_PASSWORD);
+			conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
 			PreparedStatement st = conn.prepareStatement(lambdaSQL);
 			// lambdaData.clear();
 			if (hBoxLambda != null) hBoxLambda.getChildren().clear();
@@ -1109,6 +1299,7 @@ public class QBEApp extends Application {
 				ids.clear();
 //				try {
 //					System.out.println("[DEBUG] datalog: " + datalog);
+//					  c_views = Tuple_reasoning2.tuple_reasoning(datalog, citation_strs);
 ////					  c_views = Tuple_reasoning2.tuple_reasoning(datalog, citation_strs);
 //					  // Vector<String> agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views);
 //					  // Vector<String> subset_agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views, ids);
@@ -1148,6 +1339,38 @@ public class QBEApp extends Application {
 				break;
 			}
 		}
+	}
+	
+	public static class MyCheckBoxTableCell<S, T> extends CheckBoxTableCell<S, T> {
+	    private final CheckBox checkBox;
+	    private ObservableValue<T> ov;
+
+	    public MyCheckBoxTableCell() {
+	        this.checkBox = new CheckBox();
+	        this.checkBox.setAlignment(Pos.TOP_CENTER);
+
+	        super.setAlignment(Pos.TOP_CENTER);
+	        this.setAlignment(Pos.TOP_CENTER);
+	        setGraphic(checkBox);
+	    } 
+
+	    @Override public void updateItem(T item, boolean empty) {
+	        super.updateItem(item, empty);
+	        super.setAlignment(Pos.TOP_CENTER);
+	        if (empty) {
+	            setText(null);
+	            setGraphic(null);
+	        } else {
+	            setGraphic(checkBox);
+	            if (ov instanceof BooleanProperty) {
+	                checkBox.selectedProperty().unbindBidirectional((BooleanProperty) ov);
+	            }
+	            ov = getTableColumn().getCellObservableValue(getIndex());
+	            if (ov instanceof BooleanProperty) {
+	                checkBox.selectedProperty().bindBidirectional((BooleanProperty) ov);
+	            }
+	        }
+	    }
 	}
 
 }

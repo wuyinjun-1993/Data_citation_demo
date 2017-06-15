@@ -9,18 +9,20 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.upenn.cis.citation.Pre_processing.populate_db;
+
 public class Database {
 
-	public static String DB_ADDR =  "jdbc:postgresql://datacitation.cn7s3bpawoj2.us-east-1.rds.amazonaws.com/postgres";
-	public static String DB_USERNAME = "postgres";
-	public static String DB_PASSWORD = "12345678";
+//	public static String DB_ADDR =  "jdbc:postgresql://datacitation.cn7s3bpawoj2.us-east-1.rds.amazonaws.com/postgres";
+//	public static String DB_USERNAME = "postgres";
+//  public static String DB_PASSWORD = "12345678";
 	
 	public static List<String> getTableList() {
 		List<String> list = new ArrayList<>();
 		Connection conn = null;
 		try {
 			Class.forName("org.postgresql.Driver");
-			conn = DriverManager.getConnection(DB_ADDR, DB_USERNAME, DB_PASSWORD);
+			conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
 			DatabaseMetaData metaData = conn.getMetaData();
 			ResultSet rs = metaData.getTables(null, null, "%", new String[] { "TABLE" });
 			while (rs.next()) {
@@ -48,7 +50,7 @@ public class Database {
 		Connection conn = null;
 		try {
 			Class.forName("org.postgresql.Driver");
-			conn = DriverManager.getConnection(DB_ADDR, DB_USERNAME, DB_PASSWORD);
+			conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
 			DatabaseMetaData metaData = conn.getMetaData();
 			ResultSet rs = metaData.getColumns(null, null, tableName, "%");
 			while (rs.next()) {
@@ -73,7 +75,7 @@ public class Database {
 		Connection conn = null;
 		try {
 			Class.forName("org.postgresql.Driver");
-			conn = DriverManager.getConnection(DB_ADDR, DB_USERNAME, DB_PASSWORD);
+			conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
 			Statement statement = conn.createStatement();
 			statement.execute(String.format("SELECT DISTINCT %s FROM %s A ORDER BY %s", field, tableName, field));
 			ResultSet rs = statement.getResultSet();
@@ -103,9 +105,9 @@ public class Database {
 		Connection conn = null;
 		try {
 			Class.forName("org.postgresql.Driver");
-			conn = DriverManager.getConnection(DB_ADDR, DB_USERNAME, DB_PASSWORD);
+			conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
 			Statement statement = conn.createStatement();
-			statement.execute("SELECT DISTINCT view FROM citation_view ORDER BY view");
+			statement.execute("SELECT DISTINCT view FROM view_table ORDER BY view");
 			ResultSet rs = statement.getResultSet();
 			while (rs.next()) {
 				list.add(rs.getString(1));
@@ -121,6 +123,9 @@ public class Database {
 				}
 			}
 		}
+		
+		System.out.println(list.toString());
+		
 		return list;
 	}
 	
@@ -129,7 +134,7 @@ public class Database {
 		Connection conn = null;
 		try {
 			Class.forName("org.postgresql.Driver");
-			conn = DriverManager.getConnection(DB_ADDR, DB_USERNAME, DB_PASSWORD);
+			conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
 			Statement statement = conn.createStatement();
 			if (dv == null || dv.isEmpty()) {
 				statement.execute("SELECT DISTINCT citation_view_name FROM citation_view ORDER BY citation_view_name");
@@ -158,7 +163,7 @@ public class Database {
 		Connection conn = null;
 		try {
 			Class.forName("org.postgresql.Driver");
-			conn = DriverManager.getConnection(DB_ADDR, DB_USERNAME, DB_PASSWORD);
+			conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
 			Statement statement = conn.createStatement();
 			statement.execute("SELECT * FROM citation_view");
             statement.close();
@@ -185,7 +190,7 @@ public class Database {
         StringBuilder sb = new StringBuilder();
 		try {
 			Class.forName("org.postgresql.Driver");
-			conn = DriverManager.getConnection(DB_ADDR, DB_USERNAME, DB_PASSWORD);
+			conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
 
 			Statement statement = conn.createStatement();
 			statement.execute(String.format("SELECT * FROM view_table WHERE view='" + dv + "'"));
@@ -274,7 +279,7 @@ public class Database {
 		Connection conn = null;
 		try {
 			Class.forName("org.postgresql.Driver");
-			conn = DriverManager.getConnection(DB_ADDR, DB_USERNAME, DB_PASSWORD);
+			conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
 			Statement statement = conn.createStatement();
 			statement.execute("INSERT INTO view_table (view, web_view) VALUES ('" + dv + "', FALSE )");
 		} catch (SQLException | ClassNotFoundException e) {

@@ -122,7 +122,7 @@ public class Subgoal {
 	return false;
       }
 
-      Argument image = (Argument) cm.apply(srcArg);
+      Argument image = cm.apply(srcArg);
       if (image == null) {
 	cm.put(srcArg, dstArg);  // var -> var/const
       }

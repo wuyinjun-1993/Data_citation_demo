@@ -919,15 +919,8 @@ public class populate_db {
 		if(rs.next())
 		{
 			String annotation = rs.getString(1);
-			
-			if(annotation == null || annotation.isEmpty())
-			{
-				annotation_exist = false;
-			}
-			else
-			{
-				annotation_exist = true;
-			}
+
+            annotation_exist = !(annotation == null || annotation.isEmpty());
 		}
 		
 		return annotation_exist;

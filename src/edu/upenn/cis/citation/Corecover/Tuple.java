@@ -157,7 +157,7 @@ public class Tuple {
   public HashSet getTargetSubgoals() {
     HashSet result = new HashSet();
 
-    Set entrySet = (Set) mapSubgoals.entrySet();
+    Set entrySet = mapSubgoals.entrySet();
     for (Iterator iter = entrySet.iterator(); iter.hasNext();) {
       Map.Entry mapEntry = (Map.Entry) iter.next();
       Subgoal querySubgoal = (Subgoal) mapEntry.getValue();

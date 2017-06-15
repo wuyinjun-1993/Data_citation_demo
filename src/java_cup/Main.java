@@ -150,7 +150,7 @@ public class Main {
    * @param argv an array of strings containing command line arguments.
    */
   public static void main(String argv[]) 
-    throws internal_error, java.io.IOException, java.lang.Exception
+    throws java.lang.Exception
     {
       boolean did_output = false;
 

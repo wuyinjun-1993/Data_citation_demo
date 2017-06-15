@@ -1,0 +1,19 @@
+<component name="libraryTable">
+  <library name="lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/postgresql-9.4.1212.jre6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/log4j.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/poi-ooxml-3.5-beta5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/xmlbeans-2.3.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jdbc-postgresql.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/poi-3.9.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/poi-ooxml-schemas-3.12-beta1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/controlsfx-8.40.12.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/JSqlParser.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/controlsfx-samples-8.40.12.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/dom4j-2.0.0-RC1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -20,14 +20,21 @@ public class citation_view_parametered extends citation_view{
 	
 	public String name = new String ();
 	
+	
+	
+	//the lambda_terms in the view tuple
 	public Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();
 	
 	public Query view;
+	
+	public Tuple view_tuple;
 		
 //	public Vector<String> parameters = new Vector<String>();
 	
 	public HashMap<String, String> map = new HashMap<String, String>();
 	
+	
+	//relation_name in the body of query
 	public Vector<String> table_names = new Vector<String>();
 		
 	void gen_lambda_terms(Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
@@ -265,6 +272,8 @@ public class citation_view_parametered extends citation_view{
 		this.lambda_terms = tuple.lambda_terms;
 		
 		this.view = view;
+		
+		this.view_tuple = tuple;
 		
 		put_paramters(lambda_term_values);
 		
@@ -570,6 +579,8 @@ public class citation_view_parametered extends citation_view{
 		c_v.table_names = this.table_names;
 		
 		c_v.view = this.view;
+		
+		c_v.view_tuple = this.view_tuple;
 		
 		return c_v;
 	}

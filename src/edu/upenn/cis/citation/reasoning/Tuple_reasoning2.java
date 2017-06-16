@@ -1264,7 +1264,8 @@ public class Tuple_reasoning2 {
 					
 					c_views.add(c_vec);
 					
-					Vector<String> citations = gen_citation(c_vec, vals, c, pst, citation_strings);
+//					Vector<String> citations = gen_citation(c_vec, vals, c, pst, citation_strings);
+					Vector<String> citations = new Vector<String>();
 					
 					if(citation_view_map2.get(h_vals) == null)
 					{
@@ -1313,7 +1314,9 @@ public class Tuple_reasoning2 {
 					
 					c_views.add(update_c_view);
 					
-					Vector<String> citations = populate_citation(update_c_view, vals, c, pst, citation_strings);
+//					Vector<String> citations = populate_citation(update_c_view, vals, c, pst, citation_strings);
+					
+					Vector<String> citations = new Vector<String>();
 					
 					if(citation_view_map2.get(h_vals) == null)
 					{
@@ -1387,7 +1390,8 @@ public class Tuple_reasoning2 {
 					
 					old_value = curr_str;
 				
-					Vector<String> citations = gen_citation(curr_c_views, vals, c, pst, citation_strings);
+//					Vector<String> citations = gen_citation(curr_c_views, vals, c, pst, citation_strings);
+					Vector<String> citations = new Vector<String>();
 					
 					first = false;
 					
@@ -1437,7 +1441,9 @@ public class Tuple_reasoning2 {
 					
 					c_views.add(update_c_view);
 					
-					Vector<String> citations = populate_citation(update_c_view, vals, c, pst, citation_strings);
+//					Vector<String> citations = populate_citation(update_c_view, vals, c, pst, citation_strings);
+					
+					Vector<String> citations = new Vector<String>();
 					
 					if(citation_view_map2.get(h_vals) == null)
 					{

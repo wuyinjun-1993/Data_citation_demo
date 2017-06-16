@@ -396,11 +396,11 @@ public class UserLib {
   
 //viewTuples: hashset<Tuple>; rewritings: HashSet<Rewriting>(contains a HashSet<Tuple>); non_covering: HashSet<HashSet<Tuple>>
 
-  public static HashSet genSubsets(HashSet objectSet, int k, HashSet rewritings, HashSet non_covering, HashSet covering_set_size) {
+  public static HashSet genSubsets(HashSet objectSet, int k, HashSet rewritings, HashSet covering_set_size) {
     if (objectSet.size() < k )
       return (new HashSet()); // empty
     
-    return buildSubsets(objectSet, k, rewritings, non_covering, covering_set_size);
+    return buildSubsets(objectSet, k, rewritings, covering_set_size);
   }
 
   /**
@@ -451,7 +451,7 @@ public class UserLib {
    */
   
 	//viewTuples: hashset<Tuple>; rewritings: HashSet<Rewriting>(contains a HashSet<Tuple>); non_covering: HashSet<HashSet<Tuple>>
-  static HashSet buildSubsets(HashSet objectSet, int k, HashSet rewritings, HashSet non_covering_set, HashSet covering_set_size) 
+  static HashSet buildSubsets(HashSet objectSet, int k, HashSet rewritings, HashSet covering_set_size) 
   {
 	  HashSet result = new HashSet();
 

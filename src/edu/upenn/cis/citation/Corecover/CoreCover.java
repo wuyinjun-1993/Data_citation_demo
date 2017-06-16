@@ -635,7 +635,7 @@ public class CoreCover {
 	    double min_cost = Double.MAX_VALUE;
 	    Rewriting min_rewriting = null;
 	    
-	    HashSet non_covering = new HashSet();
+//	    HashSet non_covering = new HashSet();
 	    
 	    HashSet covering_set_size = new HashSet<>();
 	    
@@ -646,19 +646,19 @@ public class CoreCover {
 	      //" size = " + size);
 	    	
 	    	
-	        HashSet non_redundant_set = UserLib.genSubsets(viewTuples, size, rewritings, non_covering, covering_set_size);
+	        HashSet non_redundant_set = UserLib.genSubsets(viewTuples, size, rewritings, covering_set_size);
 	        
-	        non_covering.clear();
+//	        non_covering.clear();
 	        
 //	        covering_set_size.clear();
 
 	    	
 //	    	if(curr_rewritings.size() == 0)
 //	    	{
-	    		gen_rewriting(non_redundant_set, size, covered_relations, query, rewritings, non_covering, covering_set_size);
+	    		gen_rewriting(non_redundant_set, size, covered_relations, query, rewritings, covering_set_size);
 	    		
-	    		if(non_covering.isEmpty())
-	    			break;
+//	    		if(non_covering.isEmpty())
+//	    			break;
 //	    	}
 //	    	else
 //	    	{
@@ -769,7 +769,7 @@ public class CoreCover {
   }
   
   
-  static void gen_rewriting(HashSet tupleSubsets, int size, HashSet covered_relations, Query query, HashSet rewritings, HashSet non_covering, HashSet covering_set_size)
+  static void gen_rewriting(HashSet tupleSubsets, int size, HashSet covered_relations, Query query, HashSet rewritings, HashSet covering_set_size)
   {
       //System.out.println("# of tupleSubsets = " + tupleSubsets.size());
 
@@ -816,10 +816,10 @@ public class CoreCover {
 //
 //	  found = true;
 	}
-	else
-	{
-		non_covering.add(tupleSubset);
-	}
+//	else
+//	{
+//		non_covering.add(tupleSubset);
+//	}
       }
   }
   

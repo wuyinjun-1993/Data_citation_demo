@@ -167,7 +167,7 @@ public class Query_operation {
 	
 	
 	
-	public static Query get_query(String id) throws SQLException, ClassNotFoundException
+	public static Query get_query_by_id(String id) throws SQLException, ClassNotFoundException
 	{
 		Class.forName("org.postgresql.Driver");
         Connection c = DriverManager

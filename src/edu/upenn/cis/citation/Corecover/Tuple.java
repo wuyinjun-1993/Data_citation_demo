@@ -18,6 +18,8 @@ public class Tuple {
   Mapping phi_str = null;
   public Subgoal subgoal = null; // the subgoal that produces this tuple in canDb.
   public HashMap mapSubgoals = null;
+  
+  public HashMap mapSubgoals_str = null;
   public Query   query = null;
   public HashSet core = new HashSet();
   
@@ -75,6 +77,8 @@ public class Tuple {
     this.args = args;
     this.phi  = phi;
     this.mapSubgoals = mapSubgoals;
+    this.mapSubgoals_str = new HashMap<>();
+    set_map_subgoal_str(mapSubgoals);
   }
 
   Tuple(String name, Vector args, Mapping phi, Mapping phi_str, HashMap mapSubgoals) {
@@ -83,7 +87,23 @@ public class Tuple {
 	    this.phi  = phi;
 	    this.phi_str = phi_str;
 	    this.mapSubgoals = mapSubgoals;
+	    this.mapSubgoals_str = new HashMap<>();
+	    set_map_subgoal_str(mapSubgoals);
 	  }
+  
+  void set_map_subgoal_str(HashMap mapSubgoals)
+  {
+	  Set<Subgoal> subgoals = mapSubgoals.keySet();
+	  
+	  for(Iterator iter = subgoals.iterator(); iter.hasNext();)
+	  {
+		  Subgoal subgoal = (Subgoal) iter.next();
+		  
+		  Subgoal mapped_subgoal = (Subgoal) mapSubgoals.get(subgoal);
+		  
+		  mapSubgoals_str.put(subgoal.name, mapped_subgoal.name);
+	  }
+  }
   
   public String getName() {
     return name;

@@ -396,11 +396,11 @@ public class UserLib {
   
 //viewTuples: hashset<Tuple>; rewritings: HashSet<Rewriting>(contains a HashSet<Tuple>); non_covering: HashSet<HashSet<Tuple>>
 
-  public static HashSet genSubsets(HashSet objectSet, int k, HashSet rewritings, HashSet non_covering) {
+  public static HashSet genSubsets(HashSet objectSet, int k, HashSet rewritings, HashSet covering_set_size) {
     if (objectSet.size() < k )
       return (new HashSet()); // empty
     
-    return buildSubsets(objectSet, k, rewritings, non_covering);
+    return buildSubsets(objectSet, k, rewritings, covering_set_size);
   }
 
   /**
@@ -451,98 +451,142 @@ public class UserLib {
    */
   
 	//viewTuples: hashset<Tuple>; rewritings: HashSet<Rewriting>(contains a HashSet<Tuple>); non_covering: HashSet<HashSet<Tuple>>
-  static HashSet buildSubsets(HashSet objectSet, int k, HashSet rewritings, HashSet non_covering_set) {
-    HashSet result = new HashSet();
-    
-    if(k == 1)
-    {
-    	for(Iterator viewmapping_iter = objectSet.iterator(); viewmapping_iter.hasNext();)
-    	{
-    		HashSet view_mapping_set = new HashSet();
-    		
-    		view_mapping_set.add(viewmapping_iter.next());
-    		
-    		result.add(view_mapping_set);
-    	}
-    	
-    	return result;
-    }
-    
-    
-	for(Iterator non_covering_iter = non_covering_set.iterator(); non_covering_iter.hasNext();)
-    {
-		
-		HashSet non_cover = (HashSet) non_covering_iter.next();
-		
-		HashSet eligible_view_mappings = (HashSet) objectSet.clone();
-		
-		eligible_view_mappings.removeAll(non_cover);
-		
-		for(Iterator rw_iter = rewritings.iterator(); rw_iter.hasNext();)
-		{
-    		
-    		Rewriting rw = (Rewriting) rw_iter.next();
-    		
-    		HashSet rw_view_tuples = (HashSet) rw.viewTuples.clone();
-    		
-    		rw_view_tuples.removeAll(non_cover);
-    		
-    		if(rw_view_tuples.size() == 1)
-    		{
-    			eligible_view_mappings.removeAll(rw_view_tuples);
-    		}
-    	}
-		
-		
-		for(Iterator view_mapping_iter = eligible_view_mappings.iterator(); view_mapping_iter.hasNext();)
-		{
-			HashSet dup_non_cover = (HashSet)non_cover.clone();
-			
-			dup_non_cover.add(view_mapping_iter.next());
-			
-			result.add(dup_non_cover);
-		}
-    }
-	
-	return result;
-    
-    
+  static HashSet buildSubsets(HashSet objectSet, int k, HashSet rewritings, HashSet covering_set_size) 
+  {
+	  HashSet result = new HashSet();
 
-//    if (k == 0) {
-//      result.add(new HashSet()); // empty set
-//      return result;
-//    }
-//
-//    if (objectSet.size() == k ) {
-//      result.add(objectSet.clone());
-//      return result;
-//    }
-//
-//    if (objectSet.size() == 0)
-//      UserLib.myerror("UserLib.buildSubsets(): error()!");
-//
-//    // randomly pick an object
-//    Object obj = objectSet.iterator().next();
-//
-//    // removed the current object
-//    HashSet tmpObjSet = (HashSet) objectSet.clone();
-//    tmpObjSet.remove(obj);
-//
-//    // part 1: buildSubsets(objectSet - o, k); // without o
-//    HashSet result1 = buildSubsets(tmpObjSet, k); 
-//    result.addAll(result1);
-//
-//    // part 2: buildSubsets(objectSet - o, k - 1); // with o
-//    HashSet result2 = buildSubsets(tmpObjSet, k - 1); 
-//
-//    // add the current object to each subset in result 2
-//    for (Iterator iter = result2.iterator(); iter.hasNext();) {
-//      HashSet oneSet = (HashSet) iter.next(); // one partition
-//      oneSet.add(obj);
-//      result.add(oneSet);
+	    if (k == 0) {
+	      result.add(new HashSet()); // empty set
+	      return result;
+	    }
+
+	    if (objectSet.size() == k ) {
+	      result.add(objectSet.clone());
+	      return result;
+	    }
+
+	    if (objectSet.size() == 0)
+	      UserLib.myerror("UserLib.buildSubsets(): error()!");
+
+	    // randomly pick an object
+	    Object obj = objectSet.iterator().next();
+
+	    // removed the current object
+	    HashSet tmpObjSet = (HashSet) objectSet.clone();
+	    tmpObjSet.remove(obj);
+
+	    // part 1: buildSubsets(objectSet - o, k); // without o
+	    HashSet result1 = buildSubsets(tmpObjSet, k); 
+	    result.addAll(result1);
+
+	    // part 2: buildSubsets(objectSet - o, k - 1); // with o
+	    HashSet result2 = buildSubsets(tmpObjSet, k - 1); 
+
+	    // add the current object to each subset in result 2
+	    for (Iterator iter = result2.iterator(); iter.hasNext();) {
+	      HashSet oneSet = (HashSet) iter.next(); // one partition
+	      
+	      if(covering_set_size.contains(oneSet))
+	    	  continue;
+	      
+	      oneSet.add(obj);
+	      result.add(oneSet);
+	    }
+	    
+	    return result;
+	  
+	  
+//    HashSet result = new HashSet();
+//    
+//    if(k == 1)
+//    {
+//    	for(Iterator viewmapping_iter = objectSet.iterator(); viewmapping_iter.hasNext();)
+//    	{
+//    		HashSet view_mapping_set = new HashSet();
+//    		
+//    		view_mapping_set.add(viewmapping_iter.next());
+//    		
+//    		result.add(view_mapping_set);
+//    	}
+//    	
+//    	return result;
 //    }
 //    
-//    return result;
+//    
+//	for(Iterator non_covering_iter = non_covering_set.iterator(); non_covering_iter.hasNext();)
+//    {
+//		
+//		HashSet non_cover = (HashSet) non_covering_iter.next();
+//		
+//		HashSet eligible_view_mappings = (HashSet) objectSet.clone();
+//		
+//		eligible_view_mappings.removeAll(non_cover);
+//		
+//		for(Iterator rw_iter = rewritings.iterator(); rw_iter.hasNext();)
+//		{
+//    		
+//    		Rewriting rw = (Rewriting) rw_iter.next();
+//    		
+//    		HashSet rw_view_tuples = (HashSet) rw.viewTuples.clone();
+//    		
+//    		rw_view_tuples.removeAll(non_cover);
+//    		
+//    		if(rw_view_tuples.size() == 1)
+//    		{
+//    			eligible_view_mappings.removeAll(rw_view_tuples);
+//    		}
+//    	}
+//		
+//		
+//		for(Iterator view_mapping_iter = eligible_view_mappings.iterator(); view_mapping_iter.hasNext();)
+//		{
+//			HashSet dup_non_cover = (HashSet)non_cover.clone();
+//			
+//			dup_non_cover.add(view_mapping_iter.next());
+//			
+//			result.add(dup_non_cover);
+//		}
+//    }
+//	
+//	return result;
+//    
+//    
+//
+////    if (k == 0) {
+////      result.add(new HashSet()); // empty set
+////      return result;
+////    }
+////
+////    if (objectSet.size() == k ) {
+////      result.add(objectSet.clone());
+////      return result;
+////    }
+////
+////    if (objectSet.size() == 0)
+////      UserLib.myerror("UserLib.buildSubsets(): error()!");
+////
+////    // randomly pick an object
+////    Object obj = objectSet.iterator().next();
+////
+////    // removed the current object
+////    HashSet tmpObjSet = (HashSet) objectSet.clone();
+////    tmpObjSet.remove(obj);
+////
+////    // part 1: buildSubsets(objectSet - o, k); // without o
+////    HashSet result1 = buildSubsets(tmpObjSet, k); 
+////    result.addAll(result1);
+////
+////    // part 2: buildSubsets(objectSet - o, k - 1); // with o
+////    HashSet result2 = buildSubsets(tmpObjSet, k - 1); 
+////
+////    // add the current object to each subset in result 2
+////    for (Iterator iter = result2.iterator(); iter.hasNext();) {
+////      HashSet oneSet = (HashSet) iter.next(); // one partition
+////      oneSet.add(obj);
+////      result.add(oneSet);
+////    }
+////    
+////    return result;
   }
 
   

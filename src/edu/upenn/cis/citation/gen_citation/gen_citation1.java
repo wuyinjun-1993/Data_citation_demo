@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Vector;
 
+import edu.upenn.cis.citation.Corecover.Lambda_term;
+import edu.upenn.cis.citation.Corecover.Mapping;
 import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Pre_processing.Query_operation;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
@@ -37,7 +39,7 @@ public class gen_citation1 {
 	    
 	}
 	
-	static String db_name = "IUPHAR/BPS Guide to PHARMACOLOGY";
+	public static String db_name = "IUPHAR/BPS Guide to PHARMACOLOGY";
 	
 	public static String get_citation_agg(Vector<citation_view_vector> c_views) throws ClassNotFoundException, SQLException
 	{
@@ -173,6 +175,69 @@ public class gen_citation1 {
 		return citation;
 	}
 	
+	public static String get_citations(citation_view_vector c_vec, Vector<String> vals, Connection c, PreparedStatement pst, HashMap<String, Vector<String>> query_str, int max_num, HashSet<String> authors) throws ClassNotFoundException, SQLException
+	{
+		String author_str = new String();
+		
+//		HashSet<String> authors = new HashSet<String>();
+		
+		
+		for(int i = 0; i<c_vec.c_vec.size(); i++)
+		{
+			if(c_vec.c_vec.get(i).has_lambda_term())
+			{
+				authors.addAll(get_authors((citation_view_parametered)c_vec.c_vec.get(i),c, pst, query_str));
+			}
+			else
+			{
+				authors.addAll(get_authors((citation_view_unparametered)c_vec.c_vec.get(i),c, pst, query_str));
+			}
+			
+			
+			
+		}
+		
+		int num = 0;
+		
+		for(Iterator iter = authors.iterator(); iter.hasNext();)
+		{
+			
+			if(num >= 1)
+				author_str += ",";
+			
+			author_str += iter.next();
+			num++;
+			
+			if(max_num > 0 && num >= max_num)
+			{
+				author_str += ", etc.";
+				break;
+			}
+		}
+		
+		String citation = author_str;
+		
+		if(!author_str.isEmpty())
+		{
+			citation = author_str + ".";
+		}
+		
+		String value_str = new String();
+		
+		for(int i = 0; i<vals.size(); i++)
+		{
+			if( i >= 1)
+				value_str += ",";
+			
+			value_str += vals.get(i);
+		}
+		
+		citation += value_str + "." + db_name;
+		
+		return citation;
+	}
+	
+	
 	public static String get_citations(citation_view_vector c_vec, Vector<String> vals, Connection c, PreparedStatement pst, HashMap<String, Vector<String>> query_str, int max_num) throws ClassNotFoundException, SQLException
 	{
 		String author_str = new String();
@@ -234,6 +299,7 @@ public class gen_citation1 {
 		
 		return citation;
 	}
+	
 	
 	public static String populate_citation(citation_view_vector c_views, Vector<String> values, Connection c, PreparedStatement pst, HashMap<String, Vector<String>> query_str, int max_num) throws SQLException
 	{
@@ -323,8 +389,110 @@ public class gen_citation1 {
 		return citation;
 	}
 	
+	public static String populate_citation(citation_view_vector c_views, Vector<String> values, Connection c, PreparedStatement pst, HashMap<String, Vector<String>> query_str, int max_num, HashSet<String> authors) throws SQLException, ClassNotFoundException
+	{
+		
+//		HashSet<String> authors = new HashSet<String>();
+		
+		
+		for(int i = 0; i<c_views.c_vec.size(); i++)
+		{
+			
+			citation_view c_view = c_views.c_vec.get(i);
+			
+			Vector<String> query_ids = get_query_id(c_view.get_name(), c, pst);
+			
+			Vector<String> curr_str = query_str.get(c_view.get_name());
+			
+			for(int j = 0; j<curr_str.size(); j++)
+			{
+				Query citation_query = Query_operation.get_query_by_id(query_ids.get(j));
+				
+				if(citation_query.lambda_term.size() > 0)
+				{
+					
+					pst = c.prepareStatement(curr_str.get(j));
+					
+					for(int k = 0; k<citation_query.lambda_term.size(); k++)
+					{
+						
+						Lambda_term l_term = citation_query.lambda_term.get(k);
+						
+						citation_view_parametered curr_c_view = (citation_view_parametered)c_view;
+						
+						HashMap mapping = curr_c_view.view_tuple.mapSubgoals_str;
+						
+						l_term.table_name = (String) mapping.get(l_term.table_name);
+						
+						pst.setString(k + 1, curr_c_view.map.get(l_term.toString()));
+					}
+					
+					ResultSet rs = pst.executeQuery();
+					
+					while(rs.next())
+					{
+						authors.add(rs.getString(1) + " " + rs.getString(2));
+					}
+				}
+				else
+				{
+					pst = c.prepareStatement(curr_str.get(j));
+					
+					ResultSet rs = pst.executeQuery();
+					
+					while(rs.next())
+					{
+						authors.add(rs.getString(1) + " " + rs.getString(2));
+					}
+				}
+			}
+			
+		}
+		
+		int num = 0;
+		
+		String author_str = new String();
+		
+		for(Iterator iter = authors.iterator(); iter.hasNext();)
+		{
+			
+			if(num >= 1)
+				author_str += ",";
+			
+			author_str += iter.next();
+			num++;
+			if(max_num > 0 && num >= max_num)
+			{
+				author_str += ", etc.";
+				break;
+			}
+			
+		}
+		
+		String citation = author_str;
+		
+		if(!author_str.isEmpty())
+		{
+			citation = author_str + ".";
+		}
+		
+		String value_str = new String();
+		
+		for(int i = 0; i<values.size(); i++)
+		{
+			if( i >= 1)
+				value_str += ",";
+			
+			value_str += values.get(i);
+		}
+		
+		citation += value_str + "." + db_name;
+		
+		return citation;
+	}
 	
-	static Vector<String> get_query_id(String c_view_name, Connection c, PreparedStatement pst) throws SQLException
+	
+	public static Vector<String> get_query_id(String c_view_name, Connection c, PreparedStatement pst) throws SQLException
 	{
 		Vector<String> query_ids = new Vector<String>();
 		
@@ -367,7 +535,7 @@ public class gen_citation1 {
 		
 		for(int k = 0; k<query_ids.size(); k++)
 		{
-			Query q = Query_operation.get_query(query_ids.get(k));
+			Query q = Query_operation.get_query_by_id(query_ids.get(k));
 			
 //			System.out.println(q);
 			
@@ -375,7 +543,7 @@ public class gen_citation1 {
 			
 			String lambda_term_q_str = new String();
 			
-			for(int i = 0; i<c_view.lambda_terms.size(); i++)
+			for(int i = 0; i<q.lambda_term.size(); i++)
 			{
 				if(i >= 1)
 					lambda_term_q_str += " and ";
@@ -586,7 +754,7 @@ public class gen_citation1 {
 		
 		for(int k = 0; k<query_ids.size(); k++)
 		{
-			Query q = Query_operation.get_query(query_ids.get(k));
+			Query q = Query_operation.get_query_by_id(query_ids.get(k));
 			
 //			System.out.println(q);
 			

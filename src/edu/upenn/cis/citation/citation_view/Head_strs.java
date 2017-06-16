@@ -6,7 +6,7 @@ import edu.upenn.cis.citation.Corecover.Argument;
 
 public class Head_strs {
 	
-	Vector<String> head_vals;
+	public Vector<String> head_vals;
 	
 	public Head_strs(Vector<String> vec_str)
 	{

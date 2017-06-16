@@ -74,10 +74,12 @@ public class Entry {
 	}
 
 	public void setCriteria(String fCriteria) {
+		// eg. =3, >4
 		criteria.set(fCriteria);
 	}
 
 	public void setJoin(String fJoin) {
+		// eg. =table.field 
 		join.set(fJoin);
 	}
 

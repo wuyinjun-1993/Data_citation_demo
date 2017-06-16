@@ -107,7 +107,7 @@ public class Database {
 			Class.forName("org.postgresql.Driver");
 			conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
 			Statement statement = conn.createStatement();
-			statement.execute("SELECT DISTINCT view FROM view_table ORDER BY view");
+			statement.execute("SELECT DISTINCT name FROM view_table ORDER BY name");
 			ResultSet rs = statement.getResultSet();
 			while (rs.next()) {
 				list.add(rs.getString(1));

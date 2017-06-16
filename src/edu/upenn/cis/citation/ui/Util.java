@@ -48,8 +48,7 @@ public class Util {
 	
 	public static String convertToDatalogOriginal(List<Entry> list) {
 
-	    // TODO: Wei
-        if (list == null || list.size() == 0) return "";
+		if (list == null || list.size() == 0) return "";
         Set<String> tables = new HashSet<>();
         StringBuilder sb = new StringBuilder();
         ArrayList<String> lambda_term = new ArrayList<>();
@@ -61,10 +60,13 @@ public class Util {
         if (lambda_term.size() > 0) {
             sb.append("λ ");
             sb.append(lambda_term.get(0));
+            for (int i = 1; i < lambda_term.size(); i++) {
+                sb.append(", " + lambda_term.get(i));
+            }
         }
-        for (int i = 1; i < lambda_term.size(); i++) {
-            sb.append(", " + lambda_term.get(i));
-        }
+//        for (int i = 1; i < lambda_term.size(); i++) {
+//            sb.append(", " + lambda_term.get(i));
+//        }
         if (lambda_term.size() > 0) sb.append("  ");
         for (int i = 0; i < list.size(); i++) {
             Entry e = list.get(i);
@@ -80,8 +82,15 @@ public class Util {
             sb.append(table + "(), ");
         }
         for (Entry e : list) {
+        	if (e.getJoin() != null && !e.getJoin().isEmpty()) {
+        		String[] join = e.getJoin().split("\\.");
+                sb.append(join[0].substring(1, join[0].length()) + "()" + ", ");
+            }
             if (e.getCriteria() != null && !e.getCriteria().isEmpty()) {
-                sb.append(e.getField() + " " + e.getCriteria() + ", ");
+                sb.append(e.getTable() + "." + e.getField() + " " + e.getCriteria() + ", ");
+            }
+            if (e.getJoin() != null && !e.getJoin().isEmpty()) {
+                sb.append(e.getTable() + "."  + e.getField() + e.getJoin() + ", ");
             }
         }
         sb.delete(sb.length()-2, sb.length());
@@ -170,16 +179,17 @@ public class Util {
             if (toCite) tables.add(item.getTable() + "_c");
             else tables.add(item.getTable());
             if (item.getCriteria() != null && !item.getCriteria().isEmpty()) {
+            	
                 if (toCite) wheres.add(item.getTable() + "_c_"  + item.getField() + " " + item.getCriteria());
                 else wheres.add(item.getTable() + "."  + item.getField() + " " + item.getCriteria());
             }
             if (item.getJoin() != null && !item.getJoin().isEmpty()) {
                 if (toCite) {
-                    String name = item.getJoin();
-                    String new_name = name.split("\\.")[0] + "_c_" + name.split("\\.")[1];
-                    joins.add(item.getTable() + "_c_"  + item.getField() + " = " + new_name);
+                    String[] name = item.getJoin().split("\\.");
+                    String new_name = name[0].substring(1, name[0].length()) + "_c_" + name[1];
+                    joins.add(item.getTable() + "_c_"  + item.getField() + name[0].charAt(0) + new_name);
                 }
-                else joins.add(item.getTable() + "."  + item.getField() + " = " + item.getJoin());
+                else joins.add(item.getTable() + "."  + item.getField() + item.getJoin());
             }
         }
         sb.append("SELECT ");

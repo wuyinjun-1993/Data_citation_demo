@@ -181,6 +181,7 @@ public class gen_citation1 {
 		
 //		HashSet<String> authors = new HashSet<String>();
 		
+//		System.out.println(c_vec.toString());
 		
 		for(int i = 0; i<c_vec.c_vec.size(); i++)
 		{
@@ -422,7 +423,9 @@ public class gen_citation1 {
 						
 						HashMap mapping = curr_c_view.view_tuple.mapSubgoals_str;
 						
-						l_term.table_name = (String) mapping.get(l_term.table_name);
+						l_term.update_table_name((String) mapping.get(l_term.table_name));
+						
+//						System.out.println(curr_c_view.map.get(l_term.toString()));
 						
 						pst.setString(k + 1, curr_c_view.map.get(l_term.toString()));
 					}
@@ -578,11 +581,26 @@ public class gen_citation1 {
 
 			curr_sql.add(sql);
 			
-//			System.out.println("sql:::" + sql);
+//			System.out.println("sql:::" + c_view.toString() + ":::" + sql);
 			
 			for(int j = 0; j<q.lambda_term.size(); j++)
 			{
-				String temp =  c_view.map.get(q.lambda_term.get(j).toString());
+				
+				HashMap subgoal_mapping = c_view.view_tuple.mapSubgoals_str;
+				
+				Lambda_term l_term = q.lambda_term.get(j);
+				
+				l_term.update_table_name((String)subgoal_mapping.get(l_term.table_name));
+				
+				String temp =  c_view.map.get(l_term.toString());
+				
+//				System.out.println(l_term.toString());
+//								
+//				System.out.println("l_term::" + l_term.toString());
+//				
+//				System.out.println(c_view.map.toString());
+//				
+//				System.out.println(temp);
 				
 				pst.setString(j + 1, temp);
 				
@@ -797,7 +815,7 @@ public class gen_citation1 {
 
 			curr_sql.add(sql);
 			
-//			System.out.println("sql:::" + sql);
+//			System.out.println("sql:::" + c_view.toString() + "::" + sql);
 			
 //			for(int j = 0; j<q.lambda_term.size(); j++)
 //			{

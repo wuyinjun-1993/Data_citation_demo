@@ -138,11 +138,15 @@ public class Tuple_reasoning1 {
 			
 			Vector<Vector<citation_view_vector>> c_views = tuple_reasoning(q, citation_strs1, head_vals, file_name, citation_view_map1);
 			
+			t1 = System.nanoTime();
+			
 			HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map1_1 = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
 			
 			HashMap<Head_strs, Vector<String> > citation_strs1_1 = new HashMap<Head_strs, Vector<String> >();
 			
 			Vector<Vector<citation_view_vector>> c_views1_1 = Tuple_reasoning1_citation_opt.tuple_reasoning(q, citation_strs1_1, head_vals, file_name, citation_view_map1_1);
+			
+			t2 = System.nanoTime();
 			
 			HashMap<Head_strs, Vector<HashSet<String>>>author_opt = Tuple_reasoning1_citation_opt.authors;
 			
@@ -160,7 +164,7 @@ public class Tuple_reasoning1 {
 		
 		
 				
-		t1 = System.nanoTime();
+		
 		
 //		System.out.println("method2");
 		
@@ -179,7 +183,7 @@ public class Tuple_reasoning1 {
 		
 		
 		
-		t2 = System.nanoTime();
+		
 		
 //		for(int i = 0; i<100; i++)
 //		{
@@ -199,15 +203,15 @@ public class Tuple_reasoning1 {
 		
 		time0 = (t1 - t0) / 100;
 		
-		time1 = (t3 - t2)/ 100;
+//		time1 = (t3 - t2)/ 100;
 		
 		time2 = (t2 - t1) / 100;
 		
 		System.out.println("time in tuple level:" + time0);
 		
-		System.out.println("time with opt:" + time1);
+//		System.out.println("time with opt:" + time1);
 		
-		System.out.println("time without opt:" + time2);
+		System.out.println("time with opt:" + time2);
 		
 //		compare(citation_view_map2, citation_view_map3);
 //		
@@ -240,7 +244,7 @@ public class Tuple_reasoning1 {
 			
 			System.out.println(h_val);
 			
-			if(h_val.toString().equals("2 1"))
+			if(h_val.toString().equals("2 1 1"))
 			{
 				int y = 0;
 				y++;
@@ -278,6 +282,16 @@ public class Tuple_reasoning1 {
 			
 			if(j >= a2.size())
 			{
+				System.out.println(i + ":::" + j);
+				
+				System.out.println(a1.get(i));
+				
+				System.out.println(a2.get(i));
+				
+				
+				
+				
+				
 				assertEquals(1, 0);
 			}
 		}
@@ -382,7 +396,7 @@ public class Tuple_reasoning1 {
 		head_args.add(new Argument("family_family_id", "family"));
 				
 		
-		head_args.add(new Argument("family1_family_id", "family1"));
+//		head_args.add(new Argument("family1_family_id", "family1"));
 //		
 //		head_args.add(new Argument("family2_family_id", "family2"));
 				
@@ -393,7 +407,7 @@ public class Tuple_reasoning1 {
 
 		
 //		head_args.add(new Argument("introduction1_family_id", "introduction1"));
-//				
+////				
 //		head_args.add(new Argument("introduction2_family_id", "introduction2"));
 		
 //		head_args.add(new Argument("introduction3_family_id", "introduction3"));
@@ -404,7 +418,7 @@ public class Tuple_reasoning1 {
 		
 		Vector<Argument> args1 = view_operation.get_full_schema("family", "family", c, pst);
 		
-		Vector<Argument> args2 = view_operation.get_full_schema("family1", "family", c, pst);
+//		Vector<Argument> args2 = view_operation.get_full_schema("family1", "family", c, pst);
 		
 		
 //		Vector<Argument> args6 = view_operation.get_full_schema("family2", "family", c, pst);
@@ -414,7 +428,7 @@ public class Tuple_reasoning1 {
 		Vector<Argument> args3 = view_operation.get_full_schema("introduction", "introduction", c, pst);
 		
 //		Vector<Argument> args4 = view_operation.get_full_schema("introduction1", "introduction", c, pst);
-//		
+////		
 //		Vector<Argument> args5 = view_operation.get_full_schema("introduction2", "introduction", c, pst);
 		
 //		Vector<Argument> args8 = view_operation.get_full_schema("introduction3", "introduction", c, pst);
@@ -422,7 +436,7 @@ public class Tuple_reasoning1 {
 		
 		subgoals.add(new Subgoal("family", args1));
 		
-		subgoals.add(new Subgoal("family1", args2));
+//		subgoals.add(new Subgoal("family1", args2));
 //		
 //		subgoals.add(new Subgoal("family2", args6));
 		
@@ -438,15 +452,15 @@ public class Tuple_reasoning1 {
 		
 		Vector<Conditions> conditions = new Vector<Conditions>();
 		
-		conditions.add(new Conditions(new Argument("family_id", "family"), "family", new op_less_equal(), new Argument("20"), new String()));
+		conditions.add(new Conditions(new Argument("family_id", "family"), "family", new op_less_equal(), new Argument("2"), new String()));
 //		
-		conditions.add(new Conditions(new Argument("family_id", "family1"), "family1", new op_less_equal(), new Argument("2"), new String()));
+//		conditions.add(new Conditions(new Argument("family_id", "family1"), "family1", new op_less_equal(), new Argument("2"), new String()));
 //		
 //		conditions.add(new Conditions(new Argument("family_id", "family2"), "family2", new op_less_equal(), new Argument("2"), new String()));
 		
 //		conditions.add(new Conditions(new Argument("family_id", "family3"), "family3", new op_less_equal(), new Argument("2"), new String()));
 //		
-		conditions.add(new Conditions(new Argument("family_id", "introduction"), "introduction", new op_less_equal(), new Argument("20"), new String()));
+		conditions.add(new Conditions(new Argument("family_id", "introduction"), "introduction", new op_less_equal(), new Argument("2"), new String()));
 		
 //		conditions.add(new Conditions(new Argument("family_id", "introduction1"), "introduction1", new op_less_equal(), new Argument("2"), new String()));
 //		
@@ -461,7 +475,7 @@ public class Tuple_reasoning1 {
 		
 		subgoal_name_mapping.put("family", "family");
 		
-		subgoal_name_mapping.put("family1", "family");
+//		subgoal_name_mapping.put("family1", "family");
 //		
 //		subgoal_name_mapping.put("family2", "family");
 		
@@ -470,7 +484,7 @@ public class Tuple_reasoning1 {
 		subgoal_name_mapping.put("introduction", "introduction");
 		
 //		subgoal_name_mapping.put("introduction1", "introduction");
-//
+////
 //		subgoal_name_mapping.put("introduction2", "introduction");
 		
 //		subgoal_name_mapping.put("introduction3", "introduction");
@@ -1442,6 +1456,7 @@ public class Tuple_reasoning1 {
 				Head_strs h_vals = new Head_strs(vals);
 				
 //				System.out.println(h_vals);
+				
 								
 				int pos1 = query.body.size() + query.head.args.size() + lambda_term_num;
 				

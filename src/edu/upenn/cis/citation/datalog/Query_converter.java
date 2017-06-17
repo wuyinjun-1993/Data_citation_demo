@@ -129,11 +129,13 @@ public class Query_converter {
 			    
 		Vector<String> citation_queries = new Vector<String>();
 
-	    
+//	    System.out.println(c_views.toString());
+		
+		
 		for(int i = 0; i<c_views.c_vec.size(); i++)
 		{
 			Vector<String> query_ids = gen_citation1.get_query_id(c_views.c_vec.get(i).get_name(), c, pst);
-			
+						
 			Vector<String> curr_citation_queries = new Vector<String>();
 			
 			for(int j = 0; j<query_ids.size(); j++)
@@ -152,11 +154,13 @@ public class Query_converter {
 				
 				String citation_condition_str = get_condition(citation_query);
 				
-//				System.out.println(citation_condition_str);
+//				System.out.println(citation_query.toString());
 				
 				String subquery = gen_citation_sub_query(citation_query_sel_item, q, head_vars, query_condition_str, group_condition_str, query_relations, citation_query_relation_names, citation_sub_query_join_condition, citation_condition_str);
 				
 				curr_citation_queries.add("(" + subquery + ")");
+				
+//				System.out.println(c_views.c_vec.get(i) + ":" + subquery);
 				
 				citation_queries = citation_queries_cross_union(citation_queries, curr_citation_queries, i);
 				
@@ -170,7 +174,7 @@ public class Query_converter {
 		{
 			full_queries.add("select distinct " + group_vars + ", string_agg(first_names ||' '|| surname, ',') from (" + citation_queries.get(i) + ") h group by " + group_vars);
 			
-			System.out.println(citation_queries.get(i));
+//			System.out.println(citation_queries.get(i));
 			
 			pst = c.prepareStatement(citation_queries.get(i));
 			
@@ -1420,7 +1424,7 @@ public class Query_converter {
 		
 //		String citation_condition = get_citation_condition(query, c, pst);
 		
-		sql = "select " + sel_item;
+		sql = "select distinct " + sel_item;
 		
 //		if(sel_lambda_terms != null && !sel_lambda_terms.isEmpty())
 //			sql += "," + sel_lambda_terms;	
@@ -1795,7 +1799,7 @@ public class Query_converter {
 			
 			if(l.table_name.equals(old_name))
 			{
-				l.table_name = new_name;
+				l.update_table_name(new_name);
 			}
 			
 			citation_query.lambda_term.set(i, l);

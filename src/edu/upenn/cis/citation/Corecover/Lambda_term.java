@@ -31,5 +31,12 @@ public class Lambda_term {
 		
 		this.table_name = table_name;
 	}
+	
+	public void update_table_name(String new_table_name)
+	{
+		table_name = new_table_name;
+		
+		name = table_name + "_" + name.substring(name.indexOf("_") + 1, name.length());
+	}
 
 }

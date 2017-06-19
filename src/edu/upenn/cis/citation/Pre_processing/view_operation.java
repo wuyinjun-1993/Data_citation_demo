@@ -689,7 +689,7 @@ public class view_operation {
         
 //        update_table(view, c, pst);
         
-        int seq = get_view_num(c, pst) + 1;
+        int seq = name.hashCode();
         
         view.name = name;//"v" + seq;
         

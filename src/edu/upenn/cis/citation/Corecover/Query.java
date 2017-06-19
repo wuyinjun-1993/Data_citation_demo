@@ -499,11 +499,15 @@ public class Query {
    */
   public boolean equals(Object tmpQuery) {
     Query query = (Query) tmpQuery;
-    return this.getName().equals(query.getName());
+//    return this.getName().equals(query.getName());
+    return this.hashCode() == query.hashCode();
   }
 
   public int hashCode() {
-    return (name.hashCode());
+	  String str = lambda_term.toString() + "," + toString().substring(name.length(), toString().length());
+	  
+	  
+    return (str.hashCode());
   }
 
   public String toString() {

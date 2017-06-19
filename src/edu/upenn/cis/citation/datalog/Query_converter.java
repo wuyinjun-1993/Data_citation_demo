@@ -43,7 +43,6 @@ import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.util.AddAliasesVisitor;
 import net.sf.jsqlparser.util.TablesNamesFinder;
-import schema_reasoning.Gen_citation1;
 import java.util.Random;
 
 

@@ -121,6 +121,8 @@ public class QBEApp extends Application {
 	List<TreeItem<TreeNode>> removedTreeItems = new ArrayList<>();
 
 	private ObservableList<ObservableList> dataTable = FXCollections.observableArrayList();
+	// view names
+	ObservableList<String> listDataViews = FXCollections.observableArrayList(Database.getDataViews());
 	List<List<String>> lambdasAll = new ArrayList<>();
 	String lambdaSQL = null;
 	String datalog = null;
@@ -350,7 +352,7 @@ private Object String;
 		// ListView Data Views
 		ListView<String> listViewDataViews = new ListView<>();
 		listViewDataViews.setPrefWidth(400);
-		ObservableList<String> listDataViews = FXCollections.observableArrayList(Database.getDataViews());
+//		ObservableList<String> listDataViews = FXCollections.observableArrayList(Database.getDataViews());
 		listViewDataViews.setItems(listDataViews);
 
 		listViewDataViews.setOnMouseClicked(event -> {
@@ -396,16 +398,6 @@ private Object String;
         });
 		Button buttonAddDataView = new Button("Add");
 		buttonAddDataView.setOnAction(event -> {
-//            TextInputDialog dialog = new TextInputDialog(null);
-//            dialog.setTitle("Enter Data View Name");
-//            dialog.setHeaderText(null);
-//            Optional<String> result = dialog.showAndWait();
-//            String entered;
-//            if (result.isPresent()) {
-//                entered = result.get();
-//            } else {
-//                return;
-//            }
 			count ++;
 			String randomName = new java.lang.String();
 			randomName = "Untitled" + count;
@@ -416,16 +408,17 @@ private Object String;
 //            alert.setContentText("The data view " + randomName + " is successfully created");
 //            alert.showAndWait();
 			listDataViews.add(randomName);
-			try {
-				HashMap<String, String> relation_mapping = new HashMap<String, String>();
-				Vector<String[]> head_vars = new Vector<String[]>();
-				Vector<String []> condition_str = new Vector<String[]>();
-				Vector<String[]> lambda_term_str = new Vector<String[]>();
-				Query emptyQuery = Gen_query.gen_query(randomName, relation_mapping, head_vars, condition_str, lambda_term_str);
-				view_operation.add(emptyQuery, randomName);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+//			try {
+//				HashMap<String, String> relation_mapping = new HashMap<String, String>();
+//				Vector<String[]> head_vars = new Vector<String[]>();
+//				Vector<String []> condition_str = new Vector<String[]>();
+//				Vector<String[]> lambda_term_str = new Vector<String[]>();
+//				Query emptyQuery = Gen_query.gen_query(randomName, relation_mapping, head_vars, condition_str, lambda_term_str);
+//				view_operation.add(emptyQuery, randomName);
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+			dv = randomName;
             dbaDataViewDataTab.setText("Data View: " + randomName);
             dbaListCitationViews.setAll(Database.getCitationViews(dbaDataViewDataTab.getText().split(":")[1].trim()));
             stage.setScene(dbaScene);
@@ -968,6 +961,7 @@ private Object String;
 		tableView.setItems(data);
 //		tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
+		tableColumn.setPrefWidth(100);
 		fieldColumn.setPrefWidth(100);
 		showColumn.setPrefWidth(70);
 		lambdaColumn.setPrefWidth(70);
@@ -1000,17 +994,30 @@ private Object String;
 		Button saveViewButton = new Button("Save View Query");
         saveViewButton.setOnAction(event -> {
         	// Edited: Yan
-        	try {
-				view_operation.delete_view_by_name(dv);
-			} catch (Exception e2) {
-				e2.printStackTrace();
-			}
+//    		ObservableList<String> listDataViews = FXCollections.observableArrayList(Database.getDataViews());
+        	if (listDataViews.contains(dv)) {
+        		try {
+    				view_operation.delete_view_by_name(dv);
+    				listDataViews.remove(dv);
+    			} catch (Exception e2) {
+    				e2.printStackTrace();
+    			}
+        	}
             TextInputDialog dialog = new TextInputDialog(dv);
             dialog.setContentText("Please enter the view query name:");
             dialog.setHeaderText(null);
             Optional<String> result = dialog.showAndWait();
             if (result.isPresent()) {
-                dv = result.get();
+                String tempName = result.get();
+                if (listDataViews.contains(tempName)) {
+                	Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Alert");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Duplicate name, pls re-enter!");
+                    alert.showAndWait();
+                    return;
+                } else
+                	dv = result.get();
             } else {
                 return;
             }
@@ -1044,7 +1051,9 @@ private Object String;
 	            if (e.getJoin() != null && !e.getJoin().isEmpty()) {
 	                String[] join = e.getJoin().split("\\."); //correspond to the setjoin() in createEditor()
 	                // split according to dot
-	                String[] condition1  = {field, table, "'" + e.getJoin().charAt(0) + "'", join[1], join[0].substring(1, join[0].length())};
+	                String comparator = Character.toString(e.getJoin().charAt(0));
+	                String[] condition1  = {field, table, comparator, join[1], join[0].substring(1, join[0].length())};
+	                // no need to -1 at the index
 	                condition_str.add(condition1);
 	            }
 	            if (e.getLambda() == true) {
@@ -1068,27 +1077,9 @@ private Object String;
             alert.setHeaderText(null);
             alert.setContentText("The view queries is successfully saved as " + dv);
             alert.showAndWait();
+            listDataViews.add(dv);
         });
         
-        HashMap<String, String> relation_mapping = new HashMap<String, String>();
-		Vector<String[]> head_vars = new Vector<String[]>();
-		Vector<String []> condition_str = new Vector<String[]>();
-		Vector<String[]> lambda_term_str = new Vector<String[]>();
-		try {
-			
-			Query generatedQuery = Gen_query.gen_query(dv, relation_mapping, head_vars, condition_str, lambda_term_str);
-			System.out.println(generatedQuery);
-			System.out.println(relation_mapping);
-			System.out.println(head_vars);
-			System.out.println(condition_str);
-			System.out.println(lambda_term_str);
-		} catch (ClassNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 
 		hboxSq.getChildren().add(saveViewButton);
 

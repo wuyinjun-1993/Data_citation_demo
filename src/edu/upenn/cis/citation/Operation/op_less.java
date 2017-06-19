@@ -33,5 +33,22 @@ public class op_less extends Operation{
 		// TODO Auto-generated method stub
 		return this.op.hashCode();
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		// TODO Auto-generated method stub
+		Operation operation = (Operation) obj;
+		
+		if(operation.get_op_name().equals(this.get_op_name()))
+			return true;
+		
+		return false;
+	}
+
+	@Override
+	public Operation counter_direction() {
+		// TODO Auto-generated method stub
+		return new op_greater();
+	}
 
 }

@@ -11,8 +11,13 @@ public abstract class Operation {
 
 	public abstract Operation negation();
 	
+	public abstract Operation counter_direction();
+	
 	@Override
 	public abstract int hashCode();
+	
+	@Override
+	public abstract boolean equals(Object obj);
 	
 //	public static final String op_equal = "=";
 //	

@@ -443,7 +443,7 @@ public class view_operation {
 			
 			String str2 = strs[1];
 			
-			String relation_name1 = str1.substring(0, str1.indexOf("_"));
+			String relation_name1 = str1.substring(0, str1.indexOf("_")).trim();
 			
 			String relation_name2 = new String();
 			
@@ -465,7 +465,7 @@ public class view_operation {
 				
 //				subgoal2 = strs2[0] + "_" + strs2[1];
 				
-				relation_name2 = str2.substring(0, str2.indexOf("_"));
+				relation_name2 = str2.substring(0, str2.indexOf("_")).trim();
 				
 				condition = new Conditions(new Argument(arg1, relation_name1), relation_name1, op, new Argument(arg2, relation_name2), relation_name2);
 
@@ -617,9 +617,9 @@ public class view_operation {
 		
 		while(r.next())
 		{
-			String subgoal_name = r.getString(1);
+			String subgoal_name = r.getString(1).trim();
 			
-			String subgoal_origin_name = r.getString(2);
+			String subgoal_origin_name = r.getString(2).trim();
 			
 			Vector<Argument> args = get_full_schema(subgoal_name, subgoal_origin_name, c, pst);
 			
@@ -665,9 +665,9 @@ public class view_operation {
 		
 		while(rs.next())
 		{
-			String lambda_str = rs.getString(1);
+			String lambda_str = rs.getString(1).trim();
 			
-			String table_name = rs.getString(2);
+			String table_name = rs.getString(2).trim();
 			
 			Lambda_term l_term = new Lambda_term(lambda_str, table_name);
 			
@@ -689,7 +689,7 @@ public class view_operation {
         
 //        update_table(view, c, pst);
         
-        int seq = get_view_num(c, pst) + 1;
+        int seq = name.hashCode();
         
         view.name = name;//"v" + seq;
         

@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import edu.upenn.cis.citation.sort_citation_view_vec.binary_compare;
-import edu.upenn.cis.citation.sort_citation_view_vec.sort_string_index;
+import edu.upenn.cis.citation.sort_citation_view_vec.sort_insert;
 
 
 import static org.junit.Assert.*;
@@ -176,7 +176,7 @@ public class citation_view_vector {
 		}
 		
 		
-		int pos = sort_string_index.binary_search(index_vec, insert_str, new binary_compare<String>(){
+		int pos = sort_insert.binary_search(index_vec, insert_str, new binary_compare<String>(){
 			
 			@Override			
 			public int compare(String a, String b)

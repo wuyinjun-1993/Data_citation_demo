@@ -97,3 +97,10 @@
     -fx-background-insets: 0, 1;
     -fx-background-radius: 2, 0;
 }
+
+.tab .tab-label { 
+    -fx-alignment: CENTER;
+    -fx-text-fill: #828290;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}

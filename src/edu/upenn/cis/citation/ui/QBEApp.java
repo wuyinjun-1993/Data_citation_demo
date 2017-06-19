@@ -31,6 +31,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TabPane.TabClosingPolicy;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.CheckBoxTableCell;
@@ -51,24 +53,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
-
-
-
-
-
-
-
-
-
 import org.controlsfx.control.table.TableRowExpanderColumn;
-
-
-
-
-
-
-
-
 
 
 import sun.tools.jar.resources.jar;
@@ -287,14 +272,14 @@ private Object String;
 			// TODO: add OAuth Authentication
 			String checkUser = txtUserName.getText().toString();
 			String checkPw = pf.getText().toString();
-			if (checkUser.equals("admin") && checkPw.equals("admin")) {
-				lblMessage.setText("Congratulations!");
-				lblMessage.setTextFill(Color.GREEN);
-			} else {
-				lblMessage.setText("Incorrect user or password.");
-				lblMessage.setTextFill(Color.RED);
-				return;
-			}
+//			if (checkUser.equals("admin") && checkPw.equals("admin")) {
+//				lblMessage.setText("Congratulations!");
+//				lblMessage.setTextFill(Color.GREEN);
+//			} else {
+//				lblMessage.setText("Incorrect user or password.");
+//				lblMessage.setTextFill(Color.RED);
+//				return;
+//			}
 			txtUserName.setText("");
 			pf.setText("");
 			this.stage.setScene(viewScene);
@@ -361,6 +346,7 @@ private Object String;
 //            String dataViewDataLog = Database.getDataViewDataLog(dv);
             try {
 				Query currentQuery = view_operation.get_view_by_name(dv);
+				System.out.println("[current view]" + dv);
 				addDataFromQuery(currentQuery);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -572,13 +558,22 @@ private Object String;
 		tableColumnUser.setCellValueFactory(new PropertyValueFactory<>("table"));
 		fieldColumnUser.setCellValueFactory(new PropertyValueFactory<>("field"));
 		showColumnUser.setCellValueFactory(new PropertyValueFactory<>("show"));
-		showColumnUser.setCellFactory(CheckBoxTableCell.forTableColumn(showColumnUser));
+//		showColumnUser.setCellFactory(CheckBoxTableCell.forTableColumn(showColumnUser));
+		showColumnUser.setCellFactory(new Callback<TableColumn<Entry, Boolean>, //
+		        TableCell<Entry, Boolean>>() {
+		            @Override
+		            public TableCell<Entry, Boolean> call(TableColumn<Entry, Boolean> p) {
+		                CheckBoxTableCell<Entry, Boolean> cell = new CheckBoxTableCell<Entry, Boolean>();
+		                cell.setAlignment(Pos.TOP_CENTER);
+		                cell.setPadding(new Insets(5,0,0,0));
+		                return cell;
+		            }
+		        });
 		showColumnUser.setEditable(true);
 		criteraColumnUser.setCellValueFactory(new PropertyValueFactory<>("criteria"));
 		criteraColumnUser.setCellFactory(TextFieldTableCell.forTableColumn());
         joinColumnUser.setCellValueFactory(new PropertyValueFactory<>("join"));
         joinColumnUser.setCellFactory(TextFieldTableCell.forTableColumn());
-        // XXX: write another createEditor
 
 		tableViewUser.getColumns().addAll(expanderColumn, tableColumnUser, fieldColumnUser, showColumnUser, criteraColumnUser, joinColumnUser);
 		tableViewUser.setItems(data);
@@ -943,22 +938,41 @@ private Object String;
 		tableColumn.setCellValueFactory(new PropertyValueFactory<>("table"));
 		fieldColumn.setCellValueFactory(new PropertyValueFactory<>("field"));
 		showColumn.setCellValueFactory(new PropertyValueFactory<>("show"));
-		
-//		CheckBoxTableCell<Entry, Boolean> check = new CheckBoxTableCell<>();
-//		check.setAlignment(Pos.BASELINE_LEFT);
-		showColumn.setCellFactory(CheckBoxTableCell.forTableColumn(showColumn));
-//		showColumn.setCellValueFactory(CheckBoxTableCell.setAlignment(Pos.TOP_CENTER));
+//		showColumn.setCellFactory(check.forTableColumn(showColumn));
+		showColumn.setCellFactory(new Callback<TableColumn<Entry, Boolean>, //
+		        TableCell<Entry, Boolean>>() {
+		            @Override
+		            public TableCell<Entry, Boolean> call(TableColumn<Entry, Boolean> p) {
+		                CheckBoxTableCell<Entry, Boolean> cell = new CheckBoxTableCell<Entry, Boolean>();
+		                cell.setAlignment(Pos.TOP_CENTER);
+		                cell.setPadding(new Insets(5,0,0,0));
+		                return cell;
+		            }
+		        });
 		showColumn.setEditable(true);
 		criteraColumn.setCellValueFactory(new PropertyValueFactory<>("criteria"));
 		criteraColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         joinColumn.setCellValueFactory(new PropertyValueFactory<>("join"));
         joinColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 		lambdaColumn.setCellValueFactory(new PropertyValueFactory<>("lambda"));
-		lambdaColumn.setCellFactory(CheckBoxTableCell.forTableColumn(lambdaColumn));
+//		lambdaColumn.setCellFactory(CheckBoxTableCell.forTableColumn(lambdaColumn));
+		lambdaColumn.setCellFactory(new Callback<TableColumn<Entry, Boolean>, //
+		        TableCell<Entry, Boolean>>() {
+		            @Override
+		            public TableCell<Entry, Boolean> call(TableColumn<Entry, Boolean> p) {
+		                CheckBoxTableCell<Entry, Boolean> cell = new CheckBoxTableCell<Entry, Boolean>();
+		                cell.setAlignment(Pos.TOP_CENTER);
+		                cell.setPadding(new Insets(5,0,0,0));
+		                return cell;
+		            }
+		        });
 		lambdaColumn.setEditable(true);
 
 		tableView.getColumns().addAll(expanderColumn, tableColumn, fieldColumn, showColumn, criteraColumn, joinColumn, lambdaColumn);
 		tableView.setItems(data);
+//		List<Entry> list = new ArrayList<>();
+//		list.addAll(data);
+//		if (datalogTextArea != null) datalogTextArea.setText(Util.convertToDatalogOriginal(list) + "\n");
 //		tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
 		tableColumn.setPrefWidth(100);
@@ -975,13 +989,6 @@ private Object String;
 //		joinColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.32));
 		paddingCriteriaDba = expanderColumn.widthProperty().get() + tableColumn.widthProperty().get() + fieldColumn.widthProperty().get() + showColumn.widthProperty().get();
 		paddingJoin = paddingCriteriaDba + criteraColumn.widthProperty().get();
-		System.out.println(expanderColumn.widthProperty().get());
-		System.out.println(tableColumn.widthProperty().get());
-		System.out.println(fieldColumn.widthProperty().get());
-		System.out.println(showColumn.widthProperty().get());
-		System.out.println(expanderColumn.getWidth());
-		System.out.println(paddingCriteriaDba);
-		System.out.println(paddingJoin);
 		// XXX: padding
 		// Label data preview
 		final Label label_1 = new Label("Data Preview");
@@ -1022,18 +1029,22 @@ private Object String;
                 return;
             }
             if (data.isEmpty()) return;
-			List<Entry> list = new ArrayList<>();
-			list.addAll(data);
 			
 			HashMap<String, String> relation_mapping = new HashMap<String, String>();
 			Vector<String[]> head_vars = new Vector<String[]>();
 			Vector<String []> condition_str = new Vector<String[]>();
 			Vector<String[]> lambda_term_str = new Vector<String[]>();
+			// The list statement should stay here
+			List<Entry> list = new ArrayList<>();
+			list.addAll(data);
 	        for (Entry e : list) {
 	        	String table = e.getTable();
 	        	String field = e.getField();
 	        	relation_mapping.put(table, table);
 	        	String[] arg = {field, table};
+	        	String[] comparator = {"=", "<", ">", "<=", ">=", "<>"};
+	        	String comparatorValue = "";
+        		String compareNumber = "";
 	        	if (e.getShow()) {
 	        		if (!head_vars.contains(arg)) {
 	        			head_vars.add(arg);
@@ -1042,18 +1053,38 @@ private Object String;
 	        	if (e.getCriteria() != null && !e.getCriteria().isEmpty()) {
 	        		String[] criteria = e.getCriteria().split("\\,");
 	        		for (int i = 0; i < criteria.length; i++) {
-	        			String comparator = criteria[i].substring(0, criteria[i].length()-1);
-	        			String compareValue = Character.toString(criteria[i].charAt(criteria[i].length()-1));
-	        			String[] condition = {field, table, comparator,"'" + compareValue + "'", ""};
+	        			// TODO: 
+	        			for (int j = 0; j < comparator.length; j++) {
+	        				if (comparator[j].equals(Character.toString(criteria[i].charAt(0))) ) {
+	        					comparatorValue = comparator[j];
+	        					compareNumber = criteria[i].substring(1, criteria[i].length());
+	        				}
+	        				else if (comparator[j].equals(criteria[i].substring(0, 2))) {
+	        					comparatorValue = comparator[j];
+	        					compareNumber = criteria[i].substring(2, criteria[i].length());
+	        				}
+	        					
+	        			}
+	        			String[] condition = {field, table, comparatorValue,"'" + compareNumber + "'", ""};
 	        			condition_str.add(condition);
 	        		}
 	        	}
 	            if (e.getJoin() != null && !e.getJoin().isEmpty()) {
 	                String[] join = e.getJoin().split("\\."); //correspond to the setjoin() in createEditor()
 	                // split according to dot
-	                String comparator = Character.toString(e.getJoin().charAt(0));
-	                String[] condition1  = {field, table, comparator, join[1], join[0].substring(1, join[0].length())};
-	                // no need to -1 at the index
+	                String joinTable = "";
+	                for (int j = 0; j < comparator.length; j++) {
+	                	if (comparator[j].equals(Character.toString(join[0].charAt(0))) ) {
+	                		comparatorValue = comparator[j];
+	                		joinTable = join[0].substring(1, join[0].length());
+	                	}
+	                	else if (comparator[j].equals(join[0].substring(0, 2))) {
+	                		comparatorValue = comparator[j];
+	                		joinTable = join[0].substring(2, join[0].length());
+	                	}
+	                }
+	                String[] condition1  = {field, table, comparatorValue, join[1], joinTable};
+	                
 	                condition_str.add(condition1);
 	            }
 	            if (e.getLambda() == true) {
@@ -1064,6 +1095,7 @@ private Object String;
 			Query generatedQuery = null;
 			try {
 				generatedQuery = Gen_query.gen_query(dv, relation_mapping, head_vars, condition_str, lambda_term_str);
+				System.out.println("[generatedQuery] " + generatedQuery);
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
@@ -1075,7 +1107,7 @@ private Object String;
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Succeed");
             alert.setHeaderText(null);
-            alert.setContentText("The view queries is successfully saved as " + dv);
+            alert.setContentText("The view queries are successfully saved as " + dv);
             alert.showAndWait();
             listDataViews.add(dv);
         });
@@ -1315,6 +1347,7 @@ private Object String;
 			if(comboBoxComparator1.getValue() != null && !comboBoxComparator1.getValue().toString().isEmpty()) {
 				entry.setJoin(comboBoxComparator1.getValue() + comboBoxTable.getValue() + "." + comboBoxField.getValue());
 			}
+			
 			comboBoxComparator.setValue(null);
 			comboBoxComparator1.setValue(null);
 			param.toggleExpanded();

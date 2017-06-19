@@ -14,20 +14,38 @@ public class sort_insert {
 	{
 		Random r = new Random();
 		
-		HashSet<Integer> set = new HashSet<Integer>();
-		
-		
-		set.add(1);
-		
-		set.add(1);
+		Vector<Integer> set = new Vector<Integer>();
 		
 		while(set.size() < num)
 		{
 			int value = r.nextInt(upper_bound);
 			
-			set.add(value);
+			insert_sort(set, value);
 		}
 		
+		System.out.println(check(set));
+		
+	}
+	
+	static boolean check(Vector<Integer> set)
+	{
+		
+		int i = 0;
+		
+		for(i = 0; i<set.size() - 1; i++)
+		{
+			if(set.get(i) <= set.get(i + 1))
+				continue;
+			else
+				break;
+		}
+		
+		if(i < set.size() - 1)
+		{			
+			return false;
+		}
+		else
+			return true;
 	}
 	
 	
@@ -107,10 +125,10 @@ public class sort_insert {
 		}
 		
 		
-		int pos = sort_insert.binary_search(index_vec, insert, new binary_compare<String>(){
+		int pos = sort_insert.binary_search(index_vec, insert, new binary_compare<T>(){
 			
 			@Override			
-			public int compare(String a, String b)
+			public int compare(T a, T b)
 			{
 				if(a.hashCode()> b.hashCode())
 					return 1;

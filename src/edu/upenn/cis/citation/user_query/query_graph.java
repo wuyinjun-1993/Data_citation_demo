@@ -1,13 +1,23 @@
 package edu.upenn.cis.citation.user_query;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Vector;
 
+import edu.upenn.cis.citation.Corecover.Argument;
+import edu.upenn.cis.citation.Corecover.Lambda_term;
 import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Corecover.Subgoal;
 import edu.upenn.cis.citation.Operation.Conditions;
+import edu.upenn.cis.citation.Operation.op_greater;
+import edu.upenn.cis.citation.Operation.op_greater_equal;
+import edu.upenn.cis.citation.Operation.op_less_equal;
 import edu.upenn.cis.citation.Pre_processing.populate_citation_view_table;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
+import edu.upenn.cis.citation.Pre_processing.view_operation;
 import edu.upenn.cis.citation.sort_citation_view_vec.sort_insert;
 
 public class query_graph {
@@ -56,6 +66,266 @@ public class query_graph {
 		}
 		
 	}
+	
+	public static void main(String [] args) throws ClassNotFoundException, SQLException
+	{
+		Query q1 = gen_query();
+		
+		Query q2 = gen_query2();
+		
+		query_graph g1 = new query_graph(q1);
+		
+		query_graph g2 = new query_graph(q2);
+		
+		System.out.println(g1.equals(g2));
+	}
+	
+	static Query gen_query() throws SQLException, ClassNotFoundException
+	{
+		Class.forName("org.postgresql.Driver");
+        Connection c = DriverManager
+           .getConnection(populate_db.db_url,
+       	        populate_db.usr_name,populate_db.passwd);
+		
+        PreparedStatement pst = null;
+        
+		Vector<Argument> head_args = new Vector<Argument>();
+		
+		head_args.add(new Argument("family_family_id", "family"));
+				
+		
+//		head_args.add(new Argument("family1_family_id", "family1"));
+//		
+//		head_args.add(new Argument("family2_family_id", "family2"));
+				
+		
+//		head_args.add(new Argument("family3_family_id", "family3"));
+		
+		head_args.add(new Argument("introduction_family_id", "introduction"));
+
+		
+//		head_args.add(new Argument("introduction1_family_id", "introduction1"));
+//				
+//		head_args.add(new Argument("introduction2_family_id", "introduction2"));
+		
+//		head_args.add(new Argument("introduction3_family_id", "introduction3"));
+		
+		Subgoal head = new Subgoal("q", head_args);
+		
+		Vector<Subgoal> subgoals = new Vector<Subgoal>();
+		
+		Vector<Argument> args1 = view_operation.get_full_schema("family", "family", c, pst);
+		
+//		Vector<Argument> args2 = view_operation.get_full_schema("family1", "family", c, pst);
+		
+		
+//		Vector<Argument> args6 = view_operation.get_full_schema("family2", "family", c, pst);
+		
+//		Vector<Argument> args7 = view_operation.get_full_schema("family3", "family", c, pst);
+		
+		Vector<Argument> args3 = view_operation.get_full_schema("introduction", "introduction", c, pst);
+		
+//		Vector<Argument> args4 = view_operation.get_full_schema("introduction1", "introduction", c, pst);
+//		
+//		Vector<Argument> args5 = view_operation.get_full_schema("introduction2", "introduction", c, pst);
+		
+//		Vector<Argument> args8 = view_operation.get_full_schema("introduction3", "introduction", c, pst);
+
+		
+		subgoals.add(new Subgoal("family", args1));
+		
+//		subgoals.add(new Subgoal("family1", args2));
+//		
+//		subgoals.add(new Subgoal("family2", args6));
+		
+//		subgoals.add(new Subgoal("family3", args7));
+				
+		subgoals.add(new Subgoal("introduction", args3));
+		
+//		subgoals.add(new Subgoal("introduction1", args4));
+//		
+//		subgoals.add(new Subgoal("introduction2", args5));
+		
+//		subgoals.add(new Subgoal("introduction3", args8));
+		
+		Vector<Conditions> conditions = new Vector<Conditions>();
+		
+		conditions.add(new Conditions(new Argument("family_id", "family"), "family", new op_less_equal(), new Argument("2"), new String()));
+//		
+//		conditions.add(new Conditions(new Argument("family_id", "family1"), "family1", new op_less_equal(), new Argument("2"), new String()));
+//		
+//		conditions.add(new Conditions(new Argument("family_id", "family2"), "family2", new op_less_equal(), new Argument("2"), new String()));
+		
+//		conditions.add(new Conditions(new Argument("family_id", "family3"), "family3", new op_less_equal(), new Argument("2"), new String()));
+//		
+		conditions.add(new Conditions(new Argument("family_id", "family"), "family", new op_greater(), new Argument("family_id", "introduction"), "introduction"));
+		
+//		conditions.add(new Conditions(new Argument("family_id", "introduction1"), "introduction1", new op_less_equal(), new Argument("2"), new String()));
+//		
+//		conditions.add(new Conditions(new Argument("family_id", "introduction2"), "introduction2", new op_less_equal(), new Argument("2"), new String()));
+
+//		conditions.add(new Conditions(new Argument("family_id", "introduction3"), "introduction3", new op_less_equal(), new Argument("2"), new String()));
+
+		
+//		conditions.add(new Conditions(new Argument("in_gtip", "object"), "object", new op_equal(), new Argument("'true'"), new String()));
+		
+		HashMap<String, String> subgoal_name_mapping = new HashMap<String, String>();
+		
+		subgoal_name_mapping.put("family", "family");
+		
+//		subgoal_name_mapping.put("family1", "family");
+//		
+//		subgoal_name_mapping.put("family2", "family");
+		
+//		subgoal_name_mapping.put("family3", "family");
+				
+		subgoal_name_mapping.put("introduction", "introduction");
+		
+//		subgoal_name_mapping.put("introduction1", "introduction");
+//
+//		subgoal_name_mapping.put("introduction2", "introduction");
+		
+//		subgoal_name_mapping.put("introduction3", "introduction");
+
+
+		
+		Query q = new Query("q", head, subgoals, new Vector<Lambda_term>(), conditions, subgoal_name_mapping);
+		
+		System.out.println(q);
+		
+		c.close();
+		
+		return q;
+		
+		
+	}
+	
+	
+	static Query gen_query2() throws SQLException, ClassNotFoundException
+	{
+		Class.forName("org.postgresql.Driver");
+        Connection c = DriverManager
+           .getConnection(populate_db.db_url,
+       	        populate_db.usr_name,populate_db.passwd);
+		
+        PreparedStatement pst = null;
+        
+		Vector<Argument> head_args = new Vector<Argument>();
+		
+//		head_args.add(new Argument("introduction_family_id", "introduction"));
+//
+//		
+//		head_args.add(new Argument("family_family_id", "family"));
+				
+		
+		head_args.add(new Argument("family1_family_id", "family1"));
+//		
+//		head_args.add(new Argument("family2_family_id", "family2"));
+				
+		
+//		head_args.add(new Argument("family3_family_id", "family3"));
+		
+
+		
+		head_args.add(new Argument("introduction1_family_id", "introduction1"));
+//				
+//		head_args.add(new Argument("introduction2_family_id", "introduction2"));
+		
+//		head_args.add(new Argument("introduction3_family_id", "introduction3"));
+		
+		Subgoal head = new Subgoal("q", head_args);
+		
+		Vector<Subgoal> subgoals = new Vector<Subgoal>();
+		
+//		Vector<Argument> args1 = view_operation.get_full_schema("family", "family", c, pst);
+		
+		Vector<Argument> args2 = view_operation.get_full_schema("family1", "family", c, pst);
+		
+		
+//		Vector<Argument> args6 = view_operation.get_full_schema("family2", "family", c, pst);
+		
+//		Vector<Argument> args7 = view_operation.get_full_schema("family3", "family", c, pst);
+		
+//		Vector<Argument> args3 = view_operation.get_full_schema("introduction", "introduction", c, pst);
+		
+		Vector<Argument> args4 = view_operation.get_full_schema("introduction1", "introduction", c, pst);
+//		
+//		Vector<Argument> args5 = view_operation.get_full_schema("introduction2", "introduction", c, pst);
+		
+//		Vector<Argument> args8 = view_operation.get_full_schema("introduction3", "introduction", c, pst);
+
+		
+//		subgoals.add(new Subgoal("introduction", args3));
+		
+//		subgoals.add(new Subgoal("family", args1));
+		
+		subgoals.add(new Subgoal("family1", args2));
+//		
+//		subgoals.add(new Subgoal("family2", args6));
+		
+//		subgoals.add(new Subgoal("family3", args7));
+				
+		
+		subgoals.add(new Subgoal("introduction1", args4));
+//		
+//		subgoals.add(new Subgoal("introduction2", args5));
+		
+//		subgoals.add(new Subgoal("introduction3", args8));
+		
+		Vector<Conditions> conditions = new Vector<Conditions>();
+		
+//		conditions.add(new Conditions(new Argument("family_id", "family"), "family", new op_less_equal(), new Argument("2"), new String()));
+//		
+		conditions.add(new Conditions(new Argument("family_id", "family1"), "family1", new op_less_equal(), new Argument("2"), new String()));
+//		
+//		conditions.add(new Conditions(new Argument("family_id", "family2"), "family2", new op_less_equal(), new Argument("2"), new String()));
+		
+//		conditions.add(new Conditions(new Argument("family_id", "family3"), "family3", new op_less_equal(), new Argument("2"), new String()));
+//		
+//		conditions.add(new Conditions(new Argument("family_id", "introduction"), "introduction", new op_less_equal(), new Argument("2"), new String()));
+		
+		conditions.add(new Conditions(new Argument("family_id", "introduction1"), "introduction1", new op_less_equal(), new Argument("family_id", "family1"), "family1"));
+//		
+//		conditions.add(new Conditions(new Argument("family_id", "introduction2"), "introduction2", new op_less_equal(), new Argument("2"), new String()));
+
+//		conditions.add(new Conditions(new Argument("family_id", "introduction3"), "introduction3", new op_less_equal(), new Argument("2"), new String()));
+
+		
+//		conditions.add(new Conditions(new Argument("in_gtip", "object"), "object", new op_equal(), new Argument("'true'"), new String()));
+		
+		HashMap<String, String> subgoal_name_mapping = new HashMap<String, String>();
+		
+//		subgoal_name_mapping.put("introduction", "introduction");
+
+		
+//		subgoal_name_mapping.put("family", "family");
+		
+		subgoal_name_mapping.put("family1", "family");
+//		
+//		subgoal_name_mapping.put("family2", "family");
+		
+//		subgoal_name_mapping.put("family3", "family");
+				
+		
+		subgoal_name_mapping.put("introduction1", "introduction");
+//
+//		subgoal_name_mapping.put("introduction2", "introduction");
+		
+//		subgoal_name_mapping.put("introduction3", "introduction");
+
+
+		
+		Query q = new Query("q", head, subgoals, new Vector<Lambda_term>(), conditions, subgoal_name_mapping);
+		
+		System.out.println(q);
+		
+		c.close();
+		
+		return q;
+		
+		
+	}
+
 	
 	@Override
 	public int hashCode()

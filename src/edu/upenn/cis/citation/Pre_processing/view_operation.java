@@ -31,7 +31,7 @@ public class view_operation {
 	
 	public static void main(String [] args) throws ClassNotFoundException, SQLException
 	{
-//		delete_view_by_id("v10");
+//		delete_view_by_id(10);
 		
 //		String query = "v9(ligand_c_ligand_id,interaction_c_object_id, ligand_c_name):ligand_c(), interaction_c(), interaction_c_ligand_id=ligand_c_ligand_id";
 //		
@@ -140,14 +140,16 @@ public class view_operation {
 	{
 		String id = insert_view(v, name);
 		
-		Vector<String> subgoal_names = new Vector<String>();
+		v.name = id;
 		
-		Vector<Subgoal> subgoals = v.body;
-		
-		for(int i = 0; i<subgoals.size(); i++)
-		{
-			subgoal_names.add(subgoals.get(i).name);
-		}
+//		Vector<String> subgoal_names = new Vector<String>();
+//		
+//		Vector<Subgoal> subgoals = v.body;
+//		
+//		for(int i = 0; i<subgoals.size(); i++)
+//		{
+//			subgoal_names.add(subgoals.get(i).name);
+//		}
 		
 //		create_view.create_views(id, subgoal_names, v.conditions, null, null);
 		
@@ -168,7 +170,7 @@ public class view_operation {
         
         Vector<Argument> head_var = new Vector<Argument>();
         
-        String id = get_id_head_vars(name, head_var, c, pst);
+        int id = get_id_head_vars(name, head_var, c, pst);
         
         Vector<Conditions> conditions = get_view_conditions(id, c, pst);
         
@@ -176,9 +178,9 @@ public class view_operation {
         
         Vector<Lambda_term> lambda_terms = get_view_lambda_terms(id, c, pst);
         
-        Subgoal head = new Subgoal(id, head_var);
+        Subgoal head = new Subgoal("v" + id, head_var);
                 
-        Query view = new Query(id, head, subgoals,lambda_terms, conditions, subgoal_name_mapping);
+        Query view = new Query("v" + id, head, subgoals,lambda_terms, conditions, subgoal_name_mapping);
         
         
         c.close();
@@ -186,7 +188,7 @@ public class view_operation {
         return view;
 	}
 	
-	public static Query get_view_by_id(String id) throws SQLException, ClassNotFoundException
+	public static Query get_view_by_id(int id) throws SQLException, ClassNotFoundException
 	{
 		Class.forName("org.postgresql.Driver");
         Connection c = DriverManager
@@ -205,9 +207,9 @@ public class view_operation {
         
         Vector<Lambda_term> lambda_terms = get_view_lambda_terms(id, c, pst);
         
-        Subgoal head = new Subgoal(id, head_var);
+        Subgoal head = new Subgoal("v" + id, head_var);
         
-        Query view = new Query(id, head, subgoals,lambda_terms, conditions, subgoal_name_mapping);
+        Query view = new Query("v" + id, head, subgoals,lambda_terms, conditions, subgoal_name_mapping);
         
         
         c.close();
@@ -215,7 +217,7 @@ public class view_operation {
         return view;
 	}
 	
-	static String get_view_id(String name, Connection c, PreparedStatement pst) throws SQLException
+	static int get_view_id(String name, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query = "select view from view_table where name = '" + name + "'";
 		
@@ -223,11 +225,11 @@ public class view_operation {
 		
 		ResultSet rs = pst.executeQuery();
 		
-		String id = new String();
+		int id = 0;
 				
 		if(rs.next())
 		{
-			id = rs.getString(1);
+			id = rs.getInt(1);
 		}
 		
 		return id;
@@ -242,7 +244,7 @@ public class view_operation {
         
         PreparedStatement pst = null;
         
-        String id = get_view_id(name, c, pst);
+        int id = get_view_id(name, c, pst);
         
 //        String id = name;
         
@@ -262,11 +264,11 @@ public class view_operation {
         
         c.close();
         
-        populate_db.delete(id, subgoals, subgoal_name_mapping, has_lambda);
+        populate_db.delete("v" + id, subgoals, subgoal_name_mapping, has_lambda);
 
 	}
 	
-	public static void delete_view_by_id(String id) throws SQLException, ClassNotFoundException
+	public static void delete_view_by_id(int id) throws SQLException, ClassNotFoundException
 	{
 		Class.forName("org.postgresql.Driver");
         Connection c = DriverManager
@@ -293,11 +295,11 @@ public class view_operation {
         
         c.close();
         
-        populate_db.delete(id, subgoals, subgoal_name_mapping, has_lambda);
+        populate_db.delete("v" + id, subgoals, subgoal_name_mapping, has_lambda);
 
 	}
 	
-	static void delete_citation_view(String id, Connection c, PreparedStatement pst) throws SQLException
+	static void delete_citation_view(int id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query = "delete from citation2view where view = '" + id + "'";
 		
@@ -309,7 +311,7 @@ public class view_operation {
 	
 	
 	
-	static boolean delete_lambda_terms(String id, Connection c, PreparedStatement pst) throws SQLException
+	static boolean delete_lambda_terms(int id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		
 		
@@ -339,7 +341,7 @@ public class view_operation {
 		
 	}
 	
-	static void delete_conditions(String id, Connection c, PreparedStatement pst) throws SQLException
+	static void delete_conditions(int id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query = "delete from view2conditions where view = '" + id + "'";
 		
@@ -348,7 +350,7 @@ public class view_operation {
 		pst.execute();
 	}
 	
-	static void delete_subgoals(String id, Connection c, PreparedStatement pst) throws SQLException
+	static void delete_subgoals(int id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query = "delete from view2subgoals where view = '" + id + "'";
 		
@@ -357,7 +359,7 @@ public class view_operation {
 		pst.execute();
 	}
 	
-	static void delete_view_table(String id, Connection c, PreparedStatement pst) throws SQLException
+	static void delete_view_table(int id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query = "delete from view_table where view = '" + id + "'";
 		
@@ -366,7 +368,7 @@ public class view_operation {
 		pst.execute();
 	}
 	
-	static Vector<Conditions> get_view_conditions(String name, Connection c, PreparedStatement pst) throws SQLException
+	static Vector<Conditions> get_view_conditions(int name, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String q_conditions = "select conditions from view2conditions where view = '" + name + "'";
 		
@@ -506,7 +508,7 @@ public class view_operation {
 	}
 	
 	
-	static Vector<Argument> get_head_vars(String id, Connection c, PreparedStatement pst) throws SQLException
+	static Vector<Argument> get_head_vars(int id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query = "select head_variables from view_table where view = '" + id + "'";
 		
@@ -543,7 +545,7 @@ public class view_operation {
 			
 	}
 	
-	static String get_id_head_vars(String name, Vector<Argument> head_var, Connection c, PreparedStatement pst) throws SQLException
+	static int get_id_head_vars(String name, Vector<Argument> head_var, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query = "select view, head_variables from view_table where name = '" + name + "'";
 		
@@ -551,13 +553,13 @@ public class view_operation {
 		
 		ResultSet rs = pst.executeQuery();
 		
-		String id = new String();
+		int id = 0;
 		
 		String head_var_str = new String();
 		
 		if(rs.next())
 		{
-			id = rs.getString(1).trim();
+			id = rs.getInt(1);
 			
 			head_var_str = rs.getString(2).trim();
 		}
@@ -577,7 +579,7 @@ public class view_operation {
 			
 	}
 	
-	static Vector<Subgoal> get_view_subgoals(String name, HashMap<String, String> subgoal_name_mapping, Connection c, PreparedStatement pst) throws SQLException
+	static Vector<Subgoal> get_view_subgoals(int name, HashMap<String, String> subgoal_name_mapping, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String q_subgoals = "select subgoal_names, subgoal_origin_names from view2subgoals where view = '" + name + "'";
 		
@@ -605,7 +607,7 @@ public class view_operation {
 		return subgoal_names;
 	}
 	
-	static Vector<Subgoal> get_view_subgoals_full(String name, HashMap<String, String> subgoal_name_mapping, Connection c, PreparedStatement pst) throws SQLException
+	static Vector<Subgoal> get_view_subgoals_full(int name, HashMap<String, String> subgoal_name_mapping, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String q_subgoals = "select subgoal_names, subgoal_origin_names from view2subgoals where view = '" + name + "'";
 		
@@ -653,7 +655,7 @@ public class view_operation {
 		
 	}
 	
-	static Vector<Lambda_term> get_view_lambda_terms(String name, Connection c, PreparedStatement pst) throws SQLException
+	static Vector<Lambda_term> get_view_lambda_terms(int name, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query = "select lambda_term, table_name from view2lambda_term where view = '" + name + "'";
 		
@@ -689,7 +691,7 @@ public class view_operation {
         
 //        update_table(view, c, pst);
         
-        int seq = name.hashCode();
+        int seq = get_view_num(c, pst);
         
         view.name = name;//"v" + seq;
         
@@ -712,7 +714,7 @@ public class view_operation {
 	
 	static int get_view_num(Connection c, PreparedStatement pst) throws SQLException
 	{
-		String query = "select count(*) from view_table";
+		String query = "select max(view) from view_table";
 		
 		pst = c.prepareStatement(query);
 		
@@ -722,7 +724,7 @@ public class view_operation {
 		
 		if(rs.next())
 		{
-			num = rs.getInt(1);
+			num = rs.getInt(1) + 1;
 		}
 		
 		return num;
@@ -744,7 +746,7 @@ public class view_operation {
 			head_vars_str += arg.name;
 		}
 		
-		String query = "insert into view_table values ('v" + seq + "','" + head_vars_str + "','" + view_name + "')";
+		String query = "insert into view_table values ('" + seq + "','" + head_vars_str + "','" + view_name + "')";
 		
 		pst = c.prepareStatement(query);
 		
@@ -758,7 +760,7 @@ public class view_operation {
 		{
 			Subgoal subgoal = (Subgoal)view.body.get(i);
 			
-			String query = "insert into view2subgoals values ('v" + seq + "','" + subgoal.name + "','" + view.subgoal_name_mapping.get(subgoal.name) + "')";
+			String query = "insert into view2subgoals values ('" + seq + "','" + subgoal.name + "','" + view.subgoal_name_mapping.get(subgoal.name) + "')";
 			
 			pst = c.prepareStatement(query);
 			
@@ -788,7 +790,7 @@ public class view_operation {
 		
 		if(!view.lambda_term.isEmpty())
 		{
-			String query = "insert into view2lambda_term values ('v" + seq + "','" + lambda_term_str + "','" + lambda_term_table_name + "')";
+			String query = "insert into view2lambda_term values ('" + seq + "','" + lambda_term_str + "','" + lambda_term_table_name + "')";
 			
 			pst = c.prepareStatement(query);
 			
@@ -804,7 +806,7 @@ public class view_operation {
 	{
 		for(int i = 0; i<view.conditions.size(); i++)
 		{			
-			String query = "insert into view2conditions values ('v" + seq + "','" + view.conditions.get(i).toString() + "')";
+			String query = "insert into view2conditions values ('" + seq + "','" + view.conditions.get(i).toStringinsql() + "')";
 			
 			pst = c.prepareStatement(query);
 			

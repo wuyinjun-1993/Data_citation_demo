@@ -588,10 +588,10 @@ public class populate_db {
 			
 			
 			
-			Vector<citation_view> citation_view = get_citation_view(view);
+//			Vector<citation_view> citation_view = get_citation_view(view);
 			
 			
-			gen_citation_view_query(citation_view,view, table_name_view, c, pst);
+			gen_citation_view_query(view, table_name_view, c, pst);
 		}
 	      
 	    
@@ -622,10 +622,10 @@ public class populate_db {
 //			
 //			
 			
-			Vector<citation_view> citation_view = get_citation_view(view);
+//			Vector<citation_view> citation_view = get_citation_view(view);
 			
 			
-			gen_citation_view_query(citation_view,view, table_name_view, c, pst);
+			gen_citation_view_query(view, table_name_view, c, pst);
 //		}
 	      
 	    
@@ -643,9 +643,9 @@ public class populate_db {
 		
 		while(rs.next())
 		{			
-			String view_name = rs.getString(1);
+			Integer view_id = rs.getInt(1);
 			
-			Query v = view_operation.get_view_by_id(view_name);
+			Query v = view_operation.get_view_by_id(view_id);
 			
 //			String q_subgoals = "select subgoal_names from view2subgoals where view = '" + view_name + "'";
 //			
@@ -926,7 +926,7 @@ public class populate_db {
 		return annotation_exist;
 	}
 	
-	public static void gen_citation_view_query(Vector<citation_view> citation_views, Query view, HashMap<String, String> table_name_view, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	public static void gen_citation_view_query(Query view, HashMap<String, String> table_name_view, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
 //		String citation_view_query = new String();
 		
@@ -1569,86 +1569,87 @@ public class populate_db {
 //		}
 //	}
 //	
-	public static Vector<citation_view> get_citation_view(Query view) throws ClassNotFoundException, SQLException
-	{
-		Connection c = null;
-	      ResultSet rs = null;
-	      PreparedStatement pst = null;
-		Class.forName("org.postgresql.Driver");
-	    c = DriverManager
-	        .getConnection(populate_db.db_url,
-	    	        populate_db.usr_name,populate_db.passwd);
-	    
-	    
-	    String view_table_q = "select * from view_table where view = '" + view.name + "'";
-	    
-	    pst = c.prepareStatement(view_table_q);
-	    
-	    rs = pst.executeQuery();
-	    
-	    
-	    Vector<citation_view> citations = new Vector<citation_view>();
-	    
-	    Vector<String> lambda_terms = new Vector<String>();
-
-	    
-	    while(rs.next())
-	    {
-//	    	boolean webview = rs.getBoolean(3);
-	    	
-//	    	web_view.add(webview);
-//	    	
-//	    	if(webview)
-//	    	{
-//	    		
-//	    		get_view_lambda_terms(view, lambda_terms, c, pst);
-//	    		
-////	    		get_view_subgoals(view.name, subgoals, c, pst);
-//	    		get_renamed_views(view.name, lambda_terms, citations, c, pst);
-//
-//	    	}
-//	    	
-//	    	else
-	    	{
-	    		get_view_lambda_terms(view, lambda_terms, c, pst);
-    		    
-	    		
-	    		Vector<String> subgoals = new Vector<String>();
-	    		
-	    		get_view_subgoals(view.name, subgoals, c, pst);
-    		    
-    		    if(!lambda_terms.isEmpty())
-    		    {	
-    		    	
-		    		citations.add(new citation_view_parametered(view.name, lambda_terms, subgoals));
-		    		    		    
-    		    }
-    		    else
-    		    {
-    		    	citations.add(new citation_view_unparametered(view.name, subgoals));
-    		    }
-	    	}
-	    	
-	    }
-	    
-		return citations;
-
-//	    String test_col = "SELECT citation_view.citation_view_name FROM citation_view WHERE citation_view.view_name='"+view.name+"'";
-//	    pst = c.prepareStatement(test_col);
+//	public static Vector<citation_view> get_citation_view(Query view) throws ClassNotFoundException, SQLException
+//	{
+//		Connection c = null;
+//	      ResultSet rs = null;
+//	      PreparedStatement pst = null;
+//		Class.forName("org.postgresql.Driver");
+//	    c = DriverManager
+//	        .getConnection(populate_db.db_url,
+//	    	        populate_db.usr_name,populate_db.passwd);
+//	    
+//	    int id = Integer.valueOf(view.name.substring(1, view.name.length()));
+//	    
+//	    String view_table_q = "select * from view_table where view = '" + id + "'";
+//	    
+//	    pst = c.prepareStatement(view_table_q);
+//	    
 //	    rs = pst.executeQuery();
 //	    
-//	    String citation_view_name = new String();
 //	    
-////	    Vector<String> lambda_term_vec = new Vector<String>(); 
+//	    Vector<citation_view> citations = new Vector<citation_view>();
 //	    
-//	    if(rs.next())
+//	    Vector<String> lambda_terms = new Vector<String>();
+//
+//	    
+//	    while(rs.next())
 //	    {
-//	    	citation_view_name = rs.getString(1);
+////	    	boolean webview = rs.getBoolean(3);
+//	    	
+////	    	web_view.add(webview);
+////	    	
+////	    	if(webview)
+////	    	{
+////	    		
+////	    		get_view_lambda_terms(view, lambda_terms, c, pst);
+////	    		
+//////	    		get_view_subgoals(view.name, subgoals, c, pst);
+////	    		get_renamed_views(view.name, lambda_terms, citations, c, pst);
+////
+////	    	}
+////	    	
+////	    	else
+//	    	{
+//	    		get_view_lambda_terms(view, lambda_terms, c, pst);
+//    		    
+//	    		
+//	    		Vector<String> subgoals = new Vector<String>();
+//	    		
+//	    		get_view_subgoals(view.name, subgoals, c, pst);
+//    		    
+//    		    if(!lambda_terms.isEmpty())
+//    		    {	
+//    		    	
+//		    		citations.add(new citation_view_parametered(view.name, lambda_terms, subgoals));
+//		    		    		    
+//    		    }
+//    		    else
+//    		    {
+//    		    	citations.add(new citation_view_unparametered(view.name, subgoals));
+//    		    }
+//	    	}
+//	    	
 //	    }
-	    
-	   
-	}
-	
+//	    
+//		return citations;
+//
+////	    String test_col = "SELECT citation_view.citation_view_name FROM citation_view WHERE citation_view.view_name='"+view.name+"'";
+////	    pst = c.prepareStatement(test_col);
+////	    rs = pst.executeQuery();
+////	    
+////	    String citation_view_name = new String();
+////	    
+//////	    Vector<String> lambda_term_vec = new Vector<String>(); 
+////	    
+////	    if(rs.next())
+////	    {
+////	    	citation_view_name = rs.getString(1);
+////	    }
+//	    
+//	   
+//	}
+//	
 	
 	static void get_renamed_views(String name, Vector<String> lambda_terms, Vector<citation_view> citations, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{

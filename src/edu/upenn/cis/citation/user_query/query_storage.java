@@ -19,9 +19,15 @@ import edu.upenn.cis.citation.Pre_processing.view_operation;
 
 public class query_storage {
 	
-	public static void main(String [] args)
+	public static void main(String [] args) throws ClassNotFoundException, SQLException
 	{
+		Query q = gen_query();
 		
+		Vector<Integer> int_list = new Vector<Integer>();
+		
+		int_list.add(1);
+		
+		store_query(q, int_list);
 	}
 	
 	static Query gen_query() throws SQLException, ClassNotFoundException
@@ -162,11 +168,11 @@ public class query_storage {
 	    {
 	    	int query_num = gen_query_id(c, pst) + 1;
 			
-			String query_id = "q" + query_num;
-
-			store_query_head_variables(query.head.args, id_list, query_id, c, pst);
+			store_query_head_variables(query.head.args, id_list, query_num, hashcode, c, pst);
 			
-			store_query_conditions(query.conditions, query_id, c, pst);
+			store_query_conditions(query.conditions, query_num, c, pst);
+			
+			store_query_subgoals(query, query_num, query.body, c, pst);
 	    }
 	    else
 	    {
@@ -195,7 +201,7 @@ public class query_storage {
 		return false;
 	}
 	
-	static void store_query_conditions(Vector<Conditions> conditions, String query_id, Connection c, PreparedStatement pst) throws SQLException
+	static void store_query_conditions(Vector<Conditions> conditions, int query_id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query_base = "insert into user_query2conditions values ('" + query_id + "','";
 		
@@ -226,7 +232,7 @@ public class query_storage {
 		return str;
 	}
 	
-	static void store_query_head_variables(Vector<Argument> head_args, Vector<Integer> int_list, String query_id, Connection c, PreparedStatement pst) throws SQLException
+	static void store_query_head_variables(Vector<Argument> head_args, Vector<Integer> int_list, int query_id, int hashcode, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String head_var_str = new String();
 		
@@ -240,7 +246,7 @@ public class query_storage {
 		
 		String id_list = vector2string(int_list);
 		
-		String query = "insert into user_query_table values ('" + query_id + "','" + head_var_str + "','" + id_list + "')";
+		String query = "insert into user_query_table values ('" + query_id + "','" + head_var_str + "','" + id_list + "','" + hashcode + "')";
 		
 		pst = c.prepareStatement(query);
 		
@@ -250,7 +256,7 @@ public class query_storage {
 	
 	static int gen_query_id(Connection c, PreparedStatement pst) throws SQLException
 	{
-		String query = "select conut(*) from user_query_table";
+		String query = "select max(query_id) from user_query_table";
 		
 		pst = c.prepareStatement(query);
 		
@@ -266,13 +272,13 @@ public class query_storage {
 		return curr_query_num;
 	}
 	
-	static void store_query_subgoals(String query_id, Vector<Subgoal> subgoals, Connection c, PreparedStatement pst) throws SQLException
+	static void store_query_subgoals(Query user_query, int query_id, Vector<Subgoal> subgoals, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query_base = "insert into user_query2subgoals values ('" + query_id + "','";
 		
 		for(int i = 0; i<subgoals.size(); i++)
 		{
-			String query = query_base + subgoals.get(i).name + "')";
+			String query = query_base + subgoals.get(i).name + "','" + user_query.subgoal_name_mapping.get(subgoals.get(i).name) + "')";
 			
 			pst = c.prepareStatement(query);
 			

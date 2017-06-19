@@ -40,6 +40,13 @@ public class Conditions {
 			return subgoal1 + "_" + str + op + subgoal2 + "_" + arg2;
 	}
 	
+	public String toStringinsql()
+	{
+		if(arg2.isConst())
+			return subgoal1 + "_" + arg1.name + op + "'" + arg2 + "'";
+		else
+			return subgoal1 + "_" + arg1.name + op + subgoal2 + "_" + arg2;
+	}
 	
 	public Conditions(Argument arg1, String subgoal1, Operation op, Argument arg2, String subgoal2)
 	{

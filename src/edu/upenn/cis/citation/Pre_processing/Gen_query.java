@@ -26,7 +26,7 @@ public class Gen_query {
 	
 	public static void main(String [] args) throws ClassNotFoundException, SQLException
 	{
-		Query view = view_operation.get_view_by_id("v4");
+		Query view = view_operation.get_view_by_id(4);
 		
 		HashMap<String, String> relation_mapping = new HashMap<String, String>(); 
 		

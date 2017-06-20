@@ -33,11 +33,11 @@ public class Query_operation {
 		
 		add(q, "q10");
 		
-//		delete_query_by_id("q10");
+//		delete_query_by_id(10);
 		
 	}
 	
-	public static void delete_query_by_id(String id) throws SQLException, ClassNotFoundException
+	public static void delete_query_by_id(int id) throws SQLException, ClassNotFoundException
 	{
 		Class.forName("org.postgresql.Driver");
         Connection c = DriverManager
@@ -70,7 +70,58 @@ public class Query_operation {
 
 	}
 	
-	static Vector<Subgoal> get_view_subgoals(String name, HashMap<String, String> subgoal_name_mapping, Connection c, PreparedStatement pst) throws SQLException
+	static int get_view_id(String name, Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "select query_id from query2head_variables where name = '" + name + "'";
+		
+		pst = c.prepareStatement(query);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		int id = 0;
+				
+		if(rs.next())
+		{
+			id = rs.getInt(1);
+		}
+		
+		return id;
+	}
+	
+	public static void delete_query_by_name(String name) throws SQLException, ClassNotFoundException
+	{
+		Class.forName("org.postgresql.Driver");
+        Connection c = DriverManager
+           .getConnection(populate_db.db_url,
+       	        populate_db.usr_name,populate_db.passwd);
+        
+        PreparedStatement pst = null;
+        
+        int id = get_view_id(name, c, pst);
+        
+//        String id = name;
+        
+        boolean has_lambda = delete_lambda_terms(id, c, pst);
+        
+        HashMap<String, String> subgoal_name_mapping = new HashMap<String, String>();
+        
+        Vector<Subgoal> subgoals = get_view_subgoals(id, subgoal_name_mapping, c, pst);
+                
+        delete_subgoals(id, c, pst);
+        
+        delete_conditions(id, c, pst);
+        
+        delete_citation_view(id, c, pst);
+        
+        delete_head_variables(id, c, pst);
+        
+        c.close();
+        
+//        populate_db.delete(id, subgoals, subgoal_name_mapping, has_lambda);
+
+	}
+	
+	static Vector<Subgoal> get_view_subgoals(int name, HashMap<String, String> subgoal_name_mapping, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String q_subgoals = "select subgoal_names, subgoal_origin_names from query2subgoal where query_id = '" + name + "'";
 		
@@ -98,7 +149,7 @@ public class Query_operation {
 		return subgoal_names;
 	}
 	
-	static void delete_citation_view(String id, Connection c, PreparedStatement pst) throws SQLException
+	static void delete_citation_view(int id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query = "delete from citation2query where query_id = '" + id + "'";
 		
@@ -108,7 +159,7 @@ public class Query_operation {
 		
 	}
 	
-	static boolean delete_lambda_terms(String id, Connection c, PreparedStatement pst) throws SQLException
+	static boolean delete_lambda_terms(int id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		
 		
@@ -138,7 +189,7 @@ public class Query_operation {
 		
 	}
 	
-	static void delete_conditions(String id, Connection c, PreparedStatement pst) throws SQLException
+	static void delete_conditions(int id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query = "delete from query2conditions where query_id = '" + id + "'";
 		
@@ -147,7 +198,7 @@ public class Query_operation {
 		pst.execute();
 	}
 	
-	static void delete_subgoals(String id, Connection c, PreparedStatement pst) throws SQLException
+	static void delete_subgoals(int id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query = "delete from query2subgoal where query_id = '" + id + "'";
 		
@@ -156,7 +207,7 @@ public class Query_operation {
 		pst.execute();
 	}
 	
-	static void delete_head_variables(String id, Connection c, PreparedStatement pst) throws SQLException
+	static void delete_head_variables(int id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query = "delete from query2head_variables where query_id = '" + id + "'";
 		
@@ -167,7 +218,7 @@ public class Query_operation {
 	
 	
 	
-	public static Query get_query_by_id(String id) throws SQLException, ClassNotFoundException
+	public static Query get_query_by_id(int id) throws SQLException, ClassNotFoundException
 	{
 		Class.forName("org.postgresql.Driver");
         Connection c = DriverManager
@@ -190,9 +241,44 @@ public class Query_operation {
         
         Vector<Lambda_term> lambda_terms = get_query_lambda_terms(id, c, pst);
         
-        Subgoal head = new Subgoal(id, head_var);
+        Subgoal head = new Subgoal("q" + id, head_var);
         
-        Query view = new Query(id, head, subgoals,lambda_terms, conditions, subgoal_name_mapping);
+        Query view = new Query("q" + id, head, subgoals,lambda_terms, conditions, subgoal_name_mapping);
+        
+        
+        c.close();
+                
+        return view;
+	}
+	
+	public static Query get_query_by_name(String name) throws SQLException, ClassNotFoundException
+	{
+		Class.forName("org.postgresql.Driver");
+        Connection c = DriverManager
+           .getConnection(populate_db.db_url,
+       	        populate_db.usr_name,populate_db.passwd);
+        
+        PreparedStatement pst = null;
+        
+        Vector<Argument> head_var = new Vector<Argument>();
+        
+        int id = get_view_id(name, c, pst);
+        
+//        String id = get_id_head_vars(name, head_var, c, pst);
+
+        head_var = get_head_vars(id, c, pst);
+        
+        HashMap<String, String> subgoal_name_mapping = new HashMap<String, String> ();
+        
+        Vector<Conditions> conditions = get_query_conditions(id, c, pst);
+        
+        Vector<Subgoal> subgoals = get_query_subgoals(id, subgoal_name_mapping, c, pst);
+        
+        Vector<Lambda_term> lambda_terms = get_query_lambda_terms(id, c, pst);
+        
+        Subgoal head = new Subgoal("q" + id, head_var);
+        
+        Query view = new Query("q" + id, head, subgoals,lambda_terms, conditions, subgoal_name_mapping);
         
         
         c.close();
@@ -320,7 +406,7 @@ public class Query_operation {
 	
 	static int get_query_num(Connection c, PreparedStatement pst) throws SQLException
 	{
-		String query = "select count(*) from query2head_variables";
+		String query = "select max(query_id) from query2head_variables";
 		
 		pst = c.prepareStatement(query);
 		
@@ -352,7 +438,7 @@ public class Query_operation {
 			head_vars_str += arg.name;
 		}
 		
-		String query = "insert into query2head_variables values ('q" + seq + "','" + head_vars_str + "','" + q_name + "')";
+		String query = "insert into query2head_variables values ('" + seq + "','" + head_vars_str + "','" + q_name + "')";
 		
 		pst = c.prepareStatement(query);
 		
@@ -366,7 +452,7 @@ public class Query_operation {
 		{
 			Subgoal subgoal = (Subgoal)q.body.get(i);
 			
-			String query = "insert into query2subgoal values ('q" + seq + "','" + subgoal.name + "','" + q.subgoal_name_mapping.get(subgoal.name) +"')";
+			String query = "insert into query2subgoal values ('" + seq + "','" + subgoal.name + "','" + q.subgoal_name_mapping.get(subgoal.name) +"')";
 			
 			pst = c.prepareStatement(query);
 			
@@ -396,7 +482,7 @@ public class Query_operation {
 		
 		if(!q.lambda_term.isEmpty())
 		{
-			String query = "insert into query2lambda_term values ('q" + seq + "','" + lambda_term_str + "','" + lambda_term_table_name + "')";
+			String query = "insert into query2lambda_term values ('" + seq + "','" + lambda_term_str + "','" + lambda_term_table_name + "')";
 			
 			pst = c.prepareStatement(query);
 			
@@ -412,7 +498,7 @@ public class Query_operation {
 	{
 		for(int i = 0; i<q.conditions.size(); i++)
 		{			
-			String query = "insert into query2conditions values ('q" + seq + "','" + q.conditions.get(i).toString() + "')";
+			String query = "insert into query2conditions values ('" + seq + "','" + q.conditions.get(i).toString() + "')";
 			
 			pst = c.prepareStatement(query);
 			
@@ -421,7 +507,7 @@ public class Query_operation {
 		}
 	}
 	
-	static String get_id_head_vars(String name, Vector<Argument> head_var, Connection c, PreparedStatement pst) throws SQLException
+	static int get_id_head_vars(String name, Vector<Argument> head_var, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query = "select query_id, head_variables from query2head_variables where name = '" + name + "'";
 		
@@ -429,13 +515,13 @@ public class Query_operation {
 		
 		ResultSet rs = pst.executeQuery();
 		
-		String id = new String();
+		int id = 0;
 		
 		String head_var_str = new String();
 		
 		if(rs.next())
 		{
-			id = rs.getString(1).trim();
+			id = rs.getInt(1);
 			
 			head_var_str = rs.getString(2).trim();
 		}
@@ -453,7 +539,7 @@ public class Query_operation {
 			
 	}
 	
-	static Vector<Argument> get_head_vars(String id, Connection c, PreparedStatement pst) throws SQLException
+	static Vector<Argument> get_head_vars(int id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query = "select head_variables from query2head_variables where query_id = '" + id + "'";
 		
@@ -498,7 +584,7 @@ public class Query_operation {
 		return values;
 	}
 	
-	static Vector<Conditions> get_query_conditions(String id, Connection c, PreparedStatement pst) throws SQLException
+	static Vector<Conditions> get_query_conditions(int id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String q_conditions = "select conditions from query2conditions where query_id = '" + id + "'";
 		
@@ -610,7 +696,7 @@ public class Query_operation {
 		
 	}
 	
-	static Vector<Subgoal> get_query_subgoals(String name, HashMap<String, String> subgoal_name_mapping, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	static Vector<Subgoal> get_query_subgoals(int name, HashMap<String, String> subgoal_name_mapping, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
 		String q_subgoals = "select subgoal_names, subgoal_origin_names from query2subgoal where query_id = '" + name + "'";
 		
@@ -645,7 +731,7 @@ public class Query_operation {
 		return subgoal_names;
 	}
 	
-	static Vector<Lambda_term> get_query_lambda_terms(String name, Connection c, PreparedStatement pst) throws SQLException
+	static Vector<Lambda_term> get_query_lambda_terms(int name, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query = "select lambda_term, table_name from query2lambda_term where query_id = '" + name + "'";
 		

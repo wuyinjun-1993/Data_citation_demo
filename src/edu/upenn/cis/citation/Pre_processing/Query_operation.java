@@ -37,6 +37,36 @@ public class Query_operation {
 		
 	}
 	
+	public static void add_connection_citation_with_query(String cname, String qname, String block) throws SQLException, ClassNotFoundException
+	{
+		Class.forName("org.postgresql.Driver");
+        Connection c = DriverManager
+           .getConnection(populate_db.db_url,
+       	        populate_db.usr_name,populate_db.passwd);
+        
+        PreparedStatement pst = null;
+        
+        int cid = citation_view_operation.get_citation_id(cname, c, pst);
+        
+        int qid = get_query_id(qname, c, pst);
+        
+        insert_citation_query_connection(cid, qid, block, c, pst);
+        
+        c.close();
+        
+	}
+	
+	static void insert_citation_query_connection(int cid, int qid, String block, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	{
+		
+        
+        String query = "insert into citation2query values ('" + cid + "','" + block + "','" + qid + "')";
+        
+        pst = c.prepareStatement(query);
+        
+        pst.execute();
+	}
+	
 	public static void delete_query_by_id(int id) throws SQLException, ClassNotFoundException
 	{
 		Class.forName("org.postgresql.Driver");
@@ -70,7 +100,7 @@ public class Query_operation {
 
 	}
 	
-	static int get_view_id(String name, Connection c, PreparedStatement pst) throws SQLException
+	static int get_query_id(String name, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query = "select query_id from query2head_variables where name = '" + name + "'";
 		
@@ -97,7 +127,7 @@ public class Query_operation {
         
         PreparedStatement pst = null;
         
-        int id = get_view_id(name, c, pst);
+        int id = get_query_id(name, c, pst);
         
 //        String id = name;
         
@@ -262,7 +292,7 @@ public class Query_operation {
         
         Vector<Argument> head_var = new Vector<Argument>();
         
-        int id = get_view_id(name, c, pst);
+        int id = get_query_id(name, c, pst);
         
 //        String id = get_id_head_vars(name, head_var, c, pst);
 

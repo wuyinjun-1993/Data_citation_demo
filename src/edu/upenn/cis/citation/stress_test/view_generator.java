@@ -26,13 +26,17 @@ import edu.upenn.cis.citation.Operation.op_greater_equal;
 import edu.upenn.cis.citation.Operation.op_less;
 import edu.upenn.cis.citation.Operation.op_less_equal;
 import edu.upenn.cis.citation.Operation.op_not_equal;
+import edu.upenn.cis.citation.Pre_processing.Query_operation;
+import edu.upenn.cis.citation.Pre_processing.citation_view_operation;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
+import edu.upenn.cis.citation.Pre_processing.view_operation;
+import edu.upenn.cis.citation.citation_view.citation_view;
 
 public class view_generator {
 	
 	
 	
-	public static String [] citatable_tables = {"gpcr","object","interaction","ligand","pathophysiology","interaction_affinity_refs","gtip_process","process_assoc","disease", "family", "introduction"};
+	public static String [] citatable_tables = {"gpcr","object", "ligand", "family", "introduction"};
 
 	static HashMap<string_array, Vector<string_array> > joinable_attribute_lists = new HashMap<string_array, Vector<string_array>>();
 	
@@ -58,27 +62,315 @@ public class view_generator {
 	
 	static int view_nums = 100;
 	
+	static HashMap<String, Vector<String>> query_table_names = new HashMap<String, Vector<String>>();
+	
+	static HashMap<String, Vector<Argument>> query_head_names = new HashMap<String, Vector<Argument>>();
+	
+	static HashMap<String, Vector<Conditions>> query_conditions = new HashMap<String, Vector<Conditions>>();
+	
+	static void initial()
+	{
+		Vector<String> table_names = new Vector<String>();
+		
+		table_names.add("contributor");
+		
+		table_names.add("contributor2object");
+		
+		table_names.add("object");
+		
+		Vector<Conditions> conditions = new Vector<Conditions>();
+		
+		conditions.add(new Conditions(new Argument("contributor_id", "contributor2object"), "contributor2object", new op_equal(), new Argument("contributor_id", "contributor"), "contributor"));
+		
+		conditions.add(new Conditions(new Argument("object_id", "contributor2object"), "contributor2object", new op_equal(), new Argument("object_id", "object"), "object"));
+		
+//		conditions.add("object_object_id = contributor2object_object_id");
+		
+		Vector<Argument> head_variables = new Vector<Argument>();
+		
+		head_variables.add(new Argument("contributor_first_names", "contributor"));
+		
+		head_variables.add(new Argument("contributor_surname", "contributor"));
+		
+		query_table_names.put("object", table_names);
+		
+		query_head_names.put("object", head_variables);
+		
+		query_conditions.put("object", conditions);
+		
+		table_names = new Vector<String>();
+		
+		table_names.add("contributor");
+		
+		table_names.add("contributor2object");
+		
+		table_names.add("gpcr");
+		
+		conditions = new Vector<Conditions>();
+		
+		conditions.add(new Conditions(new Argument("contributor_id", "contributor2object"), "contributor2object", new op_equal(), new Argument("contributor_id", "contributor"), "contributor"));
+		
+		conditions.add(new Conditions(new Argument("object_id", "contributor2object"), "contributor2object", new op_equal(), new Argument("object_id", "gpcr"), "gpcr"));
+		
+//		conditions.add("object_object_id = contributor2object_object_id");
+		
+		head_variables = new Vector<Argument>();
+		
+		head_variables.add(new Argument("contributor_first_names", "contributor"));
+		
+		head_variables.add(new Argument("contributor_surname", "contributor"));
+		
+		query_table_names.put("gpcr", table_names);
+		
+		query_head_names.put("gpcr", head_variables);
+		
+		query_conditions.put("gpcr", conditions);
+		
+		table_names = new Vector<String>();
+		
+		table_names.add("contributor");
+		
+		table_names.add("contributor2family");
+		
+		table_names.add("family");
+		
+		conditions = new Vector<Conditions>();
+		
+		conditions.add(new Conditions(new Argument("contributor_id", "contributor2family"), "contributor2family", new op_equal(), new Argument("contributor_id", "contributor"), "contributor"));
+		
+		conditions.add(new Conditions(new Argument("family_id", "contributor2family"), "contributor2family", new op_equal(), new Argument("family_id", "family"), "family"));
+		
+//		conditions.add("object_object_id = contributor2object_object_id");
+		
+		head_variables = new Vector<Argument>();
+		
+		head_variables.add(new Argument("contributor_first_names", "contributor"));
+		
+		head_variables.add(new Argument("contributor_surname", "contributor"));
+		
+		query_table_names.put("family", table_names);
+		
+		query_head_names.put("family", head_variables);
+		
+		query_conditions.put("family", conditions);
+		
+		table_names = new Vector<String>();
+		
+		table_names.add("contributor");
+		
+		table_names.add("contributor2intro");
+		
+		table_names.add("introduction");
+		
+		conditions = new Vector<Conditions>();
+		
+		conditions.add(new Conditions(new Argument("contributor_id", "contributor2intro"), "contributor2intro", new op_equal(), new Argument("contributor_id", "contributor"), "contributor"));
+		
+		conditions.add(new Conditions(new Argument("family_id", "contributor2intro"), "contributor2intro", new op_equal(), new Argument("family_id", "introduction"), "introduction"));
+		
+//		conditions.add("object_object_id = contributor2object_object_id");
+		
+		head_variables = new Vector<Argument>();
+		
+		head_variables.add(new Argument("contributor_first_names", "contributor"));
+		
+		head_variables.add(new Argument("contributor_surname", "contributor"));
+		
+		query_table_names.put("introduction", table_names);
+		
+		query_head_names.put("introduction", head_variables);
+		
+		query_conditions.put("introduction", conditions);
+		
+		table_names = new Vector<String>();
+		
+		table_names.add("contributor");
+		
+		table_names.add("contributor2ligand");
+		
+		table_names.add("ligand");
+		
+		conditions = new Vector<Conditions>();
+				
+		conditions.add(new Conditions(new Argument("ligand_id", "contributor2ligand"), "contributor2ligand", new op_equal(), new Argument("ligand_id", "ligand"), "ligand"));
+		
+//		conditions.add("object_object_id = contributor2object_object_id");
+		
+		head_variables = new Vector<Argument>();
+		
+		head_variables.add(new Argument("contributor2ligand_first_names", "contributor2ligand"));
+		
+		head_variables.add(new Argument("contributor2ligand_surname", "contributor2ligand"));
+		
+		query_table_names.put("ligand", table_names);
+		
+		query_head_names.put("ligand", head_variables);
+		
+		query_conditions.put("ligand", conditions);
+		
+//		table_names = new Vector<String>();
+//		
+//		table_names.add("contributor");
+//		
+//		table_names.add("contributor2ligand");
+//		
+//		table_names.add("ligand");
+//		
+//		conditions = new Vector<String>();
+//			
+//		conditions.add("ligand_ligand_id = contributor2ligand_ligand_id");
+//		
+//		head_variables = new Vector<String>();
+//		
+//		head_variables.add("contributor2ligand_first_names");
+//		
+//		head_variables.add("contributor2ligand_surname");
+//		
+//		query_table_names.put("ligand", table_names);
+//		
+//		query_head_names.put("ligand", head_variables);
+//		
+//		query_conditions.put("ligand", conditions);
+		
+		
+		
+	}
+	
 	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException
 	{
+		
+		initial();
+		
 		Connection c = null;
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");
 	    c = DriverManager
 	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
 	    
+	    clear_views(c, pst);
+	    
+	    clear_other_tables(c, pst);
+	    
 	    get_joinable_relations(c, pst);
 	    
 	    HashSet<Query> views = gen_views(c, pst);
 	    
-	    for(Iterator iter = views.iterator(); iter.hasNext();)
-	    {
-	    	Query q = (Query) iter.next();
-	    	
-	    }
+	    store_views(views, c, pst);
+	    
 	    
 	}
 	
+	
+	static void clear_views(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	{
+		Vector<Integer> ids = get_all_view_ids(c, pst);
+		
+		for(int i = 0; i<ids.size(); i++)
+		{
+			view_operation.delete_view_by_id(ids.get(i));
+		}
+		
+		
+	}
+	
+	static void clear_other_tables(Connection c, PreparedStatement pst) throws SQLException
+	{
+		String [] tables = {"citation2query", "citation2view", "citation_table", "query2conditions", "query2lambda_term", "query2subgoal", "query2head_variables"};
+		
+		for(int i = 0; i<tables.length; i++)
+		{
+			String query = "delete from " + tables[i];
+			
+			pst = c.prepareStatement(query);
+			
+			pst.execute();
+		}
+	}
+	
+	static Vector<Integer> get_all_view_ids(Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "select view from view_table";
+		
+		pst = c.prepareStatement(query);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		Vector<Integer> ids = new Vector<Integer>();
+		
+		
+		while(rs.next())
+		{
+			ids.add(rs.getInt(1));
+		}
+		
+		return ids;
+	}
+	
+	static void store_views(HashSet<Query> views, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	{
+		
+		int num = 1;
+		
+		for(Iterator iter = views.iterator(); iter.hasNext();)
+		{
+			
+			Query view = (Query) iter.next();
+			
+			String name = view.name;
+			
+			view_operation.add(view, view.name);
+			
+			citation_view_operation.add_citation_view("c" + num);
+			
+			citation_view_operation.add_connection_view_with_citations("c" + num, name);
+			
+			store_citation_queries(view, num);
+			
+			Query_operation.add_connection_citation_with_query("c" + num, "q" + num , "author");
+			
+			num ++;
+
+		}
+		
+	}
+	
+	static void store_citation_queries(Query view, int num) throws ClassNotFoundException, SQLException
+	{
+		Random r = new Random();
+		
+		int index = r.nextInt(view.body.size());
+		
+		Subgoal subgoal = (Subgoal)view.body.get(index);
+		
+		Vector<Conditions> conditions = query_conditions.get(subgoal.name);
+		
+		Vector<Argument> head_vars = query_head_names.get(subgoal.name);
+		
+		Vector<String> subgoals = query_table_names.get(subgoal.name);
+		
+		Subgoal head = new Subgoal("q" + num, head_vars);
+		
+		Vector<Subgoal> body = new Vector<Subgoal>();
+		
+		HashMap<String, String> subgoal_mapping = new HashMap<String, String>();
+		
+		for(int i = 0; i < subgoals.size(); i++)
+		{
+			Vector<Argument> args = new Vector<Argument>();
+			
+			body.add(new Subgoal(subgoals.get(i), args));
+			
+			subgoal_mapping.put(subgoals.get(i), subgoals.get(i));
+		}
+		
+		
+		
+		Query q = new Query("q" + num, head, body, new Vector<Argument> (), conditions, subgoal_mapping);
+		
+		Query_operation.add(q, q.name);
+		
+	}
 	
 	static void get_joinable_relations(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{

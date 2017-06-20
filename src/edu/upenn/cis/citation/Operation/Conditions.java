@@ -43,7 +43,12 @@ public class Conditions {
 	public String toStringinsql()
 	{
 		if(arg2.isConst())
-			return subgoal1 + "_" + arg1.name + op + "'" + arg2 + "'";
+		{
+			String str = arg2.name.replaceAll("'", "''");
+			
+			
+			return subgoal1 + "_" + arg1.name + op + str;
+		}
 		else
 			return subgoal1 + "_" + arg1.name + op + subgoal2 + "_" + arg2;
 	}

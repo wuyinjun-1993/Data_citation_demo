@@ -138,9 +138,9 @@ public class view_operation {
 	
 	public static void add(Query v, String name) throws ClassNotFoundException, SQLException
 	{
-		String id = insert_view(v, name);
+		int id = insert_view(v, name);
 		
-		v.name = id;
+		v.name = "v" + id;
 		
 //		Vector<String> subgoal_names = new Vector<String>();
 //		
@@ -154,6 +154,8 @@ public class view_operation {
 //		create_view.create_views(id, subgoal_names, v.conditions, null, null);
 		
 		populate_db.update(v);
+		
+//		return id;
 
 	}
 	
@@ -680,7 +682,7 @@ public class view_operation {
 		
 	}
 	
-	static String insert_view(Query view, String name) throws SQLException, ClassNotFoundException
+	static int insert_view(Query view, String name) throws SQLException, ClassNotFoundException
 	{
 		Class.forName("org.postgresql.Driver");
         Connection c = DriverManager
@@ -695,6 +697,8 @@ public class view_operation {
         
         view.name = name;//"v" + seq;
         
+        System.out.println(view.toString());
+        
         insert_view_table(seq, view, c, pst);
         
         insert_view_conditions(seq, view, c, pst);
@@ -705,9 +709,9 @@ public class view_operation {
                 
         c.close();
         
-        String id = "v" + seq;
+//        String id = "v" + seq;
         
-        return id;
+        return seq;
         
 	}
 	

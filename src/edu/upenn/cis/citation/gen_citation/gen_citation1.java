@@ -401,7 +401,7 @@ public class gen_citation1 {
 			
 			citation_view c_view = c_views.c_vec.get(i);
 			
-			Vector<String> query_ids = get_query_id(c_view.get_name(), c, pst);
+			Vector<Integer> query_ids = get_query_id(c_view.get_name(), c, pst);
 			
 			Vector<String> curr_str = query_str.get(c_view.get_name());
 			
@@ -495,9 +495,9 @@ public class gen_citation1 {
 	}
 	
 	
-	public static Vector<String> get_query_id(String c_view_name, Connection c, PreparedStatement pst) throws SQLException
+	public static Vector<Integer> get_query_id(String c_view_name, Connection c, PreparedStatement pst) throws SQLException
 	{
-		Vector<String> query_ids = new Vector<String>();
+		Vector<Integer> query_ids = new Vector<Integer>();
 		
 		String query = "select citation2query.query_id from citation2view, citation2query where citation2view.citation_view_id = citation2query.citation_view_id and citation2view.view = '" + c_view_name + "'";
 		
@@ -507,7 +507,7 @@ public class gen_citation1 {
 		
 		while(rs.next())
 		{
-			query_ids.add(rs.getString(1));
+			query_ids.add(rs.getInt(1));
 		}
 		
 		return query_ids;
@@ -518,7 +518,7 @@ public class gen_citation1 {
 	{
 		HashSet<String> authors = new HashSet<String>();
 		
-		Vector<String> query_ids = get_query_id(c_view.name, c, pst);
+		Vector<Integer> query_ids = get_query_id(c_view.name, c, pst);
 		
 		
 //		Vector<String []> query_components= get_query(c_view.name, c, pst);
@@ -752,7 +752,7 @@ public class gen_citation1 {
 
 		HashSet<String> authors = new HashSet<String>();
 		
-		Vector<String> query_ids = get_query_id(c_view.name, c, pst);
+		Vector<Integer> query_ids = get_query_id(c_view.name, c, pst);
 		
 		
 //		Vector<String []> query_components= get_query(c_view.name, c, pst);

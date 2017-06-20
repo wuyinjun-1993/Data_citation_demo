@@ -133,7 +133,7 @@ public class Query_converter {
 		
 		for(int i = 0; i<c_views.c_vec.size(); i++)
 		{
-			Vector<String> query_ids = gen_citation1.get_query_id(c_views.c_vec.get(i).get_name(), c, pst);
+			Vector<Integer> query_ids = gen_citation1.get_query_id(c_views.c_vec.get(i).get_name(), c, pst);
 						
 			Vector<String> curr_citation_queries = new Vector<String>();
 			

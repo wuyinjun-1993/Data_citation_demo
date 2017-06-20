@@ -762,7 +762,7 @@ public class Tuple_reasoning1_citation_opt {
 	         
 	            while (rs.next()) {
 	            	
-	            	String view_id = rs.getString(1);
+	            	int view_id = rs.getInt(1);
 	            	
 	            	views.add(view_operation.get_view_by_id(view_id));
 	            	

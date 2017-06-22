@@ -672,7 +672,7 @@ public class Query {
 
 
   public Object clone() {
-    return new Query(name, head, (Vector) body.clone());
+    return new Query(name, head, (Vector)body.clone(), (Vector)lambda_term.clone(), (Vector)conditions.clone(), (HashMap<String, String>)subgoal_name_mapping.clone());
   }
 
   /**

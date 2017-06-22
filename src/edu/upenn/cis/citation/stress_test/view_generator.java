@@ -183,9 +183,7 @@ public class view_generator {
 		query_conditions.put("introduction", conditions);
 		
 		table_names = new Vector<String>();
-		
-		table_names.add("contributor");
-		
+				
 		table_names.add("contributor2ligand");
 		
 		table_names.add("ligand");
@@ -325,7 +323,7 @@ public class view_generator {
 			
 			citation_view_operation.add_connection_view_with_citations("c" + num, name);
 			
-			store_citation_queries(view, num);
+			store_citation_queries(view, num, c, pst);
 			
 			Query_operation.add_connection_citation_with_query("c" + num, "q" + num , "author");
 			
@@ -335,13 +333,18 @@ public class view_generator {
 		
 	}
 	
-	static void store_citation_queries(Query view, int num) throws ClassNotFoundException, SQLException
+	static void store_citation_queries(Query view, int num, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
 		Random r = new Random();
 		
 		int index = r.nextInt(view.body.size());
 		
+		
+		
 		Subgoal subgoal = (Subgoal)view.body.get(index);
+		
+		String [] primary_key_type = get_primary_key(subgoal.name, c, pst);
+
 		
 		Vector<Conditions> conditions = query_conditions.get(subgoal.name);
 		
@@ -364,9 +367,21 @@ public class view_generator {
 			subgoal_mapping.put(subgoals.get(i), subgoals.get(i));
 		}
 		
+		Vector<Lambda_term> l_args = new Vector<Lambda_term>();
 		
-		
-		Query q = new Query("q" + num, head, body, new Vector<Argument> (), conditions, subgoal_mapping);
+		for(int i = 0; i<view.lambda_term.size(); i++)
+		{
+			Lambda_term l = view.lambda_term.get(i);
+			
+			if(l.table_name.equals(subgoal.name))
+			{
+				l_args.add(l);
+				
+				break;
+			}
+		}
+				
+		Query q = new Query("q" + num, head, body, l_args, conditions, subgoal_mapping);
 		
 		Query_operation.add(q, q.name);
 		
@@ -561,7 +576,9 @@ public class view_generator {
 			
 			int selection_size = rand.nextInt((int)(attr_list.size() * local_predicates_rate + 1));
 			
-			Vector<Conditions> conditions = gen_conditions(selection_size, attr_types, attr_list, relation, c, pst);
+			String [] primary_key_type = get_primary_key(relation, c, pst);
+			
+			Vector<Conditions> conditions = gen_local_predicates(selection_size, attr_types, attr_list, relation, primary_key_type, c, pst);
 					
 			local_predicates.addAll(conditions);
 			
@@ -569,9 +586,10 @@ public class view_generator {
 									
 			Vector<Argument> head_vars = gen_head_vars(relation, attr_list, head_size, c, pst);
 			
-			heads.addAll(head_vars);
 			
-			Vector<Lambda_term> l_terms = gen_lambda_terms(head_vars, relation);
+			Vector<Lambda_term> l_terms = gen_lambda_terms(head_vars, relation, c, pst);
+			
+			heads.addAll(head_vars);
 			
 			lambda_terms.addAll(l_terms);
 			
@@ -699,7 +717,7 @@ public class view_generator {
 		{
 			Integer index = (Integer) iter.next();
 			
-			Argument l = new Argument(attr_list.get(index), relation_name);
+			Argument l = new Argument(relation_name + "_" + attr_list.get(index), relation_name);
 			
 			head_vars.add(l);
 			
@@ -708,12 +726,12 @@ public class view_generator {
 		return head_vars;
 	}
 	
-	static Vector<Lambda_term> gen_lambda_terms(Vector<Argument> head_vars, String relation_name)
+	static Vector<Lambda_term> gen_lambda_terms(Vector<Argument> head_vars, String relation_name, Connection c, PreparedStatement pst) throws SQLException
 	{
 		
 		Random rand = new Random();
 		
-		int size = rand.nextInt(head_vars.size() + 1);
+		int size = rand.nextInt(head_vars.size()) + 1;
 		
 		
 		
@@ -725,23 +743,117 @@ public class view_generator {
 		{
 			int index = rand.nextInt(head_vars.size());
 			
-			int_list.add(index);
-		}
-		
-		for(Iterator iter = int_list.iterator(); iter.hasNext();)
-		{
-			Integer index = (Integer) iter.next();
-			
 			Argument arg = head_vars.get(index);
 			
-			l_terms.add(new Lambda_term(arg.relation_name + "_" + arg.name, arg.relation_name));
+			if(!check_null_value(relation_name, arg.name, c, pst))
+			{
+				int_list.add(index);
+			}
+			
 		}
+		
+		if(int_list.isEmpty())
+		{
+			String [] primary_key_type = get_primary_key(relation_name, c, pst);
+			
+			int i = 0;
+			
+			for(i = 0; i<head_vars.size(); i++)
+			{
+				Argument arg = head_vars.get(i);
+				
+				if(arg.relation_name.equals(relation_name) && arg.name.equals(relation_name + "_" + primary_key_type[0]))
+				{
+					break;
+				}
+				
+			}
+			
+			if(i >= head_vars.size())
+				head_vars.add(new Argument(relation_name + "_" + primary_key_type[0], relation_name));
+			
+			l_terms.add(new Lambda_term(relation_name + "_" + primary_key_type[0], relation_name));
+			
+		}
+		else
+		{
+			for(Iterator iter = int_list.iterator(); iter.hasNext();)
+			{
+				Integer index = (Integer) iter.next();
+				
+				Argument arg = head_vars.get(index);
+				
+				l_terms.add(new Lambda_term(arg.name, arg.relation_name));
+			}
+		}
+		
+		
 		
 		return l_terms;
 		
 	}
 	
-	static Vector<Conditions> gen_conditions(int selection_size, HashMap<String, String> attr_types, Vector<String> attr_list, String relation_name, Connection c, PreparedStatement pst) throws SQLException
+	static boolean check_null_value(String relation_name, String arg_name, Connection c, PreparedStatement pst) throws SQLException
+	{
+		
+		String attr_name = arg_name.substring(arg_name.indexOf("_") + 1, arg_name.length());
+		
+//		String query = "SELECT exists (SELECT 1 FROM " + relation_name + " WHERE " + attr_name + " = '' or " + attr_name + " is null LIMIT 1)";
+		
+		String query = "SELECT exists (SELECT 1 FROM " + relation_name + " WHERE " + attr_name + " is null LIMIT 1)";
+		
+		System.out.println(query);
+		
+		pst = c.prepareStatement(query);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		if(rs.next())
+		{
+			boolean b = rs.getBoolean(1);
+			
+			if(b)
+				return true;
+			
+			else
+				return false;
+		}
+		
+		return false;
+		
+		
+		
+		
+		
+	}
+	
+	static String [] get_primary_key(String table_name, Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "SELECT"
+				+ " c.column_name, c.data_type"
+				+ " FROM information_schema.table_constraints tc"
+				+ " JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_name)"
+				+ " JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name"
+				+ " where constraint_type = 'PRIMARY KEY' and tc.table_name = '"+ table_name  +"'";
+		
+		pst =c.prepareStatement(query);
+		
+		String [] results = new String [2];
+		
+		ResultSet rs = pst.executeQuery();
+		
+		if(rs.next())
+		{
+			results[0] = rs.getString(1);
+			
+			results[1] = rs.getString(2);
+		}
+		
+		return results;
+		
+	}
+	
+	static Vector<Conditions> gen_local_predicates(int selection_size, HashMap<String, String> attr_types, Vector<String> attr_list, String relation_name, String [] primary_key_type, Connection c, PreparedStatement pst) throws SQLException
 	{
 		
 		Random r = new Random();
@@ -754,20 +866,21 @@ public class view_generator {
 		if(comparable_data_type_vec.size() == 0)
 			comparable_data_type_vec.addAll(Arrays.asList(comparable_data_type));
 		
-		for(int i = 0; i<selection_size; i++)
-		{
-			int index = r.nextInt(attr_list.size());
+		
+		double value = r.nextDouble();
+		
+		if(value < local_predicates_rate)
+		{			
+			String attr_name = primary_key_type[0];
 			
-			String attr_name = attr_list.get(index);
-			
-			String type = attr_types.get(attr_name);
+			String type = primary_key_type[1];
 			
 			if(comparable_data_type_vec.contains(type))
 			{
 				Conditions insert_condition = do_gen_condition_comparable(relation_name, attr_name, c, pst);
 				
 				if(insert_condition != null)
-					conditions.add(insert_condition); 
+					conditions.add(insert_condition);
 			}
 			else
 			{
@@ -776,7 +889,6 @@ public class view_generator {
 				if(insert_condition != null)
 					conditions.add(insert_condition);
 			}
-			
 		}
 		
 		return conditions;
@@ -859,7 +971,10 @@ public class view_generator {
 		
 		String subgoal2 = new String();
 		
-		return new Conditions(new Argument(attr_name, relation_name) , relation_name, op, new Argument("'" + all_values.get(index) + "'"), subgoal2);
+		if(all_values.get(index).length() < 100)	
+			return new Conditions(new Argument(attr_name, relation_name) , relation_name, op, new Argument("'" + all_values.get(index) + "'"), subgoal2);
+		else
+			return null;
 
 	}
 	
@@ -878,7 +993,10 @@ public class view_generator {
 		
 		String subgoal2 = new String();
 		
-		return new Conditions(new Argument(attr_name, relation_name) , relation_name, op, new Argument("'" + all_values.get(index) + "'"), subgoal2);
+		if(all_values.get(index).length() < 100)
+			return new Conditions(new Argument(attr_name, relation_name) , relation_name, op, new Argument("'" + all_values.get(index) + "'"), subgoal2);
+		else
+			return null;
 
 	}
 	

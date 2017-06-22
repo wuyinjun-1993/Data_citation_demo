@@ -13,7 +13,13 @@ import edu.upenn.cis.citation.Corecover.Lambda_term;
 import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Corecover.Subgoal;
 import edu.upenn.cis.citation.Operation.Conditions;
+import edu.upenn.cis.citation.Operation.Operation;
+import edu.upenn.cis.citation.Operation.op_equal;
+import edu.upenn.cis.citation.Operation.op_greater;
+import edu.upenn.cis.citation.Operation.op_greater_equal;
+import edu.upenn.cis.citation.Operation.op_less;
 import edu.upenn.cis.citation.Operation.op_less_equal;
+import edu.upenn.cis.citation.Operation.op_not_equal;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.Pre_processing.view_operation;
 
@@ -150,6 +156,233 @@ public class query_storage {
 		
 	}
 	
+	public static Query get_query_by_id(int id) throws SQLException, ClassNotFoundException
+	{
+		Class.forName("org.postgresql.Driver");
+        Connection c = DriverManager
+           .getConnection(populate_db.db_url,
+       	        populate_db.usr_name,populate_db.passwd);
+        
+        PreparedStatement pst = null;
+        
+        Vector<Argument> head_var = new Vector<Argument>();
+        
+//        String id = get_id_head_vars(name, head_var, c, pst);
+
+        head_var = get_head_vars(id, c, pst);
+        
+        HashMap<String, String> subgoal_name_mapping = new HashMap<String, String> ();
+        
+        Vector<Conditions> conditions = get_query_conditions(id, c, pst);
+        
+        Vector<Subgoal> subgoals = get_query_subgoals(id, subgoal_name_mapping, c, pst);
+        
+        Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();//get_query_lambda_terms(id, c, pst);
+        
+        Subgoal head = new Subgoal("q" + id, head_var);
+        
+        Query view = new Query("q" + id, head, subgoals,lambda_terms, conditions, subgoal_name_mapping);
+        
+        
+        c.close();
+                
+        return view;
+	}
+	
+	static Vector<Subgoal> get_query_subgoals(int name, HashMap<String, String> subgoal_name_mapping, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	{
+		String q_subgoals = "select subgoal_name, subgoal_origin_name from user_query2subgoals where query_id = '" + name + "'";
+		
+		pst = c.prepareStatement(q_subgoals);
+		
+		ResultSet r = pst.executeQuery();
+		
+		Vector<Subgoal> subgoal_names = new Vector<Subgoal>();
+		
+		while(r.next())
+		{
+			String subgoal_name = r.getString(1).trim();
+			
+			String subgoal_origin_name = r.getString(2).trim();
+			
+//			Vector<String> arg_strs = Parse_datalog.get_columns(subgoal_name);
+			
+			subgoal_name_mapping.put(subgoal_name, subgoal_origin_name);
+			
+			Vector<Argument> args = view_operation.get_full_schema(subgoal_name, subgoal_origin_name, c, pst);
+			
+//			for(int k = 0; k<arg_strs.size(); k++)
+//			{
+//				args.add(new Argument(arg_strs.get(k), subgoal_name));
+//			}
+			
+			Subgoal subgoal = new Subgoal(subgoal_name, args);
+			
+			subgoal_names.add(subgoal);
+		}
+		
+		return subgoal_names;
+	}
+	
+	
+	static Vector<Conditions> get_query_conditions(int id, Connection c, PreparedStatement pst) throws SQLException
+	{
+		String q_conditions = "select conditions from user_query2conditions where query_id = '" + id + "'";
+		
+		pst = c.prepareStatement(q_conditions);
+		
+		ResultSet r = pst.executeQuery();
+		
+		Vector<Conditions> conditions = new Vector<Conditions>();
+		
+		while(r.next())
+		{
+			
+			String condition_str = r.getString(1);
+			
+			String []strs = null;
+			
+			Operation op = null;
+			
+			
+			if(condition_str.contains(op_equal.op))
+			{
+				strs = condition_str.split(op_equal.op);
+				
+				op = new op_equal();
+			}
+			else
+			{
+				if(condition_str.contains(op_less.op))
+				{
+					strs = condition_str.split(op_less.op);
+					
+					op = new op_less();
+				}
+				else
+				{
+					if(condition_str.contains(op_greater.op))
+					{
+						strs = condition_str.split(op_greater.op);
+						
+						op = new op_greater();
+					}
+					else
+					{
+						if(condition_str.contains(op_less_equal.op))
+						{
+							strs = condition_str.split(op_less_equal.op);
+							
+							op = new op_less_equal();
+						}
+						else
+						{
+							if(condition_str.contains(op_greater_equal.op))
+							{
+								strs = condition_str.split(op_greater_equal.op);
+								
+								op = new op_greater_equal();
+							}
+							else
+							{
+								if(condition_str.contains(op_not_equal.op))
+								{
+									strs = condition_str.split(op_not_equal.op);
+									
+									op = new op_not_equal();
+								}
+							}
+						}
+					}
+				}
+				
+			}
+			
+			
+			String str1 = strs[0];
+			
+			String str2 = strs[1];
+			
+			String relation_name1 = str1.substring(0, str1.indexOf("_")).trim();
+			
+			String relation_name2 = new String();
+			
+			String arg1 = str1.substring(str1.indexOf("_") + 1, str1.length()).trim();
+
+			String arg2 = new String ();
+			
+			Conditions condition;
+			
+			if(str2.contains("'"))
+			{
+				arg2 = str2.trim();
+				
+				condition = new Conditions(new Argument(arg1, relation_name1), relation_name1, op, new Argument(arg2), relation_name2);
+			}
+			else
+			{
+				arg2 = str2.substring(str2.indexOf("_") + 1, str2.length()).trim();
+				
+//				subgoal2 = strs2[0] + "_" + strs2[1];
+				
+				relation_name2 = str2.substring(0, str2.indexOf("_")).trim();
+				
+				condition = new Conditions(new Argument(arg1, relation_name1), relation_name1, op, new Argument(arg2, relation_name2), relation_name2);
+
+			}
+			
+			conditions.add(condition);
+		}
+		return conditions;
+		
+	}
+	
+	
+	static Vector<Argument> get_head_vars(int id, Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "select head_variable from user_query_table where query_id = '" + id + "'";
+		
+		pst = c.prepareStatement(query);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		String head_var_str = new String();
+		
+		if(rs.next())
+		{			
+			head_var_str = rs.getString(1).trim();
+		}
+		
+		String [] head_var_strs = head_var_str.split(",");
+		
+		Vector<Argument> head_var = new Vector<Argument>();
+		
+		for(int i = 0; i<head_var_strs.length; i++)
+		{
+			
+			String []values = split_relation_attr_name(head_var_strs[i]);
+			
+			Argument arg = new Argument(head_var_strs[i].trim(), values[0]);
+			
+			head_var.add(arg);
+		}
+		
+		return head_var;
+	}
+	
+	static String[] split_relation_attr_name(String head_var_str)
+	{
+		head_var_str = head_var_str.trim();
+		
+		String relation_name = head_var_str.substring(0, head_var_str.indexOf("_"));
+		
+		String attr_name = head_var_str.substring(head_var_str.indexOf("_") + 1, head_var_str.length());
+		
+		String [] values = {relation_name, attr_name};
+		
+		return values;
+	}
+	
 	
 	public static void store_query(Query query, Vector<Integer> id_list) throws SQLException, ClassNotFoundException
 	{
@@ -207,7 +440,7 @@ public class query_storage {
 		
 		for(int i = 0; i<conditions.size(); i++)
 		{
-			String query = query_base + conditions.get(i).toString() + "')";
+			String query = query_base + conditions.get(i).toStringinsql() + "')";
 			
 			pst = c.prepareStatement(query);
 			

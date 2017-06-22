@@ -896,6 +896,8 @@ public class view_operation {
 			
 			pst = c.prepareStatement(query);
 			
+			System.out.println(query);
+			
 			pst.execute();
 			
 		}

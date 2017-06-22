@@ -1228,7 +1228,7 @@ private Object String;
 		// TabPane
 		TabPane tabPane = new TabPane();
 		citationDataViewDataTab = new Tab("Citation Query Builder");
-		citationDataViewDataTab.setText("Citation: Untitled");
+		citationDataViewDataTab.setText("Citation Query: Untitled");
 		citationDataViewDataTab.setClosable(false);
 		tabPane.getTabs().setAll(citationDataViewDataTab);
 		tabPane.setTabClosingPolicy(TabClosingPolicy.SELECTED_TAB);
@@ -1244,7 +1244,7 @@ private Object String;
         citationDataViewDataTab.setContent(gridCitationSub);
 
         
-		Label label_0 = new Label("Citation Builder");
+		Label label_0 = new Label("Citation Query Builder");
 		label_0.setId("prompt-text");
 		GridPane.setHgrow(label_0, Priority.ALWAYS);
 		gridCitationSub.add(label_0, 0, 0);
@@ -1963,26 +1963,38 @@ private Object String;
                         });
 				dataView.getColumns().addAll(col);
 			}
+			
 			String qname = "qname" + count;
 			count++;
 			Query generatedQuery = addQueryByName(qname);
-			System.out.println("[generatedQuery] " + generatedQuery);
 			HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
 			HashMap<Head_strs, Vector<String> > citation_strs = new HashMap<Head_strs, Vector<String> >();
+			try {
+				Vector<Vector<citation_view_vector>> c_views = Tuple_reasoning2.tuple_reasoning(generatedQuery, citation_strs, citation_view_map);
+			} catch (IOException | InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			int num_rows = 0;
-			System.out.println(stage.getScene() == dbaScene);
 			if (stage.getScene() == dbaScene || stage.getScene() == userScene) {
-				System.out.println("true");
 				dataViewList.clear();
-				while (rs.next()) {
-					ids.add(num_rows);
-					ObservableList row = FXCollections.observableArrayList();
-					for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-						row.add(rs.getString(i));
-					}
-					dataViewList.add(row);
-					num_rows++;
-				}
+//				while (rs.next()) {
+//					ids.add(num_rows);
+//					ObservableList row = FXCollections.observableArrayList();
+//					for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+//						row.add(rs.getString(i));
+//					}
+//					dataViewList.add(row);
+//					num_rows++;
+//				}
+				Set keySet = citation_strs.keySet();
+				Iterator iterator = keySet.iterator();
+				System.out.println(iterator.hasNext());
+			      while(iterator.hasNext()) {
+			         Map.Entry entry = (Map.Entry)iterator.next();
+			         dataViewList.add(entry.getKey());
+			      }
+				
 			}
 			if (citeStage.isShowing()) {
 				dataViewListNew.clear();
@@ -2005,6 +2017,28 @@ private Object String;
 					}
 				};
 				ids.clear();
+//				String qname = "qname" + count;
+//				count++;
+//				Query generatedQuery = addQueryByName(qname);
+////				System.out.println("[generatedQuery] " + generatedQuery);
+//				HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
+//				HashMap<Head_strs, Vector<String> > citation_strs = new HashMap<Head_strs, Vector<String> >();
+				try {
+					Vector<Vector<citation_view_vector>> c_views = Tuple_reasoning2.tuple_reasoning(generatedQuery, citation_strs, citation_view_map);
+					Set entrySet = citation_strs.entrySet();
+					Iterator iterator = entrySet.iterator();
+					System.out.println(iterator.hasNext());
+				      while(iterator.hasNext()) {
+				         Map.Entry entry = (Map.Entry)iterator.next();
+				         System.out.print("key is: "+ entry.getKey() + " & Value is: ");
+				         System.out.println(entry.getValue());
+				      }
+					
+					
+				} catch (IOException | InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 //				try {
 //					  // Vector<String> agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views);
 //					  // Vector<String> subset_agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views, ids);
@@ -2016,6 +2050,7 @@ private Object String;
 //					e.printStackTrace();
 //				}
 				citationColomn.setCellFactory(cellFactory);
+				
 //				citationColomn.setCellValueFactory(
 //						new Callback<TableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
 //							public ObservableValue<String> call(TableColumn.CellDataFeatures<ObservableList, String> param) {

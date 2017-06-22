@@ -41,8 +41,13 @@ public class populate_db {
 	public static String[] base_tables = {"gpcr","object","interaction","ligand","pathophysiology","interaction_affinity_refs","gtip_process","process_assoc","disease", "family", "introduction"};
 
 	
+<<<<<<< HEAD
+//	public static String db_url = "jdbc:postgresql://citedb.cx9xmwhyomib.us-east-1.rds.amazonaws.com:5432/test";
+	public static String db_url = "jdbc:postgresql://localhost:5432/test";
+=======
 	public static String db_url = "jdbc:postgresql://citedb.cx9xmwhyomib.us-east-1.rds.amazonaws.com:5432/iuphar";
 //	public static String db_url = "jdbc:postgresql://localhost:5432/postgres";
+>>>>>>> 1a06b1e6bf864373d4efe030d22664f00e5c0afe
 
 
 	public static String usr_name = "postgres";
@@ -277,6 +282,8 @@ public class populate_db {
 			String query = "drop table " + base_tables[i] + suffix;
 			
 			pst = c.prepareStatement(query);
+			
+			System.out.println(query);
 			
 			pst.execute();
 			
@@ -972,23 +979,23 @@ public class populate_db {
 //				else
 					query2 += "'" + view.name + "('";
 				
-				for(int k = 0; k< view.lambda_term.size(); k++)
-				{
-					
-					if(k >= 1)
-					{
-						query1 += " || ','";
-						
-						query2 += " || ','";
-					}
-					
-					if(int_list != null && int_list.contains(k))
-					{
-						query1 += " || " + "f." + view.lambda_term.get(k).name.substring(subgoal.name.length() + 1, view.lambda_term.get(k).name.length());
-						
-						query2 += " || " + "f." + view.lambda_term.get(k).name.substring(subgoal.name.length() + 1, view.lambda_term.get(k).name.length());
-					}
-				}
+//				for(int k = 0; k< view.lambda_term.size(); k++)
+//				{
+//					
+//					if(k >= 1)
+//					{
+//						query1 += " || ','";
+//						
+//						query2 += " || ','";
+//					}
+//					
+//					if(int_list != null && int_list.contains(k))
+//					{
+//						query1 += " || " + "f." + view.lambda_term.get(k).name.substring(subgoal.name.length() + 1, view.lambda_term.get(k).name.length());
+//						
+//						query2 += " || " + "f." + view.lambda_term.get(k).name.substring(subgoal.name.length() + 1, view.lambda_term.get(k).name.length());
+//					}
+//				}
 				
 				query1 += " || ')'";
 				
@@ -1009,6 +1016,28 @@ public class populate_db {
 				query2 += " and f." + primary_keys.get(k) + " = " + view.subgoal_name_mapping.get(subgoal.name) + suffix + "." + primary_keys.get(k);
 			}
 			
+			
+			int local_predicate_num = 0;
+			
+			for(int k = 0; k<view.conditions.size(); k++)
+			{
+				Conditions condition = view.conditions.get(k);
+				
+				if(condition.arg2.isConst() && view.subgoal_name_mapping.get(condition.subgoal1).equals(subgoal.name))
+				{
+					
+					String str = condition.arg2.name;
+					
+					if(condition.arg2.name.length() > 2)
+					{
+						str = "'" + condition.arg2.name.substring(1, condition.arg2.name.length() - 1).replaceAll("'", "''") + "'";
+					}
+					
+					query1 += " and " + "f." + condition.arg1 + condition.op + str;
+					
+					query2 += " and " + "f." + condition.arg1 + condition.op + str;
+				}
+			}
 			
 			
 			

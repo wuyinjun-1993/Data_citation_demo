@@ -27,6 +27,16 @@ public class Head_strs {
 		
 		for(int i = 0; i<head_vals.size(); i++)
 		{
+			if(head_vals.get(i) == null && vec_str.head_vals.get(i) == null)
+				continue;
+			
+			
+			if(head_vals.get(i) == null && vec_str.head_vals.get(i) != null)
+				return false;
+			
+			if(head_vals.get(i) != null && vec_str.head_vals.get(i) == null)
+				return false;
+			
 			if(!head_vals.get(i).equals(vec_str.head_vals.get(i)))
 				return false;
 		}
@@ -38,13 +48,13 @@ public class Head_strs {
 	@Override
 	public int hashCode() {
 		
-		int hashCode = 0;
-		
-	    for (int i = 0; i < head_vals.size(); i ++) {
-	      hashCode += head_vals.get(i).hashCode();
-	    }
+//		int hashCode = 0;
+//		
+//	    for (int i = 0; i < head_vals.size(); i ++) {
+//	      hashCode += head_vals.get(i).hashCode();
+//	    }
 	    
-	    return hashCode;
+	    return toString().hashCode();
 	  }
 	
 	

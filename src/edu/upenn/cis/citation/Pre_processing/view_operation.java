@@ -385,95 +385,169 @@ public class view_operation {
 			
 			String condition_str = r.getString(1);
 			
-			String []strs = null;
+			Conditions condition = null;
 			
-			Operation op = null;
-			
-			
-			if(condition_str.contains(op_equal.op))
+			if(condition_str.contains("'"))
 			{
-				strs = condition_str.split(op_equal.op);
+				String str2 = condition_str.substring(condition_str.indexOf("'"), condition_str.length());
 				
-				op = new op_equal();
-			}
-			else
-			{
-				if(condition_str.contains(op_less.op))
+				String str1 = condition_str.substring(0, condition_str.indexOf("'"));
+				
+				String [] strs = null;
+				
+				Operation op = null;
+				
+				if(str1.contains(op_less_equal.op))
 				{
-					strs = condition_str.split(op_less.op);
+					strs = str1.split(op_less_equal.op);
 					
-					op = new op_less();
+					op = new op_less_equal();
 				}
 				else
 				{
-					if(condition_str.contains(op_greater.op))
+					if(str1.contains(op_greater_equal.op))
 					{
-						strs = condition_str.split(op_greater.op);
+						strs = str1.split(op_greater_equal.op);
 						
-						op = new op_greater();
+						op = new op_greater_equal();
 					}
 					else
 					{
-						if(condition_str.contains(op_less_equal.op))
+						if(str1.contains(op_not_equal.op))
 						{
-							strs = condition_str.split(op_less_equal.op);
+							strs = str1.split(op_not_equal.op);
 							
-							op = new op_less_equal();
+							op = new op_not_equal();
 						}
 						else
 						{
-							if(condition_str.contains(op_greater_equal.op))
+							if(str1.contains(op_less.op))
 							{
-								strs = condition_str.split(op_greater_equal.op);
+								strs = str1.split(op_less.op);
 								
-								op = new op_greater_equal();
+								op = new op_less();
 							}
 							else
 							{
-								if(condition_str.contains(op_not_equal.op))
+								if(str1.contains(op_greater.op))
 								{
-									strs = condition_str.split(op_not_equal.op);
+									strs = str1.split(op_greater.op);
 									
-									op = new op_not_equal();
+									op = new op_greater();
+								}
+								else
+								{
+									if(str1.contains(op_equal.op))
+									{
+										strs = str1.split(op_equal.op);
+										
+										op = new op_equal();
+									}
 								}
 							}
 						}
 					}
+					
 				}
 				
-			}
-			
-			String str1 = strs[0];
-			
-			String str2 = strs[1];
-			
-			String relation_name1 = str1.substring(0, str1.indexOf("_")).trim();
-			
-			String relation_name2 = new String();
-			
-			String arg1 = str1.substring(str1.indexOf("_") + 1, str1.length()).trim();
-
-			String arg2 = new String ();
-			
-			Conditions condition;
-			
-			if(str2.contains("'"))
-			{
-				arg2 = str2.trim();
 				
-				condition = new Conditions(new Argument(arg1, relation_name1), relation_name1, op, new Argument(arg2), relation_name2);
+				String relation_name1 = strs[0].substring(0, strs[0].indexOf("_")).trim();
+				
+				String relation_name2 = new String();
+				
+				String arg1 = strs[0].substring(strs[0].indexOf("_") + 1, strs[0].length()).trim();
+
+				String arg2 = new String ();
+				
+				condition = new Conditions(new Argument(arg1, relation_name1), relation_name1, op, new Argument(str2), relation_name2);
+				
+				
 			}
 			else
 			{
-				arg2 = str2.substring(str2.indexOf("_") + 1, str2.length()).trim();
+				String []strs = null;
 				
-//				subgoal2 = strs2[0] + "_" + strs2[1];
+				Operation op = null;
 				
-				relation_name2 = str2.substring(0, str2.indexOf("_")).trim();
 				
-				condition = new Conditions(new Argument(arg1, relation_name1), relation_name1, op, new Argument(arg2, relation_name2), relation_name2);
+				if(condition_str.contains(op_less_equal.op))
+				{
+					strs = condition_str.split(op_less_equal.op);
+					
+					op = new op_less_equal();
+				}
+				else
+				{
+					if(condition_str.contains(op_greater_equal.op))
+					{
+						strs = condition_str.split(op_greater_equal.op);
+						
+						op = new op_greater_equal();
+					}
+					else
+					{
+						if(condition_str.contains(op_not_equal.op))
+						{
+							strs = condition_str.split(op_not_equal.op);
+							
+							op = new op_not_equal();
+						}
+						else
+						{
+							if(condition_str.contains(op_less.op))
+							{
+								strs = condition_str.split(op_less.op);
+								
+								op = new op_less();
+							}
+							else
+							{
+								if(condition_str.contains(op_greater.op))
+								{
+									strs = condition_str.split(op_greater.op);
+									
+									op = new op_greater();
+								}
+								else
+								{
+									if(condition_str.contains(op_equal.op))
+									{
+										strs = condition_str.split(op_equal.op);
+										
+										op = new op_equal();
+									}
+								}
+							}
+						}
+					}
+					
+				}
+				
+				String str1 = strs[0];
+				
+				String str2 = strs[1];
+				
+				String relation_name1 = str1.substring(0, str1.indexOf("_")).trim();
+				
+				String relation_name2 = new String();
+				
+				String arg1 = str1.substring(str1.indexOf("_") + 1, str1.length()).trim();
 
+				String arg2 = str2.substring(str2.indexOf("_") + 1, str2.length()).trim();
+					
+//					subgoal2 = strs2[0] + "_" + strs2[1];
+					
+					relation_name2 = str2.substring(0, str2.indexOf("_")).trim();
+					
+					condition = new Conditions(new Argument(arg1, relation_name1), relation_name1, op, new Argument(arg2, relation_name2), relation_name2);
+
+				
 			}
+			
+			
+			
+			
+			
 			
 //			String []strs1 = str1.split("_");
 //			
@@ -780,26 +854,34 @@ public class view_operation {
 		
 		for(int i = 0; i<view.lambda_term.size(); i++)
 		{
-			if(i >= 1)
-			{
-				lambda_term_str += populate_db.separator;
-				
-				lambda_term_table_name += populate_db.separator;
-			}
 			
-			lambda_term_str += view.lambda_term.get(i).toString();
 			
-			lambda_term_table_name += view.lambda_term.get(i).table_name;
-		}
-		
-		if(!view.lambda_term.isEmpty())
-		{
-			String query = "insert into view2lambda_term values ('" + seq + "','" + lambda_term_str + "','" + lambda_term_table_name + "')";
+			String query = "insert into view2lambda_term values ('" + seq + "','" + view.lambda_term.get(i).toString() + "','" + view.lambda_term.get(i).table_name + "')";
 			
 			pst = c.prepareStatement(query);
 			
 			pst.execute();
+			
+//			if(i >= 1)
+//			{
+//				lambda_term_str += populate_db.separator;
+//				
+//				lambda_term_table_name += populate_db.separator;
+//			}
+//			
+//			lambda_term_str += view.lambda_term.get(i).toString();
+//			
+//			lambda_term_table_name += view.lambda_term.get(i).table_name;
 		}
+		
+//		if(!view.lambda_term.isEmpty())
+//		{
+//			String query = "insert into view2lambda_term values ('" + seq + "','" + lambda_term_str + "','" + lambda_term_table_name + "')";
+//			
+//			pst = c.prepareStatement(query);
+//			
+//			pst.execute();
+//		}
 		
 
 		

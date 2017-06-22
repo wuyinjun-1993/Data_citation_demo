@@ -46,7 +46,7 @@ public class Argument {
   
   public Argument(String name)
   {
-	  this(name, null, true);
+	  this(name, new String(), true);
   }
   
   public Argument(String name, String relation_name, String lambda_term) {

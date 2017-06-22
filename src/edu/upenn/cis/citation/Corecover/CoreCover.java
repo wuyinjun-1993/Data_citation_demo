@@ -115,15 +115,22 @@ public class CoreCover {
 
 //      System.out.println(view);
       
-      if(view.name.equals("v6"))
-      {
-    	  int y = 0;
-    	  y++;
-      }
-      
       Relation rel = canDb.execQuery(view);
       
+//      if(!rel.getTuples().isEmpty())
+//      {
+//    	  for(int p = 0; p<view.body.size(); p++)
+//    	  {
+//    		  Subgoal subgoal = (Subgoal)view.body.get(p);
+//    		  
+//    		  System.out.print(subgoal.name + " ");
+//    	  }
+//    	  
+//    	  System.out.println();
+//      }
+//      
       for (Iterator iter = rel.getTuples().iterator(); iter.hasNext();) {
+    	      	  
     	  Tuple tuple = (Tuple) iter.next();
     	  
     	  set_tuple_lambda_term(tuple, view);

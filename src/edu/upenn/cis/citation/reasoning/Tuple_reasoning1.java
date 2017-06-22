@@ -35,6 +35,7 @@ import edu.upenn.cis.citation.datalog.Parse_datalog;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.gen_citation.gen_citation1;
 import edu.upenn.cis.citation.output.output2excel;
+import edu.upenn.cis.citation.user_query.query_storage;
 import sun.util.resources.cldr.ur.CurrencyNames_ur;
 
 public class Tuple_reasoning1 {
@@ -86,16 +87,24 @@ public class Tuple_reasoning1 {
 		
 		
 		
+		Connection c = null;
+		
+	    PreparedStatement pst = null;
+	      
+		Class.forName("org.postgresql.Driver");
+		
+	    c = DriverManager
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
 		
 		
 		
 		
 		
 		
+		Query q = query_storage.get_query_by_id(1);
 		
-		Query q = gen_query();
-		
-
+		System.out.println(q);
 		
 //		String query = "q(name):object(), in_gtip = 'true'";
 //		
@@ -120,11 +129,11 @@ public class Tuple_reasoning1 {
 		
 		long t4 = 0;
 		
-		long time0 = 0;
+		double time0 = 0;
 		
-		long time1 = 0;
+		double time1 = 0;
 		
-		long time2 = 0;
+		double time2 = 0;
 		
 		
 		t0 = System.nanoTime();
@@ -136,7 +145,9 @@ public class Tuple_reasoning1 {
 			
 			HashMap<Head_strs, Vector<String> > citation_strs1 = new HashMap<Head_strs, Vector<String> >();
 			
-			Vector<Vector<citation_view_vector>> c_views = tuple_reasoning(q, citation_strs1, head_vals, file_name, citation_view_map1);
+			Vector<Vector<citation_view_vector>> c_views = Tuple_reasoning2_citation_opt.tuple_reasoning(q, citation_strs1, citation_view_map1, c, pst);
+			
+			HashMap<Head_strs, Vector<HashSet<String>>>author2 = Tuple_reasoning2_citation_opt.authors;
 			
 			t1 = System.nanoTime();
 			
@@ -144,13 +155,15 @@ public class Tuple_reasoning1 {
 			
 			HashMap<Head_strs, Vector<String> > citation_strs1_1 = new HashMap<Head_strs, Vector<String> >();
 			
-			Vector<Vector<citation_view_vector>> c_views1_1 = Tuple_reasoning1_citation_opt.tuple_reasoning(q, citation_strs1_1, head_vals, file_name, citation_view_map1_1);
+			Vector<Vector<citation_view_vector>> c_views1_1 = Tuple_reasoning1_citation_opt.tuple_reasoning(q, citation_strs1_1, citation_view_map1_1, c, pst);
 			
 			t2 = System.nanoTime();
 			
-			HashMap<Head_strs, Vector<HashSet<String>>>author_opt = Tuple_reasoning1_citation_opt.authors;
+			HashMap<Head_strs, Vector<HashSet<String>>>author1 = Tuple_reasoning1_citation_opt.authors;
 			
-			compare_authors(authors, author_opt);
+			compare(citation_view_map1, citation_view_map1_1);
+			
+			compare_authors(author2, author1);
 //		}
 		
 		
@@ -201,17 +214,19 @@ public class Tuple_reasoning1 {
 		
 		t3 = System.nanoTime();
 		
-		time0 = (t1 - t0) / 100;
+		time0 = (t1 - t0)*1.0 / 1000000000;
 		
 //		time1 = (t3 - t2)/ 100;
 		
-		time2 = (t2 - t1) / 100;
+		time2 = (t2 - t1)*1.0 / 1000000000;
 		
 		System.out.println("time in tuple level:" + time0);
 		
 //		System.out.println("time with opt:" + time1);
 		
 		System.out.println("time with opt:" + time2);
+		
+		c.close();
 		
 //		compare(citation_view_map2, citation_view_map3);
 //		
@@ -230,7 +245,7 @@ public class Tuple_reasoning1 {
 
 	}
 	
-	static void compare_authors(HashMap<Head_strs, Vector<HashSet<String>>> authors1, HashMap<Head_strs, Vector<HashSet<String>>> authors2)
+	public static void compare_authors(HashMap<Head_strs, Vector<HashSet<String>>> authors1, HashMap<Head_strs, Vector<HashSet<String>>> authors2)
 	{
 		Set<Head_strs> key_set = authors1.keySet();
 		
@@ -242,13 +257,7 @@ public class Tuple_reasoning1 {
 			
 			Vector<HashSet<String>> a2 = authors2.get(h_val);
 			
-			System.out.println(h_val);
-			
-			if(h_val.toString().equals("2 1 1"))
-			{
-				int y = 0;
-				y++;
-			}
+//			System.out.println(h_val);
 			
 			do_compare_authors(a1, a2);
 		}
@@ -297,7 +306,7 @@ public class Tuple_reasoning1 {
 		}
 	}
 	
-	static void compare(HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map1, HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map2)
+	public static void compare(HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map1, HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map2)
 	{
 		
 		System.out.println("COMPARE::::");
@@ -312,7 +321,7 @@ public class Tuple_reasoning1 {
 			
 			Vector<Vector<citation_view_vector>> c_views2 = citation_view_map2.get(h_val);
 			
-			System.out.println(h_val.toString());
+//			System.out.println(h_val.toString());
 			
 			compare(c_views1, c_views2);
 		}
@@ -337,11 +346,11 @@ public class Tuple_reasoning1 {
 			
 			if(j >= c_views1.size())
 			{
-				System.out.println("errrror");
-				
-				System.out.println(c_views.get(i).toString());
-				
-				System.out.println(c_views1.get(0).toString());
+//				System.out.println("errrror");
+//				
+//				System.out.println(c_views.get(i).toString());
+//				
+//				System.out.println(c_views1.get(0).toString());
 				
 				assertEquals(1, 0);
 			}
@@ -374,13 +383,134 @@ public class Tuple_reasoning1 {
 			}
 			if(j >= c2.size())
 			{
-				System.out.println("id1:::" + c1.get(i));
+//				System.out.println("id1:::" + c1.get(i));
 				return false;
 			}
 		}
 		return true;
 	}
 	
+	
+//	static Query gen_query() throws SQLException, ClassNotFoundException
+//	{
+//		Class.forName("org.postgresql.Driver");
+//        Connection c = DriverManager
+//           .getConnection(populate_db.db_url,
+//       	        populate_db.usr_name,populate_db.passwd);
+//		
+//        PreparedStatement pst = null;
+//        
+//		Vector<Argument> head_args = new Vector<Argument>();
+//		
+//		head_args.add(new Argument("gpcr_object_id", "gpcr"));
+//				
+//		
+//		head_args.add(new Argument("gpcr1_object_id", "gpcr1"));
+////		
+//		head_args.add(new Argument("object_object_id", "object"));
+//				
+//		
+////		head_args.add(new Argument("family3_family_id", "family3"));
+//		
+////		head_args.add(new Argument("introduction_family_id", "introduction"));
+//
+//		
+////		head_args.add(new Argument("introduction1_family_id", "introduction1"));
+//////				
+////		head_args.add(new Argument("introduction2_family_id", "introduction2"));
+//		
+////		head_args.add(new Argument("introduction3_family_id", "introduction3"));
+//		
+//		Subgoal head = new Subgoal("q", head_args);
+//		
+//		Vector<Subgoal> subgoals = new Vector<Subgoal>();
+//		
+//		Vector<Argument> args1 = view_operation.get_full_schema("gpcr", "gpcr", c, pst);
+//		
+//		Vector<Argument> args2 = view_operation.get_full_schema("gpcr1", "gpcr", c, pst);
+//		
+//		
+////		Vector<Argument> args6 = view_operation.get_full_schema("family2", "family", c, pst);
+//		
+////		Vector<Argument> args7 = view_operation.get_full_schema("family3", "family", c, pst);
+//		
+//		Vector<Argument> args3 = view_operation.get_full_schema("object", "object", c, pst);
+//		
+////		Vector<Argument> args4 = view_operation.get_full_schema("introduction1", "introduction", c, pst);
+//////		
+////		Vector<Argument> args5 = view_operation.get_full_schema("introduction2", "introduction", c, pst);
+//		
+////		Vector<Argument> args8 = view_operation.get_full_schema("introduction3", "introduction", c, pst);
+//
+//		
+//		subgoals.add(new Subgoal("gpcr", args1));
+//		
+//		subgoals.add(new Subgoal("gpcr1", args2));
+////		
+////		subgoals.add(new Subgoal("family2", args6));
+//		
+////		subgoals.add(new Subgoal("family3", args7));
+//				
+//		subgoals.add(new Subgoal("object", args3));
+//		
+////		subgoals.add(new Subgoal("gpcr", args4));
+////		
+////		subgoals.add(new Subgoal("introduction2", args5));
+//		
+////		subgoals.add(new Subgoal("introduction3", args8));
+//		
+//		Vector<Conditions> conditions = new Vector<Conditions>();
+//		
+//		conditions.add(new Conditions(new Argument("object_id", "gpcr"), "gpcr", new op_less_equal(), new Argument("3"), new String()));
+////		
+//		conditions.add(new Conditions(new Argument("object_id", "gpcr1"), "gpcr1", new op_less_equal(), new Argument("4"), new String()));
+////		
+////		conditions.add(new Conditions(new Argument("family_id", "family2"), "family2", new op_less_equal(), new Argument("2"), new String()));
+//		
+////		conditions.add(new Conditions(new Argument("family_id", "family3"), "family3", new op_less_equal(), new Argument("2"), new String()));
+////		
+//		conditions.add(new Conditions(new Argument("object_id", "object"), "object", new op_less_equal(), new Argument("3"), new String()));
+//		
+////		conditions.add(new Conditions(new Argument("family_id", "introduction1"), "introduction1", new op_less_equal(), new Argument("2"), new String()));
+////		
+////		conditions.add(new Conditions(new Argument("family_id", "introduction2"), "introduction2", new op_less_equal(), new Argument("2"), new String()));
+//
+////		conditions.add(new Conditions(new Argument("family_id", "introduction3"), "introduction3", new op_less_equal(), new Argument("2"), new String()));
+//
+//		
+////		conditions.add(new Conditions(new Argument("in_gtip", "object"), "object", new op_equal(), new Argument("'true'"), new String()));
+//		
+//		HashMap<String, String> subgoal_name_mapping = new HashMap<String, String>();
+//		
+//		subgoal_name_mapping.put("object", "object");
+//		
+//		subgoal_name_mapping.put("gpcr1", "gpcr");
+////		
+//		subgoal_name_mapping.put("gpcr", "gpcr");
+//		
+////		subgoal_name_mapping.put("family3", "family");
+//				
+////		subgoal_name_mapping.put("introduction", "introduction");
+//		
+////		subgoal_name_mapping.put("introduction1", "introduction");
+//////
+////		subgoal_name_mapping.put("introduction2", "introduction");
+//		
+////		subgoal_name_mapping.put("introduction3", "introduction");
+//
+//
+//		
+//		Query q = new Query("q", head, subgoals, new Vector<Lambda_term>(), conditions, subgoal_name_mapping);
+//		
+//		System.out.println(q);
+//		
+//		c.close();
+//		
+//		return q;
+//		
+//		
+//	}
+//	
 	
 	static Query gen_query() throws SQLException, ClassNotFoundException
 	{
@@ -393,17 +523,30 @@ public class Tuple_reasoning1 {
         
 		Vector<Argument> head_args = new Vector<Argument>();
 		
-		head_args.add(new Argument("family_family_id", "family"));
-				
+		head_args.add(new Argument("introduction_family_id", "introduction"));
 		
-//		head_args.add(new Argument("family1_family_id", "family1"));
-//		
-//		head_args.add(new Argument("family2_family_id", "family2"));
+		head_args.add(new Argument("object_in_gtip", "object"));
+				
+		head_args.add(new Argument("object_structural_info_comments", "object"));
+		
+		head_args.add(new Argument("object_only_iuphar", "object"));
+		
+		head_args.add(new Argument("object_in_cgtp", "object"));
+		
+		head_args.add(new Argument("object_grac_comments", "object"));
+		
+//		head_args.add(new Argument("gpcr_object_id", "gpcr"));
+		
+		
+		
+//		head_args.add(new Argument("gpcr1_object_id", "object"));
+////		
+//		head_args.add(new Argument("object_object_id", "gpcr"));
 				
 		
 //		head_args.add(new Argument("family3_family_id", "family3"));
 		
-		head_args.add(new Argument("introduction_family_id", "introduction"));
+//		head_args.add(new Argument("introduction_family_id", "introduction"));
 
 		
 //		head_args.add(new Argument("introduction1_family_id", "introduction1"));
@@ -416,16 +559,16 @@ public class Tuple_reasoning1 {
 		
 		Vector<Subgoal> subgoals = new Vector<Subgoal>();
 		
-		Vector<Argument> args1 = view_operation.get_full_schema("family", "family", c, pst);
+//		Vector<Argument> args1 = view_operation.get_full_schema("gpcr", "gpcr", c, pst);
 		
-//		Vector<Argument> args2 = view_operation.get_full_schema("family1", "family", c, pst);
+		Vector<Argument> args2 = view_operation.get_full_schema("introduction", "introduction", c, pst);
 		
 		
 //		Vector<Argument> args6 = view_operation.get_full_schema("family2", "family", c, pst);
 		
 //		Vector<Argument> args7 = view_operation.get_full_schema("family3", "family", c, pst);
 		
-		Vector<Argument> args3 = view_operation.get_full_schema("introduction", "introduction", c, pst);
+		Vector<Argument> args3 = view_operation.get_full_schema("object", "object", c, pst);
 		
 //		Vector<Argument> args4 = view_operation.get_full_schema("introduction1", "introduction", c, pst);
 ////		
@@ -434,17 +577,17 @@ public class Tuple_reasoning1 {
 //		Vector<Argument> args8 = view_operation.get_full_schema("introduction3", "introduction", c, pst);
 
 		
-		subgoals.add(new Subgoal("family", args1));
+//		subgoals.add(new Subgoal("gpcr", args1));
 		
-//		subgoals.add(new Subgoal("family1", args2));
+		subgoals.add(new Subgoal("introduction", args2));
 //		
 //		subgoals.add(new Subgoal("family2", args6));
 		
 //		subgoals.add(new Subgoal("family3", args7));
 				
-		subgoals.add(new Subgoal("introduction", args3));
+		subgoals.add(new Subgoal("object", args3));
 		
-//		subgoals.add(new Subgoal("introduction1", args4));
+//		subgoals.add(new Subgoal("gpcr", args4));
 //		
 //		subgoals.add(new Subgoal("introduction2", args5));
 		
@@ -452,15 +595,15 @@ public class Tuple_reasoning1 {
 		
 		Vector<Conditions> conditions = new Vector<Conditions>();
 		
-		conditions.add(new Conditions(new Argument("family_id", "family"), "family", new op_less_equal(), new Argument("2"), new String()));
+//		conditions.add(new Conditions(new Argument("object_id", "gpcr"), "gpcr", new op_less_equal(), new Argument("5"), new String()));
 //		
-//		conditions.add(new Conditions(new Argument("family_id", "family1"), "family1", new op_less_equal(), new Argument("2"), new String()));
+		conditions.add(new Conditions(new Argument("family_id", "introduction"), "introduction", new op_less_equal(), new Argument("3"), new String()));
 //		
 //		conditions.add(new Conditions(new Argument("family_id", "family2"), "family2", new op_less_equal(), new Argument("2"), new String()));
 		
 //		conditions.add(new Conditions(new Argument("family_id", "family3"), "family3", new op_less_equal(), new Argument("2"), new String()));
 //		
-		conditions.add(new Conditions(new Argument("family_id", "introduction"), "introduction", new op_less_equal(), new Argument("2"), new String()));
+		conditions.add(new Conditions(new Argument("object_id", "object"), "object", new op_less_equal(), new Argument("6"), new String()));
 		
 //		conditions.add(new Conditions(new Argument("family_id", "introduction1"), "introduction1", new op_less_equal(), new Argument("2"), new String()));
 //		
@@ -473,15 +616,15 @@ public class Tuple_reasoning1 {
 		
 		HashMap<String, String> subgoal_name_mapping = new HashMap<String, String>();
 		
-		subgoal_name_mapping.put("family", "family");
+		subgoal_name_mapping.put("object", "object");
 		
-//		subgoal_name_mapping.put("family1", "family");
+		subgoal_name_mapping.put("introduction", "introduction");
 //		
-//		subgoal_name_mapping.put("family2", "family");
+//		subgoal_name_mapping.put("gpcr", "gpcr");
 		
 //		subgoal_name_mapping.put("family3", "family");
 				
-		subgoal_name_mapping.put("introduction", "introduction");
+//		subgoal_name_mapping.put("introduction", "introduction");
 		
 //		subgoal_name_mapping.put("introduction1", "introduction");
 ////

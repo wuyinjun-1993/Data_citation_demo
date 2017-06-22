@@ -245,7 +245,7 @@ public class Query_converter {
 			
 		}
 		
-		
+		c.close();
 		
 		
 		return full_queries;
@@ -1811,9 +1811,24 @@ public class Query_converter {
 		
 		str += condition.subgoal1 + "." + condition.arg1 + condition.op;
 		
-		if(condition.subgoal2 == null || condition.subgoal2.isEmpty())
+		if(condition.arg2.isConst())
 		{
-			str += condition.arg2;
+			
+			String arg2 = condition.arg2.toString();
+			
+			if(arg2.length() > 2)
+			{
+				arg2 = arg2.substring(1, arg2.length() - 1).replaceAll("'", "''");
+				str += "'" + arg2 + "'";
+			}
+			else
+			{
+				str += arg2;
+			}
+						
+			
+			
+			
 		}
 		else
 		{

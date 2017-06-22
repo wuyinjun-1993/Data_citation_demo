@@ -249,6 +249,9 @@ public class Util {
         Set<String> tables = new HashSet<>();
         List<String> lambdas = new ArrayList<>();
         List<String> selected = new ArrayList<>(), wheres = new ArrayList<>(), joins = new ArrayList<>();
+        String[] comparator = {"=", "<", ">", "<=", ">=", "<>"};
+        String comparatorValue = "";
+        String joinTable = "";
         for (Entry item : list) {
             if (item.getShow()) {
                 if (toCite) selected.add(item.getTable() + "." + item.getField() + " AS " + item.getTable() + "_" + item.getField());
@@ -269,16 +272,22 @@ public class Util {
             }
             if (item.getJoin() != null && !item.getJoin().isEmpty()) {
             	String[] joinStrings = item.getJoin().split("\\.");
-            	if (!tables.contains(joinStrings[0].substring(1, joinStrings[0].length()))) {
-            		tables.add(joinStrings[0].substring(1, joinStrings[0].length()));
+            	for (int j = 0; j < comparator.length; j++) {
+            		if (comparator[j].equals(Character.toString(joinStrings[0].charAt(0))) ) {
+                		comparatorValue = comparator[j];
+                		joinTable = joinStrings[0].substring(1, joinStrings[0].length());
+                	}
+                	else if (comparator[j].equals(joinStrings[0].substring(0, 2))) {
+                		comparatorValue = comparator[j];
+                		joinTable = joinStrings[0].substring(2, joinStrings[0].length());
+                	}
+            	}
+            	if (!tables.contains(joinTable)) {
+            		tables.add(joinTable);
             		// add the join table relation name
             	}
-                if (toCite) {
-                    String[] name = item.getJoin().split("\\.");
-                    String new_name = name[0].substring(1, name[0].length()) + "." + name[1];
-                    joins.add(item.getTable() + "."  + item.getField() + name[0].charAt(0) + new_name);
-                }
-                else joins.add(item.getTable() + "."  + item.getField() + item.getJoin());
+                joins.add(item.getTable() + "."  + item.getField() + joinStrings[0] + "." + joinStrings[1]);
+            	
             }
         }
         sb.append("SELECT distinct ");

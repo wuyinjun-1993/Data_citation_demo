@@ -2,8 +2,10 @@ package edu.upenn.cis.citation.ui;
 
 import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Pre_processing.Gen_query;
+import edu.upenn.cis.citation.Pre_processing.citation_view_operation;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.Pre_processing.view_operation;
+import edu.upenn.cis.citation.citation_view.Head_strs;
 //import edu.upenn.cis.citation.Pre_processing.insert_new_view;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.dao.Database;
@@ -31,8 +33,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TabPane.TabClosingPolicy;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.CheckBoxTableCell;
@@ -52,10 +52,12 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import net.sf.jsqlparser.statement.select.FromItem;
 
+import org.apache.poi.poifs.property.Child;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 
-
+import sun.lwawt.macosx.CViewEmbeddedFrame;
 import sun.tools.jar.resources.jar;
 
 import com.sun.javafx.geom.RectangularShape;
@@ -82,18 +84,27 @@ public class QBEApp extends Application {
 	// private Scene newScene;
 	private Stage stage, citeStage;
 	// private TableView<ObservableList> dataSelectedView = new TableView<>();
+	// data shown in data preview table in dba or user, added in setDataView()
 	private ObservableList dataViewList = FXCollections.observableArrayList();
+	// data shown in data preview table in citation builder
+	private ObservableList dataViewListNew = FXCollections.observableArrayList();
 	// private ObservableList dataSelectedViewList = FXCollections.observableArrayList();
 	private ObservableList lambdaData = FXCollections.observableArrayList();
 	// Table tuples data
 	private final ObservableList<Entry> data = FXCollections.observableArrayList();
+	// table tuples in current citation
+	private final ObservableList<Entry> dataNew = FXCollections.observableArrayList();
 	List<String> lambdas = new ArrayList<>();
 
 	VBox vboxRightCQ = new VBox();
+	// data preview shown after run in dba and user
 	final TableView<ObservableList> dataView = new TableView(); 
-	// dataview shown after run in dba and user
-	final HBox hBoxLambda = new HBox();
+	// data preview shown after run in citation builder
+	final TableView<ObservableList> dataViewNew = new TableView(); 
 	// lambda vbox shown after run in dba and user
+	final HBox hBoxLambda = new HBox();
+	// lambda vbox shown after run in citation builder
+	final HBox hBoxLambdaNew = new HBox();
 	
 	// User
 	private Scene userScene;
@@ -101,32 +112,46 @@ public class QBEApp extends Application {
 	// DBA
 	private Scene dbaScene;
 	private GridPane gridDba, gridDbaSub;
+	
+	// add citation scene
+	private Scene citationScene;
+	private GridPane gridCitation, gridCitationSub;
+	private Tab citationDataViewDataTab;
+	
 	// TreeView share across user & dba screens
 	private TreeItem<TreeNode> root;
 	List<TreeItem<TreeNode>> removedTreeItems = new ArrayList<>();
 
-	private ObservableList<ObservableList> dataTable = FXCollections.observableArrayList();
 	// view names
 	ObservableList<String> listDataViews = FXCollections.observableArrayList(Database.getDataViews());
+	// get all citation views names
+	ObservableList<String> listCitationViews = FXCollections.observableArrayList(Database.getCitationViews(null));
 	List<List<String>> lambdasAll = new ArrayList<>();
 	String lambdaSQL = null;
 	String datalog = null;
 	String dv = ""; // The name of edited view
+	String cv = ""; // The name of edited citation
+	// datalog text area in dba or user
 	TextArea datalogTextArea = new TextArea();
+	// datalog text area in citation builder
+	TextArea datalogTextAreaNew = new TextArea();
 	List<Integer> lambdaIndex = new ArrayList<>();
 	Vector<Integer> ids = new Vector<>();
 	int count = 0; // count the untitled view
 	double paddingCriteriaUser = 0;
 	double paddingCriteriaDba = 0;
 	double paddingJoin = 0;
-	
 
+	// HBox PrevNext used in dba or user
 	HBox hBoxPrevNext, hBoxGenCitation;
-	//
+	// HBox PreNext used in citation builder
+	HBox hBoxPrevNextNew;
+	// splitPane used in dba or user scene
 	SplitPane splitPaneQbe;
+	// splitPane used in citation builder
+	SplitPane splitPaneQbeNew;
 	
 	TableRowExpanderColumn<Entry> expanderColumn;
-
 	
 	Vector<Vector<citation_view_vector>> c_views = null;
 
@@ -151,6 +176,7 @@ private Object String;
 		buildDbaScene();
 		buildUserScene();
 		buildViewScene();
+		buildCitationScene();
 		stage.setScene(loginScene);
 		stage.setMinWidth(400);
 		stage.setMinHeight(400);
@@ -207,6 +233,7 @@ private Object String;
 		Button citeButton = new Button("Cite a dataset");
 		citeButton.setOnAction(event -> {
 			this.stage.setScene(userScene);
+			citeStage.hide();
 		});
 		gridPane2.add(citeButton, 0, 4);
 		gridPane.setMaxSize(300, 300);
@@ -252,8 +279,10 @@ private Object String;
 		gridPane2.setEffect(r2);
 		// DropShadow effect
 		DropShadow dropShadow = new DropShadow();
-		dropShadow.setOffsetX(5);
-		dropShadow.setOffsetY(5);
+		dropShadow.setOffsetX(1);
+		dropShadow.setOffsetY(1);
+		dropShadow.setRadius(5);
+		dropShadow.setColor(Color.gray(0.3));
 		// Adding text and DropShadow effect to it
 		Text text = new Text("Data Citation System");
 		text.setTextAlignment(TextAlignment.CENTER);
@@ -300,8 +329,9 @@ private Object String;
         HBox hbox = new HBox();
         TextField textFieldDataViewDataLog = new TextField();
         DropShadow dropShadow = new DropShadow();
-        dropShadow.setOffsetX(5);
-        dropShadow.setOffsetY(5);
+        dropShadow.setOffsetX(1);
+        dropShadow.setOffsetY(1);
+        dropShadow.setRadius(2);
 		Text textDataLog = new Text("DataLog: ");
         textDataLog.setId("text");
         textDataLog.setFont(Font.font("Courier New", FontWeight.BOLD, 18));
@@ -315,8 +345,9 @@ private Object String;
 		HBox hb = new HBox();
 		hb.setPadding(new Insets(20, 20, 20, 30));
 		DropShadow dropShadow_2 = new DropShadow();
-        dropShadow_2.setOffsetX(5);
-        dropShadow_2.setOffsetY(5);
+        dropShadow_2.setOffsetX(2);
+        dropShadow_2.setOffsetY(2);
+		dropShadow_2.setColor(Color.gray(0.3));
 		Text text = new Text("Citation Management");
 		text.setId("text");
 		text.setFont(Font.font("Courier New", FontWeight.BOLD, 28));
@@ -334,9 +365,11 @@ private Object String;
 		gridPaneDataViews.setHgap(5);
 		gridPaneDataViews.setVgap(5);
 		Label lableDataviews = new Label("Data Views");
+		lableDataviews.setFont(Font.font("Courier New", FontWeight.BLACK, 18));
 		// ListView Data Views
 		ListView<String> listViewDataViews = new ListView<>();
 		listViewDataViews.setPrefWidth(400);
+		listViewDataViews.setStyle("-fx-font-size:15.0;");
 //		ObservableList<String> listDataViews = FXCollections.observableArrayList(Database.getDataViews());
 		listViewDataViews.setItems(listDataViews);
 
@@ -365,6 +398,7 @@ private Object String;
 		
         Button buttonEditDataView = new Button("Edit");
         buttonEditDataView.setOnAction(event -> {
+			stage.setScene(dbaScene);
             dv = listViewDataViews.getSelectionModel().getSelectedItem();
             hbox.setVisible(false);
             if (dv == null) return;
@@ -380,34 +414,30 @@ private Object String;
 				e.printStackTrace();
 				System.out.println("data view edit error");
 			}
-			stage.setScene(dbaScene);
+			citeStage.hide();
         });
 		Button buttonAddDataView = new Button("Add");
 		buttonAddDataView.setOnAction(event -> {
+			stage.setScene(dbaScene);
 			count ++;
 			String randomName = new java.lang.String();
 			randomName = "Untitled" + count;
-			
+			// reset the lambda hox and the data preview tableview
+			data.clear();
+			datalogTextArea.clear();
+			hBoxLambda.getChildren().clear();
+			dataView.getItems().clear();
+			dataView.getColumns().clear();
 //            Alert alert = new Alert(Alert.AlertType.INFORMATION);
 //            alert.setTitle("Succeed");
 //            alert.setHeaderText(null);
 //            alert.setContentText("The data view " + randomName + " is successfully created");
 //            alert.showAndWait();
-			listDataViews.add(randomName);
-//			try {
-//				HashMap<String, String> relation_mapping = new HashMap<String, String>();
-//				Vector<String[]> head_vars = new Vector<String[]>();
-//				Vector<String []> condition_str = new Vector<String[]>();
-//				Vector<String[]> lambda_term_str = new Vector<String[]>();
-//				Query emptyQuery = Gen_query.gen_query(randomName, relation_mapping, head_vars, condition_str, lambda_term_str);
-//				view_operation.add(emptyQuery, randomName);
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
+//			listDataViews.add(randomName);
 			dv = randomName;
             dbaDataViewDataTab.setText("Data View: " + randomName);
             dbaListCitationViews.setAll(Database.getCitationViews(dbaDataViewDataTab.getText().split(":")[1].trim()));
-            stage.setScene(dbaScene);
+            citeStage.hide();
 		});
 		Button buttonDeleteDataView = new Button("Delete");
 		buttonDeleteDataView.setOnAction(event -> {
@@ -445,15 +475,25 @@ private Object String;
 		gridPaneCitationViews.setAlignment(Pos.CENTER);
 		gridPaneCitationViews.setHgap(5);
 		gridPaneCitationViews.setVgap(5);
-		Label lableCitationViews = new Label("Citation Views");
+		Label lableCitationViews = new Label("Citation Queries");
+		lableCitationViews.setFont(Font.font("Courier New", FontWeight.BLACK, 18));
 		// ListView Citation Views
 		ListView<String> listViewCitationView = new ListView<>();
 		listViewCitationView.setPrefWidth(400);
+		listViewCitationView.setStyle("-fx-font-size:15.0;");
 		ObservableList<String> listCitationViews = FXCollections.observableArrayList(Database.getCitationViews(null));
 		listViewCitationView.setItems(listCitationViews);
 		Button buttonAddCitationView = new Button("Add Citation View");
 		buttonAddCitationView.setOnAction(event -> {
-			this.stage.setScene(dbaScene);
+			dataNew.clear();
+			datalogTextAreaNew.clear();
+			hBoxLambdaNew.getChildren().clear();
+			dataViewNew.getItems().clear();
+			dataViewNew.getColumns().clear();
+			cv = "Untitled";
+			this.citeStage.setScene(citationScene);
+			this.citeStage.setTitle("Build Citation Query");
+			this.citeStage.show();
 		});
 		Button buttonDeleteCitationView = new Button("Delete Citation View");
 		buttonDeleteCitationView.setOnAction(event -> {
@@ -584,7 +624,7 @@ private Object String;
 		criteraColumnUser.setPrefWidth(205);
 		joinColumnUser.setPrefWidth(260);
 		paddingCriteriaUser = expanderColumn.getPrefWidth() + tableColumnUser.getPrefWidth() + fieldColumnUser.getPrefWidth() + showColumnUser.getPrefWidth();
-		System.out.println("padding"+paddingCriteriaUser);
+//		System.out.println("padding"+paddingCriteriaUser);
 
 		// Label data preview
 		final Label label_1 = new Label("Data Preview");
@@ -609,6 +649,7 @@ private Object String;
 		hBoxGenCitation = new HBox();
 		hBoxGenCitation.setAlignment(Pos.CENTER_RIGHT);
 		Button genButton = new Button("Generate Citation");
+		// TODO 
 		genButton.setOnAction(e -> {
 			System.out.println(dataView.getSelectionModel().getSelectedItems().size());
 			ObservableList<Integer> indices = dataView.getSelectionModel().getSelectedIndices();
@@ -647,32 +688,60 @@ private Object String;
 		clearButton.setId("bevel-grey");
 		backButton.setId("bevel-grey");
 		runButton.setOnAction(e -> {
-			if (data.isEmpty()) return;
-			List<Entry> list = new ArrayList<>();
-			list.addAll(data);
-			if (textArea != null) textArea.setText(Util.convertToDatalogOriginal(list) + "\n");
-			lambdasAll.clear();
-			lambdaIndex.clear();
-			lambdaSQL = Util.convertToSQLWithLambda(list, toCite);
-			datalog = Util.convertToDatalogOriginal(list);
-			System.out.println("[DEBUG] lambdaSQL: " + lambdaSQL);
-			lambdas = Util.getLambda(list);
-			for (String lambda : lambdas) {
-				System.out.println(lambda);
-				String table = lambda.substring(0, lambda.indexOf('.'));
-				String field = lambda.substring(lambda.indexOf('.') + 1);
-				List<String> temp = Database.getDistincts(table, field);
-				lambdasAll.add(temp);
-				lambdaIndex.add(0);
+			if (stage.getScene() == dbaScene || stage.getScene() == userScene) {
+				if (data.isEmpty() ) return;
+				List<Entry> list = new ArrayList<>();
+				list.addAll(data);
+				if (textArea != null) textArea.setText(Util.convertToDatalogOriginal(list) + "\n");
+				lambdasAll.clear();
+				lambdaIndex.clear();
+				lambdaSQL = Util.convertToSQLWithLambda(list, toCite);
+				datalog = Util.convertToDatalogOriginal(list);
+				System.out.println("[DEBUG] lambdaSQL: " + lambdaSQL);
+				lambdas = Util.getLambda(list);
+				for (String lambda : lambdas) {
+					System.out.println(lambda);
+					String table = lambda.substring(0, lambda.indexOf('.'));
+					String field = lambda.substring(lambda.indexOf('.') + 1);
+					List<String> temp = Database.getDistincts(table, field);
+					lambdasAll.add(temp);
+					lambdaIndex.add(0);
+				}
+				setDataView(hBoxLambda, dataView, toCite);
+			} else if (citeStage.isShowing()) {
+				if ( dataNew.isEmpty()) return;
+				List<Entry> listNew = new ArrayList<>();
+				listNew.addAll(dataNew);
+				if (datalogTextAreaNew != null) datalogTextAreaNew.setText(Util.convertToDatalogOriginal(listNew) + "\n");
+				lambdasAll.clear();
+				lambdaIndex.clear();
+				lambdaSQL = Util.convertToSQLWithLambda(listNew, toCite);
+				System.out.println("[DEBUG] lambdaSQL: " + lambdaSQL);
+				lambdas = Util.getLambda(listNew);
+				for (String lambda : lambdas) {
+					System.out.println(lambda);
+					String table = lambda.substring(0, lambda.indexOf('.'));
+					String field = lambda.substring(lambda.indexOf('.') + 1);
+					List<String> temp = Database.getDistincts(table, field);
+					lambdasAll.add(temp);
+					lambdaIndex.add(0);
+				}
+				setDataView(hBoxLambda, dataView, toCite);
 			}
-			setDataView(hBoxLambda, dataView, toCite);
-			
 		});
 		clearButton.setOnAction(e -> {
-			data.clear();
-			if (textArea != null) textArea.clear();
-			dataView.getColumns().clear();
-			dataViewList.clear();
+			System.out.print(stage.getScene() == dbaScene);
+			if (stage.getScene() == dbaScene || stage.getScene() == userScene) {
+				data.clear();
+				if (textArea != null) textArea.clear();
+				dataView.getColumns().clear();
+				dataViewList.clear();
+			} else if (citeStage.isShowing()) {
+				dataNew.clear();
+				if (textArea != null) textArea.clear();
+				dataView.getColumns().clear();
+				dataViewListNew.clear();
+			}
 		});
 		backButton.setOnAction(e -> {
 			data.clear();
@@ -691,6 +760,8 @@ private Object String;
 		HBox.setMargin(runButton, new Insets(0, 5, 0, 5));
 		HBox.setMargin(clearButton, new Insets(0, 5, 0, 5));
 		HBox.setMargin(backButton, new Insets(0, 5, 0, 5));
+		if (citeStage.isShowing())
+			backButton.setVisible(false);
 		hBox.getChildren().addAll(runButton, clearButton, backButton);
 		return hBox;
 	}
@@ -773,11 +844,20 @@ private Object String;
 		Button btDataView = new Button("Add ");
         btDataView.setFont(Font.font("Courier New", FontWeight.BOLD, 12));
         btDataView.setOnAction(e -> {
-        	stage.setWidth(stage.getWidth()+230);
-            Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
-            stage.setX((primScreenBounds.getWidth() - stage.getWidth()) / 2);
-            stage.setY((primScreenBounds.getHeight() - stage.getHeight()) / 2);
-        	gridDba.add(vboxRightCQ, 3, 0, 1, 2);
+			dataNew.clear();
+			datalogTextAreaNew.clear();
+			hBoxLambdaNew.getChildren().clear();
+			dataViewNew.getItems().clear();
+			dataViewNew.getColumns().clear();
+        	cv = "Untitled";
+			this.citeStage.setScene(citationScene);
+			this.citeStage.setTitle("Build Citation Query");
+			this.citeStage.show();
+//        	stage.setWidth(stage.getWidth()+230);
+//            Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
+//            stage.setX((primScreenBounds.getWidth() - stage.getWidth()) / 2);
+//            stage.setY((primScreenBounds.getHeight() - stage.getHeight()) / 2);
+//        	gridDba.add(vboxRightCQ, 3, 0, 1, 2);
 		});
         
 		Button btDataViewSave = new Button("Save");
@@ -909,7 +989,7 @@ private Object String;
 		Label datalogLabel = new Label("Datalog:");
 //        TextField datalogTextArea = new TextField();
         datalogLabel.setFont(Font.font("Courier New", FontWeight.BOLD, 16));
-        datalogTextArea.setFont(Font.font("Courier New", FontWeight.BLACK, 12));
+        datalogTextArea.setFont(Font.font("Courier New", FontWeight.BLACK, 14));
         datalogTextArea.setWrapText(true);
 		final HBox hBox = buildTopMenu(datalogTextArea, hBoxLambda, dataView, false);
 		final HBox vboxDatalog = new HBox();
@@ -948,6 +1028,7 @@ private Object String;
 		                cell.setPadding(new Insets(5,0,0,0));
 		                return cell;
 		            }
+		           
 		        });
 		showColumn.setEditable(true);
 		criteraColumn.setCellValueFactory(new PropertyValueFactory<>("criteria"));
@@ -989,7 +1070,6 @@ private Object String;
 //		joinColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.32));
 		paddingCriteriaDba = expanderColumn.widthProperty().get() + tableColumn.widthProperty().get() + fieldColumn.widthProperty().get() + showColumn.widthProperty().get();
 		paddingJoin = paddingCriteriaDba + criteraColumn.widthProperty().get();
-		// XXX: padding
 		// Label data preview
 		final Label label_1 = new Label("Data Preview");
 		label_1.setId("prompt-text");
@@ -1030,75 +1110,76 @@ private Object String;
             }
             if (data.isEmpty()) return;
 			
-			HashMap<String, String> relation_mapping = new HashMap<String, String>();
-			Vector<String[]> head_vars = new Vector<String[]>();
-			Vector<String []> condition_str = new Vector<String[]>();
-			Vector<String[]> lambda_term_str = new Vector<String[]>();
-			// The list statement should stay here
-			List<Entry> list = new ArrayList<>();
-			list.addAll(data);
-	        for (Entry e : list) {
-	        	String table = e.getTable();
-	        	String field = e.getField();
-	        	relation_mapping.put(table, table);
-	        	String[] arg = {field, table};
-	        	String[] comparator = {"=", "<", ">", "<=", ">=", "<>"};
-	        	String comparatorValue = "";
-        		String compareNumber = "";
-	        	if (e.getShow()) {
-	        		if (!head_vars.contains(arg)) {
-	        			head_vars.add(arg);
-	        		}
-	        	}
-	        	if (e.getCriteria() != null && !e.getCriteria().isEmpty()) {
-	        		String[] criteria = e.getCriteria().split("\\,");
-	        		for (int i = 0; i < criteria.length; i++) {
-	        			// TODO: 
-	        			for (int j = 0; j < comparator.length; j++) {
-	        				if (comparator[j].equals(Character.toString(criteria[i].charAt(0))) ) {
-	        					comparatorValue = comparator[j];
-	        					compareNumber = criteria[i].substring(1, criteria[i].length());
-	        				}
-	        				else if (comparator[j].equals(criteria[i].substring(0, 2))) {
-	        					comparatorValue = comparator[j];
-	        					compareNumber = criteria[i].substring(2, criteria[i].length());
-	        				}
-	        					
-	        			}
-	        			String[] condition = {field, table, comparatorValue,"'" + compareNumber + "'", ""};
-	        			condition_str.add(condition);
-	        		}
-	        	}
-	            if (e.getJoin() != null && !e.getJoin().isEmpty()) {
-	                String[] join = e.getJoin().split("\\."); //correspond to the setjoin() in createEditor()
-	                // split according to dot
-	                String joinTable = "";
-	                for (int j = 0; j < comparator.length; j++) {
-	                	if (comparator[j].equals(Character.toString(join[0].charAt(0))) ) {
-	                		comparatorValue = comparator[j];
-	                		joinTable = join[0].substring(1, join[0].length());
-	                	}
-	                	else if (comparator[j].equals(join[0].substring(0, 2))) {
-	                		comparatorValue = comparator[j];
-	                		joinTable = join[0].substring(2, join[0].length());
-	                	}
-	                }
-	                String[] condition1  = {field, table, comparatorValue, join[1], joinTable};
-	                
-	                condition_str.add(condition1);
-	            }
-	            if (e.getLambda() == true) {
-	        		lambda_term_str.add(arg);
-	        	}
-	        }
-			
-			Query generatedQuery = null;
-			try {
-				generatedQuery = Gen_query.gen_query(dv, relation_mapping, head_vars, condition_str, lambda_term_str);
-				System.out.println("[generatedQuery] " + generatedQuery);
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
+//			HashMap<String, String> relation_mapping = new HashMap<String, String>();
+//			Vector<String[]> head_vars = new Vector<String[]>();
+//			Vector<String []> condition_str = new Vector<String[]>();
+//			Vector<String[]> lambda_term_str = new Vector<String[]>();
+//			// The list statement should stay here
+//			List<Entry> list = new ArrayList<>();
+//			list.addAll(data);
+//	        for (Entry e : list) {
+//	        	String table = e.getTable();
+//	        	String field = e.getField();
+//	        	relation_mapping.put(table, table);
+//	        	String[] arg = {field, table};
+//	        	String[] comparator = {"=", "<", ">", "<=", ">=", "<>"};
+//	        	String comparatorValue = "";
+//        		String compareNumber = "";
+//	        	if (e.getShow()) {
+//	        		if (!head_vars.contains(arg)) {
+//	        			head_vars.add(arg);
+//	        		}
+//	        	}
+//	        	if (e.getCriteria() != null && !e.getCriteria().isEmpty()) {
+//	        		String[] criteria = e.getCriteria().split("\\,");
+//	        		for (int i = 0; i < criteria.length; i++) {
+//	        			for (int j = 0; j < comparator.length; j++) {
+//	        				if (comparator[j].equals(Character.toString(criteria[i].charAt(0))) ) {
+//	        					comparatorValue = comparator[j];
+//	        					compareNumber = criteria[i].substring(1, criteria[i].length());
+//	        				}
+//	        				else if (comparator[j].equals(criteria[i].substring(0, 2))) {
+//	        					comparatorValue = comparator[j];
+//	        					compareNumber = criteria[i].substring(2, criteria[i].length());
+//	        				}
+//	        					
+//	        			}
+//	        			String[] condition = {field, table, comparatorValue,"'" + compareNumber + "'", ""};
+//	        			condition_str.add(condition);
+//	        		}
+//	        	}
+//	            if (e.getJoin() != null && !e.getJoin().isEmpty()) {
+//	                String[] join = e.getJoin().split("\\."); //correspond to the setjoin() in createEditor()
+//	                // split according to dot
+//	                String joinTable = "";
+//	                for (int j = 0; j < comparator.length; j++) {
+//	                	if (comparator[j].equals(Character.toString(join[0].charAt(0))) ) {
+//	                		comparatorValue = comparator[j];
+//	                		joinTable = join[0].substring(1, join[0].length());
+//	                	}
+//	                	else if (comparator[j].equals(join[0].substring(0, 2))) {
+//	                		comparatorValue = comparator[j];
+//	                		joinTable = join[0].substring(2, join[0].length());
+//	                	}
+//	                }
+//	                String[] condition1  = {field, table, comparatorValue, join[1], joinTable};
+//	                
+//	                condition_str.add(condition1);
+//	            }
+//	            if (e.getLambda() == true) {
+//	        		lambda_term_str.add(arg);
+//	        	}
+//	        }
+//			
+//			Query generatedQuery = null;
+//			try {
+//				generatedQuery = Gen_query.gen_query(dv, relation_mapping, head_vars, condition_str, lambda_term_str);
+//				System.out.println("[generatedQuery] " + generatedQuery);
+//			} catch (Exception e1) {
+//				e1.printStackTrace();
+//			}
+            
+            Query generatedQuery = addQueryByName(dv);
             try {
 				view_operation.add(generatedQuery,dv);
 			} catch (Exception e1) {
@@ -1134,7 +1215,222 @@ private Object String;
 		dbaScene = new Scene(gridDba);
 		dbaScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
 	}
+	
+	/* ===================================================================
+	 * Build the new citation scene
+	 */
+    private void buildCitationScene() {
+    	gridCitation = new GridPane();
+        gridCitation.setPadding(new Insets(5, 10, 10, 10));
+        gridCitation.setHgap(10);
+        gridCitation.setVgap(10);
+        
+		// TabPane
+		TabPane tabPane = new TabPane();
+		citationDataViewDataTab = new Tab("Citation Query Builder");
+		citationDataViewDataTab.setText("Citation: Untitled");
+		citationDataViewDataTab.setClosable(false);
+		tabPane.getTabs().setAll(citationDataViewDataTab);
+		tabPane.setTabClosingPolicy(TabClosingPolicy.SELECTED_TAB);
+		tabPane.getStyleClass().add(TabPane.STYLE_CLASS_FLOATING);
+		GridPane.setHgrow(tabPane, Priority.ALWAYS);
+		GridPane.setVgrow(tabPane, Priority.ALWAYS);
+		gridCitation.add(tabPane, 1, 0, 1, 2);
+		
+        gridCitationSub = new GridPane();
+        gridCitationSub.setPadding(new Insets(2, 5, 2, 5));
+        gridCitationSub.setHgap(5);
+        gridCitationSub.setVgap(5);
+        citationDataViewDataTab.setContent(gridCitationSub);
 
+        
+		Label label_0 = new Label("Citation Builder");
+		label_0.setId("prompt-text");
+		GridPane.setHgrow(label_0, Priority.ALWAYS);
+		gridCitationSub.add(label_0, 0, 0);
+
+		// TreeView and search box
+		TreeView<TreeNode> samplesTreeView = new TreeView<TreeNode>();
+		buildSampleTree(samplesTreeView, null, true);
+		buildSampleTreeView(samplesTreeView);
+		GridPane.setVgrow(samplesTreeView, Priority.ALWAYS);
+		gridCitation.add(samplesTreeView, 0, 1);
+		TextField searchBox = buildSearchBox(samplesTreeView);
+		GridPane.setMargin(searchBox, new Insets(5, 0, 0, 0));
+		GridPane.setHgrow(searchBox, Priority.NEVER);
+		gridCitation.add(searchBox, 0, 0);
+
+		// Pane
+		TableView<Entry> tableView = new TableView<Entry>();
+		splitPaneQbeNew = new SplitPane();
+		GridPane.setHgrow(splitPaneQbeNew, Priority.ALWAYS);
+		GridPane.setVgrow(splitPaneQbeNew, Priority.ALWAYS);
+		splitPaneQbeNew.getItems().add(tableView);
+		
+		// dataViewNew is the data preview table in citation builder
+		GridPane.setVgrow(dataViewNew, Priority.ALWAYS);
+		GridPane.setHgrow(dataViewNew, Priority.ALWAYS);
+		dataViewNew.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+		dataViewNew.setItems(dataViewListNew);
+		gridCitationSub.add(dataViewNew, 0, 4, 2, 1);
+		
+//		// Lambda
+		hBoxLambdaNew.getChildren().add(new Label("Lambda Terms:  "));
+		hBoxLambdaNew.getStyleClass().add("hBoxLambda");
+		GridPane.setHgrow(hBoxLambdaNew, Priority.ALWAYS);
+		gridCitationSub.add(hBoxLambdaNew, 0, 5);
+		
+		Label datalogLabel = new Label("Datalog:");
+        datalogLabel.setFont(Font.font("Courier New", FontWeight.BOLD, 16));
+        datalogTextAreaNew.setFont(Font.font("Courier New", FontWeight.BLACK, 14));
+        datalogTextAreaNew.setWrapText(true);
+		final HBox hBox = buildTopMenu(datalogTextAreaNew, hBoxLambdaNew, dataViewNew, false);
+		final HBox vboxDatalog = new HBox();
+		vboxDatalog.setSpacing(5);
+		vboxDatalog.setPadding(new Insets(5, 5, 5, 5));
+		vboxDatalog.getChildren().addAll(datalogLabel, datalogTextAreaNew);
+        vboxDatalog.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(datalogTextAreaNew, Priority.ALWAYS);
+		gridCitationSub.add(hBox, 1, 0);
+		gridCitationSub.add(splitPaneQbeNew, 0, 1, 2, 1);
+		gridCitationSub.add(vboxDatalog, 0, 2, 2, 1);
+
+		// Table View
+		tableView.setEditable(true);
+		tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		expanderColumn = new TableRowExpanderColumn<>(this::createEditor);
+		expanderColumn.setMaxWidth(30);
+		expanderColumn.setMinWidth(30);
+		TableColumn<Entry, String> tableColumn = new TableColumn<>("Table");
+		TableColumn<Entry, String> fieldColumn = new TableColumn<>("Field");
+		TableColumn<Entry, Boolean> showColumn = new TableColumn<>("Show");
+		TableColumn<Entry, String> criteraColumn = new TableColumn<>("Criteria");
+        TableColumn<Entry, String> joinColumn = new TableColumn<>("Join");
+		TableColumn<Entry, Boolean> lambdaColumn = new TableColumn<>("Lambda");
+		tableColumn.setCellValueFactory(new PropertyValueFactory<>("table"));
+		fieldColumn.setCellValueFactory(new PropertyValueFactory<>("field"));
+		showColumn.setCellValueFactory(new PropertyValueFactory<>("show"));
+		showColumn.setCellFactory(new Callback<TableColumn<Entry, Boolean>, 
+		        TableCell<Entry, Boolean>>() {
+		            @Override
+		            public TableCell<Entry, Boolean> call(TableColumn<Entry, Boolean> p) {
+		                CheckBoxTableCell<Entry, Boolean> cell = new CheckBoxTableCell<Entry, Boolean>();
+		                cell.setAlignment(Pos.TOP_CENTER);
+		                cell.setPadding(new Insets(5,0,0,0));
+		                return cell;
+		            }
+		           
+		        });
+		showColumn.setEditable(true);
+		criteraColumn.setCellValueFactory(new PropertyValueFactory<>("criteria"));
+		criteraColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        joinColumn.setCellValueFactory(new PropertyValueFactory<>("join"));
+        joinColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+		lambdaColumn.setCellValueFactory(new PropertyValueFactory<>("lambda"));
+		lambdaColumn.setCellFactory(new Callback<TableColumn<Entry, Boolean>, //
+		        TableCell<Entry, Boolean>>() {
+		            @Override
+		            public TableCell<Entry, Boolean> call(TableColumn<Entry, Boolean> p) {
+		                CheckBoxTableCell<Entry, Boolean> cell = new CheckBoxTableCell<Entry, Boolean>();
+		                cell.setAlignment(Pos.TOP_CENTER);
+		                cell.setPadding(new Insets(5,0,0,0));
+		                return cell;
+		            }
+		        });
+		lambdaColumn.setEditable(true);
+
+		tableView.getColumns().addAll(expanderColumn, tableColumn, fieldColumn, showColumn, criteraColumn, joinColumn, lambdaColumn);
+		tableView.setItems(dataNew);
+
+		tableColumn.setPrefWidth(100);
+		fieldColumn.setPrefWidth(100);
+		showColumn.setPrefWidth(70);
+		lambdaColumn.setPrefWidth(70);
+		criteraColumn.setPrefWidth(205);
+		joinColumn.setPrefWidth(260);
+		paddingCriteriaDba = expanderColumn.widthProperty().get() + tableColumn.widthProperty().get() + fieldColumn.widthProperty().get() + showColumn.widthProperty().get();
+		// Label data preview
+		final Label label_1 = new Label("Data Preview");
+		label_1.setId("prompt-text");
+		GridPane.setHgrow(label_1, Priority.ALWAYS);
+		gridCitationSub.add(label_1, 0, 3);
+		
+		HBox hboxSq = new HBox();
+		hboxSq.setAlignment(Pos.CENTER_RIGHT);
+		Button saveCitationButton = new Button("Save Citation Query");
+        saveCitationButton.setOnAction(event -> {
+        	// Edited: Yan
+        	if (listCitationViews.contains(cv)) {
+        		try {
+    				citation_view_operation.delete_citation_views(cv);
+    				listCitationViews.remove(cv);
+    			} catch (Exception e2) {
+    				e2.printStackTrace();
+    			}
+        	}
+            TextInputDialog dialog = new TextInputDialog(cv);
+            dialog.setContentText("Please enter the citation query name:");
+            dialog.setHeaderText(null);
+            Optional<String> result = dialog.showAndWait();
+            if (result.isPresent()) {
+                String tempName = result.get();
+                if (listCitationViews.contains(tempName)) {
+                	Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Alert");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Duplicate name, pls re-enter!");
+                    alert.showAndWait();
+                    return;
+                } else if (tempName.equals("Untitled")) {
+                	Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Alert");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Pls give it a reasonable name");
+                    alert.showAndWait();
+                    return;
+                } else
+                	cv = result.get();
+            } else {
+                return;
+            }
+            if (dataNew.isEmpty()) return;
+            
+            try {
+				citation_view_operation.add_citation_view(cv);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Succeed");
+            alert.setHeaderText(null);
+            alert.setContentText("The citation queries are successfully saved as " + cv);
+            alert.showAndWait();
+            listCitationViews.add(cv);
+            citeStage.hide();
+        });
+        
+
+		hboxSq.getChildren().add(saveCitationButton);
+
+		gridCitationSub.add(hboxSq, 1, 3);
+
+		hBoxPrevNextNew = new HBox();
+		hBoxPrevNextNew.setAlignment(Pos.CENTER_RIGHT);
+		final Button prevButton = new Button("<<");
+		final Button nextButton = new Button(">>");
+		prevButton.setId("prevnext");
+		nextButton.setId("prevnext");
+		nextButton.setOnAction(e -> {
+			next();
+			setDataView(hBoxLambdaNew, dataViewNew, false);
+		});
+		hBoxPrevNextNew.getChildren().addAll(prevButton, nextButton);
+		GridPane.setHgrow(hBoxPrevNextNew, Priority.ALWAYS);
+		gridCitationSub.add(hBoxPrevNextNew, 1, 5);
+
+		citationScene = new Scene(gridCitation);
+		citationScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
+    }
 	/* ===================================================================
 	 * Supplement methods
 	 */
@@ -1170,16 +1466,16 @@ private Object String;
 		return gridCg;
 	}
 
-	private GridPane createEditor(TableRowExpanderColumn.TableRowDataFeatures<Entry> param) {
-		GridPane editor = new GridPane();
-		editor.setPadding(new Insets(10));
-		editor.setHgap(10);
-		editor.setVgap(5);
+	// table editor for citation builder
+	private HBox createEditor(TableRowExpanderColumn.TableRowDataFeatures<Entry> param) {
+		HBox hboxPane = new HBox();
+		VBox vboxCriteria = new VBox();
+		vboxCriteria.setPadding(new Insets(5,0,15,paddingCriteriaDba+5));
+		vboxCriteria.setSpacing(5);
+		VBox vboxJoin = new VBox();
+		vboxJoin.setPadding(new Insets(5,15,5,10));
+		vboxJoin.setSpacing(5);
 		Entry entry = param.getValue();
-//		TextField criteriaField = new TextField(entry.getCriteria());
-//		// TextField joinField = new TextField(entry.getJoin());
-//		editor.addRow(0, new Label("Criteria"), criteriaField);
-//        ObservableList<String> optionsTable = FXCollections.observableArrayList(Database.getTableList());
 		/* Edited: Yan
 		 * Create criteria comboBox
 		 * Keep criteria and join both a string 
@@ -1189,11 +1485,106 @@ private Object String;
 		comboBoxComparator.getItems().addAll("=","<>",">","<",">=","<=");
 		comboBoxComparator.setValue(null);
 		TextField comparatorValue = new TextField();
+		comparatorValue.setPrefWidth(100);
 		Button addCriteria = new Button();
+		addCriteria.setText("+");
+		addCriteria.setFont(Font.font(12));
+		addCriteria.setPadding(new Insets(2,5,2,5));
+		Button minusCriteria = new Button();
+		minusCriteria.setText("-");
+		minusCriteria.setFont(Font.font("Courier New", FontWeight.BOLD, 12));
+		minusCriteria.setPadding(new Insets(2,5.45,2,5.45));
+		ListView<String> listCriteria = new ListView<String>();
+		listCriteria.setPrefHeight(60);
+		listCriteria.setMaxWidth(170);
+		String [] criterias = entry.getCriteria().split("\\,");
+		List<String> list = new ArrayList<>();
+		for (int i = 0; i < criterias.length; i++) list.add(criterias[i]);
+		ObservableList<String> items = FXCollections.observableArrayList(list);
+		listCriteria.setItems(items);
+		// criteria should be split by ","
+		addCriteria.setOnAction((event) -> {
+			if(comboBoxComparator.getValue() != null && !comparatorValue.getText().isEmpty()) {
+				String oldCriteria = entry.getCriteria();
+				String[] oldCriteriaList = oldCriteria.split("\\,");
+				String addString  = comboBoxComparator.getValue() + comparatorValue.getText();
+				Vector<String> oldString = new Vector<String>();
+				if (oldCriteria == null || oldCriteria.isEmpty()) {
+					entry.setCriteria(addString);
+				} else {
+					// check duplicate criteria
+					for (int j = 0; j < oldCriteriaList.length; j++ ) {
+						oldString.add(oldCriteriaList[j]);
+					}
+					if (oldString.contains(addString)) {
+						return;
+					} else {
+						entry.setCriteria(oldCriteria + "," + addString);
+					}
+				}
+			}
+			// renew the listCriteria
+			String [] criteriasnew = entry.getCriteria().split("\\,");
+			List<String> listnew = new ArrayList<>();
+			for (int i = 0; i < criteriasnew.length; i++) listnew.add(criteriasnew[i]);
+			ObservableList<String> itemsnew = FXCollections.observableArrayList(listnew);
+			listCriteria.getItems().setAll(itemsnew);
+			comboBoxComparator.setValue(null);
+			comparatorValue.setText(null);
+		});
+		minusCriteria.setOnAction((event) -> {
+			if(comboBoxComparator.getValue() != null && !comparatorValue.getText().isEmpty()) {
+				String oldCriteria = entry.getCriteria();
+				String[] oldCriteriaList = oldCriteria.split("\\,");
+				String minusString  = comboBoxComparator.getValue() + comparatorValue.getText();
+				Vector<String> oldString = new Vector<String>();
+				if (oldCriteria != null && !oldCriteria.isEmpty()) {
+					for (int j = 0; j < oldCriteriaList.length; j++ ) {
+						oldString.add(oldCriteriaList[j]);
+					}
+					if (oldString.contains(minusString)) {
+						oldString.remove(minusString);
+					}
+				}
+				String newCriteria = "";
+				for (int j = 0; j < oldString.size(); j++) {
+					newCriteria += oldString.get(j) + ",";
+				}
+				if (newCriteria != null && !newCriteria.isEmpty()) {
+					// prevent string index out of bound
+					newCriteria = newCriteria.substring(0, newCriteria.length()-1);
+				}
+				entry.setCriteria(newCriteria);
+			}
+			// renew the listCriteria
+			String [] criteriasnew = entry.getCriteria().split("\\,");
+			List<String> listnew = new ArrayList<>();
+			for (int i = 0; i < criteriasnew.length; i++) listnew.add(criteriasnew[i]);
+			ObservableList<String> itemsnew = FXCollections.observableArrayList(listnew);
+			listCriteria.getItems().setAll(itemsnew);
+			comboBoxComparator.setValue(null);
+			comparatorValue.setText(null);
+		});
+		
+		listCriteria.setOnMouseClicked(event -> {
+			String[] comparator = {"=", ">", "<", ">=", "<=", "<>"};
+            String criteriaString = listCriteria.getSelectionModel().getSelectedItem();
+            if (criteriaString == null) return;
+            for (int j = 0; j < comparator.length; j++) {
+				if (comparator[j].equals(Character.toString(criteriaString.charAt(0))) ) {
+					comboBoxComparator.setValue(comparator[j]);
+					comparatorValue.setText(criteriaString.substring(1, criteriaString.length()));
+				}
+				else if (comparator[j].equals(criteriaString.substring(0, 2))) {
+					comboBoxComparator.setValue(comparator[j]);
+					comparatorValue.setText(criteriaString.substring(2, criteriaString.length()));
+				}
+					
+			}
+        });
 		HBox hb = new HBox();
 		hb.setSpacing(5);
-		hb.getChildren().addAll(new Label("Criteria: "), comboBoxComparator, comparatorValue);
-		editor.addRow(0,hb);
+		hb.getChildren().addAll(comboBoxComparator, comparatorValue, addCriteria);
 		
 		final ComboBox comboBoxComparator1 = new ComboBox();
 		comboBoxComparator1.getItems().addAll("=","<>",">","<",">=","<=");
@@ -1207,32 +1598,37 @@ private Object String;
         });
         final ComboBox<String> comboBoxField = new ComboBox(optionsField);
         comboBoxField.setPromptText("Field");
-        HBox hb1 = new HBox();
-        hb1.setSpacing(5);
-        hb1.getChildren().addAll(new Label("Join: "), comboBoxComparator1, comboBoxTable, comboBoxField);
-		editor.addRow(1,hb1);
+		vboxJoin.getChildren().addAll(new Label("Join: "), comboBoxTable, comboBoxField, comboBoxComparator1);
+        
 		Button saveButton = new Button("Save");
 		saveButton.setOnAction(event -> {
-			//entry.setCriteria(criteriaField.getText());
-			if(comboBoxComparator.getValue() != null && !comboBoxComparator.getValue().toString().isEmpty()) {
-				entry.setCriteria(comboBoxComparator.getValue() + comparatorValue.getText());
-			}
-			if(comboBoxComparator1.getValue() != null && !comboBoxComparator1.getValue().toString().isEmpty()) {
+			if(comboBoxComparator1.getValue() != null && !comboBoxTable.getValue().isEmpty() && !comboBoxField.getValue().isEmpty() ) {
 				entry.setJoin(comboBoxComparator1.getValue() + comboBoxTable.getValue() + "." + comboBoxField.getValue());
 			}
+			List<Entry> entryList = new ArrayList<>();
+			entryList.addAll(dataNew);
+			if (datalogTextAreaNew != null) datalogTextAreaNew.setText(Util.convertToDatalogOriginal(entryList) + "\n");
 			comboBoxComparator.setValue(null);
 			comboBoxComparator1.setValue(null);
 			param.toggleExpanded();
 		});
+		HBox hb3 = new HBox();
+		hb3.setSpacing(5);
+		hb3.getChildren().addAll(listCriteria, minusCriteria);
+		vboxCriteria.getChildren().addAll(new Label("Criteria: "), hb, hb3);
+		
 		Button cancelButton = new Button("Cancel");
 		cancelButton.setOnAction(event -> param.toggleExpanded());
 		Button deleteButton = new Button("Delete Row");
-		deleteButton.setOnAction(event -> data.remove(entry));
+		deleteButton.setOnAction(event -> dataNew.remove(entry));
 		HBox hb2 = new HBox();
 		hb2.setSpacing(5);
 		hb2.getChildren().addAll(saveButton, cancelButton, deleteButton);
-		editor.addRow(2,hb2);
-		return editor;
+		vboxJoin.getChildren().add(hb2);
+		hb2.setAlignment(Pos.CENTER_RIGHT);
+		hboxPane.getChildren().addAll(vboxCriteria,vboxJoin);
+		HBox.setHgrow(vboxJoin, Priority.ALWAYS);
+		return hboxPane;
 	}
 	
 	private HBox createAnotherEditor(TableRowExpanderColumn.TableRowDataFeatures<Entry> param) {
@@ -1240,13 +1636,13 @@ private Object String;
 //		hboxPane.setPadding(new Insets(10,0,10,paddingCriteria));
 		VBox vboxCriteria = new VBox();
 		if (stage.getScene() == dbaScene) {
-			vboxCriteria.setPadding(new Insets(5,0,10,paddingCriteriaDba+5));
+			vboxCriteria.setPadding(new Insets(5,0,15,paddingCriteriaDba+5));
 		} else {
-			vboxCriteria.setPadding(new Insets(5,0,10,paddingCriteriaUser-45));
+			vboxCriteria.setPadding(new Insets(5,0,15,paddingCriteriaUser-45));
 		}
 		vboxCriteria.setSpacing(5);
 		VBox vboxJoin = new VBox();
-		vboxJoin.setPadding(new Insets(5,0,5,0));
+		vboxJoin.setPadding(new Insets(5,15,5,10));
 		vboxJoin.setSpacing(5);
 		Entry entry = param.getValue();
 //        ObservableList<String> optionsTable = FXCollections.observableArrayList(Database.getTableList());
@@ -1264,6 +1660,10 @@ private Object String;
 		addCriteria.setText("+");
 		addCriteria.setFont(Font.font(12));
 		addCriteria.setPadding(new Insets(2,5,2,5));
+		Button minusCriteria = new Button();
+		minusCriteria.setText("-");
+		minusCriteria.setFont(Font.font("Courier New", FontWeight.BOLD, 12));
+		minusCriteria.setPadding(new Insets(2,5.45,2,5.45));
 		ListView<String> listCriteria = new ListView<String>();
 		listCriteria.setPrefHeight(60);
 		listCriteria.setMaxWidth(170);
@@ -1274,14 +1674,59 @@ private Object String;
 		listCriteria.setItems(items);
 		// criteria should be split by ","
 		addCriteria.setOnAction((event) -> {
-			if(comboBoxComparator.getValue() != null && !comboBoxComparator.getValue().toString().isEmpty()) {
+			if(comboBoxComparator.getValue() != null && !comparatorValue.getText().isEmpty()) {
 				String oldCriteria = entry.getCriteria();
-				if (oldCriteria.equals(null) || oldCriteria.equals("")) {
-					entry.setCriteria(comboBoxComparator.getValue() + comparatorValue.getText());
+				String[] oldCriteriaList = oldCriteria.split("\\,");
+				String addString  = comboBoxComparator.getValue() + comparatorValue.getText();
+				Vector<String> oldString = new Vector<String>();
+				if (oldCriteria == null || oldCriteria.isEmpty()) {
+					entry.setCriteria(addString);
 				} else {
-					entry.setCriteria(oldCriteria + "," + comboBoxComparator.getValue() + comparatorValue.getText());
+					// check duplicate criteria
+					for (int j = 0; j < oldCriteriaList.length; j++ ) {
+						oldString.add(oldCriteriaList[j]);
+					}
+					if (oldString.contains(addString)) {
+						return;
+					} else {
+						entry.setCriteria(oldCriteria + "," + addString);
+					}
 				}
 			}
+			// renew the listCriteria
+			String [] criteriasnew = entry.getCriteria().split("\\,");
+			List<String> listnew = new ArrayList<>();
+			for (int i = 0; i < criteriasnew.length; i++) listnew.add(criteriasnew[i]);
+			ObservableList<String> itemsnew = FXCollections.observableArrayList(listnew);
+			listCriteria.getItems().setAll(itemsnew);
+			comboBoxComparator.setValue(null);
+			comparatorValue.setText(null);
+		});
+		minusCriteria.setOnAction((event) -> {
+			if(comboBoxComparator.getValue() != null && !comparatorValue.getText().isEmpty()) {
+				String oldCriteria = entry.getCriteria();
+				String[] oldCriteriaList = oldCriteria.split("\\,");
+				String minusString  = comboBoxComparator.getValue() + comparatorValue.getText();
+				Vector<String> oldString = new Vector<String>();
+				if (oldCriteria != null && !oldCriteria.isEmpty()) {
+					for (int j = 0; j < oldCriteriaList.length; j++ ) {
+						oldString.add(oldCriteriaList[j]);
+					}
+					if (oldString.contains(minusString)) {
+						oldString.remove(minusString);
+					}
+				}
+				String newCriteria = "";
+				for (int j = 0; j < oldString.size(); j++) {
+					newCriteria += oldString.get(j) + ",";
+				}
+				if (newCriteria != null && !newCriteria.isEmpty()) {
+					// prevent string index out of bound
+					newCriteria = newCriteria.substring(0, newCriteria.length()-1);
+				}
+				entry.setCriteria(newCriteria);
+			}
+			// renew the listCriteria
 			String [] criteriasnew = entry.getCriteria().split("\\,");
 			List<String> listnew = new ArrayList<>();
 			for (int i = 0; i < criteriasnew.length; i++) listnew.add(criteriasnew[i]);
@@ -1292,25 +1737,35 @@ private Object String;
 		});
 		
 		listCriteria.setOnMouseClicked(event -> {
+			String[] comparator = {"=", ">", "<", ">=", "<=", "<>"};
             String criteriaString = listCriteria.getSelectionModel().getSelectedItem();
             if (criteriaString == null) return;
-            comboBoxComparator.setValue(criteriaString.substring(0, criteriaString.length()-1));
-            comparatorValue.setText(Character.toString(criteriaString.charAt(criteriaString.length()-1)));
-            listCriteria.getItems().remove(criteriaString);
-            Vector<String> newEntryVector = new Vector<String>();
-            String[] oldEntry  = entry.getCriteria().split("\\,");
-            for (int i = 0; i < oldEntry.length; i++) {
-            	if (criteriaString.equals(oldEntry[i])) 
-            		System.out.println(oldEntry[i]);
-            	else {
-            		newEntryVector.add(oldEntry[i]);
-            	}
-            }
-            String newEntry = "";
-            for (int i = 0; i < newEntryVector.size(); i++) {
-            	newEntry += newEntryVector.get(i);
-            }
-            entry.setCriteria(newEntry);
+            for (int j = 0; j < comparator.length; j++) {
+				if (comparator[j].equals(Character.toString(criteriaString.charAt(0))) ) {
+					comboBoxComparator.setValue(comparator[j]);
+					comparatorValue.setText(criteriaString.substring(1, criteriaString.length()));
+				}
+				else if (comparator[j].equals(criteriaString.substring(0, 2))) {
+					comboBoxComparator.setValue(comparator[j]);
+					comparatorValue.setText(criteriaString.substring(2, criteriaString.length()));
+				}
+					
+			}
+//            listCriteria.getItems().remove(criteriaString);
+//            Vector<String> newEntryVector = new Vector<String>();
+//            String[] oldEntry  = entry.getCriteria().split("\\,");
+//            for (int i = 0; i < oldEntry.length; i++) {
+//            	if (criteriaString.equals(oldEntry[i])) 
+//            		System.out.println(oldEntry[i]);
+//            	else {
+//            		newEntryVector.add(oldEntry[i]);
+//            	}
+//            }
+//            String newEntry = "";
+//            for (int i = 0; i < newEntryVector.size(); i++) {
+//            	newEntry += newEntryVector.get(i);
+//            }
+//            entry.setCriteria(newEntry);
         });
 		HBox hb = new HBox();
 		hb.setSpacing(5);
@@ -1336,23 +1791,28 @@ private Object String;
 		Button saveButton = new Button("Save");
 		saveButton.setOnAction(event -> {
 			//entry.setCriteria(criteriaField.getText());
-			if(comboBoxComparator.getValue() != null && !comboBoxComparator.getValue().toString().isEmpty()) {
-				String oldCriteria = entry.getCriteria();
-				if (oldCriteria.equals(null) || oldCriteria.equals("")) {
-					entry.setCriteria(comboBoxComparator.getValue() + comparatorValue.getText());
-				} else {
-					entry.setCriteria(oldCriteria + "," + comboBoxComparator.getValue() + comparatorValue.getText());
-				}
-			}
-			if(comboBoxComparator1.getValue() != null && !comboBoxComparator1.getValue().toString().isEmpty()) {
+//			if(comboBoxComparator.getValue() != null && !comboBoxComparator.getValue().toString().isEmpty()) {
+//				String oldCriteria = entry.getCriteria();
+//				if (oldCriteria.equals(null) || oldCriteria.equals("")) {
+//					entry.setCriteria(comboBoxComparator.getValue() + comparatorValue.getText());
+//				} else {
+//					entry.setCriteria(oldCriteria + "," + comboBoxComparator.getValue() + comparatorValue.getText());
+//				}
+//			}
+			if(comboBoxComparator1.getValue() != null && !comboBoxTable.getValue().isEmpty() && !comboBoxField.getValue().isEmpty() ) {
 				entry.setJoin(comboBoxComparator1.getValue() + comboBoxTable.getValue() + "." + comboBoxField.getValue());
 			}
-			
+			List<Entry> entryList = new ArrayList<>();
+			entryList.addAll(data);
+			if (datalogTextArea != null) datalogTextArea.setText(Util.convertToDatalogOriginal(entryList) + "\n");
 			comboBoxComparator.setValue(null);
 			comboBoxComparator1.setValue(null);
 			param.toggleExpanded();
 		});
-		vboxCriteria.getChildren().addAll(new Label("Criteria: "), hb, listCriteria);
+		HBox hb3 = new HBox();
+		hb3.setSpacing(5);
+		hb3.getChildren().addAll(listCriteria, minusCriteria);
+		vboxCriteria.getChildren().addAll(new Label("Criteria: "), hb, hb3);
 		
 		Button cancelButton = new Button("Cancel");
 		cancelButton.setOnAction(event -> param.toggleExpanded());
@@ -1361,8 +1821,11 @@ private Object String;
 		HBox hb2 = new HBox();
 		hb2.setSpacing(5);
 		hb2.getChildren().addAll(saveButton, cancelButton, deleteButton);
-		vboxCriteria.getChildren().add(hb2);
+//		vboxCriteria.getChildren().add(hb2);
+		vboxJoin.getChildren().add(hb2);
+		hb2.setAlignment(Pos.CENTER_RIGHT);
 		hboxPane.getChildren().addAll(vboxCriteria,vboxJoin);
+		HBox.setHgrow(vboxJoin, Priority.ALWAYS);
 		return hboxPane;
 	}
 
@@ -1419,7 +1882,11 @@ private Object String;
 							return;
 						} else {
 							String field = node.getValue().getName();
-							data.add(new Entry(table, field, true, "", "", false));
+							if (!citeStage.isShowing() && (stage.getScene() == dbaScene || stage.getScene() == userScene))
+								data.add(new Entry(table, field, true, "", "", false));
+							// add data to citation builder
+							else if (citeStage.isShowing())
+								dataNew.add(new Entry(table, field, true, "", "", false));
 						}
 					}
 				});
@@ -1477,7 +1944,7 @@ private Object String;
 			System.out.println(st.toString());
 			st.execute();
 			ResultSet rs = st.getResultSet();
-			dataViewList.clear();
+//			dataViewList.clear();
 			dataView.getColumns().clear();
 
 			final int size = rs.getMetaData().getColumnCount();
@@ -1496,18 +1963,40 @@ private Object String;
                         });
 				dataView.getColumns().addAll(col);
 			}
+			String qname = "qname" + count;
+			count++;
+			Query generatedQuery = addQueryByName(qname);
+			System.out.println("[generatedQuery] " + generatedQuery);
+			HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
+			HashMap<Head_strs, Vector<String> > citation_strs = new HashMap<Head_strs, Vector<String> >();
 			int num_rows = 0;
-			while (rs.next()) {
-				ids.add(num_rows);
-				ObservableList row = FXCollections.observableArrayList();
-				for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-					row.add(rs.getString(i));
+			System.out.println(stage.getScene() == dbaScene);
+			if (stage.getScene() == dbaScene || stage.getScene() == userScene) {
+				System.out.println("true");
+				dataViewList.clear();
+				while (rs.next()) {
+					ids.add(num_rows);
+					ObservableList row = FXCollections.observableArrayList();
+					for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+						row.add(rs.getString(i));
+					}
+					dataViewList.add(row);
+					num_rows++;
 				}
-				dataViewList.add(row);
-				num_rows++;
+			}
+			if (citeStage.isShowing()) {
+				dataViewListNew.clear();
+				while (rs.next()) {
+					ObservableList row = FXCollections.observableArrayList();
+					for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+						row.add(rs.getString(i));
+					}
+					dataViewListNew.add(row);
+					num_rows++;
+				}
 			}
 			if (toCite) {
-				Vector<Vector<String>> citation_strs = new Vector<Vector<String>>();
+				// toCite = true, in the user scene
 				TableColumn citationColomn = new TableColumn("Citation");
 				Callback<TableColumn, TableCell> cellFactory = new Callback<TableColumn, TableCell>() {
 					@Override
@@ -1517,28 +2006,25 @@ private Object String;
 				};
 				ids.clear();
 //				try {
-//					System.out.println("[DEBUG] datalog: " + datalog);
-//					  c_views = Tuple_reasoning2.tuple_reasoning(datalog, citation_strs);
-////					  c_views = Tuple_reasoning2.tuple_reasoning(datalog, citation_strs);
 //					  // Vector<String> agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views);
 //					  // Vector<String> subset_agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views, ids);
+////					for (int i = 0; i < dataViewList.size(); i++) {
+////						ObservableList<String> lambdaData = FXCollections.observableArrayList(citation_strs.get(i));
+////						((ObservableList) dataViewList.get(i)).add(lambdaData);
+////					}
 //				} catch (ClassNotFoundException | SQLException | IOException | InterruptedException e) {
 //					e.printStackTrace();
 //				}
-				for (int i = 0; i < dataViewList.size(); i++) {
-					ObservableList<String> lambdaData = FXCollections.observableArrayList(citation_strs.get(i));
-					((ObservableList) dataViewList.get(i)).add(lambdaData);
-				}
 				citationColomn.setCellFactory(cellFactory);
-				citationColomn.setCellValueFactory(
-						new Callback<TableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
-							public ObservableValue<String> call(TableColumn.CellDataFeatures<ObservableList, String> param) {
-								if (param.getValue() == null || param.getValue().get(size) == null) return new SimpleStringProperty("");
-								ObservableList<String> list =  (ObservableList<String>) param.getValue().get(size);
-								if (list == null || list.size() == 0) return new SimpleStringProperty("");
-								return new SimpleStringProperty(list.get(0));
-							}
-						});
+//				citationColomn.setCellValueFactory(
+//						new Callback<TableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
+//							public ObservableValue<String> call(TableColumn.CellDataFeatures<ObservableList, String> param) {
+//								if (param.getValue() == null || param.getValue().get(size-1) == null) return new SimpleStringProperty("");
+//								ObservableList<String> list = FXCollections.observableArrayList(param.getValue().get(size-1));
+//								if (list == null || list.size() == 0) return new SimpleStringProperty("");
+//								return new SimpleStringProperty(list.get(0));
+//							}
+//						});
 				dataView.getColumns().addAll(citationColomn);
 			}
 			dataView.setEditable(true);
@@ -1584,12 +2070,16 @@ private Object String;
         			for (int j = 0; j < condition_str.size(); j ++) {
         				String conditionVar = condition_str.get(j)[0];
         				String conditionRelation = condition_str.get(j)[1];
-        				if (vars.equals(conditionVar) & head_vars.get(i)[1].equals(conditionRelation) & condition_str.get(j)[4].isEmpty()) {
-        					criteria = condition_str.get(j)[2] + condition_str.get(j)[3].replaceAll("\\'", "");
-        				}
-        				// get join and set it to entry
-        				if (vars.equals(conditionVar) & head_vars.get(i)[1].equals(conditionRelation) & !condition_str.get(j)[4].isEmpty()) {
-        					join = condition_str.get(j)[2] + condition_str.get(j)[4] + "." + condition_str.get(j)[3];
+        				String lastString  = condition_str.get(j)[4];
+        				if (vars.equals(conditionVar) & head_vars.get(i)[1].equals(conditionRelation) ) {
+//        					if (lastString.isEmpty() || lastString.equals(null) ) {
+//        						criteria = condition_str.get(j)[2] + condition_str.get(j)[3].replaceAll("\\'", "");
+//        					}
+        					if (lastString!=null) {
+        						// get join and set it to entry
+        						join = condition_str.get(j)[2] + condition_str.get(j)[4] + "." + condition_str.get(j)[3];
+        					} else
+        						criteria = condition_str.get(j)[2] + condition_str.get(j)[3].replaceAll("\\'", "");
         				}
         			}
         			
@@ -1614,7 +2104,7 @@ private Object String;
         		String conditionVar = condition_str.get(i)[0];
 				String conditionRelation = condition_str.get(i)[1];
 				String criteria = "";
-        		if (!headVarRelation.contains(conditionRelation) & condition_str.get(i)[4].isEmpty()) {
+        		if (condition_str.get(i)[4] == null && !headVarRelation.contains(conditionRelation)) {
         			criteria = condition_str.get(i)[2] + condition_str.get(i)[3].replaceAll("\\'", "");
         			Boolean lambda = false;
         			if (!lambda_term_str.equals(null) & !lambda_term_str.isEmpty()) {
@@ -1648,6 +2138,78 @@ private Object String;
 			lambdaIndex.add(0);
 		}
 		setDataView(hBoxLambda, dataView, false);
+	}
+	
+	private Query addQueryByName (String qname) {
+		HashMap<String, String> relation_mapping = new HashMap<String, String>();
+		Vector<String[]> head_vars = new Vector<String[]>();
+		Vector<String []> condition_str = new Vector<String[]>();
+		Vector<String[]> lambda_term_str = new Vector<String[]>();
+		// The list statement should stay here
+		List<Entry> list = new ArrayList<>();
+		list.addAll(data);
+        for (Entry e : list) {
+        	String table = e.getTable();
+        	String field = e.getField();
+        	relation_mapping.put(table, table);
+        	String[] arg = {field, table};
+        	String[] comparator = {"=", "<", ">", "<=", ">=", "<>"};
+        	String comparatorValue = "";
+    		String compareNumber = "";
+        	if (e.getShow()) {
+        		if (!head_vars.contains(arg)) {
+        			head_vars.add(arg);
+        		}
+        	}
+        	if (e.getCriteria() != null && !e.getCriteria().isEmpty()) {
+        		String[] criteria = e.getCriteria().split("\\,");
+        		for (int i = 0; i < criteria.length; i++) {
+        			for (int j = 0; j < comparator.length; j++) {
+        				if (comparator[j].equals(Character.toString(criteria[i].charAt(0))) ) {
+        					comparatorValue = comparator[j];
+        					compareNumber = criteria[i].substring(1, criteria[i].length());
+        				}
+        				else if (comparator[j].equals(criteria[i].substring(0, 2))) {
+        					comparatorValue = comparator[j];
+        					compareNumber = criteria[i].substring(2, criteria[i].length());
+        				}
+        					
+        			}
+        			String[] condition = {field, table, comparatorValue,"'" + compareNumber + "'", ""};
+        			condition_str.add(condition);
+        		}
+        	}
+            if (e.getJoin() != null && !e.getJoin().isEmpty()) {
+                String[] join = e.getJoin().split("\\."); //correspond to the setjoin() in createEditor()
+                // split according to dot
+                String joinTable = "";
+                for (int j = 0; j < comparator.length; j++) {
+                	if (comparator[j].equals(Character.toString(join[0].charAt(0))) ) {
+                		comparatorValue = comparator[j];
+                		joinTable = join[0].substring(1, join[0].length());
+                	}
+                	else if (comparator[j].equals(join[0].substring(0, 2))) {
+                		comparatorValue = comparator[j];
+                		joinTable = join[0].substring(2, join[0].length());
+                	}
+                }
+                String[] condition1  = {field, table, comparatorValue, join[1], joinTable};
+                
+                condition_str.add(condition1);
+            }
+            if (e.getLambda() == true) {
+        		lambda_term_str.add(arg);
+        	}
+        }
+		
+		Query generatedQuery = null;
+		try {
+			generatedQuery = Gen_query.gen_query_full(qname, relation_mapping, head_vars, condition_str, lambda_term_str);
+			System.out.println("[generatedQuery] " + generatedQuery);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		return generatedQuery;
 	}
 
 }

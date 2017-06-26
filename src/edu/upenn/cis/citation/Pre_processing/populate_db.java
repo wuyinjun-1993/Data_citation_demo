@@ -41,14 +41,9 @@ public class populate_db {
 	public static String[] base_tables = {"gpcr","object","interaction","ligand","pathophysiology","interaction_affinity_refs","gtip_process","process_assoc","disease", "family", "introduction"};
 
 	
-<<<<<<< HEAD
-//	public static String db_url = "jdbc:postgresql://citedb.cx9xmwhyomib.us-east-1.rds.amazonaws.com:5432/test";
-	public static String db_url = "jdbc:postgresql://localhost:5432/test";
-=======
-	public static String db_url = "jdbc:postgresql://citedb.cx9xmwhyomib.us-east-1.rds.amazonaws.com:5432/iuphar";
-//	public static String db_url = "jdbc:postgresql://localhost:5432/postgres";
->>>>>>> 1a06b1e6bf864373d4efe030d22664f00e5c0afe
 
+//	public static String db_url = "jdbc:postgresql://citedb.cx9xmwhyomib.us-east-1.rds.amazonaws.com:5432/iuphar_pro";
+	public static String db_url = "jdbc:postgresql://localhost:5432/test";
 
 	public static String usr_name = "postgres";
 	
@@ -56,6 +51,7 @@ public class populate_db {
 	
 	public static String suffix = "_c";
 	
+	public static String star_op = " union ";	
 	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException
 	{
@@ -274,7 +270,7 @@ public class populate_db {
 	}
 	
 	
-	static void renew_table(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	public static void renew_table(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
 		for(int i = 0; i<base_tables.length; i++)
 		{
@@ -283,7 +279,7 @@ public class populate_db {
 			
 			pst = c.prepareStatement(query);
 			
-			System.out.println(query);
+//			System.out.println(query);
 			
 			pst.execute();
 			
@@ -316,7 +312,7 @@ public class populate_db {
 			
 			query += "primary key (" + primary_key_string + "), foreign key (" + primary_key_string + ") references " + base_relations[i] + "(" + primary_key_string + ") on update cascade )";
 			
-			System.out.println(query);
+//			System.out.println(query);
 			
 			pst = c.prepareStatement(query);
 			
@@ -431,7 +427,7 @@ public class populate_db {
 			
 			String update_q = "update " + relation + populate_db.suffix + " set citation_view = regexp_replace(citation_view, '"+ new_citation_view +"','')";
 			
-			System.out.println(update_q);
+//			System.out.println(update_q);
 			
 			pst = c.prepareStatement(update_q);
 			
@@ -439,7 +435,7 @@ public class populate_db {
 			
 			update_q = "update " + relation + populate_db.suffix + " set citation_view = regexp_replace(citation_view, '\\|\\|','|')";
 			
-			System.out.println(update_q);
+//			System.out.println(update_q);
 			
 			pst = c.prepareStatement(update_q);
 			
@@ -447,7 +443,7 @@ public class populate_db {
 			
 			update_q = "update " + relation + populate_db.suffix + " set citation_view = regexp_replace(citation_view, '^\\|','')";
 			
-			System.out.println(update_q);
+//			System.out.println(update_q);
 			
 			pst = c.prepareStatement(update_q);
 			
@@ -455,7 +451,7 @@ public class populate_db {
 			
 			update_q = "update " + relation + populate_db.suffix + " set citation_view = regexp_replace(citation_view, '\\|$','')";
 			
-			System.out.println(update_q);
+//			System.out.println(update_q);
 			
 			pst = c.prepareStatement(update_q);
 			
@@ -652,7 +648,7 @@ public class populate_db {
 		{			
 			Integer view_id = rs.getInt(1);
 			
-			Query v = view_operation.get_view_by_id(view_id);
+			Query v = view_operation.get_view_by_id(view_id, c, pst);
 			
 //			String q_subgoals = "select subgoal_names from view2subgoals where view = '" + view_name + "'";
 //			
@@ -1041,9 +1037,9 @@ public class populate_db {
 			
 			
 			
-			System.out.println(query1);
+//			System.out.println(query1);
 			
-			System.out.println(query2);
+//			System.out.println(query2);
 			
 			pst = c.prepareStatement(query1);
 			

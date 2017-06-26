@@ -39,4 +39,9 @@ public class Lambda_term {
 		name = table_name + "_" + name.substring(name.indexOf("_") + 1, name.length());
 	}
 
+	@Override
+	public Object clone()
+	{
+		return new Lambda_term(this.name, this.table_name);
+	}
 }

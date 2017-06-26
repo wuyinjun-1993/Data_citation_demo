@@ -39,7 +39,7 @@ import edu.upenn.cis.citation.output.output2excel;
 import edu.upenn.cis.citation.user_query.query_storage;
 import sun.util.resources.cldr.ur.CurrencyNames_ur;
 
-public class Tuple_reasoning1_citation_opt {
+public class Tuple_reasoning1_citation_opt2 {
 		
 	static int max_author_num = 0;
 			
@@ -62,6 +62,10 @@ public class Tuple_reasoning1_citation_opt {
 	static String file_name = "tuple_level.xlsx";
 	
 	static HashMap<Head_strs, Vector<HashSet<String>>> authors = new HashMap<Head_strs, Vector<HashSet<String>>>();
+	
+	static HashMap<String, HashMap<String, Vector<Integer>>> citation_query_mapping = new HashMap<String, HashMap<String, Vector<Integer>>>();
+	
+	static HashMap<Integer, Query> all_citation_queries = new HashMap<Integer, Query>();
 	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException, IOException, InterruptedException
 	{
@@ -494,6 +498,10 @@ public class Tuple_reasoning1_citation_opt {
 		tuple_mapping.clear();
 										
 		authors.clear();
+		
+		citation_query_mapping.clear();
+		
+		all_citation_queries.clear();
 	}
 	
 //	public static Vector<Vector<citation_view_vector>> tuple_reasoning2(Query query, HashMap<Head_strs, Vector<String> > citation_strs, HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map1, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException, IOException, InterruptedException
@@ -809,25 +817,7 @@ public class Tuple_reasoning1_citation_opt {
 	      
 	      return views;
 	}
-	
-	static String get_args_web_view(String subgoal, Connection c, PreparedStatement pst) throws SQLException
-	{
-		String q = "select arguments from subgoal_arguments where subgoal_names ='" + subgoal + "'";
-		
-		pst = c.prepareStatement(q);
-		
-		ResultSet r = pst.executeQuery();
-		
-		String subgoal_args = new String();
-		
-		if(r.next())
-		{
-			subgoal_args += r.getString(1);
-		}
-		
-		return subgoal_args;
-		
-	}
+
 	
 	public static void check_equality(Query view, Connection c, PreparedStatement pst) throws SQLException
 	{
@@ -1033,6 +1023,80 @@ public class Tuple_reasoning1_citation_opt {
 		return false;
 	}
 	
+	static void get_view_query_mapping(Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "select view, citation_block, query_id from citation2query, citation2view where citation2query.citation_view_id = citation2view.citation_view_id";
+		
+		pst = c.prepareStatement(query);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		while(rs.next())
+		{
+			
+			String view_name = "v" + rs.getInt(1);
+			
+			String block_name = rs.getString(2);
+			
+			Integer query_id = rs.getInt(3);
+			
+			HashMap<String, Vector<Integer>> mapping = citation_query_mapping.get(view_name);
+			
+			if(mapping == null)
+			{
+				mapping = new HashMap<String, Vector<Integer>>();
+				
+				Vector<Integer> ids = new Vector<Integer>();
+				
+				ids.add(query_id);
+				
+				mapping.put(block_name, ids);
+				
+				citation_query_mapping.put(view_name, mapping);
+			}
+			else
+			{
+				if(mapping.get(block_name) == null)
+				{
+					Vector<Integer> ids = new Vector<Integer>();
+					
+					ids.add(query_id);
+					
+					mapping.put(block_name, ids);
+				}
+				else
+				{
+					Vector<Integer> ids = mapping.get(block_name);
+					
+					ids.add(query_id);
+					
+					mapping.put(block_name, ids);
+				}
+				
+				citation_query_mapping.put(view_name, mapping);
+				
+			}
+		}
+	}
+	
+	public static void get_all_citation_query(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	{
+		String query = "select query_id from query2head_variables";
+		
+		pst = c.prepareStatement(query);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		while(rs.next())
+		{
+			int id = rs.getInt(1);
+			
+			Query citation_query =  Query_operation.get_query_by_id(id, c, pst);
+			
+			all_citation_queries.put(id, citation_query);
+		}
+	}
+	
 	public static Vector<Query> pre_processing(Query q, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
 		
@@ -1043,6 +1107,9 @@ public class Tuple_reasoning1_citation_opt {
 			view_mapping.put(views.get(k).name, views.get(k));
 		}
 
+		get_view_query_mapping(c, pst);
+		
+		get_all_citation_query(c, pst);
 		
 //	    q = q.minimize();
 
@@ -1132,7 +1199,7 @@ public class Tuple_reasoning1_citation_opt {
 		reset();
 	    
 		pre_processing(q ,c,pst);
-		
+				
 		Vector<Vector<citation_view_vector>> citation_views = get_citation_views(q, c, pst, citation_strs, citation_view_map1);
 				
 		
@@ -1387,6 +1454,10 @@ public class Tuple_reasoning1_citation_opt {
 		
 //		HashMap<Head_strs, Vector<String> > citation_strs = new HashMap<Head_strs, Vector<String> >();
 
+		Vector<String> citation_sqls = new Vector<String>();
+		
+		HashSet<Head_strs> head_vals = new HashSet<Head_strs>();
+		
 		int group_num = 0;
 		
 		if(!valid_conditions.isEmpty())
@@ -1409,6 +1480,8 @@ public class Tuple_reasoning1_citation_opt {
 				values.add(vals);
 				
 				Head_strs h_vals = new Head_strs(vals);
+				
+				head_vals.add(h_vals);
 				
 //				System.out.println(h_vals);
 								
@@ -1502,7 +1575,7 @@ public class Tuple_reasoning1_citation_opt {
 						
 					}
 					
-					gen_citations(citation_strs, c_unit_combinaton, curr_str, query, c, pst);
+					citation_sqls.addAll(gen_citations(citation_strs, c_unit_combinaton, curr_str, query, c, pst));
 					
 //					output2excel.citation_output_row(rs, query, vals, c_unit_combinaton, file_name, tuple_num, citations);
 
@@ -1593,6 +1666,7 @@ public class Tuple_reasoning1_citation_opt {
 				
 				Head_strs h_vals = new Head_strs(vals);
 				
+				head_vals.add(h_vals);
 				
 				if(first)
 				{
@@ -1664,7 +1738,7 @@ public class Tuple_reasoning1_citation_opt {
 					
 					String curr_str = new String();
 					
-					gen_citations(citation_strs, c_unit_combinaton, curr_str, query, c, pst);
+					citation_sqls.addAll(gen_citations(citation_strs, c_unit_combinaton, curr_str, query, c, pst));
 				}
 				
 				else
@@ -1724,6 +1798,87 @@ public class Tuple_reasoning1_citation_opt {
 		}
 		
 		System.out.print(group_num + "	");
+		
+		String citation_sql = new String();
+		
+		for(int i = 0; i<citation_sqls.size(); i++)
+		{
+			if(i >= 1)
+				citation_sql += " union ";
+			
+			citation_sql += citation_sqls.get(i);
+		}
+		
+				
+		pst = c.prepareStatement(citation_sql);
+		
+		rs = pst.executeQuery();
+				
+		ResultSetMetaData rs_meta = rs.getMetaData();
+		
+		int col_num = rs_meta.getColumnCount();
+		
+		HashSet<Head_strs> heads = head_vals;
+		
+		while(rs.next())
+		{
+			Vector<String> head_str = new Vector<String> ();
+			
+			for(int k = 0; k<col_num - 1; k++)
+			{
+				head_str.add(rs.getString(k + 1));
+			}
+			
+			
+			String author_str = rs.getString(col_num);
+			
+			String citation = gen_full_citaiton(head_str, author_str);
+			
+			Head_strs h_str = new Head_strs(head_str);
+			
+			heads.remove(h_str);
+			
+			if(citation_strs.get(h_str) == null)
+			{
+				HashSet<String> citations = new HashSet<String>();
+				
+				citations.add(citation);
+				
+				citation_strs.put(h_str, citations);
+			}
+			else
+			{
+				HashSet<String> citations = citation_strs.get(h_str);
+				
+				citations.add(citation);
+				
+				citation_strs.put(h_str, citations);
+			}
+		}
+		
+		for(Iterator iter = heads.iterator(); iter.hasNext();)
+		{
+			Head_strs h_str = (Head_strs) iter.next();
+			
+			String citation = gen_full_citaiton(h_str.head_vals, new String());
+			
+			if(citation_strs.get(h_str) == null)
+			{
+				HashSet<String> citations = new HashSet<String>();
+				
+				citations.add(citation);
+				
+				citation_strs.put(h_str, citations);
+			}
+			else
+			{
+				HashSet<String> citations = citation_strs.get(h_str);
+				
+				citations.add(citation);
+				
+				citation_strs.put(h_str, citations);
+			}
+		}
 		
 //		output2excel.citation_output(rs, query, values, c_views, file_name, citation_strs);
 //		return citation_strs;
@@ -1786,7 +1941,7 @@ public class Tuple_reasoning1_citation_opt {
 	
 	
 	
-	static void gen_citations(HashMap<Head_strs, HashSet<String>> citation_strs, Vector<citation_view_vector> c_views, String curr_str, Query q, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	static Vector<String> gen_citations(HashMap<Head_strs, HashSet<String>> citation_strs, Vector<citation_view_vector> c_views, String curr_str, Query q, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
 		
 		String group_vars = Query_converter.get_group_item(q);
@@ -1803,88 +1958,127 @@ public class Tuple_reasoning1_citation_opt {
 				
 		HashSet<Head_strs> head_vs = Query_converter.get_head_vars(group_sql, c, pst);
 				
+		String sql = new String();
+		
+		Vector<String> citation_sqls = new Vector<String>();
+		
 		for(int i = 0; i<c_views.size(); i++)
 		{
-			do_gen_citations(head_vs, head_vars, query_relations, group_vars, group_condition_str, query_condition_str, citation_strs, c_views.get(i), curr_str, q, c, pst);
+//			
+//			citation_view_vector c_vec = c_views.get(i);
+//			
+//			HashMap<String, Vector<Query>> query_mapping = new HashMap<String, Vector<Query>>();
+//			
+//			for(int j = 0; j<c_vec.c_vec.size(); j++)
+//			{
+//				
+//			}
+//			
+			String curr_sql = do_gen_citations(head_vs, head_vars, query_relations, group_vars, group_condition_str, query_condition_str, citation_strs, c_views.get(i), curr_str, q, c, pst);
+			
+//			if(i >= 1)
+//				sql += " union ";
+//			
+//			sql += "(" + curr_sql + ")";
+			
+			citation_sqls.add(curr_sql);
+			
 		}
+		
+		return citation_sqls;
+		
+//		pst = c.prepareStatement(sql);
+//		
+//		ResultSet rs = pst.executeQuery();
+//		
+//		ResultSetMetaData rs_meta = rs.getMetaData();
+//		
+//		int col_num = rs_meta.getColumnCount();
+//		
+//		HashSet<Head_strs> heads = (HashSet<Head_strs>) head_vs.clone();
+//		
+//		while(rs.next())
+//		{
+//			Vector<String> head_vals = new Vector<String> ();
+//			
+//			for(int k = 0; k<col_num - 1; k++)
+//			{
+//				head_vals.add(rs.getString(k + 1));
+//			}
+//			
+//			
+//			String author_str = rs.getString(col_num);
+//			
+//			String citation = gen_full_citaiton(head_vals, author_str);
+//			
+//			Head_strs h_str = new Head_strs(head_vals);
+//			
+//			heads.remove(h_str);
+//			
+//			if(citation_strs.get(h_str) == null)
+//			{
+//				HashSet<String> citations = new HashSet<String>();
+//				
+//				citations.add(citation);
+//				
+//				citation_strs.put(h_str, citations);
+//			}
+//			else
+//			{
+//				HashSet<String> citations = citation_strs.get(h_str);
+//				
+//				citations.add(citation);
+//				
+//				citation_strs.put(h_str, citations);
+//			}
+//		}
+//		
+//		for(Iterator iter = heads.iterator(); iter.hasNext();)
+//		{
+//			Head_strs h_str = (Head_strs) iter.next();
+//			
+//			String citation = gen_full_citaiton(h_str.head_vals, new String());
+//			
+//			if(citation_strs.get(h_str) == null)
+//			{
+//				HashSet<String> citations = new HashSet<String>();
+//				
+//				citations.add(citation);
+//				
+//				citation_strs.put(h_str, citations);
+//			}
+//			else
+//			{
+//				HashSet<String> citations = citation_strs.get(h_str);
+//				
+//				citations.add(citation);
+//				
+//				citation_strs.put(h_str, citations);
+//			}
+//		}
 	}
 	
-	static void do_gen_citations(HashSet<Head_strs> head_vs, String head_vars, String query_relations, String group_vars, String group_condition_str, String query_condition_str, HashMap<Head_strs, HashSet<String>> citation_strs, citation_view_vector c_views, String curr_str, Query q, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	static String do_gen_citations(HashSet<Head_strs> head_vs, String head_vars, String query_relations, String group_vars, String group_condition_str, String query_condition_str, HashMap<Head_strs, HashSet<String>> citation_strs, citation_view_vector c_views, String curr_str, Query q, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{		
-		Vector<String> queries = Query_converter.group_sub_query_citations(head_vars, query_relations, group_vars, query_condition_str, group_condition_str, c_views, valid_conditions, curr_str, q, authors, c, pst);
+		Vector<String> queries = Query_converter.group_sub_query_citations(head_vars, query_relations, group_vars, query_condition_str, group_condition_str, c_views, valid_conditions, curr_str, q, authors, citation_query_mapping, all_citation_queries, c, pst);
 		
+		String sql = new String();
 		
 		for(int i = 0; i<queries.size(); i++)
 		{
-			pst = c.prepareStatement(queries.get(i));
+			if(i >= 1)
+				sql += " union ";
 			
-			ResultSet rs = pst.executeQuery();
+			sql += "(" + queries.get(i) + ")";
+		}
+		
+		System.out.println(sql);
+		
+		return sql;
+		
+//		for(int i = 0; i<queries.size(); i++)
+//		{
 			
-			ResultSetMetaData rs_meta = rs.getMetaData();
-			
-			int col_num = rs_meta.getColumnCount();
-			
-			HashSet<Head_strs> heads = (HashSet<Head_strs>) head_vs.clone();
-			
-			while(rs.next())
-			{
-				Vector<String> head_vals = new Vector<String> ();
-				
-				for(int k = 0; k<col_num - 1; k++)
-				{
-					head_vals.add(rs.getString(k + 1));
-				}
-				
-				
-				String author_str = rs.getString(col_num);
-				
-				String citation = gen_full_citaiton(head_vals, author_str);
-				
-				Head_strs h_str = new Head_strs(head_vals);
-				
-				heads.remove(h_str);
-				
-				if(citation_strs.get(h_str) == null)
-				{
-					HashSet<String> citations = new HashSet<String>();
-					
-					citations.add(citation);
-					
-					citation_strs.put(h_str, citations);
-				}
-				else
-				{
-					HashSet<String> citations = citation_strs.get(h_str);
-					
-					citations.add(citation);
-					
-					citation_strs.put(h_str, citations);
-				}
-			}
-			
-			for(Iterator iter = heads.iterator(); iter.hasNext();)
-			{
-				Head_strs h_str = (Head_strs) iter.next();
-				
-				String citation = gen_full_citaiton(h_str.head_vals, new String());
-				
-				if(citation_strs.get(h_str) == null)
-				{
-					HashSet<String> citations = new HashSet<String>();
-					
-					citations.add(citation);
-					
-					citation_strs.put(h_str, citations);
-				}
-				else
-				{
-					HashSet<String> citations = citation_strs.get(h_str);
-					
-					citations.add(citation);
-					
-					citation_strs.put(h_str, citations);
-				}
-			}
 			
 //			pst = c.prepareStatement(citation_queries.get(i));
 //			
@@ -1929,7 +2123,7 @@ public class Tuple_reasoning1_citation_opt {
 //			}
 			
 			
-		}
+//		}
 	}
 	
 	static String gen_full_citaiton(Vector<String> head_vals, String author_str)
@@ -1950,7 +2144,6 @@ public class Tuple_reasoning1_citation_opt {
 		
 		return citation;
 	}
-	
 	
 	
 	static Vector<String> populate_citation(Vector<citation_view_vector> update_c_view, Vector<String> vals, Connection c, PreparedStatement pst, Vector<HashMap<String, Vector<String>>> citation_strings) throws SQLException

@@ -248,14 +248,14 @@ public class Query_operation {
 	
 	
 	
-	public static Query get_query_by_id(int id) throws SQLException, ClassNotFoundException
+	public static Query get_query_by_id(int id, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-        
-        PreparedStatement pst = null;
+//		Class.forName("org.postgresql.Driver");
+//        Connection c = DriverManager
+//           .getConnection(populate_db.db_url,
+//       	        populate_db.usr_name,populate_db.passwd);
+//        
+//        PreparedStatement pst = null;
         
         Vector<Argument> head_var = new Vector<Argument>();
         
@@ -276,7 +276,7 @@ public class Query_operation {
         Query view = new Query("q" + id, head, subgoals,lambda_terms, conditions, subgoal_name_mapping);
         
         
-        c.close();
+//        c.close();
                 
         return view;
 	}

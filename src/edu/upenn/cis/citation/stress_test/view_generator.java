@@ -52,7 +52,7 @@ public class view_generator {
 	
 	static double citatble_rate = 0.3;
 	
-	static double local_predicates_rate = 0.5;
+	static double local_predicates_rate = 0.7;
 	
 	static double lambda2head_rate = 0.3;
 	
@@ -67,6 +67,8 @@ public class view_generator {
 	static HashMap<String, Vector<Argument>> query_head_names = new HashMap<String, Vector<Argument>>();
 	
 	static HashMap<String, Vector<Conditions>> query_conditions = new HashMap<String, Vector<Conditions>>();
+	
+	static int const_range = 20;
 	
 	static void initial()
 	{
@@ -257,6 +259,32 @@ public class view_generator {
 	    store_views(views, c, pst);
 	    
 	    
+	}
+	
+	
+	public static HashSet<Query> generate_store_views(Vector<String> subgoal_names, int num_views, int sizeofquery) throws SQLException, ClassNotFoundException
+	{
+		initial();
+		
+		Connection c = null;
+	      PreparedStatement pst = null;
+		Class.forName("org.postgresql.Driver");
+	    c = DriverManager
+	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
+	    
+	    clear_views(c, pst);
+	    
+	    clear_other_tables(c, pst);
+	    
+	    populate_db.renew_table(c, pst);
+	    
+	    get_joinable_relations(c, pst);
+	    
+	    HashSet<Query> views = gen_views(subgoal_names, num_views, sizeofquery,  c, pst);
+	    
+	    store_views(views, c, pst);
+	    
+	    return views;
 	}
 	
 	
@@ -483,12 +511,39 @@ public class view_generator {
 		
 		while(i < num)
 		{
-			double val = r.nextGaussian() * 5 + 1;
+			double val = r.nextGaussian() * 5;
 			
-			if(val < 0)
+			if(val <= 0)
 				continue;
 			
-			int value = (int) Math.round(val);
+			int value = (int) Math.ceil(val);
+			
+			if(value == 0)
+				continue;
+			
+			random_number.add(value);
+			
+			i++;
+		}
+		return random_number;
+	}
+	
+	static Vector<Integer> generator_random_numbers(int num, int max_num)
+	{
+		int i = 0;
+		
+		Vector<Integer> random_number = new Vector<Integer>();
+		
+		Random r = new Random();
+		
+		while(i < num)
+		{
+			double val = r.nextGaussian() * 5;
+			
+			if(val <= 0 || val > max_num)
+				continue;
+			
+			int value = (int) Math.ceil(val);
 			
 			if(value == 0)
 				continue;
@@ -528,6 +583,84 @@ public class view_generator {
 		}
 		
 		return queries;
+	}
+	
+	static HashSet<Query> gen_views(Vector<String> subgoal_names, int num_views, int sizeofquety, Connection c, PreparedStatement pst) throws SQLException
+	{
+		Vector<Integer> sizes = generator_random_numbers(num_views, sizeofquety);
+		
+		HashSet<Query> queries = new HashSet<Query>();
+		
+		int num = 0;
+		
+		while(queries.size() < sizes.size())
+		{
+			
+			int size = sizes.get(num);
+						
+			Query query = generate_view(subgoal_names, num + 1, sizes.get(num), c, pst);
+						
+			if(!queries.contains(query))
+			{
+				queries.add(query);
+				
+		    	System.out.println(query.lambda_term + "," + query.toString());
+				
+				num ++;
+			}
+			
+			
+		}
+		
+		return queries;
+	}
+	
+	static void gen_one_additional_view(HashSet<Query> views, Vector<String> subgoal_names, int sizeofquery) throws SQLException, ClassNotFoundException
+	{
+		Vector<Integer> sizes = generator_random_numbers(1, sizeofquery);
+		
+		Connection c = null;
+	      PreparedStatement pst = null;
+		Class.forName("org.postgresql.Driver");
+	    c = DriverManager
+	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
+		
+		int old_num = views.size();
+		
+		while(views.size() < old_num + 1)
+		{
+			
+			int size = sizes.get(0);
+						
+			Query query = generate_view(subgoal_names, views.size() + 1, sizes.get(0), c, pst);
+						
+			if(!views.contains(query))
+			{
+				views.add(query);
+				
+		    	System.out.println(query.lambda_term + "," + query.toString());
+		    	
+		    	int curr_num = old_num + 1;
+		    	
+		    	view_operation.add(query, query.name);
+		    	
+		    	citation_view_operation.add_citation_view("c" + curr_num);
+				
+				citation_view_operation.add_connection_view_with_citations("c" + curr_num, query.name);
+				
+				store_citation_queries(query, curr_num, c, pst);
+				
+				Query_operation.add_connection_citation_with_query("c" + curr_num, "q" + curr_num , "author");
+		    	
+			}
+			
+			System.out.println(query);
+			
+			
+		}
+		
+		
+		
 	}
 	
 	static Query generate_view(int id, int size, Connection c, PreparedStatement pst) throws SQLException
@@ -611,6 +744,88 @@ public class view_generator {
 		return new Query(name, new Subgoal(name, heads), body, lambda_terms, predicates, maps);
 	}
 	
+	
+	static Query generate_view(Vector<String> subgoal_names, int id, int size, Connection c, PreparedStatement pst) throws SQLException
+	{
+		Random r = new Random();
+		
+		HashSet<String> relation_names = new HashSet<String>();
+		
+		Vector<Argument> heads = new Vector<Argument>();
+		
+		Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();
+		
+		Vector<Conditions> local_predicates = new Vector<Conditions>();
+		
+		HashMap<String, String> maps = new HashMap<String, String>();
+		
+		Vector<Subgoal> body = new Vector<Subgoal>();
+		
+		for(int i = 0; i<size; i++)
+		{
+			int index = r.nextInt((int) (subgoal_names.size()));
+			
+			String relation = subgoal_names.get(index);
+			
+			if(relation_names.contains(relation))
+			{
+				continue;
+			}
+			else
+			{
+				relation_names.add(relation);
+				
+				maps.put(relation, relation);
+			}
+			
+			HashMap<String, String> attr_types = get_attr_types(relation, c, pst);
+			
+			
+			Set<String> attr_names = attr_types.keySet();
+			
+			Vector<String> attr_list = new Vector<String> ();
+			
+			attr_list.addAll(attr_names);
+			
+			Random rand = new Random();
+			
+			int selection_size = rand.nextInt((int)(attr_list.size() * local_predicates_rate + 1));
+			
+			String [] primary_key_type = get_primary_key(relation, c, pst);
+			
+			Vector<Conditions> conditions = gen_local_predicates(selection_size, attr_types, attr_list, relation, primary_key_type, c, pst);
+					
+			local_predicates.addAll(conditions);
+			
+			int head_size = rand.nextInt((int)(attr_list.size() * head_var_rate + 1)) + 1;
+									
+			Vector<Argument> head_vars = gen_head_vars(relation, attr_list, head_size, c, pst);
+			
+			
+			Vector<Lambda_term> l_terms = gen_lambda_terms(head_vars, relation, c, pst);
+			
+			heads.addAll(head_vars);
+			
+			lambda_terms.addAll(l_terms);
+			
+			Vector<Argument> args = new Vector<Argument>();
+			
+			body.add(new Subgoal(relation, args));
+		}
+		
+		String name = "v" + id;
+		
+		Vector<Conditions> global_predicates = gen_global_conditions(body);
+		
+		Vector<Conditions> predicates = new Vector<Conditions>();
+		
+		predicates.addAll(global_predicates);
+		
+		predicates.addAll(local_predicates);
+		
+		return new Query(name, new Subgoal(name, heads), body, lambda_terms, predicates, maps);
+	}
+
 	
 	static Vector<String[]> get_foreign_key_pairs(Vector<String> subgoal_names)
 	{
@@ -802,7 +1017,7 @@ public class view_generator {
 		
 		String query = "SELECT exists (SELECT 1 FROM " + relation_name + " WHERE " + attr_name + " is null LIMIT 1)";
 		
-		System.out.println(query);
+//		System.out.println(query);
 		
 		pst = c.prepareStatement(query);
 		
@@ -972,7 +1187,7 @@ public class view_generator {
 		String subgoal2 = new String();
 		
 		if(all_values.get(index).length() < 100)	
-			return new Conditions(new Argument(attr_name, relation_name) , relation_name, op, new Argument("'" + all_values.get(index) + "'"), subgoal2);
+			return new Conditions(new Argument(attr_name, relation_name) , relation_name, op, new Argument("'" + r.nextInt(const_range) + "'"), subgoal2);
 		else
 			return null;
 

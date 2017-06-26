@@ -31,7 +31,11 @@ public class view_operation {
 	
 	public static void main(String [] args) throws ClassNotFoundException, SQLException
 	{
-//		delete_view_by_id(10);
+		delete_view_by_id(4);
+		
+		delete_view_by_id(5);
+		
+		delete_view_by_id(9);
 		
 //		String query = "v9(ligand_c_ligand_id,interaction_c_object_id, ligand_c_name):ligand_c(), interaction_c(), interaction_c_ligand_id=ligand_c_ligand_id";
 //		
@@ -53,11 +57,11 @@ public class view_operation {
 		
 		
 		
-		Query q = gen_sample_view();
-		
-		add(q, "v10");
-		
-		System.out.println(q);
+//		Query q = gen_sample_view();
+//		
+//		add(q, "v10");
+//		
+//		System.out.println(q);
 		
 		
 	}
@@ -216,6 +220,27 @@ public class view_operation {
         
         c.close();
                 
+        return view;
+	}
+	
+	public static Query get_view_by_id(int id, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	{
+        
+        Vector<Argument> head_var = get_head_vars(id, c, pst);
+        
+        Vector<Conditions> conditions = get_view_conditions(id, c, pst);
+        
+        HashMap<String, String> subgoal_name_mapping = new HashMap<String, String>();
+        
+        Vector<Subgoal> subgoals = get_view_subgoals_full(id, subgoal_name_mapping, c, pst);
+        
+        Vector<Lambda_term> lambda_terms = get_view_lambda_terms(id, c, pst);
+        
+        Subgoal head = new Subgoal("v" + id, head_var);
+        
+        Query view = new Query("v" + id, head, subgoals,lambda_terms, conditions, subgoal_name_mapping);
+        
+                        
         return view;
 	}
 	
@@ -771,7 +796,7 @@ public class view_operation {
         
         view.name = name;//"v" + seq;
         
-        System.out.println(view.toString());
+//        System.out.println(view.toString());
         
         insert_view_table(seq, view, c, pst);
         
@@ -896,7 +921,7 @@ public class view_operation {
 			
 			pst = c.prepareStatement(query);
 			
-			System.out.println(query);
+//			System.out.println(query);
 			
 			pst.execute();
 			

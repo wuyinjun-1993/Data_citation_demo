@@ -6,11 +6,13 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
 import edu.upenn.cis.citation.Corecover.Query;
+import edu.upenn.cis.citation.Corecover.Subgoal;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
@@ -20,13 +22,33 @@ import edu.upenn.cis.citation.reasoning.Tuple_reasoning1_citation_opt;
 import edu.upenn.cis.citation.reasoning.Tuple_reasoning2_citation_opt;
 import edu.upenn.cis.citation.user_query.query_storage;
 
-public class stress_test {
+public class stress_test1 {
 	
 	static int size_range = 100;
 	
-	static int times = 3;
+	static int times = 1;
 	
 	static int size_upper_bound = 5;
+	
+	static Vector<String> get_unique_relation_names(Query query)
+	{
+		Vector<String> relation_names = new Vector<String>();
+		
+		HashSet<String> relations = new HashSet<String>();
+		
+		for(int i = 0; i<query.body.size(); i++)
+		{
+			Subgoal subgoal = (Subgoal) query.body.get(i);
+			
+			relations.add(query.subgoal_name_mapping.get(subgoal.name));
+			
+		}
+		
+		relation_names.addAll(relations);
+		
+		return relation_names;
+		
+	}
 	
 	public static void main(String [] args) throws ClassNotFoundException, SQLException, IOException, InterruptedException
 	{
@@ -41,9 +63,9 @@ public class stress_test {
 		
 		
 		
-		HashMap<Head_strs, Vector<String> > citation_strs = new HashMap<Head_strs, Vector<String>>();
+		HashMap<Head_strs, HashSet<String> > citation_strs = new HashMap<Head_strs, HashSet<String>>();
 		
-		HashMap<Head_strs, Vector<String> > citation_strs2 = new HashMap<Head_strs, Vector<String>>();
+		HashMap<Head_strs, HashSet<String> > citation_strs2 = new HashMap<Head_strs, HashSet<String>>();
 
 		
 		String f_name = new String();
@@ -127,7 +149,7 @@ public class stress_test {
 				{
 					Head_strs h_value = (Head_strs) iter.next();
 					
-					Vector<String> citations = citation_strs.get(h_value);
+					HashSet<String> citations = citation_strs.get(h_value);
 					
 					citation_size += citations.size();
 					
@@ -171,7 +193,7 @@ public class stress_test {
 				{
 					Head_strs h_value = (Head_strs) iter.next();
 					
-					Vector<String> citations = citation_strs2.get(h_value);
+					HashSet<String> citations = citation_strs2.get(h_value);
 					
 					citation_size += citations.size();
 					

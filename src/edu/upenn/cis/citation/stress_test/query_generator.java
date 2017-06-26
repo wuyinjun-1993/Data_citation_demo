@@ -36,7 +36,7 @@ public class query_generator {
 	
 	
 	
-	public static String [] citatable_tables = {"interaction", "gpcr","object", "ligand", "family", "introduction"};
+	public static String [] citatable_tables = {"ligand", "gpcr","object", "family", "introduction"};
 
 	static HashMap<string_array, Vector<string_array> > joinable_attribute_lists = new HashMap<string_array, Vector<string_array>>();
 	
@@ -264,7 +264,7 @@ public class query_generator {
 	
 	
 	
-	static Query gen_query(int size, Connection c, PreparedStatement pst) throws SQLException
+	public static Query gen_query(int size, Connection c, PreparedStatement pst) throws SQLException
 	{		
 		
 		
@@ -292,7 +292,7 @@ public class query_generator {
 		
 		for(int i = 0; i<size; i++)
 		{
-			int index = 3;//r.nextInt((int) (citatable_tables.length));
+			int index = r.nextInt((int) (citatable_tables.length));
 			
 			String relation = citatable_tables[index];
 			

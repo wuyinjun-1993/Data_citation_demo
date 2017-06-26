@@ -124,7 +124,7 @@ public class Database {
 			}
 		}
 		
-		System.out.println(list.toString());
+		System.out.println("DataViews: " + list.toString());
 		
 		return list;
 	}
@@ -137,9 +137,9 @@ public class Database {
 			conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
 			Statement statement = conn.createStatement();
 			if (dv == null || dv.isEmpty()) {
-				statement.execute("SELECT DISTINCT citation_view_name FROM citation_view ORDER BY citation_view_name");
+				statement.execute("SELECT DISTINCT citation_view_name FROM citation_table ORDER BY citation_view_name");
 			} else {
-				statement.execute("SELECT DISTINCT citation_view_name FROM citation_view WHERE view = '" + dv + "' ORDER BY citation_view_name");
+				statement.execute("SELECT DISTINCT citation_table.citation_view_name FROM citation_table, citation2view, view_table WHERE view_table.view = citation2view.view and citation_table.citation_view_id = citation2view.citation_view_id and view_table.name = '" + dv + "' ORDER BY citation_table.citation_view_name");
 			}
 			ResultSet rs = statement.getResultSet();
 			while (rs.next()) {
@@ -156,6 +156,7 @@ public class Database {
 				}
 			}
 		}
+		System.out.println("CitationViews: " + list.toString());
 		return list;
 	}
 

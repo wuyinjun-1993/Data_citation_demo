@@ -40,14 +40,9 @@ public class populate_db {
 
 	public static String[] base_tables = {"gpcr","object","interaction","ligand","pathophysiology","interaction_affinity_refs","gtip_process","process_assoc","disease", "family", "introduction"};
 
-	
-<<<<<<< HEAD
-//	public static String db_url = "jdbc:postgresql://citedb.cx9xmwhyomib.us-east-1.rds.amazonaws.com:5432/test";
-	public static String db_url = "jdbc:postgresql://localhost:5432/test";
-=======
+
 	public static String db_url = "jdbc:postgresql://citedb.cx9xmwhyomib.us-east-1.rds.amazonaws.com:5432/iuphar";
 //	public static String db_url = "jdbc:postgresql://localhost:5432/postgres";
->>>>>>> 1a06b1e6bf864373d4efe030d22664f00e5c0afe
 
 
 	public static String usr_name = "postgres";

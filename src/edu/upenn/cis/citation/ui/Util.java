@@ -296,7 +296,10 @@ public class Util {
             if (i < selected.size() - 1) sb.append(", ");
         }
         sb.append(" FROM ");
-        for (String table : tables) sb.append(table + ", ");
+        for (String table : tables) {
+        	if(table != null && !table.isEmpty())
+        		sb.append(table + ", ");
+        }
         if (sb.charAt(sb.length()-1) ==  ' ') sb.delete(sb.length()-2, sb.length());
         if (wheres.size() + lambdas.size() + joins.size() > 0) {
             sb.append(" WHERE ");

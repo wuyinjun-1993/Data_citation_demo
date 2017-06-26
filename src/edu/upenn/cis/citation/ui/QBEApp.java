@@ -57,7 +57,7 @@ import net.sf.jsqlparser.statement.select.FromItem;
 import org.apache.poi.poifs.property.Child;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 
-import sun.lwawt.macosx.CViewEmbeddedFrame;
+
 import sun.tools.jar.resources.jar;
 
 import com.sun.javafx.geom.RectangularShape;

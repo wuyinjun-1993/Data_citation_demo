@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,52 +65,14 @@ public class Query_converter {
 	}
 	
 	
-	static String get_group_conditions(HashSet<Conditions> conditions, String curr_str)
-	{
-		
-		String condition_str = new String();
-		
-		if(curr_str.isEmpty())
-			return condition_str;
-		
-		int i = 0;
-		
-		for(Iterator iter = conditions.iterator(); iter.hasNext();)
-		{
-			
-			Conditions condition = (Conditions) iter.next();
-			
-			if(i >= 1)
-				condition_str += " and ";
-			
-			if(curr_str.charAt(i) == '1')
-			{
-				condition_str += get_single_condition_str(condition);
-			}
-			else
-			{
-				condition_str += get_single_condition_str_neg(condition);
-			}
-			
-			i ++;
-		}
-		
-		return condition_str;
-	}
 	
-	public static Vector<String> group_sub_query_citations(citation_view_vector c_views, HashSet<Conditions> valid_conditions, String curr_str, Query q, HashMap<Head_strs, Vector<HashSet<String>>> author_lists) throws ClassNotFoundException, SQLException
-	{
-		String head_vars = get_renamed_sel_item(q);
+	
+	public static Vector<String> group_sub_query_citations(String head_vars, String query_relations, String group_vars, String group_condition_str, String query_condition_str, citation_view_vector c_views, HashSet<Conditions> valid_conditions, String curr_str, Query q, HashMap<Head_strs, Vector<HashSet<String>>> author_lists, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	{		
 		
-		String group_vars = get_group_item(q);
+				
 		
-		String query_condition_str = get_condition(q);
-		
-		String group_condition_str = get_group_conditions(valid_conditions, curr_str);
-		
-		String query_relations = get_relations_without_citation_table(q);
-		
-		Vector<String> author_block_queries = gen_query_author_block(c_views, q, head_vars, query_condition_str, group_condition_str, query_relations, group_vars, author_lists);
+		Vector<String> author_block_queries = gen_query_author_block(c_views, q, head_vars, query_condition_str, group_condition_str, query_relations, group_vars, author_lists, c, pst);
 		
 //		System.out.println(author_block_queries.get(0));
 		
@@ -117,15 +80,15 @@ public class Query_converter {
 	}
 	
 	
-	static Vector<String> gen_query_author_block(citation_view_vector c_views, Query q, String head_vars, String query_condition_str, String group_condition_str, String query_relations, String group_vars, HashMap<Head_strs, Vector<HashSet<String>>> author_lists) throws ClassNotFoundException, SQLException
+	static Vector<String> gen_query_author_block(citation_view_vector c_views, Query q, String head_vars, String query_condition_str, String group_condition_str, String query_relations, String group_vars, HashMap<Head_strs, Vector<HashSet<String>>> author_lists, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
 		
-		Connection c = null;
-	      PreparedStatement pst = null;
-		Class.forName("org.postgresql.Driver");
-	    c = DriverManager
-	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
-			    
+//		Connection c = null;
+//	      PreparedStatement pst = null;
+//		Class.forName("org.postgresql.Driver");
+//	    c = DriverManager
+//	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
+//			    
 		Vector<String> citation_queries = new Vector<String>();
 
 //	    System.out.println(c_views.toString());
@@ -139,7 +102,7 @@ public class Query_converter {
 			
 			for(int j = 0; j<query_ids.size(); j++)
 			{
-				Query citation_query = Query_operation.get_query_by_id(query_ids.get(j));
+				Query citation_query = Query_operation.get_query_by_id(query_ids.get(j), c, pst);
 				
 //				System.out.println(citation_query.toString());
 				
@@ -245,7 +208,159 @@ public class Query_converter {
 			
 		}
 		
-		c.close();
+//		c.close();
+		
+		
+		return full_queries;
+		
+	}
+	
+	
+	public static Vector<String> group_sub_query_citations(String head_vars, String query_relations, String group_vars, String group_condition_str, String query_condition_str, citation_view_vector c_views, HashSet<Conditions> valid_conditions, String curr_str, Query q, HashMap<Head_strs, Vector<HashSet<String>>> author_lists, HashMap<String, HashMap<String, Vector<Integer>>> citation_query_mapping, HashMap<Integer, Query> citation_query, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	{		
+		
+				
+		
+		Vector<String> author_block_queries = gen_query_author_block(c_views, q, head_vars, query_condition_str, group_condition_str, query_relations, group_vars, author_lists, citation_query_mapping, citation_query, c, pst);
+		
+//		System.out.println(author_block_queries.get(0));
+		
+		return author_block_queries;
+	}
+	
+	
+	static Vector<String> gen_query_author_block(citation_view_vector c_views, Query q, String head_vars, String query_condition_str, String group_condition_str, String query_relations, String group_vars, HashMap<Head_strs, Vector<HashSet<String>>> author_lists, HashMap<String, HashMap<String, Vector<Integer>>> citation_query_mapping, HashMap<Integer, Query> all_citation_queries, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	{
+		
+//		Connection c = null;
+//	      PreparedStatement pst = null;
+//		Class.forName("org.postgresql.Driver");
+//	    c = DriverManager
+//	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
+//			    
+		Vector<String> citation_queries = new Vector<String>();
+
+//	    System.out.println(c_views.toString());
+		
+		
+		for(int i = 0; i<c_views.c_vec.size(); i++)
+		{
+			
+			HashMap<String, Vector<Integer>> mapping = citation_query_mapping.get(c_views.c_vec.get(i).get_name());
+			
+			Vector<Integer> query_ids = mapping.get("author");//gen_citation1.get_query_id(c_views.c_vec.get(i).get_name(), c, pst);
+						
+			Vector<String> curr_citation_queries = new Vector<String>();
+						
+			for(int j = 0; j<query_ids.size(); j++)
+			{
+				Query citation_query = all_citation_queries.get(query_ids.get(j));
+				
+//				System.out.println(citation_query.toString());
+				
+				String citation_query_relation_names = get_relations_without_citation_table(q, citation_query);
+
+				
+				String citation_query_sel_item = get_citation_query_sel_item(citation_query);
+				
+				
+				String citation_sub_query_join_condition = get_citation_subquery_join_condition(c_views.c_vec.get(i), citation_query, q);
+				
+				String citation_condition_str = get_condition(citation_query);
+				
+//				System.out.println(citation_query.toString());
+				
+				String subquery = gen_citation_sub_query(citation_query_sel_item, q, head_vars, query_condition_str, group_condition_str, query_relations, citation_query_relation_names, citation_sub_query_join_condition, citation_condition_str);
+				
+				curr_citation_queries.add("(" + subquery + ")");
+				
+//				System.out.println(c_views.c_vec.get(i) + ":" + subquery);
+				
+				citation_queries = citation_queries_cross_union(citation_queries, curr_citation_queries, i);
+				
+			}
+			
+		}
+		
+		Vector<String> full_queries = new Vector<String>();
+		
+		for(int i = 0; i<citation_queries.size(); i++)
+		{
+			full_queries.add("select distinct " + group_vars + ", string_agg(first_names ||' '|| surname, ',') from (" + citation_queries.get(i) + ") h group by " + group_vars);
+			
+//			System.out.println(citation_queries.get(i));
+			
+//			pst = c.prepareStatement(citation_queries.get(i));
+//			
+//			ResultSet rs = pst.executeQuery();
+//			
+//			HashMap<Head_strs, HashSet<String>> curr_authors = new HashMap<Head_strs, HashSet<String>>();
+//			
+//			while(rs.next())
+//			{
+//				
+//				Vector<String> head_vals = new Vector<String> ();
+//				
+//				for(int k = 0; k<q.head.size() ; k++)
+//				{
+//					head_vals.add(rs.getString(k + 1));
+//				}
+//				
+//				Head_strs h_vals = new Head_strs(head_vals);
+//				
+//				String author = rs.getString(q.head.size() + 1) + " " + rs.getString(q.head.size() + 2);
+//				
+//				if(curr_authors.get(h_vals) == null)
+//				{
+//					HashSet<String> authors = new HashSet<String>();
+//					
+//					authors.add(author);
+//					
+//					curr_authors.put(h_vals, authors);
+//				}
+//				else
+//				{
+//					HashSet<String> authors = curr_authors.get(h_vals);
+//					
+//					authors.add(author);
+//					
+//					curr_authors.put(h_vals, authors);
+//				}
+//			}
+//			
+//			
+//			Set<Head_strs> h_keys = curr_authors.keySet();
+//			
+//			for(Iterator iter = h_keys.iterator(); iter.hasNext();)
+//			{
+//				Head_strs h_val = (Head_strs) iter.next();
+//				
+//				HashSet<String> curr_author_lists = curr_authors.get(h_val);
+//				
+//				if(author_lists.get(h_val) == null)
+//				{
+//					Vector<HashSet<String>> authors = new Vector<HashSet<String>>();
+//					
+//					authors.add(curr_author_lists);
+//					
+//					author_lists.put(h_val, authors);
+//					
+//				}
+//				else
+//				{
+//					Vector<HashSet<String>> authors = author_lists.get(h_val);
+//					
+//					authors.add(curr_author_lists);
+//					
+//					author_lists.put(h_val, authors);
+//				}
+//				
+//			}
+			
+			
+		}
+		
+//		c.close();
 		
 		
 		return full_queries;
@@ -1390,7 +1505,27 @@ public class Query_converter {
 //		
 //		return sql;
 //	}
+	
+	static String get_lambda_term(Query query)
+	{
+		String str = new String();
+		
+//		System.out.println("head::" + q.head);
+		
+		for(int i = 0; i<query.lambda_term.size(); i++)
+		{
+			Lambda_term arg = query.lambda_term.get(i);
+			
+			if(i >= 1)
+				str += ",";
+			
+			str += arg.table_name + "." + arg.name.substring(arg.name.indexOf("_") + 1, arg.name.length());
+			
+		}
+		return str;
+	}
 //	
+	
 	public static String datalog2sql_citation_query(Query query) throws SQLException, ClassNotFoundException
 	{		
 		Connection c = null;
@@ -1406,6 +1541,8 @@ public class Query_converter {
 		String sql = new String();
 		
 		String sel_item = get_sel_item(query);	
+		
+		String sel_item_with_lambda_terms = get_lambda_term(query);
 		
 //		String citation_unit = get_sel_citation_unit(query);
 		
@@ -1425,6 +1562,9 @@ public class Query_converter {
 		
 		sql = "select distinct " + sel_item;
 		
+		if(!sel_item_with_lambda_terms.isEmpty())
+			sql += "," + sel_item_with_lambda_terms;
+		
 //		if(sel_lambda_terms != null && !sel_lambda_terms.isEmpty())
 //			sql += "," + sel_lambda_terms;	
 //		if(condition_str[0] != null && !condition_str[0].isEmpty())
@@ -1439,6 +1579,68 @@ public class Query_converter {
 //			sql += " order by " + condition_str[1]; 
 		
 //		System.out.println("sql:::" + sql);
+		
+		c.close();
+		
+		return sql;
+	}
+	
+	public static String datalog2sql_citation_query(Query query, int max_num) throws SQLException, ClassNotFoundException
+	{		
+		Connection c = null;
+		
+	    PreparedStatement pst = null;
+	      
+		Class.forName("org.postgresql.Driver");
+		
+	    c = DriverManager
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
+		
+		String sql = new String();
+		
+		String sel_item = get_sel_item(query);	
+		
+		String sel_item_with_lambda_terms = get_lambda_term(query);
+		
+//		String citation_unit = get_sel_citation_unit(query);
+		
+//		String sel_lambda_terms = get_lambda_str(query, lambda_terms);
+		
+//		String [] condition_str = get_condition_boolean_value(query, query.conditions);
+		
+//		System.out.println("c1:::" + condition_str[0]);
+//		
+//		System.out.println("c2::::"+ condition_str[1]);
+		
+		String citation_table = get_relations_without_citation_table(query);
+		
+		String condition = get_condition(query);
+		
+//		String citation_condition = get_citation_condition(query, c, pst);
+		
+		sql = "select distinct " + sel_item;
+		
+		if(!sel_item_with_lambda_terms.isEmpty())
+			sql += "," + sel_item_with_lambda_terms;
+		
+//		if(sel_lambda_terms != null && !sel_lambda_terms.isEmpty())
+//			sql += "," + sel_lambda_terms;	
+//		if(condition_str[0] != null && !condition_str[0].isEmpty())
+//			sql += "," + condition_str[0];
+		
+		sql += " from " + citation_table;// + " where " +  citation_condition;
+		
+		if(condition != null && !condition.isEmpty())
+			sql += " where " + condition;
+		
+//		if(condition_str[1] != null && !condition_str[1].isEmpty())
+//			sql += " order by " + condition_str[1]; 
+		
+//		System.out.println("sql:::" + sql);
+		
+		if(max_num > 0)
+			sql += " limit " + max_num;
 		
 		c.close();
 		
@@ -1540,7 +1742,7 @@ public class Query_converter {
 		return str;
 	}
 	
-	static String get_renamed_sel_item(Query q)
+	public static String get_renamed_sel_item(Query q)
 	{
 		String str = new String();
 		
@@ -1559,24 +1761,24 @@ public class Query_converter {
 		return str;
 	}
 	
-	static String get_group_item(Query q)
-	{
-		String str = new String();
-		
-//		System.out.println("head::" + q.head);
-		
-		for(int i = 0; i<q.head.size(); i++)
-		{
-			Argument arg = (Argument) q.head.args.get(i);
-			
-			if(i >= 1)
-				str += ",";
-			
-			str += arg.name;
-			
-		}
-		return str;
-	}
+//	static String get_group_item(Query q)
+//	{
+//		String str = new String();
+//		
+////		System.out.println("head::" + q.head);
+//		
+//		for(int i = 0; i<q.head.size(); i++)
+//		{
+//			Argument arg = (Argument) q.head.args.get(i);
+//			
+//			if(i >= 1)
+//				str += ",";
+//			
+//			str += arg.name;
+//			
+//		}
+//		return str;
+//	}
 	
 	static String get_citation_query_sel_item(Query q)
 	{
@@ -1645,7 +1847,7 @@ public class Query_converter {
 		
 	}
 	
-	static String get_relations_without_citation_table(Query q)
+	public static String get_relations_without_citation_table(Query q)
 	{
 		String str = new String();
 		
@@ -1856,7 +2058,7 @@ public class Query_converter {
 		return str;
 	}
 	
-	static String get_condition(Query q)
+	public static String get_condition(Query q)
 	{
 		String str = new String();
 		
@@ -1879,6 +2081,58 @@ public class Query_converter {
 			str += get_single_condition_str(q.conditions.get(i));
 		}
 		
+		return str;
+	}
+	
+	public static String get_group_conditions(HashSet<Conditions> conditions, String curr_str)
+	{
+		
+		String condition_str = new String();
+		
+		if(curr_str.isEmpty())
+			return condition_str;
+		
+		int i = 0;
+		
+		for(Iterator iter = conditions.iterator(); iter.hasNext();)
+		{
+			
+			Conditions condition = (Conditions) iter.next();
+			
+			if(i >= 1)
+				condition_str += " and ";
+			
+			if(curr_str.charAt(i) == '1')
+			{
+				condition_str += get_single_condition_str(condition);
+			}
+			else
+			{
+				condition_str += get_single_condition_str_neg(condition);
+			}
+			
+			i ++;
+		}
+		
+		return condition_str;
+	}
+	
+	public static String get_group_item(Query q)
+	{
+		String str = new String();
+		
+//		System.out.println("head::" + q.head);
+		
+		for(int i = 0; i<q.head.size(); i++)
+		{
+			Argument arg = (Argument) q.head.args.get(i);
+			
+			if(i >= 1)
+				str += ",";
+			
+			str += arg.name;
+			
+		}
 		return str;
 	}
 	
@@ -2024,6 +2278,74 @@ public class Query_converter {
 		return sql;
 	}
 	
+	public static String datalog2sql_group(Query q, String sel_item, String conditions, String group_conditions)
+	{
+		String table_str = get_relations_without_citation_table(q);
+		
+		String sql = new String();
+		
+		sql = "select distinct " + sel_item;
+		
+		sql += " from " + table_str;
+		
+		Vector<String> where_clause = new Vector<String>();
+		
+		if(!conditions.isEmpty())
+		{
+			where_clause.add(conditions);
+		}
+		
+		if(!group_conditions.isEmpty())
+		{
+			where_clause.add(group_conditions);
+		}
+		
+		if(where_clause.size() >0)
+		{
+			sql += " where ";
+			
+			for(int i = 0; i<where_clause.size(); i++)
+			{
+				if(i >= 1)
+					sql += " and ";
+				
+				sql += where_clause.get(i);
+			}
+		}
+		
+		return sql;
+		
+	}
+	
+	public static HashSet<Head_strs> get_head_vars(String sql, Connection c, PreparedStatement pst) throws SQLException
+	{
+		pst = c.prepareStatement(sql);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		HashSet<Head_strs> heads = new HashSet<Head_strs>();
+		
+		ResultSetMetaData rm = rs.getMetaData();
+		
+		int col_num = rm.getColumnCount();
+		
+		while(rs.next())
+		{
+			Vector<String> head_vars = new Vector<String>();
+
+			for(int i = 0; i<col_num; i++)
+			{
+				head_vars.add(rs.getString(1 + i));
+
+			}
+			
+			heads.add(new Head_strs(head_vars));
+			
+		}
+		
+		return heads;
+	}
+	
 	public static String datalog2sql(Query query) throws SQLException, ClassNotFoundException
 	{
 				
@@ -2051,10 +2373,10 @@ public class Query_converter {
 				
 		sql = "select " + sel_item;
 		
-		sql += " from " + citation_table + " where ";
+		sql += " from " + citation_table;
 		
 		if(condition != null && !condition.isEmpty())
-			sql += condition;
+			sql += " where " + condition;
 		
 		
 //		System.out.println("sql:::" + sql);

@@ -2,6 +2,7 @@ package edu.upenn.cis.citation.ui;
 
 import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Pre_processing.Gen_query;
+import edu.upenn.cis.citation.Pre_processing.Query_operation;
 import edu.upenn.cis.citation.Pre_processing.citation_view_operation;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.Pre_processing.view_operation;
@@ -56,7 +57,6 @@ import net.sf.jsqlparser.statement.select.FromItem;
 
 import org.apache.poi.poifs.property.Child;
 import org.controlsfx.control.table.TableRowExpanderColumn;
-
 
 import sun.tools.jar.resources.jar;
 
@@ -451,6 +451,8 @@ private Object String;
 //            Database.deleteDataViewByName(dv);
             try {
 				view_operation.delete_view_by_name(dv);
+				citation_view_operation.delete_connection_view_with_citations(dv, dv);
+				citation_view_operation.delete_citation_views(dv);
 				Alert alert = new Alert(Alert.AlertType.INFORMATION);
 	            alert.setTitle("Succeed");
 	            alert.setHeaderText(null);
@@ -466,9 +468,13 @@ private Object String;
 		GridPane.setVgrow(listViewDataViews, Priority.ALWAYS);
 		gridPaneDataViews.add(lableDataviews, 0, 0, 3, 1);
 		gridPaneDataViews.add(listViewDataViews, 0, 1, 3, 1);
-        gridPaneDataViews.add(buttonEditDataView, 0, 2);
-		gridPaneDataViews.add(buttonAddDataView, 1, 2);
-		gridPaneDataViews.add(buttonDeleteDataView, 2, 2);
+		HBox hboxButton = new HBox();
+		hboxButton.setSpacing(5);
+		hboxButton.getChildren().addAll(buttonEditDataView, buttonAddDataView, buttonDeleteDataView);
+		gridPaneDataViews.add(hboxButton, 0, 2);
+//        gridPaneDataViews.add(buttonEditDataView, 0, 2);
+//		gridPaneDataViews.add(buttonAddDataView, 1, 2);
+//		gridPaneDataViews.add(buttonDeleteDataView, 2, 2);
 		Reflection r1 = new Reflection();
 		r1.setFraction(0.7f);
 		gridPaneDataViews.setEffect(r1);
@@ -505,7 +511,8 @@ private Object String;
 			cv = listViewCitationView.getSelectionModel().getSelectedItem();
 			if (cv == null || cv.isEmpty()) return;
 			try {
-				citation_view_operation.delete_citation_views(cv);
+//				citation_view_operation.delete_citation_views(cv);
+				Query_operation.delete_query_by_name(cv);
 				Alert alert = new Alert(Alert.AlertType.INFORMATION);
 	            alert.setTitle("Succeed");
 	            alert.setHeaderText(null);
@@ -523,8 +530,12 @@ private Object String;
 		gridPaneCitationViews.setPadding(new Insets(10, 10, 10, 10));
 		gridPaneCitationViews.add(lableCitationViews, 0, 0);
 		gridPaneCitationViews.add(listViewCitationView, 0, 1, 2, 1);
-		gridPaneCitationViews.add(buttonAddCitationView, 0, 2);
-		gridPaneCitationViews.add(buttonDeleteCitationView, 1, 2);
+		HBox hboxButton2 = new HBox();
+		hboxButton2.getChildren().addAll(buttonAddCitationView, buttonDeleteCitationView);
+		hboxButton2.setSpacing(5);
+		gridPaneCitationViews.add(hboxButton2, 0, 2);
+//		gridPaneCitationViews.add(buttonAddCitationView, 0, 2);
+//		gridPaneCitationViews.add(buttonDeleteCitationView, 1, 2);
 		Reflection r2 = new Reflection();
 		r2.setFraction(0.7f);
 		gridPaneCitationViews.setEffect(r2);
@@ -677,25 +688,37 @@ private Object String;
                 alert.showAndWait();
                 return;
 			}
-			System.out.println(dataView.getSelectionModel().getSelectedItems().size());
-			ObservableList<Integer> indices = dataView.getSelectionModel().getSelectedIndices();
-			ids.clear();
-			ids.addAll(indices);
-			Vector<String> subset_agg_citations = new Vector<>();
-			try {
-				subset_agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views, ids);
-			} catch (ClassNotFoundException | SQLException e1) {
-				e1.printStackTrace();
-			}
+//			System.out.println(dataView.getSelectionModel().getSelectedItems().size());
 			ObservableList<String> listCitations = FXCollections.observableArrayList();
-			for (String s : subset_agg_citations) {
-				listCitations.add(s);
+			ObservableList<Integer> indices = dataView.getSelectionModel().getSelectedIndices();
+			if (indices == null || indices.isEmpty()) {
+				try {
+					// generate all citations
+					Vector<String> agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views);
+					for (String s : agg_citations) {
+						listCitations.add(s);
+					}
+				} catch (ClassNotFoundException | SQLException e1) {
+					e1.printStackTrace();
+				}
+			} else {
+				ids.clear();
+				ids.addAll(indices);
+				// generated selected citations
+				try {
+					Vector<String> subset_agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views, ids);
+					for (String s : subset_agg_citations) {
+						listCitations.add(s);
+					}
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
 			}
-			
 			GridPane gridCg = buildGridCg(listCitations);
 			this.citeStage.setScene(new Scene(gridCg, 500, 300));
 			this.citeStage.setTitle("Citations");
 			this.citeStage.show();
+		
 		});
 		genButton.setId("buttonGen");
 		hBoxGenCitation.getChildren().add(genButton);
@@ -886,6 +909,20 @@ private Object String;
 		
 		listViewCv.setItems(dbaListCitationViews);
 		
+		listViewCv.setOnMouseClicked(event -> {
+			String cv = listViewCv.getSelectionModel().getSelectedItem();
+			dbaListCitationViews.remove(cv);
+			try {
+				Query citationQuery = Query_operation.get_query_by_name(cv);
+				ObservableList<Entry> returnData = returnDataFromQuery(citationQuery);
+				List<Entry> list = new ArrayList<>();
+				list.addAll(returnData);
+				String queryContent = Util.convertToSQLWithLambda(list, false);
+				System.out.println(queryContent);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		});
 //		TextField tfDataView = new TextField();
 //		Label viewNameLabel = new Label("Citation View Name:");
 		
@@ -931,17 +968,9 @@ private Object String;
 			}
 			for (int i = 0; i < listViewCv.getItems().size(); i++) {
 				String currentCQ = listViewCv.getItems().get(i);
-				if (!listCitationViews.contains(currentCQ)){
-					try {
-						citation_view_operation.add_citation_view(currentCQ);
-						listCitationViews.add(currentCQ);
-					} catch (Exception e1) {
-						System.out.println("Add new CQ error");
-						e1.printStackTrace();
-					}
-				}
+				String block = "";
 				try {
-					citation_view_operation.add_connection_view_with_citations(currentCQ, dv);
+					Query_operation.add_connection_citation_with_query(dv, cv, block);
 					System.out.println("add " + currentCQ + " to " + dv);
 				} catch (Exception e1) {
 					System.out.println("Add new CQ connection error");
@@ -996,10 +1025,10 @@ private Object String;
 			return cell;
 		});
 		listViewRightCQ.setOnMouseClicked(event -> {
-			String dv = dbaDataViewDataTab.getText().split(":")[1].trim();
+//			String dv = dbaDataViewDataTab.getText().split(":")[1].trim();
 			String cv = listViewRightCQ.getSelectionModel().getSelectedItem();
 			dbaListCitationViews.add(cv);
-			Database.insertDCTuple(dv, cv);
+//			Database.insertDCTuple(dv, cv);
 		});
 		ObservableList<String> listRightCitationViews = FXCollections.observableArrayList(Database.getCitationViews(null));
 		listViewRightCQ.setItems(listRightCitationViews);
@@ -1172,6 +1201,8 @@ private Object String;
         		try {
     				view_operation.delete_view_by_name(dv);
     				listDataViews.remove(dv);
+    				citation_view_operation.delete_connection_view_with_citations(dv, dv);
+    				citation_view_operation.delete_citation_views(dv);
     			} catch (Exception e2) {
     				e2.printStackTrace();
     			}
@@ -1195,79 +1226,12 @@ private Object String;
                 return;
             }
             if (data.isEmpty()) return;
-			
-//			HashMap<String, String> relation_mapping = new HashMap<String, String>();
-//			Vector<String[]> head_vars = new Vector<String[]>();
-//			Vector<String []> condition_str = new Vector<String[]>();
-//			Vector<String[]> lambda_term_str = new Vector<String[]>();
-//			// The list statement should stay here
-//			List<Entry> list = new ArrayList<>();
-//			list.addAll(data);
-//	        for (Entry e : list) {
-//	        	String table = e.getTable();
-//	        	String field = e.getField();
-//	        	relation_mapping.put(table, table);
-//	        	String[] arg = {field, table};
-//	        	String[] comparator = {"=", "<", ">", "<=", ">=", "<>"};
-//	        	String comparatorValue = "";
-//        		String compareNumber = "";
-//	        	if (e.getShow()) {
-//	        		if (!head_vars.contains(arg)) {
-//	        			head_vars.add(arg);
-//	        		}
-//	        	}
-//	        	if (e.getCriteria() != null && !e.getCriteria().isEmpty()) {
-//	        		String[] criteria = e.getCriteria().split("\\,");
-//	        		for (int i = 0; i < criteria.length; i++) {
-//	        			for (int j = 0; j < comparator.length; j++) {
-//	        				if (comparator[j].equals(Character.toString(criteria[i].charAt(0))) ) {
-//	        					comparatorValue = comparator[j];
-//	        					compareNumber = criteria[i].substring(1, criteria[i].length());
-//	        				}
-//	        				else if (comparator[j].equals(criteria[i].substring(0, 2))) {
-//	        					comparatorValue = comparator[j];
-//	        					compareNumber = criteria[i].substring(2, criteria[i].length());
-//	        				}
-//	        					
-//	        			}
-//	        			String[] condition = {field, table, comparatorValue,"'" + compareNumber + "'", ""};
-//	        			condition_str.add(condition);
-//	        		}
-//	        	}
-//	            if (e.getJoin() != null && !e.getJoin().isEmpty()) {
-//	                String[] join = e.getJoin().split("\\."); //correspond to the setjoin() in createEditor()
-//	                // split according to dot
-//	                String joinTable = "";
-//	                for (int j = 0; j < comparator.length; j++) {
-//	                	if (comparator[j].equals(Character.toString(join[0].charAt(0))) ) {
-//	                		comparatorValue = comparator[j];
-//	                		joinTable = join[0].substring(1, join[0].length());
-//	                	}
-//	                	else if (comparator[j].equals(join[0].substring(0, 2))) {
-//	                		comparatorValue = comparator[j];
-//	                		joinTable = join[0].substring(2, join[0].length());
-//	                	}
-//	                }
-//	                String[] condition1  = {field, table, comparatorValue, join[1], joinTable};
-//	                
-//	                condition_str.add(condition1);
-//	            }
-//	            if (e.getLambda() == true) {
-//	        		lambda_term_str.add(arg);
-//	        	}
-//	        }
-//			
-//			Query generatedQuery = null;
-//			try {
-//				generatedQuery = Gen_query.gen_query(dv, relation_mapping, head_vars, condition_str, lambda_term_str);
-//				System.out.println("[generatedQuery] " + generatedQuery);
-//			} catch (Exception e1) {
-//				e1.printStackTrace();
-//			}
             
-            Query generatedQuery = addQueryByName(dv);
+            Query generatedQuery = addQueryByName(dv,data);
             try {
 				view_operation.add(generatedQuery,dv);
+				citation_view_operation.add_citation_view(dv);
+				citation_view_operation.add_connection_view_with_citations(dv, dv);
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
@@ -1310,6 +1274,7 @@ private Object String;
         gridCitation.setPadding(new Insets(5, 10, 10, 10));
         gridCitation.setHgap(10);
         gridCitation.setVgap(10);
+        gridCitation.setMaxSize(1000, 600);
         
 		// TabPane
 		TabPane tabPane = new TabPane();
@@ -1450,7 +1415,7 @@ private Object String;
                 alert.setContentText("Empty citation query!");
                 alert.showAndWait();
                 return;
-            }
+            } 
             TextInputDialog dialog = new TextInputDialog(cv);
             dialog.setContentText("Please enter the citation query name:");
             dialog.setHeaderText(null);
@@ -1476,12 +1441,13 @@ private Object String;
             } else {
                 return;
             }
-            
+            // generate query
+            Query currentQuery = addQueryByName(cv, dataNew);
             if (stage.getScene() == viewScene) {
             	// at this stage, dv = ""
             	try {
     				if (!listCitationViews.contains(cv)) {
-    					citation_view_operation.add_citation_view(cv);
+    					Query_operation.add(currentQuery, cv);
     					listCitationViews.add(cv);
     					Alert alert = new Alert(Alert.AlertType.INFORMATION);
     	                alert.setTitle("Succeed");
@@ -1495,6 +1461,7 @@ private Object String;
             } else if (stage.getScene() == dbaScene) {
             	try {
     				if (!dbaListCitationViews.contains(cv)) {
+    					Query_operation.add(currentQuery, cv);
         				dbaListCitationViews.add(cv);
         				Alert alert = new Alert(Alert.AlertType.INFORMATION);
                         alert.setTitle("Succeed");
@@ -2109,13 +2076,12 @@ private Object String;
 				
 				String qname = "qname" + count;
 				count++;
-				Query generatedQuery = addQueryByName(qname);
+				Query generatedQuery = addQueryByName(qname, data);
 				HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
-				HashMap<Head_strs, Vector<String> > citation_strs = new HashMap<Head_strs, Vector<String> >();
+				HashMap<Head_strs, HashSet<String> > citation_strs = new HashMap<Head_strs, HashSet<String> >();
 				try {
-					Vector<Vector<citation_view_vector>> c_views = Tuple_reasoning2.tuple_reasoning(generatedQuery, citation_strs, citation_view_map);
+					c_views = Tuple_reasoning2.tuple_reasoning(generatedQuery, citation_strs, citation_view_map, conn, st);
 				} catch (IOException | InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
@@ -2139,6 +2105,7 @@ private Object String;
 				citationColomn.setCellFactory(cellFactory);
 				
 				Iterator<Head_strs> keySetIterator = citation_strs.keySet().iterator();
+				int rows = 0;
 				while(keySetIterator.hasNext()) {
 					Head_strs keys = keySetIterator.next();
 //					ObservableList row = FXCollections.observableArrayList();
@@ -2146,13 +2113,17 @@ private Object String;
 					
 					System.out.println(keys.toString());
 					System.out.println(citation_strs.get(keys));
+					ObservableList<String> lambdaData = FXCollections.observableArrayList(citation_strs.get(keys));
+					((ObservableList) dataViewList.get(rows)).add(lambdaData);
+					rows++;
 				}
 				
 				citationColomn.setCellValueFactory(
 						new Callback<TableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
 							public ObservableValue<String> call(TableColumn.CellDataFeatures<ObservableList, String> param) {
 								if (param.getValue() == null || param.getValue().get(size-1) == null) return new SimpleStringProperty("");
-								ObservableList<String> list = (ObservableList<java.lang.String>) param.getValue().get(size-1);
+//								ObservableList<String> list = (ObservableList<java.lang.String>) param.getValue().get(size-1);
+								ObservableList<String> list = FXCollections.observableArrayList(param.getValue());
 								if (list == null || list.size() == 0) return new SimpleStringProperty("");
 								return new SimpleStringProperty(list.get(0));
 							}
@@ -2273,14 +2244,14 @@ private Object String;
 		setDataView(hBoxLambda, dataView, false);
 	}
 	
-	private Query addQueryByName (String qname) {
+	private Query addQueryByName (String qname, ObservableList<Entry> currentData) {
 		HashMap<String, String> relation_mapping = new HashMap<String, String>();
 		Vector<String[]> head_vars = new Vector<String[]>();
 		Vector<String []> condition_str = new Vector<String[]>();
 		Vector<String[]> lambda_term_str = new Vector<String[]>();
 		// The list statement should stay here
 		List<Entry> list = new ArrayList<>();
-		list.addAll(data);
+		list.addAll(currentData);
         for (Entry e : list) {
         	String table = e.getTable();
         	String field = e.getField();
@@ -2348,6 +2319,83 @@ private Object String;
 			e1.printStackTrace();
 		}
 		return generatedQuery;
+	}
+	
+	private ObservableList<Entry> returnDataFromQuery(Query currentQuery) {
+		ObservableList<Entry> returnData = FXCollections.observableArrayList();
+		// show view info in dba scene
+		HashMap<String, String> relation_mapping = new HashMap<String, String>();
+        Vector<String[]> head_vars = new Vector<String[]>();
+        Vector<String[]> condition_str = new Vector<String[]>();
+        Vector<String[]> lambda_term_str = new Vector<String[]>();
+        Gen_query.get_query_info(currentQuery, relation_mapping, head_vars, condition_str, lambda_term_str);
+        String vars = "";
+        System.out.println(currentQuery);
+        Set keys = relation_mapping.keySet();
+        Vector<String> headVarRelation = new Vector<String>();
+        // add entry appeared in head vars
+        if (!head_vars.equals(null) & !head_vars.isEmpty()) {
+        	for (int i = 0; i < head_vars.size(); i++) {
+        		headVarRelation.add(head_vars.get(i)[1]);
+        		if (keys.contains(head_vars.get(i)[1])) {
+        			// the attribute is set to show in headvars
+        			vars = head_vars.get(i)[0];
+        			// get criteria and set it to entry
+        			String criteria = "";
+        			String join  = "";
+        			for (int j = 0; j < condition_str.size(); j ++) {
+        				String conditionVar = condition_str.get(j)[0];
+        				String conditionRelation = condition_str.get(j)[1];
+        				String lastString  = condition_str.get(j)[4];
+        				if (vars.equals(conditionVar) & head_vars.get(i)[1].equals(conditionRelation) ) {
+//        					if (lastString.isEmpty() || lastString.equals(null) ) {
+//        						criteria = condition_str.get(j)[2] + condition_str.get(j)[3].replaceAll("\\'", "");
+//        					}
+        					if (lastString!=null && !lastString.isEmpty()) {
+        						// get join and set it to entry
+        						join = condition_str.get(j)[2] + condition_str.get(j)[4] + "." + condition_str.get(j)[3];
+        					} else {
+        						criteria = condition_str.get(j)[2] + condition_str.get(j)[3].replaceAll("\\'", "");
+        					}
+        				}
+        			}
+        			
+        			// get lambda term
+        			Boolean lambda = false;
+        			if (!lambda_term_str.equals(null) & !lambda_term_str.isEmpty()) {
+        				for (int j = 0; j < lambda_term_str.size(); j ++ ) {
+            				if (lambda_term_str.get(j)[0].equals(vars) & lambda_term_str.get(j)[1].equals(head_vars.get(i)[1]))
+            					lambda = true;
+            			}
+        			}
+        			returnData.add(new Entry(head_vars.get(i)[1], vars, true, criteria, join, lambda));
+        		} else {
+        			System.out.println("head var not in relation mapping");
+        		}
+        	}
+        }
+        // add entry in criteria conditions, but not in head vars
+        // need to guarantee entry appeared in head vars just show once
+        if (!condition_str.equals(null) & !condition_str.isEmpty()) {
+        	for (int i = 0; i < condition_str.size(); i++) {
+        		String conditionVar = condition_str.get(i)[0];
+				String conditionRelation = condition_str.get(i)[1];
+				String criteria = "";
+        		if (condition_str.get(i)[4] == null && !headVarRelation.contains(conditionRelation)) {
+        			criteria = condition_str.get(i)[2] + condition_str.get(i)[3].replaceAll("\\'", "");
+        			Boolean lambda = false;
+        			if (!lambda_term_str.equals(null) & !lambda_term_str.isEmpty()) {
+        				for (int j = 0; j < lambda_term_str.size(); j ++ ) {
+            				if (lambda_term_str.get(j)[0].equals(conditionVar) & lambda_term_str.get(j)[1].equals(conditionRelation))
+            					lambda = true;
+            			}
+        			}
+        			returnData.add(new Entry(conditionRelation, conditionVar, false, criteria, "", lambda));
+        		}
+        	}
+        }
+        return returnData;
+        
 	}
 
 }

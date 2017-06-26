@@ -137,9 +137,11 @@ public class Database {
 			conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
 			Statement statement = conn.createStatement();
 			if (dv == null || dv.isEmpty()) {
-				statement.execute("SELECT DISTINCT citation_view_name FROM citation_table ORDER BY citation_view_name");
+				statement.execute("SELECT DISTINCT query2head_variables.name FROM query2head_variables ORDER BY query2head_variables.name");
 			} else {
-				statement.execute("SELECT DISTINCT citation_table.citation_view_name FROM citation_table, citation2view, view_table WHERE view_table.view = citation2view.view and citation_table.citation_view_id = citation2view.citation_view_id and view_table.name = '" + dv + "' ORDER BY citation_table.citation_view_name");
+				statement.execute("SELECT DISTINCT query2head_variables.name FROM query2head_variables, citation2query, citation2view, view_table "
+						+ "WHERE query2head_variables.query_id = citation2query.query_id and citation2query.citation_view_id = citation2view.citation_view_id "
+						+ "and view_table.view = citation2view.view and view_table.name = '" + dv + "' ORDER BY query2head_variables.name");
 			}
 			ResultSet rs = statement.getResultSet();
 			while (rs.next()) {

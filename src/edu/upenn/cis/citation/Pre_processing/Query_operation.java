@@ -38,7 +38,7 @@ public class Query_operation {
 		
 	}
 	
-	public static void add_connection_citation_with_query(String cname, String qname, String block) throws SQLException, ClassNotFoundException
+	public static void add_connection_citation_with_query(String cname, Vector<String[]> qname_block) throws SQLException, ClassNotFoundException
 	{
 		Class.forName("org.postgresql.Driver");
         Connection c = DriverManager
@@ -49,9 +49,14 @@ public class Query_operation {
         
         int cid = citation_view_operation.get_citation_id(cname, c, pst);
         
-        int qid = get_query_id(qname, c, pst);
+        for(int i = 0; i<qname_block.size(); i++)
+        {
+        	int qid = get_query_id(qname_block.get(i)[0], c, pst);
+            
+            insert_citation_query_connection(cid, qid, qname_block.get(i)[1], c, pst);
+        }
         
-        insert_citation_query_connection(cid, qid, block, c, pst);
+        
         
         c.close();
         

@@ -359,11 +359,11 @@ public class Tuple_reasoning1 {
 			
 			Vector<Vector<citation_view_vector>> c_views2 = citation_view_map2.get(h_val);
 			
-//			System.out.println(h_val);
-//			
-//			System.out.println(c_views1);
-//			
-//			System.out.println(c_views2);
+			System.out.println(h_val);
+			
+			System.out.println(c_views1);
+			
+			System.out.println(c_views2);
 			
 			compare(c_views1, c_views2);
 		}

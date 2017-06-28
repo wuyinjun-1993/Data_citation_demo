@@ -1084,10 +1084,10 @@ public class Tuple_reasoning2 {
 					citation_view_vector curr_combination = c_view;
 					
 //					if((c_combination.index_vec.containsAll(curr_combination.index_vec) && c_combination.index_vec.size() > curr_combination.index_vec.size()))
-					if(Tuple_reasoning1.view_vector_contains(c_combination, curr_combination) && c_combination.index_vec.size() > curr_combination.index_vec.size())
+					if(Tuple_reasoning1.view_vector_contains(c_combination, curr_combination)&& Tuple_reasoning1.table_names_contains(c_combination, curr_combination) && c_combination.index_vec.size() > curr_combination.index_vec.size())
 					{
 						
-						if(c_combination.table_names.equals(curr_combination.table_names))
+//						if(c_combination.table_names.equals(curr_combination.table_names))
 						{
 							c_combinations.remove(i);
 							
@@ -1097,7 +1097,7 @@ public class Tuple_reasoning2 {
 						}
 					}
 					
-					if(view_vector_contains(curr_combination, c_combination) && curr_combination.index_vec.size() > c_combination.index_vec.size())
+					if(Tuple_reasoning1.view_vector_contains(curr_combination, c_combination) && Tuple_reasoning1.table_names_contains(c_combination, curr_combination) && curr_combination.index_vec.size() > c_combination.index_vec.size())
 						break;
 				}
 				

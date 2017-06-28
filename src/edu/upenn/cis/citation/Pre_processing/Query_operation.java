@@ -62,6 +62,22 @@ public class Query_operation {
         
 	}
 	
+	public static void delete_connection_citation_with_query(String cname) throws SQLException, ClassNotFoundException
+	{
+		Class.forName("org.postgresql.Driver");
+        Connection c = DriverManager
+           .getConnection(populate_db.db_url,
+       	        populate_db.usr_name,populate_db.passwd);
+        
+        PreparedStatement pst = null;
+        
+        int cid = citation_view_operation.get_citation_id(cname, c, pst);
+        
+        citation_view_operation.delete_citation2query(cid, c, pst);
+        
+        c.close();
+	}
+	
 	public static Vector<String> get_connection_citation_with_query(String citation_name, Vector<String> block_names) throws SQLException, ClassNotFoundException
 	{
 		Class.forName("org.postgresql.Driver");

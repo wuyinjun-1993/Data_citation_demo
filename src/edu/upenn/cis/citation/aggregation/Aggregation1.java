@@ -43,9 +43,9 @@ public class Aggregation1 {
 				
 		while(i1 < curr_res.size() && i2 < c.size())
 		{
-			String id1 = curr_res.get(i1).get(0).table_name_str;
+			String id1 = curr_res.get(i1).get(0).view_name_str;
 						
-			String id2 = c.get(i2).table_name_str;
+			String id2 = c.get(i2).view_name_str;
 								
 			if(id1.equals(id2))
 			{

@@ -52,6 +52,8 @@ public class citation_view_operation {
 		c.close();
 	}
 	
+
+	
 	public static void delete_connection_view_with_citations(String view_name, String citation_view_name) throws SQLException, ClassNotFoundException
 	{
 		Class.forName("org.postgresql.Driver");

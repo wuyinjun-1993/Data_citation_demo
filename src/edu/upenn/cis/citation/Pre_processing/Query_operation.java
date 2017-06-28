@@ -27,11 +27,12 @@ public class Query_operation {
 	
 	public static void main(String [] args) throws ClassNotFoundException, SQLException
 	{
-		Query q = gen_sample_view();
+
+		Vector<String> block_names = new Vector<String>();
 		
-		System.out.println(q);
+		Vector<String> table_names = get_connection_citation_with_query("c1", block_names);
 		
-		add(q, "q10");
+		System.out.println(table_names);
 		
 //		delete_query_by_id(10);
 		
@@ -55,6 +56,44 @@ public class Query_operation {
         c.close();
         
 	}
+	
+	public static Vector<String> get_connection_citation_with_query(String citation_name, Vector<String> block_names) throws SQLException, ClassNotFoundException
+	{
+		Class.forName("org.postgresql.Driver");
+        Connection c = DriverManager
+           .getConnection(populate_db.db_url,
+       	        populate_db.usr_name,populate_db.passwd);
+        
+        PreparedStatement pst = null;
+        
+        int cid = citation_view_operation.get_citation_id(citation_name, c, pst);
+        
+        Vector<String> query_names = get_query_name(cid, block_names, c, pst);
+        
+        return query_names;
+	}
+	
+	static Vector<String> get_query_name(int cid, Vector<String> block_names, Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "select citation2query.citation_block, query2head_variables.name from citation2query, query2head_variables where citation2query.query_id = query2head_variables.query_id and citation2query.citation_view_id = '" + cid + "'";
+		
+		pst = c.prepareStatement(query);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		Vector<String> names = new Vector<String>();
+		
+		while(rs.next())
+		{
+			names.add(rs.getString(2));
+			
+			block_names.add(rs.getString(1));
+		}
+		
+		return names;
+	}
+	
+	
 	
 	static void insert_citation_query_connection(int cid, int qid, String block, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{

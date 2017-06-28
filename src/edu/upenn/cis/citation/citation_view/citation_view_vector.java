@@ -24,6 +24,8 @@ public class citation_view_vector {
 		
 	public String index_str;
 	
+	public String view_name_str;
+	
 	public String table_name_str;
 	
 	public citation_view_vector()
@@ -64,9 +66,11 @@ public class citation_view_vector {
 		
 		c_vec = new Vector<citation_view>();
 		
-		table_name_str = new String();
+		view_name_str = new String();
 		
 		index_str = new String();
+		
+		table_name_str = new String();
 		
 		for(int i = 0; i<vec.size(); i++)
 		{
@@ -76,8 +80,8 @@ public class citation_view_vector {
 				table_names.addAll(vec.get(i).get_table_names());
 				
 				insert_sort(index_vec, vec.get(i).toString());
-								
-				c_vec.add(vec.get(i));
+				
+				insert_sort(c_vec, vec.get(i));
 				
 			}
 
@@ -87,19 +91,15 @@ public class citation_view_vector {
 		{
 			index_str += index_vec.get(i);
 			
-			table_name_str += index_vec.get(i).replaceFirst("\\(.*\\)", "");
+			view_name_str += index_vec.get(i).replaceFirst("\\(.*\\)", "");
+			
+			table_name_str += c_vec.get(i).get_table_name_string();
 		}
 		
 	}
 	
 	public citation_view_vector merge(citation_view c)
 	{
-		
-		if(c.toString().equals("v6(2)") && index_vec.toString().equals("[v4(2), v6(2)]"))
-		{
-			int y = 0;
-			y++;
-		}
 		
 		Vector<citation_view> vec_new = (Vector<citation_view>) c_vec.clone();
 				
@@ -109,7 +109,9 @@ public class citation_view_vector {
 		
 		String index_str_new = new String();
 		
-		String table_name_str_new = new String();
+		String view_name_str_new = new String();
+		
+		String table_name_str = new String();
 		
 		if(!table_names_new.containsAll(c.get_table_names()))
 		{
@@ -117,15 +119,17 @@ public class citation_view_vector {
 			
 			insert_sort(index_new, c.toString());
 			
-			for(int j = 1; j<index_new.size(); j++)
-			{
-				if(index_new.get(j).compareTo(index_new.get(j - 1))< 0)
-				{
-					assertEquals(1, 0);
-				}
-			}
+			insert_sort(vec_new, c);
 			
-			vec_new.add(c);
+//			for(int j = 1; j<index_new.size(); j++)
+//			{
+//				if(index_new.get(j).compareTo(index_new.get(j - 1))< 0)
+//				{
+//					assertEquals(1, 0);
+//				}
+//			}
+			
+//			vec_new.add(c);
 			
 
 		}
@@ -136,14 +140,18 @@ public class citation_view_vector {
 			
 			String str = index_new.get(i).replaceFirst("\\(.*\\)", "");
 						
-			table_name_str_new += str;
+			view_name_str_new += str;
+			
+			table_name_str += vec_new.get(i).get_table_name_string();
 		}
 		
 		citation_view_vector c_v = new citation_view_vector(vec_new, index_new, table_names_new);
 		
 		c_v.index_str = index_str_new;
 		
-		c_v.table_name_str = table_name_str_new;
+		c_v.view_name_str = view_name_str_new;
+		
+		c_v.table_name_str = table_name_str;
 		
 		return c_v;
 	}
@@ -198,6 +206,56 @@ public class citation_view_vector {
 		
 	}
 	
+	public void insert_sort(Vector<citation_view> index_vec, citation_view insert_str)
+	{
+		if(index_vec.size() == 0)
+		{
+			index_vec.add(insert_str);
+			return;
+		
+		}
+		
+		citation_view first_str = index_vec.firstElement();
+		
+		if(insert_str.toString().compareTo(first_str.toString()) < 0)
+		{
+			index_vec.insertElementAt(insert_str, 0);
+			
+			return;
+		}
+		
+		citation_view last_str = index_vec.lastElement();
+		
+		if(insert_str.toString().compareTo(last_str.toString()) > 0)
+		{
+			index_vec.add(insert_str);
+			
+			return;
+		}
+		
+		
+		int pos = sort_insert.binary_search(index_vec, insert_str, new binary_compare<citation_view>(){
+			
+			@Override			
+			public int compare(citation_view a, citation_view b)
+			{
+				if(a.toString().compareTo(b.toString()) > 0)
+					return 1;
+				else
+				{
+					if(a.toString().compareTo(b.toString()) < 0)
+						return -1;
+					else
+						return 0;
+				}
+			}
+		} );
+		
+		
+		index_vec.insertElementAt(insert_str, pos);
+		
+	}
+	
 	public citation_view_vector(Vector<citation_view> vec, Vector<String> index_vec, HashSet<String> table_names){
 		
 		this.c_vec = vec;
@@ -222,6 +280,8 @@ public class citation_view_vector {
 		table_names.add(c.toString());
 		
 		index_vec.add(c.get_index());
+		
+		table_name_str = c.get_table_name_string();
 		
 	}
 	
@@ -294,6 +354,8 @@ public class citation_view_vector {
 		c_v.table_names.addAll(table_names);
 		
 		c_v.index_str = index_str;
+		
+		c_v.view_name_str = view_name_str;
 		
 		c_v.table_name_str = table_name_str;
 		

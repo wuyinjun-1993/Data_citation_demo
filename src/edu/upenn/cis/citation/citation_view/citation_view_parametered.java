@@ -20,6 +20,10 @@ public class citation_view_parametered extends citation_view{
 	
 	public String name = new String ();
 	
+	public String table_name_str = new String();
+	
+	
+	
 	
 	
 	//the lambda_terms in the view tuple
@@ -296,6 +300,8 @@ public class citation_view_parametered extends citation_view{
 			
 			table_names.add(subgoal.name);
 		}
+		
+		table_name_str = table_names.toString();
 	}
 	
 	public citation_view_parametered(String name, Vector<String> lambda_terms, Vector<String> table_names) throws ClassNotFoundException, SQLException {
@@ -595,6 +601,12 @@ public class citation_view_parametered extends citation_view{
 			return true;
 		
 		return false;
+	}
+
+	@Override
+	public String get_table_name_string() {
+		// TODO Auto-generated method stub
+		return table_name_str;
 	}
 	
 

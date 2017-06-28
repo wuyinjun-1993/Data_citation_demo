@@ -2190,7 +2190,18 @@ public class Query_converter {
 			}
 			
 			if(condition.subgoal2 == null || condition.subgoal2.isEmpty())
-				str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + condition.op + condition.arg2 + ") as condition" + condition_num;
+			{
+				String arg2_str = condition.arg2.name;
+				
+				if(arg2_str.length() > 2)
+				{
+					arg2_str = "'" + arg2_str.substring(1, condition.arg2.name.length() - 1).replaceAll("'", "''") + "'";
+				}
+				
+				
+				
+				str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + condition.op + arg2_str + ") as condition" + condition_num;
+			}
 			else
 				str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + condition.op + condition.subgoal2 + "." + condition.arg2 + ") as condition" + condition_num;
 			

@@ -28,6 +28,8 @@ public abstract class citation_view {
 	
 	public abstract citation_view clone();
 	
+	public abstract String get_table_name_string();
+	
 	@Override
 	public abstract boolean equals(Object o);
 

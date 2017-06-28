@@ -1270,12 +1270,6 @@ public class Tuple_reasoning2_opt {
 				values.add(vals);
 				
 				Head_strs h_vals = new Head_strs(vals);
-				
-				if(h_vals.toString().equals("1 17 4 1"))
-				{
-					int y = 0;
-					y++;
-				}
 								
 				int pos1 = query.head.args.size() + valid_lambda_terms.size();
 				
@@ -1341,9 +1335,9 @@ public class Tuple_reasoning2_opt {
 					
 //					Vector<String> citations = new Vector<String>();
 					
-//					HashSet<String> citations = gen_citation(c_vec, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
+					HashSet<String> citations = gen_citation(c_vec, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
 					
-					HashSet<String> citations = new HashSet<String>();
+//					HashSet<String> citations = new HashSet<String>();
 					
 					if(citation_view_map2.get(h_vals) == null)
 					{
@@ -1394,9 +1388,9 @@ public class Tuple_reasoning2_opt {
 					
 //					Vector<String> citations = populate_citation(update_c_view, vals, c, pst, citation_strings);
 					
-//					HashSet<String> citations = gen_citation(update_c_view, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
+					HashSet<String> citations = gen_citation(update_c_view, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
 					
-					HashSet<String> citations = new HashSet<String>();
+//					HashSet<String> citations = new HashSet<String>();
 					
 					if(citation_view_map2.get(h_vals) == null)
 					{
@@ -1449,12 +1443,6 @@ public class Tuple_reasoning2_opt {
 				
 				Head_strs h_vals = new Head_strs(vals);
 				
-				if(h_vals.toString().equals("1 17 4 1"))
-				{
-					int y = 0;
-					y++;
-				}
-				
 				int pos1 = query.head.args.size() + valid_lambda_terms.size();
 
 				int pos2 = pos1 + valid_conditions.size();
@@ -1478,9 +1466,9 @@ public class Tuple_reasoning2_opt {
 					old_value = curr_str;
 				
 //					Vector<String> citations = gen_citation(curr_c_views, vals, c, pst, citation_strings);
-//					HashSet<String> citations = gen_citation(curr_c_views, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
+					HashSet<String> citations = gen_citation(curr_c_views, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
 					
-					HashSet<String> citations = new HashSet<String>();
+//					HashSet<String> citations = new HashSet<String>();
 					
 					first = false;
 					
@@ -1530,9 +1518,9 @@ public class Tuple_reasoning2_opt {
 					
 					c_views.add(update_c_view);
 					
-//					HashSet<String> citations = gen_citation(update_c_view, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
+					HashSet<String> citations = gen_citation(update_c_view, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
 					
-					HashSet<String> citations = new HashSet<String>();
+//					HashSet<String> citations = new HashSet<String>();
 					
 //					Vector<String> citations = populate_citation(update_c_view, vals, c, pst, citation_strings);
 					
@@ -1712,11 +1700,11 @@ public class Tuple_reasoning2_opt {
 			
 			insert_c_view.add(i, c_vec);
 		}
-		
-
-//		insert_c_view = remove_duplicate(insert_c_view);
-		
 		insert_c_view = remove_duplicate_final(insert_c_view);
+
+
+		insert_c_view = remove_duplicate(insert_c_view);
+		
 		
 //		Vector<citation_view_vector> update_c_views = new Vector<citation_view_vector>();
 //		

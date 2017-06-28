@@ -15,6 +15,12 @@ public class test {
 	public static void main(String [] args) throws SQLException, ClassNotFoundException
 	{
 		
+		String s1 = ".*v1.*v2.*v2.*";
+		
+		String s2 = "v3v1v5v2v3v2v4";
+		
+		System.out.println(s2.matches(s1));
+		
 		Connection c = null;
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");

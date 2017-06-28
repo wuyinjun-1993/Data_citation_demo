@@ -33,7 +33,7 @@ public class stress_test4 {
 	
 	static int size_upper_bound = 5;
 	
-	static int num_views = 3;
+	static int num_views = 10;
 	
 	static int view_max_size = 40;
 	
@@ -89,7 +89,12 @@ public class stress_test4 {
 		
 		Vector<String> relation_names = get_unique_relation_names(query);
 		
-//		HashSet<Query> views = view_generator.generate_store_views(relation_names, num_views, query.body.size());
+//		HashSet<Query> views = view_generator.generate_store_views_without_predicates(relation_names, num_views, query.body.size());
+//		
+//		view_generator.gen_one_additional_predicates(views, relation_names, query.body.size());
+//		
+//		view_generator.gen_one_additional_predicates(views, relation_names, query.body.size());
+
 		
 		for(int j = 0; j<view_max_size; j++)
 		{
@@ -282,7 +287,7 @@ public class stress_test4 {
 			
 			
 			
-//			view_generator.gen_one_additional_view(views, relation_names, query.body.size());
+//			view_generator.gen_one_additional_predicates(views, relation_names, query.body.size());
 			
 			
 		}

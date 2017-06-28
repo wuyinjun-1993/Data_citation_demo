@@ -1335,9 +1335,9 @@ public class Tuple_reasoning2 {
 					
 //					Vector<String> citations = new Vector<String>();
 					
-					HashSet<String> citations = gen_citation(c_vec, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
+//					HashSet<String> citations = gen_citation(c_vec, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
 					
-//					HashSet<String> citations = new HashSet<String>();
+					HashSet<String> citations = new HashSet<String>();
 					
 					if(citation_view_map2.get(h_vals) == null)
 					{
@@ -1388,9 +1388,9 @@ public class Tuple_reasoning2 {
 					
 //					Vector<String> citations = populate_citation(update_c_view, vals, c, pst, citation_strings);
 					
-					HashSet<String> citations = gen_citation(update_c_view, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
+//					HashSet<String> citations = gen_citation(update_c_view, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
 					
-//					HashSet<String> citations = new HashSet<String>();
+					HashSet<String> citations = new HashSet<String>();
 					
 					if(citation_view_map2.get(h_vals) == null)
 					{
@@ -1466,9 +1466,9 @@ public class Tuple_reasoning2 {
 					old_value = curr_str;
 				
 //					Vector<String> citations = gen_citation(curr_c_views, vals, c, pst, citation_strings);
-					HashSet<String> citations = gen_citation(curr_c_views, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
+//					HashSet<String> citations = gen_citation(curr_c_views, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
 					
-//					HashSet<String> citations = new HashSet<String>();
+					HashSet<String> citations = new HashSet<String>();
 					
 					first = false;
 					
@@ -1518,9 +1518,9 @@ public class Tuple_reasoning2 {
 					
 					c_views.add(update_c_view);
 					
-					HashSet<String> citations = gen_citation(update_c_view, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
+//					HashSet<String> citations = gen_citation(update_c_view, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
 					
-//					HashSet<String> citations = new HashSet<String>();
+					HashSet<String> citations = new HashSet<String>();
 					
 //					Vector<String> citations = populate_citation(update_c_view, vals, c, pst, citation_strings);
 					

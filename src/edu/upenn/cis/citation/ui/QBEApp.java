@@ -37,11 +37,13 @@ import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Reflection;
 import javafx.scene.Group;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -56,6 +58,7 @@ import javafx.util.Callback;
 import net.sf.jsqlparser.statement.select.FromItem;
 
 import org.apache.poi.poifs.property.Child;
+import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 
 import sun.tools.jar.resources.jar;
@@ -83,6 +86,8 @@ public class QBEApp extends Application {
 	private Tab dbaDataViewDataTab;
 	// citation view names connected with current dataview
 	private ObservableList<String> dbaListCitationViews;
+	//
+	private ObservableList<String> dbaListBlock;
 	
 	// private Scene newScene;
 	private Stage stage, citeStage;
@@ -97,6 +102,8 @@ public class QBEApp extends Application {
 	private final ObservableList<Entry> data = FXCollections.observableArrayList();
 	// table tuples in current citation
 	private final ObservableList<Entry> dataNew = FXCollections.observableArrayList();
+	// all citation queries
+	private final ObservableList<CQuery> dataQuery = FXCollections.observableArrayList();
 	List<String> lambdas = new ArrayList<>();
 
 	VBox vboxRightCQ = new VBox();
@@ -121,6 +128,8 @@ public class QBEApp extends Application {
 	private GridPane gridCitation, gridCitationSub;
 	private Tab citationDataViewDataTab;
 	
+	private Scene queryScene;
+	
 	// TreeView share across user & dba screens
 	private TreeItem<TreeNode> root;
 	List<TreeItem<TreeNode>> removedTreeItems = new ArrayList<>();
@@ -134,6 +143,8 @@ public class QBEApp extends Application {
 	String datalog = null;
 	String dv = ""; // The name of edited view
 	String cv = ""; // The name of edited citation
+	// citation query name hand over to queryScene
+	String listQuery = "";
 	// datalog text area in dba or user
 	TextArea datalogTextArea = new TextArea();
 	// datalog text area in citation builder
@@ -176,7 +187,7 @@ private Object String;
 		this.stage = stage;
 		this.citeStage = new Stage();
 		buildLoginScene();
-		buildDbaScene();
+//		buildDbaScene();
 		buildUserScene();
 		buildViewScene();
 		buildCitationScene();
@@ -335,7 +346,7 @@ private Object String;
         dropShadow.setOffsetX(1);
         dropShadow.setOffsetY(1);
         dropShadow.setRadius(2);
-		Text textDataLog = new Text("DataLog: ");
+		Text textDataLog = new Text("SQL: ");
         textDataLog.setId("text");
         textDataLog.setFont(Font.font("Courier New", FontWeight.BOLD, 18));
         textDataLog.setFill(Color.WHITE);
@@ -343,6 +354,7 @@ private Object String;
         hbox.getChildren().addAll(textDataLog, textFieldDataViewDataLog);
         HBox.setHgrow(textFieldDataViewDataLog, Priority.ALWAYS);
         hbox.setAlignment(Pos.CENTER);
+        hbox.setPadding(new Insets(5,0,0,0));
 
 		// Adding HBox
 		HBox hb = new HBox();
@@ -390,7 +402,7 @@ private Object String;
             if (!hbox.isVisible()) hbox.setVisible(true);
             List<Entry> list = new ArrayList<>();
     		list.addAll(data);
-    		if (textFieldDataViewDataLog != null) textFieldDataViewDataLog.setText(Util.convertToDatalogOriginal(list) + "\n");
+    		if (textFieldDataViewDataLog != null) textFieldDataViewDataLog.setText(Util.convertToSQLWithLambda(list, false));
     		data.clear();
         });
 		listViewDataViews.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -403,6 +415,7 @@ private Object String;
         buttonEditDataView.setOnAction(event -> {
         	dv = listViewDataViews.getSelectionModel().getSelectedItem();
         	if (dv == null || dv.isEmpty()) return;
+        	buildDbaScene();
 			stage.setScene(dbaScene);
             hbox.setVisible(false);
             if (dv == null) return;
@@ -423,6 +436,7 @@ private Object String;
         });
 		Button buttonAddDataView = new Button("Add");
 		buttonAddDataView.setOnAction(event -> {
+			buildDbaScene();
 			stage.setScene(dbaScene);
 			count ++;
 			String randomName = new java.lang.String();
@@ -493,6 +507,15 @@ private Object String;
 		listViewCitationView.setPrefWidth(400);
 		listViewCitationView.setStyle("-fx-font-size:15.0;");
 		listViewCitationView.setItems(listCitationViews);
+		listViewCitationView.setOnMouseClicked(event -> {
+			cv = listViewCitationView.getSelectionModel().getSelectedItem();
+			if (cv == null || cv.isEmpty()) return;
+			else {
+				if (!hbox.isVisible()) hbox.setVisible(true);
+				if (textFieldDataViewDataLog != null) textFieldDataViewDataLog.setText("Query SQL");
+				cv = "";
+			}
+		});
 		Button buttonAddCitationView = new Button("Add");
 		buttonAddCitationView.setOnAction(event -> {
 			dv = "";
@@ -873,61 +896,89 @@ private Object String;
 		vboxRight.setAlignment(Pos.CENTER);
         vboxRight.setMinWidth(180);
         vboxRight.setMaxWidth(180);
-        vboxRight.setPadding(new Insets(5,0,10,0));
+        vboxRight.setPadding(new Insets(8,0,2,0));
 
 		Label labelCv = new Label("Citation Queries");
 		labelCv.setId("prompt-text");
 		labelCv.setMinWidth(165);
 		labelCv.setStyle("-fx-font-size: 16px;");
 		
-		ListView<String> listViewCv = new ListView<>();
+//		ListView<String> listViewCv = new ListView<>();
+		HBox hboxQuery = new HBox();
+		ComboBox<String> comboBlock = new ComboBox<>();
+		hboxQuery.getChildren().addAll(comboBlock);
+//		listViewCv.setMinWidth(180);
+//		listViewCv.setCellFactory(lv -> {
+//			ListCell<String> cell = new ListCell<>();
+//			ContextMenu contextMenu = new ContextMenu();
+//			MenuItem editItem = new MenuItem();
+//			editItem.textProperty().bind(Bindings.format("Edit \"%s\"", cell.itemProperty()));
+//			editItem.setOnAction(event -> {
+//				String item = cell.getItem();
+//				// code to edit item...
+//				listQuery = item;
+//				buildQueryScene();
+//				citeStage.setScene(queryScene);
+//				citeStage.setTitle("Citation Query Content");
+//				citeStage.show();
+//			});
+//			MenuItem deleteItem = new MenuItem();
+//			deleteItem.textProperty().bind(Bindings.format("Delete \"%s\"", cell.itemProperty()));
+//			deleteItem.setOnAction(event -> listViewCv.getItems().remove(cell.getItem()));
+//			contextMenu.getItems().addAll(editItem, deleteItem);
+//			cell.textProperty().bind(cell.itemProperty());
+//			cell.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
+//				if (isNowEmpty) {
+//					cell.setContextMenu(null);
+//				} else {
+//					cell.setContextMenu(contextMenu);
+//				}
+//			});
+//			return cell;
+//		});
+		TableView<CQuery> listViewCv = new TableView<CQuery>();
+		listViewCv.setItems(dataQuery);
 		listViewCv.setMinWidth(180);
-		listViewCv.setCellFactory(lv -> {
-			ListCell<String> cell = new ListCell<>();
-			ContextMenu contextMenu = new ContextMenu();
-			MenuItem editItem = new MenuItem();
-			editItem.textProperty().bind(Bindings.format("Edit \"%s\"", cell.itemProperty()));
-			editItem.setOnAction(event -> {
-				String item = cell.getItem();
-				// code to edit item...
-			});
-			MenuItem deleteItem = new MenuItem();
-			deleteItem.textProperty().bind(Bindings.format("Delete \"%s\"", cell.itemProperty()));
-			deleteItem.setOnAction(event -> listViewCv.getItems().remove(cell.getItem()));
-			contextMenu.getItems().addAll(editItem, deleteItem);
-			cell.textProperty().bind(cell.itemProperty());
-			cell.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
-				if (isNowEmpty) {
-					cell.setContextMenu(null);
-				} else {
-					cell.setContextMenu(contextMenu);
-				}
-			});
-			return cell;
-		});
+		listViewCv.setEditable(true);
+		TableColumn<CQuery, String> nameCol = new TableColumn<CQuery, String>("Name");
+		TableColumn<CQuery, String> blockCol = new TableColumn<CQuery, String>("Block");
+		listViewCv.getColumns().addAll(nameCol, blockCol);
+		nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+		nameCol.setMinWidth(120);
+		blockCol.setMinWidth(60);
+		blockCol.setCellValueFactory(cellData -> cellData.getValue().blockProperty());
+		ObservableList<String> blockList = FXCollections.observableArrayList(
+				new java.lang.String("Author"),
+				new java.lang.String("Title"));
+		blockCol.setCellFactory(ComboBoxTableCell.forTableColumn(blockList));
+		
+		listViewCv.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		dbaListCitationViews = FXCollections.observableArrayList();
+		if (dv != null || !dv.isEmpty()) {
+			dbaListCitationViews.setAll(Database.getCitationViews(dv));
+			if (dbaListCitationViews == null || dbaListCitationViews.isEmpty()) {
+				for (int i = 0; i < dbaListCitationViews.size(); i ++ ) {
+					String qName = dbaListCitationViews.get(i);
+//					String qblock = 
+					dataQuery.add(new CQuery(qName, "+"));
+				}
+			}
+		}
 		
-		listViewCv.setItems(dbaListCitationViews);
-		
-		listViewCv.setOnMouseClicked(event -> {
-			String cv = listViewCv.getSelectionModel().getSelectedItem();
-			dbaListCitationViews.remove(cv);
-			try {
-				Query citationQuery = Query_operation.get_query_by_name(cv);
-				ObservableList<Entry> returnData = returnDataFromQuery(citationQuery);
-				List<Entry> list = new ArrayList<>();
-				list.addAll(returnData);
-				String queryContent = Util.convertToSQLWithLambda(list, false);
-				System.out.println(queryContent);
-			} catch (Exception e1) {
-				e1.printStackTrace();
+		listViewCv.setRowFactory(tv -> new TableRow<CQuery>() {
+			private Tooltip tp = new Tooltip();
+			public void updateItem (CQuery CQ, boolean empty) {
+				super.updateItem(CQ, empty);
+				if(CQ == null) {
+					setTooltip(null);
+				} else {
+					tp.setText(CQ.getName());
+					setTooltip(tp);;
+				}
 			}
 		});
-//		TextField tfDataView = new TextField();
-//		Label viewNameLabel = new Label("Citation View Name:");
 		
-		Button btDataViewExisted = new Button("Add Existed");
-        btDataViewExisted.setFont(Font.font("Courier New", FontWeight.BOLD, 12));
+		Button btDataViewExisted = new Button("Add");
         btDataViewExisted.setOnAction(e -> {
         	stage.setWidth(stage.getWidth()+230);
             Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
@@ -935,28 +986,8 @@ private Object String;
             stage.setY((primScreenBounds.getHeight() - stage.getHeight()) / 2);
         	gridDba.add(vboxRightCQ, 3, 0, 1, 2);
 		});
-		
-		Button btDataView = new Button("  Add New  ");
-        btDataView.setFont(Font.font("Courier New", FontWeight.BOLD, 12));
-        btDataView.setOnAction(e -> {
-			dataNew.clear();
-			datalogTextAreaNew.clear();
-			hBoxLambdaNew.getChildren().clear();
-			dataViewNew.getItems().clear();
-			dataViewNew.getColumns().clear();
-        	cv = "Untitled";
-			this.citeStage.setScene(citationScene);
-			this.citeStage.setTitle("Build Citation Query");
-			this.citeStage.show();
-//        	stage.setWidth(stage.getWidth()+230);
-//            Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
-//            stage.setX((primScreenBounds.getWidth() - stage.getWidth()) / 2);
-//            stage.setY((primScreenBounds.getHeight() - stage.getHeight()) / 2);
-//        	gridDba.add(vboxRightCQ, 3, 0, 1, 2);
-		});
         
 		Button btDataViewSave = new Button("Save");
-        btDataViewSave.setFont(Font.font("Courier New", FontWeight.BOLD, 12));
 		btDataViewSave.setOnAction(e -> {
 			if (listViewCv.getItems() == null || listViewCv.getItems().isEmpty()) {
 				Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -966,11 +997,20 @@ private Object String;
                 alert.showAndWait();
                 return;
 			}
+			// save a valid view before save the corresponding queries
+			if (data == null || data.isEmpty()) {
+				Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Alert");
+                alert.setHeaderText(null);
+                alert.setContentText("Pls save the view first!");
+                alert.showAndWait();
+                return;
+			}
 			for (int i = 0; i < listViewCv.getItems().size(); i++) {
-				String currentCQ = listViewCv.getItems().get(i);
+				String currentCQ = listViewCv.getItems().get(i).getName();
 				String block = "";
 				try {
-					Query_operation.add_connection_citation_with_query(dv, cv, block);
+					Query_operation.add_connection_citation_with_query(dv, currentCQ, block);
 					System.out.println("add " + currentCQ + " to " + dv);
 				} catch (Exception e1) {
 					System.out.println("Add new CQ connection error");
@@ -983,17 +1023,30 @@ private Object String;
             alert.showAndWait();
 			
 		});
+		Button btDataViewDelete = new Button("Delete");
+        btDataViewDelete.setOnAction(event -> {
+        	String cv = listViewCv.getSelectionModel().getSelectedItem().getName();
+        	CQuery CQ = listViewCv.getSelectionModel().getSelectedItem();
+        	if (cv !=null && !cv.isEmpty()) {
+        		dbaListCitationViews.remove(cv);
+        		dataQuery.remove(CQ);
+        	}
+
+        });
+        
 		VBox addSaveHBox = new VBox();
 		addSaveHBox.setVgrow(btDataViewExisted, Priority.ALWAYS);
 		addSaveHBox.setVgrow(btDataViewSave, Priority.ALWAYS);
-		addSaveHBox.setVgrow(btDataView, Priority.ALWAYS);
-		addSaveHBox.setSpacing(5);
-		addSaveHBox.setPadding(new Insets(0,0,5,5));
-		btDataView.setPrefWidth(250);
-		btDataViewExisted.setPrefWidth(250);
-		btDataViewSave.setPrefWidth(250);
-		addSaveHBox.getChildren().addAll(btDataView, btDataViewExisted, btDataViewSave);
-        addSaveHBox.setAlignment(Pos.BASELINE_LEFT);
+		addSaveHBox.setSpacing(2);
+		addSaveHBox.setPadding(new Insets(2,0,0,0));
+		btDataViewExisted.setId("buttonGen");
+		btDataViewSave.setId("buttonGen");
+		btDataViewDelete.setId("buttonGen");
+		btDataViewDelete.setPrefWidth(130);
+		btDataViewExisted.setPrefWidth(130);
+		btDataViewSave.setPrefWidth(130);
+		addSaveHBox.getChildren().addAll(btDataViewExisted, btDataViewDelete, btDataViewSave);
+        addSaveHBox.setAlignment(Pos.CENTER);
 
 		VBox.setVgrow(listViewCv, Priority.ALWAYS);
 		vboxRight.getChildren().addAll(labelCv, listViewCv, addSaveHBox);
@@ -1027,18 +1080,22 @@ private Object String;
 		listViewRightCQ.setOnMouseClicked(event -> {
 //			String dv = dbaDataViewDataTab.getText().split(":")[1].trim();
 			String cv = listViewRightCQ.getSelectionModel().getSelectedItem();
-			dbaListCitationViews.add(cv);
+			if (!dbaListCitationViews.contains(cv)) {
+				dbaListCitationViews.add(cv);
+				dataQuery.add(new CQuery(cv, ""));
+			}
 //			Database.insertDCTuple(dv, cv);
 		});
+		listViewRightCQ.setTooltip(new Tooltip("Select to add"));
 		ObservableList<String> listRightCitationViews = FXCollections.observableArrayList(Database.getCitationViews(null));
 		listViewRightCQ.setItems(listRightCitationViews);
 		
-		Label rightCQLabel = new Label("All Citation Views");
+		Label rightCQLabel = new Label("Existing Queries");
 		rightCQLabel.setId("prompt-text");
 		rightCQLabel.setMinWidth(180);
 		rightCQLabel.setStyle("-fx-font-size: 16px;");
 		
-		Button rightBtCQ = new Button("Hide");
+		Button rightBtCQ = new Button("Hide   ");
 		rightBtCQ.setId("buttonGen");
 		rightBtCQ.setOnAction(e -> {
         	gridDba.getChildren().remove(vboxRightCQ);
@@ -1047,15 +1104,36 @@ private Object String;
             stage.setX((primScreenBounds.getWidth() - stage.getWidth()) / 2);
             stage.setY((primScreenBounds.getHeight() - stage.getHeight()) / 2);
 		});
+		Button btDataView = new Button("Add New");
+		btDataView.setId("buttonGen");
+        btDataView.setOnAction(e -> {
+			dataNew.clear();
+			datalogTextAreaNew.clear();
+			hBoxLambdaNew.getChildren().clear();
+			dataViewNew.getItems().clear();
+			dataViewNew.getColumns().clear();
+        	cv = "Untitled";
+			this.citeStage.setScene(citationScene);
+			this.citeStage.setTitle("Build Citation Query");
+			this.citeStage.show();
+//        	stage.setWidth(stage.getWidth()+230);
+//            Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
+//            stage.setX((primScreenBounds.getWidth() - stage.getWidth()) / 2);
+//            stage.setY((primScreenBounds.getHeight() - stage.getHeight()) / 2);
+//        	gridDba.add(vboxRightCQ, 3, 0, 1, 2);
+		});
+		
 		// Right side pop-up selection citation queries
 		vboxRightCQ = new VBox();
 		vboxRightCQ.setMaxWidth(190);
         vboxRightCQ.setMinWidth(190);
+        vboxRightCQ.setSpacing(2);
 		vboxRightCQ.setAlignment(Pos.CENTER);
+		btDataView.setPrefWidth(130);
+		rightBtCQ.setPrefWidth(130);
 		VBox.setVgrow(listViewRightCQ, Priority.ALWAYS);
 		vboxRightCQ.setStyle("-fx-border-color: black;-fx-border-insets: 4;-fx-border-width: 2;-fx-border-style: dashed;-fx-border-radius: 5;");
-		vboxRightCQ.getChildren().addAll(rightCQLabel, listViewRightCQ, rightBtCQ);
-        vboxRightCQ.setAlignment(Pos.CENTER);
+		vboxRightCQ.getChildren().addAll(rightCQLabel, listViewRightCQ, btDataView, rightBtCQ);
 		
         gridDbaSub = new GridPane();
         gridDbaSub.setPadding(new Insets(2, 5, 2, 5));
@@ -1498,6 +1576,61 @@ private Object String;
 		citationScene = new Scene(gridCitation);
 		citationScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
     }
+    
+    private void buildQueryScene() {
+    	BorderPane borderPane = new BorderPane();
+    	borderPane.setPadding(new Insets(5));
+    	// TODO
+    	Label qName = new Label("Citation Query Name: " + listQuery);
+    	qName.setId("prompt-text");
+    	Label sql = new Label("SQL");
+    	sql.setFont(Font.font("Courier New", FontWeight.BOLD, 16));
+    	// retrieve the sql content
+    	String queryContent = "";
+    	if (listQuery == null || listQuery.isEmpty()) return;
+    	else {
+    		try {
+    			Query citationQuery = Query_operation.get_query_by_name(listQuery);
+    			ObservableList<Entry> returnData = returnDataFromQuery(citationQuery);
+    			List<Entry> list = new ArrayList<>();
+    			list.addAll(returnData);
+    			queryContent = Util.convertToSQLWithLambda(list, false);
+    		} catch (Exception e1) {
+    			e1.printStackTrace();
+    		}
+    	}
+    	System.out.println(queryContent);
+    	TextArea textSQL = new TextArea();
+    	textSQL.setText(queryContent);
+    	HBox hboxSQL = new HBox();
+    	hboxSQL.setSpacing(5);
+    	hboxSQL.setPadding(new Insets(5));
+    	hboxSQL.getChildren().addAll(sql, textSQL);
+    	HBox hboxBlock = new HBox();
+    	hboxBlock.setSpacing(5);
+    	hboxBlock.setPadding(new Insets(5));
+    	ComboBox<String> block = buildBlock();
+    	
+    	Button saveBlock = new Button("Save");
+    	saveBlock.setOnAction(event -> {
+    		String blockValue = block.getValue();
+    	});
+    	hboxBlock.getChildren().addAll(block, saveBlock);
+    	hboxBlock.setAlignment(Pos.BASELINE_RIGHT);
+    	borderPane.setCenter(hboxSQL);
+    	borderPane.setTop(qName);
+    	borderPane.setBottom(hboxBlock);
+        queryScene = new Scene(borderPane);
+		queryScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
+    }
+    
+    private ComboBox<String> buildBlock() {
+    	ComboBox<String> block = new ComboBox<>();
+    	block.getItems().addAll("Author","Title");
+		block.setValue("Select Block");
+    	return block;
+    }
+    
 	/* ===================================================================
 	 * Supplement methods
 	 */
@@ -2396,6 +2529,11 @@ private Object String;
         }
         return returnData;
         
+	}
+	
+	private void setCQ(String dv) {
+		Vector<String> block_names = new Vector<String>();
+		Query_operation.getC
 	}
 
 }

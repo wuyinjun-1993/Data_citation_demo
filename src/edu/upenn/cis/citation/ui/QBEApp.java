@@ -12,6 +12,7 @@ import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.dao.Database;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.reasoning.Tuple_reasoning2;
+import edu.upenn.cis.citation.user_query.query_storage;
 import java_cup.internal_error;
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
@@ -378,9 +379,14 @@ private Object String;
 		Button signOut = new Button("Sign Out");
 		signOut.setFont(Font.font("Courier New", FontWeight.BLACK, 14));
 		hb.setSpacing(650);
-		signOut.setId("ButtonGen");
+		signOut.setId("buttonGen");
 		signOut.setAlignment(Pos.CENTER_RIGHT);
 		hb.getChildren().addAll(text, signOut );
+		signOut.setOnAction(e ->{
+			data.clear();
+			dataViewList.clear();
+			this.stage.setScene(loginScene);
+		});
 
 		// Reflection for gridPane
 		BorderPane bp = new BorderPane();
@@ -1758,10 +1764,31 @@ private Object String;
 		
 		HBox hBox = new HBox();
 		hBox.setAlignment(Pos.CENTER_RIGHT);
+		hBox.setSpacing(5);
 		Button button = new Button("Copy Selected Citation");
 		button.setId("prevnext");
 		GridPane.setHgrow(hBox, Priority.ALWAYS);
-		hBox.getChildren().add(button);
+		
+		Button save = new Button("Save Citation");
+		save.setId("prevnext");
+		save.setOnAction(event ->{
+			String name = "CiteQ" + count;
+			Query citeQuery = addQueryByName(name, data);
+			Vector<Integer> id_list = new Vector<Integer>();
+			if (ids != null || !ids.isEmpty()) {
+				for (int id : ids) {
+					id_list.add(id);
+				}
+			}
+			try {
+				int query_list_id = query_storage.store_query(citeQuery, id_list);
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			count++;
+		});
+		hBox.getChildren().addAll(button, save);
 		gridCg.add(hBox, 0, 1);
 		
 		return gridCg;

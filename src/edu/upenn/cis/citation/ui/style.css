@@ -104,3 +104,25 @@
     -fx-font-size: 15px;
     -fx-font-weight: bold;
 }
+
+#CQ-combo {
+	-fx-pref-width:75;
+	-fx-background-color: transparent;
+}
+
+#CQ-combo:filled {
+	-fx-background-size:29,29;
+	-fx-background-image: url("arrow.png");
+    -fx-background-repeat: no-repeat; 
+    -fx-background-position: right;
+	/*-fx-shape-size: 10, 10;*/
+}
+
+#CQ-combo-popup.list-view {
+	-fx-pref-width:75;
+}
+
+#CQ-combo .arrow {
+    -fx-padding: 3;
+    /*-fx-shape: "M150 0 L150 0 L0 280 L300 280 M0 370 L300 370 L150 670 L150 670 Z";*/
+}

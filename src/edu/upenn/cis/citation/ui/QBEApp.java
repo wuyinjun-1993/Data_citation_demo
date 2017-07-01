@@ -10,6 +10,7 @@ import edu.upenn.cis.citation.citation_view.Head_strs;
 //import edu.upenn.cis.citation.Pre_processing.insert_new_view;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.dao.Database;
+import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.reasoning.Tuple_reasoning2;
 import java_cup.internal_error;
 import javafx.application.Application;
@@ -39,14 +40,17 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Reflection;
 import javafx.scene.Group;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
@@ -78,6 +82,7 @@ import java.sql.*;
 import java.util.*;
 import java.util.List;
 
+
 public class QBEApp extends Application {
 
 	private Scene loginScene;
@@ -85,9 +90,9 @@ public class QBEApp extends Application {
 
 	private Tab dbaDataViewDataTab;
 	// citation view names connected with current dataview
-	private ObservableList<String> dbaListCitationViews;
+	private ObservableList<String> dbaListCitationViews = FXCollections.observableArrayList();
 	//
-	private ObservableList<String> dbaListBlock;
+	private ObservableList<String> dbaListBlock = FXCollections.observableArrayList();
 	
 	// private Scene newScene;
 	private Stage stage, citeStage;
@@ -341,7 +346,9 @@ private Object String;
 	 * Show all data view and citation views */
 	private void buildViewScene() {
         HBox hbox = new HBox();
-        TextField textFieldDataViewDataLog = new TextField();
+        TextArea textFieldDataViewDataLog = new TextArea();
+        textFieldDataViewDataLog.setEditable(false);
+        textFieldDataViewDataLog.setPrefHeight(60);
         DropShadow dropShadow = new DropShadow();
         dropShadow.setOffsetX(1);
         dropShadow.setOffsetY(1);
@@ -358,7 +365,7 @@ private Object String;
 
 		// Adding HBox
 		HBox hb = new HBox();
-		hb.setPadding(new Insets(20, 20, 20, 30));
+		hb.setPadding(new Insets(20,20, 20, 30));
 		DropShadow dropShadow_2 = new DropShadow();
         dropShadow_2.setOffsetX(2);
         dropShadow_2.setOffsetY(2);
@@ -367,7 +374,13 @@ private Object String;
 		text.setId("text");
 		text.setFont(Font.font("Courier New", FontWeight.BOLD, 28));
 		text.setEffect(dropShadow_2);
-		hb.getChildren().add(text);
+		
+		Button signOut = new Button("Sign Out");
+		signOut.setFont(Font.font("Courier New", FontWeight.BLACK, 14));
+		hb.setSpacing(650);
+		signOut.setId("ButtonGen");
+		signOut.setAlignment(Pos.CENTER_RIGHT);
+		hb.getChildren().addAll(text, signOut );
 
 		// Reflection for gridPane
 		BorderPane bp = new BorderPane();
@@ -402,7 +415,7 @@ private Object String;
             if (!hbox.isVisible()) hbox.setVisible(true);
             List<Entry> list = new ArrayList<>();
     		list.addAll(data);
-    		if (textFieldDataViewDataLog != null) textFieldDataViewDataLog.setText(Util.convertToSQLWithLambda(list, false));
+    		if (textFieldDataViewDataLog != null) textFieldDataViewDataLog.setText(splitSQL(Util.convertToSQLWithLambda(list, false)));
     		data.clear();
         });
 		listViewDataViews.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -415,12 +428,14 @@ private Object String;
         buttonEditDataView.setOnAction(event -> {
         	dv = listViewDataViews.getSelectionModel().getSelectedItem();
         	if (dv == null || dv.isEmpty()) return;
+        	dataQuery.clear();
+        	setCQ(dv);
         	buildDbaScene();
 			stage.setScene(dbaScene);
             hbox.setVisible(false);
             if (dv == null) return;
             dbaDataViewDataTab.setText("Data View: " + dv);
-            dbaListCitationViews.setAll(Database.getCitationViews(dbaDataViewDataTab.getText().split(":")[1].trim()));
+//            dbaListCitationViews.setAll(Database.getCitationViews(dbaDataViewDataTab.getText().split(":")[1].trim()));
 //            dbaListCitationViews.setAll(Database.getCitationViews(dv));
             Query currentQuery;
 			data.clear();
@@ -436,6 +451,10 @@ private Object String;
         });
 		Button buttonAddDataView = new Button("Add");
 		buttonAddDataView.setOnAction(event -> {
+			dataQuery.clear();
+			dbaListCitationViews = FXCollections.observableArrayList();
+			dbaListCitationViews.clear();
+			dbaListBlock.clear();
 			buildDbaScene();
 			stage.setScene(dbaScene);
 			count ++;
@@ -464,14 +483,15 @@ private Object String;
 //            dbaListCitationViews.remove(dv);
 //            Database.deleteDataViewByName(dv);
             try {
-				view_operation.delete_view_by_name(dv);
 				citation_view_operation.delete_connection_view_with_citations(dv, dv);
 				citation_view_operation.delete_citation_views(dv);
-				Alert alert = new Alert(Alert.AlertType.INFORMATION);
-	            alert.setTitle("Succeed");
-	            alert.setHeaderText(null);
-	            alert.setContentText("The data view is successfully deleted");
-	            alert.showAndWait();
+				view_operation.delete_view_by_name(dv);
+//				Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//	            alert.setTitle("Succeed");
+//	            alert.setHeaderText(null);
+//	            alert.setContentText("The data view is successfully deleted");
+//	            alert.showAndWait();
+				System.out.println("The data view is successfully deleted");
 				listDataViews.remove(dv);
 			} catch (Exception e) {
 				System.out.println("view delete error");
@@ -512,8 +532,15 @@ private Object String;
 			if (cv == null || cv.isEmpty()) return;
 			else {
 				if (!hbox.isVisible()) hbox.setVisible(true);
-				if (textFieldDataViewDataLog != null) textFieldDataViewDataLog.setText("Query SQL");
-				cv = "";
+				try {
+					Query q_datalog = Query_operation.get_query_by_name(cv);
+					String q_sql = Query_converter.datalog2sql(q_datalog);
+					if (textFieldDataViewDataLog != null) textFieldDataViewDataLog.setText(splitSQL(q_sql));
+					cv = "";
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
 			}
 		});
 		Button buttonAddCitationView = new Button("Add");
@@ -536,11 +563,12 @@ private Object String;
 			try {
 //				citation_view_operation.delete_citation_views(cv);
 				Query_operation.delete_query_by_name(cv);
-				Alert alert = new Alert(Alert.AlertType.INFORMATION);
-	            alert.setTitle("Succeed");
-	            alert.setHeaderText(null);
-	            alert.setContentText("The citation query view is successfully deleted");
-	            alert.showAndWait();
+//				Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//	            alert.setTitle("Succeed");
+//	            alert.setHeaderText(null);
+//	            alert.setContentText("The citation query view is successfully deleted");
+//	            alert.showAndWait();
+				System.out.println("The citation query view is successfully deleted");
 	            listCitationViews.remove(cv);
 			} catch (Exception e) {
 				System.out.println("citation delete error!");
@@ -737,6 +765,7 @@ private Object String;
 					e1.printStackTrace();
 				}
 			}
+			System.out.println("[Citation List] " + listCitations);
 			GridPane gridCg = buildGridCg(listCitations);
 			this.citeStage.setScene(new Scene(gridCg, 500, 300));
 			this.citeStage.setTitle("Citations");
@@ -907,7 +936,6 @@ private Object String;
 		HBox hboxQuery = new HBox();
 		ComboBox<String> comboBlock = new ComboBox<>();
 		hboxQuery.getChildren().addAll(comboBlock);
-//		listViewCv.setMinWidth(180);
 //		listViewCv.setCellFactory(lv -> {
 //			ListCell<String> cell = new ListCell<>();
 //			ContextMenu contextMenu = new ContextMenu();
@@ -944,39 +972,75 @@ private Object String;
 		TableColumn<CQuery, String> blockCol = new TableColumn<CQuery, String>("Block");
 		listViewCv.getColumns().addAll(nameCol, blockCol);
 		nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-		nameCol.setMinWidth(120);
-		blockCol.setMinWidth(60);
-		blockCol.setCellValueFactory(cellData -> cellData.getValue().blockProperty());
+		nameCol.setMinWidth(100);
+		nameCol.setStyle( "-fx-alignment: CENTER-LEFT;");
+		blockCol.setMinWidth(75);
+		blockCol.setStyle( "-fx-alignment: CENTER-LEFT;");
+//		blockCol.setCellValueFactory(cellData -> cellData.getValue().blockProperty());
+		blockCol.setCellValueFactory(new PropertyValueFactory<>("block"));
 		ObservableList<String> blockList = FXCollections.observableArrayList(
 				new java.lang.String("Author"),
 				new java.lang.String("Title"));
-		blockCol.setCellFactory(ComboBoxTableCell.forTableColumn(blockList));
+//		blockCol.setCellFactory(ComboBoxTableCell.forTableColumn(blockList));
+		blockCol.setCellFactory(new Callback<TableColumn<CQuery,String>, TableCell<CQuery,String>>() {
+			public TableCell<CQuery, String> call(TableColumn<CQuery,String> tc) {
+//				TableCell<CQuery, String> cell = new TableCell<CQuery, String>(){
+//					protected void updateItem(final String item, boolean empty) {
+//						super.updateItem(item, empty);
+//						ComboBox combo = new ComboBox(blockList);
+//						if (item != null && !empty) {
+//							setGraphic(combo);
+//							combo.setValue(item);
+//						}
+//					}
+//				};
+				TableCell<CQuery, String> cell = new ComboBoxTableCell<CQuery, String>(blockList);
+				cell.setBackground(Background.EMPTY);
+			    cell.setId("CQ-combo");
+				return cell;
+			}
+		});
 		
 		listViewCv.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-		dbaListCitationViews = FXCollections.observableArrayList();
-		if (dv != null || !dv.isEmpty()) {
-			dbaListCitationViews.setAll(Database.getCitationViews(dv));
-			if (dbaListCitationViews == null || dbaListCitationViews.isEmpty()) {
-				for (int i = 0; i < dbaListCitationViews.size(); i ++ ) {
-					String qName = dbaListCitationViews.get(i);
-//					String qblock = 
-					dataQuery.add(new CQuery(qName, "+"));
-				}
-			}
-		}
-		
-		listViewCv.setRowFactory(tv -> new TableRow<CQuery>() {
+		// setTooltip to the each query name on each row
+		nameCol.setCellFactory(col -> new TextFieldTableCell<CQuery, String>(){
 			private Tooltip tp = new Tooltip();
-			public void updateItem (CQuery CQ, boolean empty) {
-				super.updateItem(CQ, empty);
-				if(CQ == null) {
+			public void updateItem (String name, boolean empty) {
+				super.updateItem(name, empty);
+				if(name == null|| name.isEmpty()) {
 					setTooltip(null);
 				} else {
-					tp.setText(CQ.getName());
-					setTooltip(tp);;
+					try {
+						Query query_datalog = Query_operation.get_query_by_name(name);
+						String query_sql = Query_converter.datalog2sql(query_datalog);
+						query_sql = splitSQL(query_sql);
+						tp.setText(query_sql);
+						setTooltip(tp);
+					} catch (ClassNotFoundException | SQLException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		});
+//		listViewCv.setRowFactory(tv -> new TableRow<CQuery>() {
+//			private Tooltip tp = new Tooltip();
+//			public void updateItem (CQuery CQ, boolean empty) {
+//				super.updateItem(CQ, empty);
+//				if(CQ == null || empty) {
+//					setTooltip(null);
+//				} else {
+//					try {
+//						Query query_datalog = Query_operation.get_query_by_name(CQ.getName());
+//						String query_sql = Query_converter.datalog2sql(query_datalog);
+//						query_sql = splitSQL(query_sql);
+//						tp.setText(query_sql);
+//						setTooltip(tp);
+//					} catch (ClassNotFoundException | SQLException e) {
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+//		});
 		
 		Button btDataViewExisted = new Button("Add");
         btDataViewExisted.setOnAction(e -> {
@@ -1006,16 +1070,28 @@ private Object String;
                 alert.showAndWait();
                 return;
 			}
+			Vector<String[]> qname_block = new Vector<String[]>();
 			for (int i = 0; i < listViewCv.getItems().size(); i++) {
-				String currentCQ = listViewCv.getItems().get(i).getName();
-				String block = "";
-				try {
-					Query_operation.add_connection_citation_with_query(dv, currentCQ, block);
-					System.out.println("add " + currentCQ + " to " + dv);
-				} catch (Exception e1) {
-					System.out.println("Add new CQ connection error");
-					e1.printStackTrace();
+				CQuery CQ = listViewCv.getItems().get(i);
+				String q_name = CQ.getName();
+				String b_name = CQ.getBlock();
+				if (b_name == null || b_name.isEmpty()) {
+					Alert alert = new Alert(Alert.AlertType.WARNING);
+		            alert.setHeaderText(null);
+		            alert.setContentText("Specify block to each query before save!");
+		            alert.showAndWait();
+					return;
 				}
+				String[] q_b = {q_name, b_name};
+				qname_block.add(q_b);
+			}
+			try {
+				Query_operation.delete_connection_citation_with_query(dv);
+				System.out.println("[name+block] " + qname_block);
+				Query_operation.add_connection_citation_with_query(dv, qname_block);
+			} catch (Exception e1) {
+				System.out.println("Add new CQ connection error");
+				e1.printStackTrace();
 			}
 			Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setHeaderText(null);
@@ -1025,10 +1101,12 @@ private Object String;
 		});
 		Button btDataViewDelete = new Button("Delete");
         btDataViewDelete.setOnAction(event -> {
-        	String cv = listViewCv.getSelectionModel().getSelectedItem().getName();
         	CQuery CQ = listViewCv.getSelectionModel().getSelectedItem();
+        	String cv = CQ.getName();
+        	String bname = CQ.getBlock();
         	if (cv !=null && !cv.isEmpty()) {
         		dbaListCitationViews.remove(cv);
+        		dbaListBlock.remove(bname);
         		dataQuery.remove(CQ);
         	}
 
@@ -1054,41 +1132,62 @@ private Object String;
 		
 		ListView<String> listViewRightCQ = new ListView<String>();
 		listViewRightCQ.setMinWidth(180);
-		listViewRightCQ.setCellFactory(lv -> {
-			ListCell<String> cell = new ListCell<>();
-			ContextMenu contextMenu = new ContextMenu();
-			MenuItem editItem = new MenuItem();
-			editItem.textProperty().bind(Bindings.format("Edit \"%s\"", cell.itemProperty()));
-			editItem.setOnAction(event -> {
-				String item = cell.getItem();
-				// code to edit item...
-			});
-			MenuItem deleteItem = new MenuItem();
-			deleteItem.textProperty().bind(Bindings.format("Delete \"%s\"", cell.itemProperty()));
-			deleteItem.setOnAction(event -> listViewCv.getItems().remove(cell.getItem()));
-			contextMenu.getItems().addAll(editItem, deleteItem);
-			cell.textProperty().bind(cell.itemProperty());
-			cell.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
-				if (isNowEmpty) {
-					cell.setContextMenu(null);
-				} else {
-					cell.setContextMenu(contextMenu);
-				}
-			});
-			return cell;
-		});
+//		listViewRightCQ.setCellFactory(lv -> {
+//			ListCell<String> cell = new ListCell<String>();
+//			ContextMenu contextMenu = new ContextMenu();
+//			MenuItem editItem = new MenuItem();
+//			editItem.textProperty().bind(Bindings.format("Edit \"%s\"", cell.itemProperty()));
+//			editItem.setOnAction(event -> {
+//				String item = cell.getItem();
+//				// code to edit item...
+//			});
+//			MenuItem deleteItem = new MenuItem();
+//			deleteItem.textProperty().bind(Bindings.format("Delete \"%s\"", cell.itemProperty()));
+//			deleteItem.setOnAction(event -> listViewCv.getItems().remove(cell.getItem()));
+//			contextMenu.getItems().addAll(editItem, deleteItem);
+//			cell.textProperty().bind(cell.itemProperty());
+//			cell.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
+//				if (isNowEmpty) {
+//					cell.setContextMenu(null);
+//				} else {
+//				}
+//			});
+//			return cell;
+//		});
+		
 		listViewRightCQ.setOnMouseClicked(event -> {
 //			String dv = dbaDataViewDataTab.getText().split(":")[1].trim();
 			String cv = listViewRightCQ.getSelectionModel().getSelectedItem();
+			System.out.println(dbaListCitationViews.contains(cv));
 			if (!dbaListCitationViews.contains(cv)) {
 				dbaListCitationViews.add(cv);
-				dataQuery.add(new CQuery(cv, ""));
+				dataQuery.add(new CQuery(cv, "Undef"));
 			}
 //			Database.insertDCTuple(dv, cv);
 		});
-		listViewRightCQ.setTooltip(new Tooltip("Select to add"));
-		ObservableList<String> listRightCitationViews = FXCollections.observableArrayList(Database.getCitationViews(null));
-		listViewRightCQ.setItems(listRightCitationViews);
+		listViewRightCQ.setItems(listCitationViews);
+		
+		// set Tooltip to each cell of listViewRightCQ
+		listViewRightCQ.setCellFactory(col ->
+			new TextFieldListCell<String>(){
+				private Tooltip tp = new Tooltip();
+				public void updateItem (String name, boolean empty) {
+					super.updateItem(name, empty);
+					if(name == null|| name.isEmpty()) {
+						setTooltip(null);
+					} else {
+						try {
+							Query query_datalog = Query_operation.get_query_by_name(name);
+							String query_sql = Query_converter.datalog2sql(query_datalog);
+							query_sql = splitSQL(query_sql);
+							tp.setText(query_sql);
+							setTooltip(tp);
+						} catch (ClassNotFoundException | SQLException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+		});
 		
 		Label rightCQLabel = new Label("Existing Queries");
 		rightCQLabel.setId("prompt-text");
@@ -1541,6 +1640,8 @@ private Object String;
     				if (!dbaListCitationViews.contains(cv)) {
     					Query_operation.add(currentQuery, cv);
         				dbaListCitationViews.add(cv);
+        				dataQuery.add(new CQuery(cv, "Undef"));
+        				listCitationViews.add(cv);
         				Alert alert = new Alert(Alert.AlertType.INFORMATION);
                         alert.setTitle("Succeed");
                         alert.setHeaderText(null);
@@ -2533,7 +2634,69 @@ private Object String;
 	
 	private void setCQ(String dv) {
 		Vector<String> block_names = new Vector<String>();
-//		Query_operation.getC
+		if (dv !=null && !dv.isEmpty()) {
+			try {
+				Vector<String> q_names = Query_operation.get_connection_citation_with_query(dv, block_names);
+				System.out.println("[query_names] " + q_names);
+				System.out.println("[block_names] " + block_names);
+				List<String> list_q = new ArrayList<>();
+				List<String> list_b = new ArrayList<>();
+				for (int i = 0; i < q_names.size(); i++) {
+					if (!list_q.contains(q_names.get(i)))
+						list_q.add(q_names.get(i));
+					if (!list_b.contains(block_names.get(i)))
+						list_b.add(block_names.get(i));
+				}
+				dbaListCitationViews = FXCollections.observableArrayList();
+				dbaListBlock = FXCollections.observableArrayList();
+				dbaListCitationViews.clear();
+				dbaListBlock.clear();
+				dbaListCitationViews.setAll(list_q);
+				dbaListBlock.setAll(list_b);
+				
+				if (dv != null || !dv.isEmpty()) {
+					if (dbaListCitationViews != null && !dbaListCitationViews.isEmpty()) {
+						for (int i = 0; i < dbaListCitationViews.size(); i ++ ) {
+							String qName = q_names.get(i);
+							String qblock = block_names.get(i);
+//							if (dbaListBlock != null && !dbaListBlock.isEmpty()){
+//								try {
+//									qblock = dbaListBlock.get(i);
+//								} catch (IndexOutOfBoundsException e){ }
+//							}
+							dataQuery.add(new CQuery(qName, qblock));
+						}
+					}
+				}
+			} catch (ClassNotFoundException | SQLException e) {
+				e.printStackTrace();
+			}
+		}
 	}
+	
+	private String splitSQL (String query) {
+		String splitSQL = "";
+		String[] q1 = null;
+		String[] q2 = null;
+		if (query.contains("from")) {
+			q1 = query.split("from");
+			splitSQL = q1[0].trim() + "\n";
+			if (q1[1].contains("where")) {
+				q2 = q1[1].split("where");
+				splitSQL += "from " + q2[0].trim() + "\n" + "where " + q2[1].trim();
+			}
+		} else if (query.contains("FROM")){
+			 q1 = query.split("FROM");
+			 splitSQL = q1[0].trim() + "\n";
+			 if (q1[1].contains("WHERE")) {
+				 q2 = q1[1].split("WHERE");
+				 splitSQL += "FROM " + q2[0].trim() + "\n" + "WHERE " + q2[1].trim();
+				 }
+		} else
+			splitSQL = query;
+		return splitSQL;
+	}
+	
+
 
 }

@@ -84,7 +84,9 @@ public class Util {
         for (Entry e : list) {
         	if (e.getJoin() != null && !e.getJoin().isEmpty()) {
         		String[] join = e.getJoin().split("\\.");
-                sb.append(join[0].substring(1, join[0].length()) + "()" + ", ");
+        		String joinTable = join[0].substring(1, join[0].length());
+        		if (!tables.contains(joinTable))
+        			sb.append(join[0].substring(1, join[0].length()) + "()" + ", ");
             }
             if (e.getCriteria() != null && !e.getCriteria().isEmpty()) {
                 sb.append(e.getTable() + "." + e.getField() + " " + e.getCriteria() + ", ");

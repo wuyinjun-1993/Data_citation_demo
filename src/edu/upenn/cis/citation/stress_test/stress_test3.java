@@ -37,6 +37,8 @@ public class stress_test3 {
 	
 	static int view_max_size = 40;
 	
+	static int upper_bound = 20;
+	
 	static int query_num = 4;
 	
 	static Vector<String> get_unique_relation_names(Query query)
@@ -134,9 +136,9 @@ public class stress_test3 {
 		
 //		HashSet<Query> views = view_generator.generate_store_views(relation_names, num_views, query.body.size(), query);
 		
-		int view_size = 0;
+		int view_size = 2;
 		
-		int view_id = 0;
+		int view_id = views.size();
 		
 		while(true)
 		{
@@ -329,9 +331,9 @@ public class stress_test3 {
 			
 			
 			
-			boolean finished = view_generator.gen_views_with_n_subgoals(k, id, upper_bound);
+			view_id = view_generator.gen_views_with_n_subgoals(view_size, view_id, upper_bound);
 			
-			if(finished)
+			if(view_id >= upper_bound)
 				break;
 			
 			

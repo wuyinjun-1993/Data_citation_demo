@@ -41,11 +41,12 @@ public class populate_db {
 //	public static String[] base_tables = {"gpcr","object","interaction","ligand","pathophysiology","interaction_affinity_refs","gtip_process","process_assoc","disease", "family", "introduction"};
 
 
-	public static String db_url = "jdbc:postgresql://citedb.cx9xmwhyomib.us-east-1.rds.amazonaws.com:5432/iuphar";
 //	public static String db_url = "jdbc:postgresql://localhost:5432/test";
 //	public static String db_url = "jdbc:postgresql://citedb.cx9xmwhyomib.us-east-1.rds.amazonaws.com:5432/iuphar";
-	public static String []default_table_names = {"view_table", "view2subgoals", "view2lambda_term", "view2conditions", "citation_table", "citation2view", "citation2query", "query2head_variables", "query2conditions", "query2head_variables", "query2subgoal"};
+	public static String []default_table_names = {"view_table", "view2subgoals", "view2lambda_term", "view2conditions", "citation_table", "citation2view", "citation2query", "query2head_variables", "query2conditions", "query2head_variables", "query2subgoal", "user_query_table", "user_query2conditions", "user_query2subgoals"};
 	
+	public static String db_url = "jdbc:postgresql://localhost:5432/test";
+
 
 	public static String usr_name = "postgres";
 	

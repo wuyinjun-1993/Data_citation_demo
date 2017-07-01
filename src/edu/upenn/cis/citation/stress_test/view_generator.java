@@ -18,6 +18,7 @@ import edu.upenn.cis.citation.Corecover.Argument;
 import edu.upenn.cis.citation.Corecover.Lambda_term;
 import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Corecover.Subgoal;
+import edu.upenn.cis.citation.Corecover.UserLib;
 import edu.upenn.cis.citation.Operation.Conditions;
 import edu.upenn.cis.citation.Operation.Operation;
 import edu.upenn.cis.citation.Operation.op_equal;
@@ -326,9 +327,84 @@ public class view_generator {
 		
 	}
 	
+	public static Vector<Query> gen_default_views() throws SQLException, ClassNotFoundException
+	{
+		initial();
+		
+		Connection c = null;
+	      PreparedStatement pst = null;
+		Class.forName("org.postgresql.Driver");
+	    c = DriverManager
+	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
+	    
+	    
+	    get_joinable_relations(c, pst);
+	    
+	    clear_views(c, pst);
+	    
+	    clear_other_tables(c, pst);
+	    
+	    populate_db.renew_table(c, pst);
+	    
+	    Vector<Query> views = new Vector<Query>();
+		
+		for(int i = 0; i<citatable_tables.length; i++)
+		{
+			Query view = generate_default_view(citatable_tables[i], i, c, pst);
+			
+			views.add(view);
+		}
+		
+		c.close();
+		
+		return views;
+	}
+	
+	public static int gen_views_with_n_subgoals(int n, int id, int upper_bound) throws SQLException, ClassNotFoundException
+	{
+		Connection c = null;
+	      PreparedStatement pst = null;
+		Class.forName("org.postgresql.Driver");
+	    c = DriverManager
+	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
+		
+		HashSet<String> relation_names = new HashSet<String>();
+		
+		Vector<Query> queries = new Vector<Query>();
+		
+		relation_names.addAll(Arrays.asList(citatable_tables));
+		
+		HashSet relation_sets = UserLib.genSubsets(relation_names, n);
+		
+		for(Iterator iter = relation_sets.iterator(); iter.hasNext();)
+		{
+			HashSet<String> relation_subset = (HashSet<String>) iter.next();
+			
+			Vector<String> relation_seq = new Vector<String>();
+			
+			relation_seq.addAll(relation_subset);
+			
+			Query view = generate_views_with_n_subgoals_without_predicates(relation_seq, id, c, pst);
+			
+			queries.add(view);
+			
+			id++;
+			
+			if(id == upper_bound)
+			{
+				break;
+			}
+		}
+				
+		c.close();
+		
+		return id;
+		
+	}
+	
 	public static void clear_other_tables(Connection c, PreparedStatement pst) throws SQLException
 	{
-		String [] tables = {"citation2query", "citation2view", "citation_table"};
+		String [] tables = {"citation2query", "citation2view", "citation_table", "query2subgoal", "query2lambda_term", "query2conditions", "query2head_variables"};
 		
 		for(int i = 0; i<tables.length; i++)
 		{
@@ -957,6 +1033,68 @@ public class view_generator {
 		return new Query(name, new Subgoal(name, heads), body, lambda_terms, predicates, maps);
 	}
 	
+	static Query generate_default_view(String subgoal_name, int id, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	{		
+		Vector<Argument> heads = new Vector<Argument>();
+		
+		Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();
+		
+		Vector<Conditions> local_predicates = new Vector<Conditions>();
+		
+		HashMap<String, String> maps = new HashMap<String, String>();
+		
+		Vector<Subgoal> body = new Vector<Subgoal>();
+		
+		maps.put(subgoal_name, subgoal_name);
+		
+		HashMap<String, String> attr_types = get_attr_types(subgoal_name, c, pst);
+		
+		
+		Set<String> attr_names = attr_types.keySet();
+		
+		Vector<String> attr_list = new Vector<String> ();
+		
+		attr_list.addAll(attr_names);
+		
+		Vector<Argument> head_vars = gen_default_head_vars(subgoal_name, attr_list, c, pst);
+		
+		
+		Vector<Lambda_term> l_terms = gen_default_lambda_terms(subgoal_name, c, pst);
+		
+		heads.addAll(head_vars);
+		
+		lambda_terms.addAll(l_terms);
+		
+		Vector<Argument> args = new Vector<Argument>();
+		
+		body.add(new Subgoal(subgoal_name, args));
+		
+		String name = "v" + id;
+		
+		Vector<Conditions> global_predicates = gen_global_conditions(body);
+		
+		Vector<Conditions> predicates = new Vector<Conditions>();
+		
+		predicates.addAll(global_predicates);
+		
+		predicates.addAll(local_predicates);
+		
+		Query view =  new Query(name, new Subgoal(name, heads), body, lambda_terms, predicates, maps);
+		
+		view_operation.add(view, view.name);
+		
+		citation_view_operation.add_citation_view("c" + id);
+		
+		citation_view_operation.add_connection_view_with_citations("c" + id, name);
+		
+		store_citation_queries(view, id, c, pst);
+		
+		Query_operation.add_connection_citation_with_query("c" + id, "q" + id , "author");
+		
+		
+		return view;
+	}
+	
 	static Query generate_view_without_predicates(Vector<String> subgoal_names, int id, int size, Connection c, PreparedStatement pst) throws SQLException
 	{
 		Random r = new Random();
@@ -1027,15 +1165,88 @@ public class view_generator {
 		
 		String name = "v" + id;
 		
-//		Vector<Conditions> global_predicates = gen_global_conditions(body);
+		Vector<Conditions> global_predicates = gen_global_conditions(body);
 		
 		Vector<Conditions> predicates = new Vector<Conditions>();
 		
-//		predicates.addAll(global_predicates);
+		predicates.addAll(global_predicates);
 		
 		predicates.addAll(local_predicates);
 		
 		return new Query(name, new Subgoal(name, heads), body, lambda_terms, predicates, maps);
+	}
+	
+	static Query generate_views_with_n_subgoals_without_predicates(Vector<String> subgoal_names, int id, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	{		
+		HashSet<String> relation_names = new HashSet<String>();
+		
+		Vector<Argument> heads = new Vector<Argument>();
+		
+		Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();
+		
+		Vector<Conditions> local_predicates = new Vector<Conditions>();
+		
+		HashMap<String, String> maps = new HashMap<String, String>();
+		
+		Vector<Subgoal> body = new Vector<Subgoal>();
+		
+		for(int i = 0; i<subgoal_names.size(); i++)
+		{			
+			String relation = subgoal_names.get(i);
+			
+			maps.put(relation, relation);
+			
+			HashMap<String, String> attr_types = get_attr_types(relation, c, pst);
+			
+			
+			Set<String> attr_names = attr_types.keySet();
+			
+			Vector<String> attr_list = new Vector<String> ();
+			
+			attr_list.addAll(attr_names);
+												
+//			Vector<Conditions> conditions = gen_local_predicates(selection_size, attr_types, attr_list, relation, primary_key_type, c, pst);
+					
+//			local_predicates.addAll(conditions);
+												
+			Vector<Argument> head_vars = gen_default_head_vars(relation, attr_list, c, pst);
+			
+			
+			Vector<Lambda_term> l_terms = gen_lambda_terms(head_vars, relation, c, pst);
+			
+			heads.addAll(head_vars);
+			
+			lambda_terms.addAll(l_terms);
+			
+			Vector<Argument> args = new Vector<Argument>();
+			
+			body.add(new Subgoal(relation, args));
+		}
+		
+		String name = "v" + id;
+		
+		Vector<Conditions> global_predicates = gen_global_conditions(body);
+		
+		Vector<Conditions> predicates = new Vector<Conditions>();
+		
+		predicates.addAll(global_predicates);
+		
+		predicates.addAll(local_predicates);
+		
+		Query view = new Query(name, new Subgoal(name, heads), body, lambda_terms, predicates, maps);
+		
+		view_operation.add(view, view.name);
+		
+		citation_view_operation.add_citation_view("c" + id);
+		
+		citation_view_operation.add_connection_view_with_citations("c" + id, name);
+		
+		store_citation_queries(view, id, c, pst);
+		
+		Query_operation.add_connection_citation_with_query("c" + id, "q" + id , "author");
+		
+		
+		return view;
 	}
 
 	
@@ -1117,6 +1328,43 @@ public class view_generator {
 		}
 		
 		return global_predicates;
+	}
+	
+	static Vector<String> get_all_attrs(String relation, Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "SELECT column_name"
+				+ " FROM information_schema.columns "
+				+ " WHERE table_name = '" + relation + "' ";
+		
+		pst = c.prepareStatement(query);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		Vector<String> attr_names = new Vector<String>();
+		
+		while(rs.next())
+		{
+			attr_names.add(rs.getString(1));
+		}
+		
+		return attr_names;
+	}
+	
+	static Vector<Argument> gen_default_head_vars(String relation_name, Vector<String> attr_list, Connection c, PreparedStatement pst) throws SQLException
+	{
+		
+		Vector<Argument> head_vars = new Vector<Argument>();
+		
+		Vector<String> attr_names = get_all_attributes(relation_name, c, pst);
+		
+		for(int i = 0; i<attr_names.size(); i++)
+		{
+			Argument l = new Argument(relation_name + populate_db.separator + attr_names.get(i), relation_name);
+			
+			head_vars.add(l);
+		}
+		
+		return head_vars;
 	}
 	
 	static Vector<Argument> gen_head_vars(String relation_name, Vector<String> attr_list, int size, Connection c, PreparedStatement pst)
@@ -1243,6 +1491,20 @@ public class view_generator {
 		}
 		
 		
+		
+		return l_terms;
+		
+	}
+	
+	static Vector<Lambda_term> gen_default_lambda_terms(String relation_name, Connection c, PreparedStatement pst) throws SQLException
+	{
+		
+		
+		String [] primary_key_type = get_primary_key(relation_name, c, pst);
+		
+		Vector<Lambda_term> l_terms = new Vector<Lambda_term>();
+
+		l_terms.add(new Lambda_term(relation_name + populate_db.separator + primary_key_type[0], relation_name));
 		
 		return l_terms;
 		

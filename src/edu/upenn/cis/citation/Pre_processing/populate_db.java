@@ -36,13 +36,15 @@ public class populate_db {
 	
 	public static String separator = "|";
 
-	public static String[] base_relations = {"gpcr_c","object_c","interaction_c","ligand_c","pathophysiology_c","interaction_affinity_refs_c","gtip_process_c","process_assoc_c","disease_c", "family_c", "introduction_c"};
+//	public static String[] base_relations = {"gpcr_c","object_c","interaction_c","ligand_c","pathophysiology_c","interaction_affinity_refs_c","gtip_process_c","process_assoc_c","disease_c", "family_c", "introduction_c"};
 
-	public static String[] base_tables = {"gpcr","object","interaction","ligand","pathophysiology","interaction_affinity_refs","gtip_process","process_assoc","disease", "family", "introduction"};
+//	public static String[] base_tables = {"gpcr","object","interaction","ligand","pathophysiology","interaction_affinity_refs","gtip_process","process_assoc","disease", "family", "introduction"};
 
 
 	public static String db_url = "jdbc:postgresql://citedb.cx9xmwhyomib.us-east-1.rds.amazonaws.com:5432/iuphar";
 //	public static String db_url = "jdbc:postgresql://localhost:5432/test";
+//	public static String db_url = "jdbc:postgresql://citedb.cx9xmwhyomib.us-east-1.rds.amazonaws.com:5432/iuphar";
+	public static String []default_table_names = {"view_table", "view2subgoals", "view2lambda_term", "view2conditions", "citation_table", "citation2view", "citation2query", "query2head_variables", "query2conditions", "query2head_variables", "query2subgoal"};
 	
 
 	public static String usr_name = "postgres";
@@ -269,25 +271,104 @@ public class populate_db {
 		
 	}
 	
+	static Vector<String> get_all_relations(Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "SELECT table_name"
+				+ "  FROM information_schema.tables"
+				+ " WHERE table_schema='public'"
+				+ "   AND table_type='BASE TABLE'";
+		
+		pst = c.prepareStatement(query);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		Vector<String> relations = new Vector<String>();
+		
+		Vector<String> default_relations = new Vector<String>();
+		
+		default_relations.addAll(Arrays.asList(default_table_names));
+		
+		while(rs.next())
+		{
+			
+			String relation = rs.getString(1);
+			
+			if(!default_relations.contains(relation))
+			{
+				relations.add(rs.getString(1));
+			}
+			
+		}
+		
+		return relations;
+	}
+	
+	static boolean check_exist_table(String relation, Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "SELECT EXISTS ("
+				+ "   SELECT 1"
+				+ "   FROM   information_schema.tables"
+				+ "   WHERE  table_name = '" + relation + "'"
+				+ "   )";
+		
+		pst = c.prepareStatement(query);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		if(rs.next())
+		{
+			boolean b = rs.getBoolean(1);
+			
+			return b;
+		}
+		
+		return false;
+	}
 	
 	public static void renew_table(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
-		for(int i = 0; i<base_tables.length; i++)
+		
+		Vector<String> relation_names = get_all_relations(c, pst);
+		
+		for(int i = 0; i<relation_names.size(); i++)
 		{
+			String query = new String();
+
+			if(relation_names.get(i).endsWith(suffix + suffix))
+			{
+				query = "drop table " + relation_names.get(i) + " cascade";
+				
+				pst = c.prepareStatement(query);
+				
+//				System.out.println(query);
+				
+				pst.execute();
+			}
 			
-			String query = "drop table " + base_tables[i] + suffix;
+			if(relation_names.get(i).endsWith(suffix))
+				continue;
 			
-			pst = c.prepareStatement(query);
+			if(check_exist_table(relation_names.get(i) + suffix, c, pst))
+			{
+				query = "drop table " + relation_names.get(i) + suffix + " cascade";
+				
+				pst = c.prepareStatement(query);
+				
+//				System.out.println(query);
+				
+				pst.execute();
+			}
 			
-//			System.out.println(query);
 			
-			pst.execute();
 			
-			HashMap<String, String> primary_keys = get_primary_key_type(base_tables[i], c, pst);
+			HashMap<String, String> primary_keys = get_primary_key_type(relation_names.get(i), c, pst);
+			
+			if(primary_keys.isEmpty())
+				continue;
 			
 			Set<String> keys = primary_keys.keySet();
 			
-			query = "create table " + base_tables[i] + suffix + "(";
+			query = "create table " + relation_names.get(i) + suffix + "(";
 			
 			int num = 0;
 			
@@ -310,15 +391,15 @@ public class populate_db {
 			
 			query += "citation_view text, ";
 			
-			query += "primary key (" + primary_key_string + "), foreign key (" + primary_key_string + ") references " + base_relations[i] + "(" + primary_key_string + ") on update cascade )";
+			query += "primary key (" + primary_key_string + "), foreign key (" + primary_key_string + ") references " + relation_names.get(i) + "(" + primary_key_string + ") on update cascade )";
 			
-//			System.out.println(query);
+			System.out.println(query);
 			
 			pst = c.prepareStatement(query);
 			
 			pst.execute();
 			
-			initial_new_table(base_tables[i], c, pst, primary_key_string);
+			initial_new_table(relation_names.get(i), c, pst, primary_key_string);
 			
 			
 		}

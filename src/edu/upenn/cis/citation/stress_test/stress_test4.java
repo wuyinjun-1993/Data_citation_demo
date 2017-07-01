@@ -8,12 +8,14 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
 
 import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Corecover.Subgoal;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
+import edu.upenn.cis.citation.Pre_processing.view_operation;
 import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.datalog.Query_converter;
@@ -29,13 +31,16 @@ public class stress_test4 {
 	
 	static int size_range = 100;
 	
-	static int times = 1;
+	static int times = 3;
 	
 	static int size_upper_bound = 5;
 	
-	static int num_views = 10;
+	static int num_views = 5;
 	
 	static int view_max_size = 40;
+
+	static int query_num = 5;
+
 	
 	static Vector<String> get_unique_relation_names(Query query)
 	{
@@ -69,7 +74,69 @@ public class stress_test4 {
 	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
 		
 		
+				
+//		Query query = query_storage.get_query_by_id(1);
 		
+				
+		
+		
+		for(int k = 0; k<query_num; k++)
+		{
+			reset();
+			
+			Random r = new Random();
+			
+			int size = r.nextInt(query_num);
+			
+			while(size <= 0)
+			{
+				size = r.nextInt(query_num);
+			}
+			
+//			Query query = query_storage.get_query_by_id(1);
+			
+			Query query = query_generator.gen_query(size, c, pst);
+			
+			query_storage.store_query(query, new Vector<Integer>());
+			
+			Vector<String> relation_names = get_unique_relation_names(query);
+			
+			HashSet<Query> views = view_generator.generate_store_views_without_predicates(relation_names, num_views, query.body.size());
+
+			for(Iterator iter = views.iterator(); iter.hasNext();)
+			{
+				Query view = (Query) iter.next();
+				
+				view_generator.gen_one_local_predicate(view, c, pst, query);
+//				view_generator.gen_one_additional_predicates(views, relation_names, query.body.size(), query);
+				
+				view_operation.delete_view_by_name(view.name);
+				
+				view_operation.add(view, view.name);
+				
+				System.out.println(view);
+
+			}
+			
+			System.out.println(query);
+			
+			stress_test(query, c, pst, views, relation_names);
+
+		}
+		
+		
+		
+		
+		
+		
+		
+		c.close();
+		
+		
+	}
+	
+	static void stress_test(Query query, Connection c, PreparedStatement pst, HashSet<Query> views, Vector<String> relation_names) throws ClassNotFoundException, SQLException, IOException, InterruptedException
+	{
 		HashMap<Head_strs, HashSet<String> > citation_strs = new HashMap<Head_strs, HashSet<String>>();
 		
 		HashMap<Head_strs, HashSet<String> > citation_strs2 = new HashMap<Head_strs, HashSet<String>>();
@@ -84,16 +151,6 @@ public class stress_test4 {
 		Vector<Vector<citation_view_vector>> citation_view1 = new Vector<Vector<citation_view_vector>>();
 
 		Vector<Vector<citation_view_vector>> citation_view2 = new Vector<Vector<citation_view_vector>>();
-		
-		Query query = query_storage.get_query_by_id(1);
-		
-		Vector<String> relation_names = get_unique_relation_names(query);
-		
-//		HashSet<Query> views = view_generator.generate_store_views_without_predicates(relation_names, num_views, query.body.size());
-//		
-//		view_generator.gen_one_additional_predicates(views, relation_names, query.body.size());
-//		
-//		view_generator.gen_one_additional_predicates(views, relation_names, query.body.size());
 
 		
 		for(int j = 0; j<view_max_size; j++)
@@ -196,7 +253,7 @@ public class stress_test4 {
 				
 				citation_strs2.clear();
 				
-				Tuple_reasoning2_opt.tuple_reasoning(query, citation_strs2, citation_view_map2, c, pst);
+				Tuple_reasoning2.tuple_reasoning(query, citation_strs2, citation_view_map2, c, pst);
 			}
 			
 			end_time = System.nanoTime();
@@ -287,14 +344,10 @@ public class stress_test4 {
 			
 			
 			
-//			view_generator.gen_one_additional_predicates(views, relation_names, query.body.size());
+			view_generator.gen_one_additional_predicates(views, relation_names, query.body.size(), query);
 			
 			
 		}
-		
-		c.close();
-		
-		
 	}
 	
 	static void reset() throws SQLException, ClassNotFoundException

@@ -411,7 +411,7 @@ public class Query_converter {
 				
 				String var_name = citation_query.lambda_term.get(i).name;
 				
-				String variable = var_name.substring(var_name.indexOf("_") + 1, var_name.length());
+				String variable = var_name.substring(citation_query.lambda_term.get(i).table_name.length() + 1, var_name.length());
 				
 				
 				
@@ -1519,7 +1519,7 @@ public class Query_converter {
 			if(i >= 1)
 				str += ",";
 			
-			str += arg.table_name + "." + arg.name.substring(arg.name.indexOf("_") + 1, arg.name.length());
+			str += arg.table_name + "." + arg.name.substring(arg.table_name.length() + 1, arg.name.length());
 			
 		}
 		return str;
@@ -1736,7 +1736,7 @@ public class Query_converter {
 			if(i >= 1)
 				str += ",";
 			
-			str += arg.relation_name + "." + arg.name.substring(arg.name.indexOf("_") + 1, arg.name.length());
+			str += arg.relation_name + "." + arg.name.substring(arg.name.indexOf(populate_db.separator) + 1, arg.name.length());
 			
 		}
 		return str;
@@ -1755,7 +1755,7 @@ public class Query_converter {
 			if(i >= 1)
 				str += ",";
 			
-			str += arg.relation_name + "." + arg.name.substring(arg.name.indexOf("_") + 1, arg.name.length()) + " as " + arg.name;
+			str += arg.relation_name + "." + arg.name.substring(arg.relation_name.length() + 1, arg.name.length()) + " as " + arg.name;
 			
 		}
 		return str;
@@ -1796,12 +1796,12 @@ public class Query_converter {
 			
 			if(arg.name.contains("first_names"))
 			{
-				str += arg.relation_name + "." + arg.name.substring(arg.name.indexOf("_") + 1, arg.name.length()) + " as first_names"; 
+				str += arg.relation_name + "." + arg.name.substring(arg.relation_name.length() + 1, arg.name.length()) + " as first_names"; 
 			}
 			
 			if(arg.name.contains("surname"))
 			{
-				str += arg.relation_name + "." + arg.name.substring(arg.name.indexOf("_") + 1, arg.name.length()) + " as surname"; 
+				str += arg.relation_name + "." + arg.name.substring(arg.relation_name.length() + 1, arg.name.length()) + " as surname"; 
 			}
 			
 			
@@ -2007,7 +2007,7 @@ public class Query_converter {
 		}
 	}
 	
-	static String get_single_condition_str(Conditions condition)
+	public static String get_single_condition_str(Conditions condition)
 	{
 		String str = new String();
 		
@@ -2226,7 +2226,7 @@ public class Query_converter {
 			
 			String name = lambda_terms.get(i).name;
 			
-			str += lambda_terms.get(i).table_name + "." + name.substring(name.indexOf("_") + 1, name.length());
+			str += lambda_terms.get(i).table_name + "." + name.substring(lambda_terms.get(i).table_name.length() + 1, name.length());
 		}
 		
 		return str;

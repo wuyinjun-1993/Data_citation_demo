@@ -57,6 +57,15 @@ public class Tuple_reasoning2_opt {
 		
 	static int max_author_num = 10;
 	
+	static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String, Vector<Integer>>();
+	
+	
+	
+	static HashMap<Integer, Vector<Lambda_term>> query_lambda_str = new HashMap<Integer, Vector<Lambda_term>>();
+	
+	static HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping = new HashMap<Integer, HashMap<Head_strs, HashSet<String>>>();
+
+	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException, IOException, InterruptedException
 	{
 		
@@ -201,7 +210,7 @@ public class Tuple_reasoning2_opt {
 		
 		for(int i = 0; i<agg_res.size(); i++)
 		{
-			String str = gen_citation1.get_citation_agg(agg_res.get(i), max_author_num);
+			String str = gen_citation1.get_citation_agg(agg_res.get(i), max_author_num, view_query_mapping, query_lambda_str, author_mapping);
 			
 			citation_aggs.add(str);
 //			
@@ -233,7 +242,7 @@ public class Tuple_reasoning2_opt {
 		
 		for(int i = 0; i<agg_res.size(); i++)
 		{
-			String str = gen_citation1.get_citation_agg(agg_res.get(i), max_author_num);
+			String str = gen_citation1.get_citation_agg(agg_res.get(i), max_author_num, view_query_mapping, query_lambda_str, author_mapping);
 			
 			citation_aggs.add(str);
 //			
@@ -759,6 +768,13 @@ public class Tuple_reasoning2_opt {
 		conditions_map.clear();
 				
 		tuple_mapping.clear();
+		
+		view_query_mapping.clear();
+		
+		query_lambda_str.clear();
+		
+		author_mapping.clear();
+
 												
 	}
 	
@@ -1230,15 +1246,7 @@ public class Tuple_reasoning2_opt {
 		int col_num = r.getColumnCount();
 						
 		String old_value = new String();
-		
-		HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String, Vector<Integer>>();
-		
-		
-		
-		HashMap<Integer, Vector<Lambda_term>> query_lambda_str = new HashMap<Integer, Vector<Lambda_term>>();
-		
-		HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping = new HashMap<Integer, HashMap<Head_strs, HashSet<String>>>();
-		
+				
 		Vector<Vector<String>> values = new Vector<Vector<String>>();
 		
 //		Vector<Vector<String>> citation_strs = new Vector<Vector<String>>();

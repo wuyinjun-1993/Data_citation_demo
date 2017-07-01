@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -44,7 +46,7 @@ public class gen_citation1 {
 	
 	public static String db_name = "IUPHAR/BPS Guide to PHARMACOLOGY";
 	
-	public static String get_citation_agg(Vector<citation_view_vector> c_views, int max_num) throws ClassNotFoundException, SQLException
+	public static String get_citation_agg(Vector<citation_view_vector> c_views, int max_num, HashMap<String, Vector<Integer> > view_query_mapping, HashMap<Integer, Vector<Lambda_term>> query_lambda_str, HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping) throws ClassNotFoundException, SQLException
 	{
 		
 		Connection c = null;
@@ -55,74 +57,81 @@ public class gen_citation1 {
 	        .getConnection(populate_db.db_url,
 	    	        populate_db.usr_name,populate_db.passwd);
 		
-		citation_view_vector c_v = c_views.get(0);
 		
 		HashSet<String> authors = new HashSet<String>();
 		
 		HashMap<String, HashSet<String>> query_str = new HashMap<String, HashSet<String>>();
 		
-		for(int i = 0; i<c_v.c_vec.size(); i++)
+		for(int k = 0; k<c_views.size(); k++)
 		{
-			
-//			System.out.println(c_v.c_vec);
-			
-			if(c_v.c_vec.get(i).has_lambda_term())
-			{
-				authors.addAll(get_authors((citation_view_parametered)c_v.c_vec.get(i),c, pst, query_str, max_num));
-			}
-			else
-			{
-				authors.addAll(get_authors((citation_view_unparametered)c_v.c_vec.get(i),c, pst, query_str, max_num));
-			}
-			
-		}
-		
-		for(int p = 1; p<c_views.size(); p++)
-		{
-			c_v = c_views.get(p);
+			citation_view_vector c_v = c_views.get(k);
+
 			
 			for(int i = 0; i<c_v.c_vec.size(); i++)
 			{
 				
-				citation_view c_view = c_v.c_vec.get(i);
+//				System.out.println(c_v.c_vec);
 				
-				HashSet<String> curr_str = query_str.get(c_view.get_name());
-				
-//				for(int j = 0; j<curr_str.size(); j++)
-				for(Iterator iter = curr_str.iterator(); iter.hasNext();)
+				if(c_v.c_vec.get(i).has_lambda_term())
+				{								
+					authors.addAll(get_authors2((citation_view_parametered)c_v.c_vec.get(i), c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num));
+				}
+				else
 				{
-					if(c_view.has_lambda_term())
-					{
-						
-						pst = c.prepareStatement((String)iter.next());
-						
-						for(int k = 0; k<((citation_view_parametered)c_view).lambda_terms.size(); k++)
-						{
-							pst.setString(k + 1, ((citation_view_parametered)c_view).map.get(((citation_view_parametered)c_view).lambda_terms.get(k)));
-						}
-						
-						ResultSet r = pst.executeQuery();
-						
-						while(r.next())
-						{
-							authors.add(r.getString(1) + " " + r.getString(2));
-						}
-					}
-					else
-					{
-						pst = c.prepareStatement((String)iter.next());
-						
-						ResultSet s = pst.executeQuery();
-						
-						while(s.next())
-						{
-							authors.add(s.getString(1) + " " + s.getString(2));
-						}
-					}
+					authors.addAll(get_authors2((citation_view_unparametered)c_v.c_vec.get(i), c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num));
 				}
 				
 			}
 		}
+		
+
+		
+//		for(int p = 1; p<c_views.size(); p++)
+//		{
+//			c_v = c_views.get(p);
+//			
+//			for(int i = 0; i<c_v.c_vec.size(); i++)
+//			{
+//				
+//				citation_view c_view = c_v.c_vec.get(i);
+//				
+//				HashSet<String> curr_str = query_str.get(c_view.get_name());
+//				
+////				for(int j = 0; j<curr_str.size(); j++)
+//				for(Iterator iter = curr_str.iterator(); iter.hasNext();)
+//				{
+//					if(c_view.has_lambda_term())
+//					{
+//						
+//						pst = c.prepareStatement((String)iter.next());
+//						
+//						for(int k = 0; k<((citation_view_parametered)c_view).lambda_terms.size(); k++)
+//						{
+//							pst.setString(k + 1, ((citation_view_parametered)c_view).map.get(((citation_view_parametered)c_view).lambda_terms.get(k)));
+//						}
+//						
+//						ResultSet r = pst.executeQuery();
+//						
+//						while(r.next())
+//						{
+//							authors.add(r.getString(1) + " " + r.getString(2));
+//						}
+//					}
+//					else
+//					{
+//						pst = c.prepareStatement((String)iter.next());
+//						
+//						ResultSet s = pst.executeQuery();
+//						
+//						while(s.next())
+//						{
+//							authors.add(s.getString(1) + " " + s.getString(2));
+//						}
+//					}
+//				}
+//				
+//			}
+//		}
 		
 		
 		
@@ -130,7 +139,7 @@ public class gen_citation1 {
 		
 		c.close();
 		
-		return combine_blocks(authors, 30, new Vector<String>());
+		return combine_blocks(authors, max_num, new Vector<String>());
 	}
 	
 	
@@ -174,10 +183,20 @@ public class gen_citation1 {
 			value_str += vals.get(i);
 		}
 		
-		citation += value_str + "." + db_name;
+		citation = value_str;
+		
+		citation += "Accessed on " + getCurrentDate() + ". ";
+		
+		citation += db_name;
 		
 		return citation;
 	}
+	
+	private static String getCurrentDate() {
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        java.util.Date date = new java.util.Date();
+        return dateFormat.format(date);
+}
 	
 	public static String get_citations(citation_view_vector c_vec, Vector<String> vals, Connection c, PreparedStatement pst, HashMap<String, HashSet<String>> query_str, int max_num, HashSet<String> authors) throws ClassNotFoundException, SQLException
 	{
@@ -496,9 +515,9 @@ public class gen_citation1 {
 						
 						String l_term = sql_with_lambdas[k];
 						
-						String table_name = l_term.substring(0, l_term.indexOf("_"));
+						String table_name = l_term.substring(0, l_term.indexOf(populate_db.separator));
 						
-						String arg_name = l_term.substring(l_term.indexOf("_"), l_term.length());
+						String arg_name = l_term.substring(l_term.indexOf(populate_db.separator), l_term.length());
 						
 						citation_view_parametered curr_c_view = (citation_view_parametered)c_view;
 						
@@ -636,7 +655,7 @@ public class gen_citation1 {
 				
 				String l_name = q.lambda_term.get(i).name;
 				
-				lambda_term_q_str += q.lambda_term.get(i).table_name + "." + l_name.substring(l_name.indexOf("_") + 1, l_name.length()) + "::text= ?";// + c_view.map.get(c_view.lambda_terms.get(i)) + "'"; 
+				lambda_term_q_str += q.lambda_term.get(i).table_name + "." + l_name.substring(l_name.indexOf(populate_db.separator) + 1, l_name.length()) + "::text= ?";// + c_view.map.get(c_view.lambda_terms.get(i)) + "'"; 
 			}
 			
 			
@@ -902,7 +921,7 @@ public class gen_citation1 {
 				
 				String table_name = (String)subgoal_mapping.get(l_term.table_name);
 								
-				String temp =  c_view.map.get(table_name + "_" + l_term.name.substring(l_term.name.indexOf("_") + 1, l_term.name.length()));
+				String temp =  c_view.map.get(table_name + populate_db.separator + l_term.name.substring(l_term.name.indexOf(populate_db.separator) + 1, l_term.name.length()));
 				
 				head_strs.add(temp);
 			}

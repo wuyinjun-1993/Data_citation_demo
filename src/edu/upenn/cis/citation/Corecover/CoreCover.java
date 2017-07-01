@@ -9,6 +9,7 @@ package edu.upenn.cis.citation.Corecover;
 import java.util.*;
 
 import edu.upenn.cis.citation.Operation.Conditions;
+import edu.upenn.cis.citation.Pre_processing.populate_db;
 
 public class CoreCover {
 
@@ -152,7 +153,7 @@ public class CoreCover {
 	  {
 		  String curr_lambda_name = tuple.phi_str.apply(view.lambda_term.get(i).name);
 		  
-		  String curr_table_name = curr_lambda_name.substring(0, curr_lambda_name.indexOf("_"));
+		  String curr_table_name = curr_lambda_name.substring(0, curr_lambda_name.indexOf(populate_db.separator));
 		  
 		  Lambda_term l_term = new Lambda_term(curr_lambda_name, curr_table_name);
 		  
@@ -168,11 +169,11 @@ public class CoreCover {
 	  
 	  for(int i = 0; i<view.conditions.size(); i++)
 	  {
-		  String curr_arg1 = tuple.phi_str.apply(view.conditions.get(i).subgoal1 + "_" + view.conditions.get(i).arg1.name);
+		  String curr_arg1 = tuple.phi_str.apply(view.conditions.get(i).subgoal1 + populate_db.separator + view.conditions.get(i).arg1.name);
 		  
-		  String subgoal1 = curr_arg1.substring(0, curr_arg1.indexOf("_"));
+		  String subgoal1 = curr_arg1.substring(0, curr_arg1.indexOf(populate_db.separator));
 		  
-		  curr_arg1 = curr_arg1.substring(curr_arg1.indexOf("_") + 1, curr_arg1.length());
+		  curr_arg1 = curr_arg1.substring(curr_arg1.indexOf(populate_db.separator) + 1, curr_arg1.length());
 		  
 		  String curr_arg2 = new String();
 		  
@@ -188,11 +189,11 @@ public class CoreCover {
 		  }
 		  else
 		  {
-			  curr_arg2 = tuple.phi_str.apply(view.conditions.get(i).subgoal2 + "_" + view.conditions.get(i).arg2.name);
+			  curr_arg2 = tuple.phi_str.apply(view.conditions.get(i).subgoal2 + populate_db.separator + view.conditions.get(i).arg2.name);
+			  			  
+			  subgoal2 = curr_arg2.substring(0, curr_arg2.indexOf(populate_db.separator));
 			  
-			  subgoal2 = curr_arg2.substring(0, curr_arg2.indexOf("_"));
-			  
-			  curr_arg2 = curr_arg2.substring(curr_arg2.indexOf("_") + 1, curr_arg2.length());
+			  curr_arg2 = curr_arg2.substring(curr_arg2.indexOf(populate_db.separator) + 1, curr_arg2.length());
 			  
 			  condition = new Conditions(new Argument(curr_arg1, subgoal1), subgoal1, view.conditions.get(i).op, new Argument(curr_arg2, subgoal2), subgoal2);
 		  }

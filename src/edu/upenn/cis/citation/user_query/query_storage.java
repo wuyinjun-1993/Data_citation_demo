@@ -253,19 +253,20 @@ public class query_storage {
 			}
 			else
 			{
-				if(condition_str.contains(op_less.op))
+				if(condition_str.contains(op_not_equal.op))
 				{
-					strs = condition_str.split(op_less.op);
+					strs = condition_str.split(op_not_equal.op);
 					
-					op = new op_less();
+					op = new op_not_equal();
 				}
+				
 				else
 				{
-					if(condition_str.contains(op_greater.op))
+					if(condition_str.contains(op_greater_equal.op))
 					{
-						strs = condition_str.split(op_greater.op);
+						strs = condition_str.split(op_greater_equal.op);
 						
-						op = new op_greater();
+						op = new op_greater_equal();
 					}
 					else
 					{
@@ -277,19 +278,20 @@ public class query_storage {
 						}
 						else
 						{
-							if(condition_str.contains(op_greater_equal.op))
+
+							if(condition_str.contains(op_greater.op))
 							{
-								strs = condition_str.split(op_greater_equal.op);
+								strs = condition_str.split(op_greater.op);
 								
-								op = new op_greater_equal();
+								op = new op_greater();
 							}
 							else
 							{
-								if(condition_str.contains(op_not_equal.op))
+								if(condition_str.contains(op_less.op))
 								{
-									strs = condition_str.split(op_not_equal.op);
+									strs = condition_str.split(op_less.op);
 									
-									op = new op_not_equal();
+									op = new op_less();
 								}
 							}
 						}

@@ -189,6 +189,49 @@ public class query_storage {
         return view;
 	}
 	
+	public static Vector<Integer> get_query_list_by_id(int id) throws SQLException, ClassNotFoundException
+	{
+		Class.forName("org.postgresql.Driver");
+        Connection c = DriverManager
+           .getConnection(populate_db.db_url,
+       	        populate_db.usr_name,populate_db.passwd);
+        
+        PreparedStatement pst = null;
+        
+        Vector<Argument> head_var = new Vector<Argument>();
+        
+        String query = "select rids from user_query_table where query_id = '" + id + "'";
+        
+        pst = c.prepareStatement(query);
+        
+        ResultSet rs = pst.executeQuery();
+        
+        Vector<Integer> int_list = new Vector<Integer>();
+        
+        if(rs.next())
+        {
+        	String values = rs.getString(1);
+        	
+        	if(values == null && values.isEmpty())
+        		return int_list;
+        	
+        	String [] value_list = values.split(",");
+        	
+        	for(int i = 0; i<value_list.length; i++)
+        	{
+        		int int_val = Integer.valueOf(value_list[i]);
+        		
+        		int_list.add(int_val);
+        	}
+        	
+        	
+        }
+        
+        return int_list;
+        
+//        String id = get_id_head_vars(name, head_var, c, pst)
+	}
+	
 	static Vector<Subgoal> get_query_subgoals(int name, HashMap<String, String> subgoal_name_mapping, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
 		String q_subgoals = "select subgoal_name, subgoal_origin_name from user_query2subgoals where query_id = '" + name + "'";
@@ -386,7 +429,7 @@ public class query_storage {
 	}
 	
 	
-	public static void store_query(Query query, Vector<Integer> id_list) throws SQLException, ClassNotFoundException
+	public static int store_query(Query query, Vector<Integer> id_list) throws SQLException, ClassNotFoundException
 	{
 		
 		Connection c = null;
@@ -399,7 +442,9 @@ public class query_storage {
 	    
 	    int hashcode = q_graph.hashCode();
 	    
-	    if(!check_existence(hashcode, c, pst))
+	    int id = check_existence(hashcode, c, pst);
+	    
+	    if(id <= 0)
 	    {
 	    	int query_num = gen_query_id(c, pst) + 1;
 			
@@ -408,19 +453,18 @@ public class query_storage {
 			store_query_conditions(query.conditions, query_num, c, pst);
 			
 			store_query_subgoals(query, query_num, query.body, c, pst);
+			
 	    }
-	    else
-	    {
-	    	
-	    }
+	    
+	    return id;
 		
 		
 		
 	}
 	
-	static boolean check_existence(int hashcode, Connection c, PreparedStatement pst) throws SQLException
+	static int check_existence(int hashcode, Connection c, PreparedStatement pst) throws SQLException
 	{
-		String query = "SELECT exists (SELECT 1 FROM user_query_table WHERE hash_value = " + hashcode + " LIMIT 1)";
+		String query = "SELECT query_id FROM user_query_table WHERE hash_value = " + hashcode;
 		
 		pst = c.prepareStatement(query);
 		
@@ -428,12 +472,12 @@ public class query_storage {
 		
 		if(rs.next())
 		{
-			boolean b = rs.getBoolean(1);
+			int id = rs.getInt(1);
 			
-			return b;
+			return id;
 		}
 		
-		return false;
+		return -1;
 	}
 	
 	static void store_query_conditions(Vector<Conditions> conditions, int query_id, Connection c, PreparedStatement pst) throws SQLException

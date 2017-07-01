@@ -130,9 +130,15 @@ public class stress_test3 {
 		
 		Vector<String> relation_names = get_unique_relation_names(query);
 		
-		HashSet<Query> views = view_generator.generate_store_views(relation_names, num_views, query.body.size(), query);
+		Vector<Query> views = view_generator.gen_default_views();
 		
-		for(int j = 0; j<view_max_size; j++)
+//		HashSet<Query> views = view_generator.generate_store_views(relation_names, num_views, query.body.size(), query);
+		
+		int view_size = 0;
+		
+		int view_id = 0;
+		
+		while(true)
 		{
 		
 			System.out.println("start");
@@ -323,7 +329,10 @@ public class stress_test3 {
 			
 			
 			
-			view_generator.gen_one_additional_view(views, relation_names, query.body.size(), query);
+			boolean finished = view_generator.gen_views_with_n_subgoals(k, id, upper_bound);
+			
+			if(finished)
+				break;
 			
 			
 		}

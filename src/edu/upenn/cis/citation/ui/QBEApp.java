@@ -365,7 +365,7 @@ private Object String;
 
 		// Adding HBox
 		HBox hb = new HBox();
-		hb.setPadding(new Insets(20, 20, 20, 30));
+		hb.setPadding(new Insets(20,20, 20, 30));
 		DropShadow dropShadow_2 = new DropShadow();
         dropShadow_2.setOffsetX(2);
         dropShadow_2.setOffsetY(2);
@@ -374,7 +374,13 @@ private Object String;
 		text.setId("text");
 		text.setFont(Font.font("Courier New", FontWeight.BOLD, 28));
 		text.setEffect(dropShadow_2);
-		hb.getChildren().add(text);
+		
+		Button signOut = new Button("Sign Out");
+		signOut.setFont(Font.font("Courier New", FontWeight.BLACK, 14));
+		hb.setSpacing(650);
+		signOut.setId("ButtonGen");
+		signOut.setAlignment(Pos.CENTER_RIGHT);
+		hb.getChildren().addAll(text, signOut );
 
 		// Reflection for gridPane
 		BorderPane bp = new BorderPane();
@@ -759,6 +765,7 @@ private Object String;
 					e1.printStackTrace();
 				}
 			}
+			System.out.println("[Citation List] " + listCitations);
 			GridPane gridCg = buildGridCg(listCitations);
 			this.citeStage.setScene(new Scene(gridCg, 500, 300));
 			this.citeStage.setTitle("Citations");

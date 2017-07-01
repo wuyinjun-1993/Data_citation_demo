@@ -4,6 +4,7 @@ import java.util.Vector;
 
 import edu.upenn.cis.citation.Corecover.Argument;
 import edu.upenn.cis.citation.Corecover.Subgoal;
+import edu.upenn.cis.citation.Pre_processing.populate_db;
 
 public class Conditions {
 	
@@ -35,9 +36,9 @@ public class Conditions {
 		String str = arg1.name;
 		
 		if(arg2.isConst())
-			return subgoal1 + "_" + str + op + arg2;
+			return subgoal1 + populate_db.separator + str + op + arg2;
 		else
-			return subgoal1 + "_" + str + op + subgoal2 + "_" + arg2;
+			return subgoal1 + populate_db.separator + str + op + subgoal2 + populate_db.separator + arg2;
 	}
 	
 	public String toStringinsql()
@@ -47,10 +48,10 @@ public class Conditions {
 			String str = arg2.name.replaceAll("'", "''");
 			
 			
-			return subgoal1 + "_" + arg1.name + op + str;
+			return subgoal1 + populate_db.separator + arg1.name + op + str;
 		}
 		else
-			return subgoal1 + "_" + arg1.name + op + subgoal2 + "_" + arg2;
+			return subgoal1 + populate_db.separator + arg1.name + op + subgoal2 + populate_db.separator + arg2;
 	}
 	
 	public Conditions(Argument arg1, String subgoal1, Operation op, Argument arg2, String subgoal2)

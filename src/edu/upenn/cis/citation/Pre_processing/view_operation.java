@@ -31,11 +31,11 @@ public class view_operation {
 	
 	public static void main(String [] args) throws ClassNotFoundException, SQLException
 	{
-		delete_view_by_id(4);
-		
-		delete_view_by_id(5);
-		
-		delete_view_by_id(9);
+//		delete_view_by_id(4);
+//		
+//		delete_view_by_id(5);
+//		
+		delete_view_by_id(18);
 		
 //		String query = "v9(ligand_c_ligand_id,interaction_c_object_id, ligand_c_name):ligand_c(), interaction_c(), interaction_c_ligand_id=ligand_c_ligand_id";
 //		
@@ -58,7 +58,7 @@ public class view_operation {
 		
 		
 //		Query q = gen_sample_view();
-//		
+////		
 //		add(q, "v10");
 //		
 //		System.out.println(q);
@@ -70,7 +70,7 @@ public class view_operation {
 	{
 		Vector<Argument> head_args = new Vector<Argument>();
 //		
-		head_args.add(new Argument("family_type", "family"));
+		head_args.add(new Argument("family" + populate_db.separator + "type", "family"));
 		
 		Subgoal head = new Subgoal("q", head_args);
 		
@@ -476,11 +476,11 @@ public class view_operation {
 				}
 				
 				
-				String relation_name1 = strs[0].substring(0, strs[0].indexOf("_")).trim();
+				String relation_name1 = strs[0].substring(0, strs[0].indexOf(populate_db.separator)).trim();
 				
 				String relation_name2 = new String();
 				
-				String arg1 = strs[0].substring(strs[0].indexOf("_") + 1, strs[0].length()).trim();
+				String arg1 = strs[0].substring(strs[0].indexOf(populate_db.separator) + 1, strs[0].length()).trim();
 
 				String arg2 = new String ();
 				
@@ -552,17 +552,17 @@ public class view_operation {
 				
 				String str2 = strs[1];
 				
-				String relation_name1 = str1.substring(0, str1.indexOf("_")).trim();
+				String relation_name1 = str1.substring(0, str1.indexOf(populate_db.separator)).trim();
 				
 				String relation_name2 = new String();
 				
-				String arg1 = str1.substring(str1.indexOf("_") + 1, str1.length()).trim();
+				String arg1 = str1.substring(str1.indexOf(populate_db.separator) + 1, str1.length()).trim();
 
-				String arg2 = str2.substring(str2.indexOf("_") + 1, str2.length()).trim();
+				String arg2 = str2.substring(str2.indexOf(populate_db.separator) + 1, str2.length()).trim();
 					
 //					subgoal2 = strs2[0] + "_" + strs2[1];
 					
-					relation_name2 = str2.substring(0, str2.indexOf("_")).trim();
+					relation_name2 = str2.substring(0, str2.indexOf(populate_db.separator)).trim();
 					
 					condition = new Conditions(new Argument(arg1, relation_name1), relation_name1, op, new Argument(arg2, relation_name2), relation_name2);
 
@@ -599,9 +599,9 @@ public class view_operation {
 	{
 		head_var_str = head_var_str.trim();
 		
-		String relation_name = head_var_str.substring(0, head_var_str.indexOf("_"));
+		String relation_name = head_var_str.substring(0, head_var_str.indexOf(populate_db.separator));
 		
-		String attr_name = head_var_str.substring(head_var_str.indexOf("_") + 1, head_var_str.length());
+		String attr_name = head_var_str.substring(head_var_str.indexOf(populate_db.separator) + 1, head_var_str.length());
 		
 		String [] values = {relation_name, attr_name};
 		
@@ -749,7 +749,7 @@ public class view_operation {
 		
 		while(rs.next())
 		{
-			args.add(new Argument(subgoal_name + "_" + rs.getString(1), subgoal_name));
+			args.add(new Argument(subgoal_name + populate_db.separator + rs.getString(1), subgoal_name));
 		}
 		
 		return args;

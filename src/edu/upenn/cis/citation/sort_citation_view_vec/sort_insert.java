@@ -6,7 +6,7 @@ import java.util.Vector;
 
 public class sort_insert {
 	
-	static int upper_bound = 100000;
+	static int upper_bound = 1000000;
 	
 	static int num = 10000;
 	
@@ -141,7 +141,6 @@ public class sort_insert {
 				}
 			}
 		} );
-		
 		
 		index_vec.insertElementAt(insert, pos);
 		

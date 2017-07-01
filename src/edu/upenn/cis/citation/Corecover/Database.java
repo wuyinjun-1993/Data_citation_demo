@@ -32,7 +32,7 @@ public class Database {
       Relation subgoalRel = processSubgoal(subgoal, query);
 
       // process the join
-      sr = join(sr, subgoalRel, query.getName());
+      sr = join(sr, subgoalRel, query.getName(), i);
 
       Vector usefulArgs = query.getUsefulArgs(i);
       sr = sr.project(usefulArgs);
@@ -256,6 +256,56 @@ public class Database {
     return new Relation(resName, resSchema, resTuples);
   }
 
+  Relation join(Relation rel1, Relation rel2, String resName, int seq) {
+	    
+	    // returns the other relation if one relation's schema is empty
+	    if (seq == 0 && rel1.getAttrNum() == 0) return rel2;
+	    if (seq == 0 && rel2.getAttrNum() == 0) return rel1;
+
+	    //System.out.println("rel1 = " + rel1 );
+	    //System.out.println("rel2 = " + rel2 );
+
+	    // computes the schema
+	    Vector schema1   = rel1.getSchema();
+	    Vector schema2   = rel2.getSchema();
+	    Vector resSchema = new Vector();
+
+	    for (int i = 0; i < schema1.size(); i ++) {
+	      Argument arg = (Argument) schema1.elementAt(i);
+	      // removes duplicates and useless args
+	      if (!resSchema.contains(arg))
+		resSchema.add(arg);
+	    }
+
+	    for (int i = 0; i < schema2.size(); i ++) {
+	      Argument arg = (Argument) schema2.elementAt(i);
+	      // removes duplicates and useless args
+	      if (!resSchema.contains(arg))
+		resSchema.add(arg);
+	    }
+
+	    // computes the tuples using a loop join
+	    HashSet resTuples = new HashSet();
+	    HashSet tuples1  = rel1.getTuples();
+	    HashSet tuples2  = rel2.getTuples();
+	    for (Iterator iter1 = tuples1.iterator(); iter1.hasNext();) {
+	      Tuple tuple1 = (Tuple) iter1.next();
+
+	      for (Iterator iter2 = tuples2.iterator(); iter2.hasNext();) {
+		  Tuple tuple2 = (Tuple) iter2.next();
+
+		// joins two tuples
+		Tuple tuple = join(tuple1, schema1, tuple2, schema2, resName);
+		if (tuple != null) {
+		    resTuples.add(tuple);
+		}
+	      }
+	    }
+	    
+	    return new Relation(resName, resSchema, resTuples);
+	  }
+
+  
   /**
    * Joins two given tuples with their schemas, 
    */

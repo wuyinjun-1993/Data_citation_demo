@@ -149,7 +149,7 @@ public class Gen_query {
 		
 		for(int i = 0; i<lambda_term_str.size(); i++)
 		{
-			Lambda_term l_term = new Lambda_term(lambda_term_str.get(i)[1] + "_" + lambda_term_str.get(i)[0], lambda_term_str.get(i)[1]);
+			Lambda_term l_term = new Lambda_term(lambda_term_str.get(i)[1] + populate_db.separator + lambda_term_str.get(i)[0], lambda_term_str.get(i)[1]);
 			
 			lambda_terms.add(l_term);
 		}
@@ -164,7 +164,7 @@ public class Gen_query {
 		{
 			String [] lambda_term_str = new String [2];
 			
-			lambda_term_str[0] = lambda_terms.get(i).name.substring(lambda_terms.get(i).name.indexOf("_") + 1, lambda_terms.get(i).name.length());
+			lambda_term_str[0] = lambda_terms.get(i).name.substring(lambda_terms.get(i).name.indexOf(populate_db.separator) + 1, lambda_terms.get(i).name.length());
 			
 			lambda_term_str[1] = lambda_terms.get(i).table_name;
 			
@@ -241,7 +241,7 @@ public class Gen_query {
         
         for(int i = 0; i<head_vars.size(); i++)
         {
-        	Argument h_var = new Argument(head_vars.get(i)[1].trim() + "_" + head_vars.get(i)[0].trim(), head_vars.get(i)[1].trim());
+        	Argument h_var = new Argument(head_vars.get(i)[1].trim() + populate_db.separator + head_vars.get(i)[0].trim(), head_vars.get(i)[1].trim());
         	
         	head_args.add(h_var);
         }
@@ -277,7 +277,7 @@ public class Gen_query {
         
         for(int i = 0; i<head_vars.size(); i++)
         {
-        	Argument h_var = new Argument(head_vars.get(i)[1].trim() + "_" + head_vars.get(i)[0].trim(), head_vars.get(i)[1].trim());
+        	Argument h_var = new Argument(head_vars.get(i)[1].trim() + populate_db.separator + head_vars.get(i)[0].trim(), head_vars.get(i)[1].trim());
         	
         	head_args.add(h_var);
         }
@@ -323,7 +323,7 @@ public class Gen_query {
 			
 			String rel_name = arg.relation_name;
 			
-			String arg_name = arg.name.substring(arg.name.indexOf("_") + 1, arg.name.length());
+			String arg_name = arg.name.substring(arg.name.indexOf(populate_db.separator) + 1, arg.name.length());
 			
 			String [] rel_args = {arg_name, rel_name};
 			

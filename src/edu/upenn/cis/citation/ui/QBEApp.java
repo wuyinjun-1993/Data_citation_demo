@@ -2533,7 +2533,7 @@ private Object String;
 	
 	private void setCQ(String dv) {
 		Vector<String> block_names = new Vector<String>();
-		Query_operation.getC
+//		Query_operation.getC
 	}
 
 }

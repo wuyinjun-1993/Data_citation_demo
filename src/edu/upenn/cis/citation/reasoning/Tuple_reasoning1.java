@@ -52,7 +52,7 @@ public class Tuple_reasoning1 {
 	
 	static HashMap<String, Integer> lambda_term_id_mapping = new HashMap<String, Integer>();
 	
-	static HashMap<String, Vector<String>> conditions_map = new HashMap<String, Vector<String>>();
+	static HashMap<String, Vector<Tuple>> conditions_map = new HashMap<String, Vector<Tuple>>();
 	
 	static HashMap<String, Vector<String>> lambda_terms_map = new HashMap<String, Vector<String>>();
 	
@@ -61,6 +61,13 @@ public class Tuple_reasoning1 {
 	static String file_name = "tuple_level.xlsx";
 	
 	static HashMap<Head_strs, Vector<HashSet<String>>> authors = new HashMap<Head_strs, Vector<HashSet<String>>>();
+	
+	static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String, Vector<Integer> >();
+	
+	static HashMap<Integer, Vector<Lambda_term>> query_lambda_str = new HashMap<Integer, Vector<Lambda_term>>();
+	
+	static HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping = new HashMap<Integer, HashMap<Head_strs, HashSet<String>>>();
+
 	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException, IOException, InterruptedException
 	{
@@ -359,11 +366,11 @@ public class Tuple_reasoning1 {
 			
 			Vector<Vector<citation_view_vector>> c_views2 = citation_view_map2.get(h_val);
 			
-			System.out.println(h_val);
-			
-			System.out.println(c_views1);
-			
-			System.out.println(c_views2);
+//			System.out.println(h_val);
+//			
+//			System.out.println(c_views1);
+//			
+//			System.out.println(c_views2);
 			
 			compare(c_views1, c_views2);
 		}
@@ -468,6 +475,7 @@ public class Tuple_reasoning1 {
 			
 			if(j >= c_views1.size())
 			{
+				assertEquals(1, 0);
 //				System.out.println("errrror");
 //				
 //				System.out.println(c_views.get(i).toString());
@@ -524,12 +532,12 @@ public class Tuple_reasoning1 {
         
 		Vector<Argument> head_args = new Vector<Argument>();
 		
-		head_args.add(new Argument("gpcr_object_id", "gpcr"));
+		head_args.add(new Argument("gpcr" + populate_db.separator + "object_id", "gpcr"));
 				
 		
-		head_args.add(new Argument("gpcr1_object_id", "gpcr1"));
+		head_args.add(new Argument("gpcr1" + populate_db.separator + "object_id", "gpcr1"));
 //		
-		head_args.add(new Argument("object_object_id", "object"));
+		head_args.add(new Argument("object" + populate_db.separator + "object_id", "object"));
 				
 		
 //		head_args.add(new Argument("family3_family_id", "family3"));
@@ -905,7 +913,7 @@ public class Tuple_reasoning1 {
 		{
 //			output_vec_com(agg_res.get(i));
 			
-			String str = gen_citation1.get_citation_agg(agg_res.get(i), max_author_num);
+			String str = gen_citation1.get_citation_agg(agg_res.get(i), max_author_num, view_query_mapping, query_lambda_str, author_mapping);
 			
 			citation_aggs.add(str);
 //			
@@ -926,7 +934,8 @@ public class Tuple_reasoning1 {
 		
 		for(int i = 0; i<agg_res.size(); i++)
 		{
-			String str = gen_citation1.get_citation_agg(agg_res.get(i), max_author_num);
+			
+			String str = gen_citation1.get_citation_agg(agg_res.get(i), max_author_num, view_query_mapping, query_lambda_str, author_mapping);
 			
 			citation_aggs.add(str);
 //			
@@ -974,6 +983,12 @@ public class Tuple_reasoning1 {
 		tuple_mapping.clear();
 										
 		authors.clear();
+		
+		view_query_mapping.clear();
+		
+		query_lambda_str.clear();
+		
+		author_mapping.clear();
 		
 	}
 	
@@ -1293,117 +1308,7 @@ public class Tuple_reasoning1 {
 		
 	}
 	
-	public static void check_equality(Query view, Connection c, PreparedStatement pst) throws SQLException
-	{
 		
-		String q_conditions = "select conditions from view2conditions where view = '" + view.name + "'";
-		
-		pst = c.prepareStatement(q_conditions);
-		
-		ResultSet r = pst.executeQuery();
-		
-		Vector<Conditions> conditions = new Vector<Conditions>();
-		
-		while(r.next())
-		{
-			
-			String condition_str = r.getString(1);
-			
-			String []strs = null;
-			
-			Operation op = null;
-			
-			
-			if(condition_str.contains(op_equal.op))
-			{
-				strs = condition_str.split(op_equal.op);
-				
-				op = new op_equal();
-			}
-			else
-			{
-				if(condition_str.contains(op_less.op))
-				{
-					strs = condition_str.split(op_less.op);
-					
-					op = new op_less();
-				}
-				else
-				{
-					if(condition_str.contains(op_greater.op))
-					{
-						strs = condition_str.split(op_greater.op);
-						
-						op = new op_greater();
-					}
-					else
-					{
-						if(condition_str.contains(op_less_equal.op))
-						{
-							strs = condition_str.split(op_less_equal.op);
-							
-							op = new op_less_equal();
-						}
-						else
-						{
-							if(condition_str.contains(op_greater_equal.op))
-							{
-								strs = condition_str.split(op_greater_equal.op);
-								
-								op = new op_greater_equal();
-							}
-							else
-							{
-								if(condition_str.contains(op_not_equal.op))
-								{
-									strs = condition_str.split(op_not_equal.op);
-									
-									op = new op_not_equal();
-								}
-							}
-						}
-					}
-				}
-				
-			}
-			
-			
-			String str1 = strs[0];
-			
-			String str2 = strs[1];
-			
-
-			String []strs1 = str1.split("_");
-			
-			String subgoal1 = strs1[0] + "_" + strs1[1];
-			
-			String arg1 = str1.trim();//.substring(subgoal1.length() + 1, str1.length());
-			
-			String subgoal2 = new String();
-			
-			String arg2 = new String ();
-			
-			if(str2.contains("'"))
-			{
-				arg2 = str2;
-			}
-			else
-			{
-				String []strs2 = str2.split("_");
-				
-				subgoal2 = strs2[0] + "_" + strs2[1];
-				
-				arg2 = str2.trim();//.substring(subgoal2.length() + 1, str2.length());
-			}
-				
-			Conditions condition = new Conditions(new Argument(arg1.trim(), arg1.trim()), subgoal1.trim(), op, new Argument(arg2.trim(), arg2.trim()), subgoal2.trim());
-			
-			conditions.add(condition);
-		}
-		
-		view.conditions = conditions;
-	}
-	
 	static String get_subgoals (Vector<String> subgoal_names, Vector<String> subgoal_arguments, String view_id, Connection c, PreparedStatement pst ) throws SQLException
 	{
 		String subgoal_query = "select s.subgoal_names, a.arguments from view2subgoals s join subgoal_arguments a using (subgoal_names) where s.view = '" + view_id + "'";
@@ -1487,7 +1392,7 @@ public class Tuple_reasoning1 {
 //				
 //				System.out.println();
 				
-				if(args.get(i).toString().equals(condition.subgoal1 + "_" + condition.arg1) || (condition.subgoal2 != null && condition.subgoal2.isEmpty() && args.get(i).toString().equals(condition.subgoal2 + "_" + condition.arg2)))
+				if(args.get(i).toString().equals(condition.subgoal1 + populate_db.separator + condition.arg1) || (condition.subgoal2 != null && condition.subgoal2.isEmpty() && args.get(i).toString().equals(condition.subgoal2 + populate_db.separator + condition.arg2)))
 				{
 					return true;
 				}
@@ -1497,7 +1402,7 @@ public class Tuple_reasoning1 {
 		return false;
 	}
 	
-	public static Vector<Query> pre_processing(Query q, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	public static HashSet<Tuple> pre_processing(Query q, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
 		
 		Vector<Query> views = populate_db.get_views_schema(c, pst);
@@ -1544,6 +1449,23 @@ public class Tuple_reasoning1 {
 	    	for(int i = 0; i<tuple.conditions.size(); i++)
 	    	{
 	    		String condition_str = tuple.conditions.get(i).toString();
+	    		
+	    		Vector<Tuple> curr_tuples = conditions_map.get(condition_str);
+	    		
+	    		if(curr_tuples == null)
+	    		{
+	    			curr_tuples =  new Vector<Tuple>();
+	    			
+	    			curr_tuples.add(tuple);
+	    			
+	    			conditions_map.put(condition_str, curr_tuples);
+	    		}
+	    		else
+	    		{	    			
+	    			curr_tuples.add(tuple);
+	    			
+	    			conditions_map.put(condition_str, curr_tuples);
+	    		}
 	    			    		
 //	    		if(condition_id_mapping.get(condition_str) == null)
 	    		{
@@ -1569,7 +1491,7 @@ public class Tuple_reasoning1 {
 
 	    // compute tuple-cores
 	    
-	    return views;
+	    return viewTuples;
 	    
 	    
 	}
@@ -1583,9 +1505,9 @@ public class Tuple_reasoning1 {
 				
 		reset();
 		
-		pre_processing(q ,c,pst);
+		HashSet<Tuple> viewTuples = pre_processing(q ,c,pst);
 		
-		Vector<Vector<citation_view_vector>> citation_views = get_citation_views(q, citation_strs, citation_view_map1, c, pst);
+		Vector<Vector<citation_view_vector>> citation_views = get_citation_views(q, citation_strs, citation_view_map1, viewTuples, c, pst);
 				
 		
 		
@@ -1637,9 +1559,9 @@ public class Tuple_reasoning1 {
 		}
 	}
 	
-	public static Vector<Vector<citation_view_vector>> get_citation_views(Query query, HashMap<Head_strs, HashSet<String> > citation_strs, HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map1,Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException, IOException, InterruptedException
+	public static Vector<Vector<citation_view_vector>> get_citation_views(Query query, HashMap<Head_strs, HashSet<String> > citation_strs, HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map1, HashSet<Tuple> viewTuples, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException, IOException, InterruptedException
 	{
-		Vector<Vector<citation_view_vector>> c_views = query_execution(query, c, pst, citation_strs, citation_view_map1);
+		Vector<Vector<citation_view_vector>> c_views = query_execution(query, c, pst, citation_strs, citation_view_map1, viewTuples);
 				
 		return c_views;
 	}
@@ -1715,16 +1637,16 @@ public class Tuple_reasoning1 {
 		if(valid_conditions.size() == 0 || query.conditions == null || query.conditions.size() == 0)
 		{
 			
-			int id = 0;
-			
-			for(Iterator iter = valid_conditions.iterator(); iter.hasNext();)
-			{
-				Conditions condition = (Conditions) iter.next();
-				
-				condition_id_mapping.put(condition.toString(), id);
-				
-				id ++;
-			}
+//			int id = 0;
+//			
+//			for(Iterator iter = valid_conditions.iterator(); iter.hasNext();)
+//			{
+//				Conditions condition = (Conditions) iter.next();
+//				
+//				condition_id_mapping.put(condition.toString(), id);
+//				
+//				id ++;
+//			}
 			
 			return valid_conditions;
 		}
@@ -1757,23 +1679,23 @@ public class Tuple_reasoning1 {
 			
 			valid_conditions = update_conditions;
 			
-			int id = 0;
-			
-			for(Iterator iter = valid_conditions.iterator(); iter.hasNext();)
-			{
-				Conditions condition = (Conditions) iter.next();
-				
-				condition_id_mapping.put(condition.toString(), id);
-				
-				id ++;
-			}
+//			int id = 0;
+//			
+//			for(Iterator iter = valid_conditions.iterator(); iter.hasNext();)
+//			{
+//				Conditions condition = (Conditions) iter.next();
+//				
+//				condition_id_mapping.put(condition.toString(), id);
+//				
+//				id ++;
+//			}
 			
 			return valid_conditions;
 			
 		}
 	}
 	
-	public static Vector<Vector<citation_view_vector>> query_execution(Query query, Connection c, PreparedStatement pst, HashMap<Head_strs, HashSet<String> > citation_strs, HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map1) throws SQLException, ClassNotFoundException, IOException, InterruptedException
+	public static Vector<Vector<citation_view_vector>> query_execution(Query query, Connection c, PreparedStatement pst, HashMap<Head_strs, HashSet<String> > citation_strs, HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map1, HashSet<Tuple> viewTuples) throws SQLException, ClassNotFoundException, IOException, InterruptedException
 	{
 				
 		Vector<Vector<citation_view_vector>> c_views = new Vector<Vector<citation_view_vector>>();
@@ -1786,7 +1708,7 @@ public class Tuple_reasoning1 {
 					
 		String sql = Query_converter.datalog2sql_citation(query, valid_lambda_terms, valid_conditions);
 		
-		reasoning(c_views, query, c, pst, sql, citation_view_map1, citation_strs);
+		reasoning(c_views, query, c, pst, sql, citation_view_map1, citation_strs, viewTuples);
 		
 		return c_views;
 	}
@@ -1825,7 +1747,7 @@ public class Tuple_reasoning1 {
 //		}
 //	}
 //	
-	public static void reasoning(Vector<Vector<citation_view_vector>> c_views, Query query, Connection c, PreparedStatement pst, String sql, HashMap<Head_strs, Vector<Vector<citation_view_vector> > > citation_view_map1, HashMap<Head_strs, HashSet<String> > citation_strs) throws SQLException, ClassNotFoundException, IOException, InterruptedException
+	public static void reasoning(Vector<Vector<citation_view_vector>> c_views, Query query, Connection c, PreparedStatement pst, String sql, HashMap<Head_strs, Vector<Vector<citation_view_vector> > > citation_view_map1, HashMap<Head_strs, HashSet<String> > citation_strs, HashSet<Tuple> viewTuples) throws SQLException, ClassNotFoundException, IOException, InterruptedException
 	{
 		pst = c.prepareStatement(sql);
 				
@@ -1839,14 +1761,7 @@ public class Tuple_reasoning1 {
 		
 //		HashMap<Head_strs, Vector<String> > citation_strs = new HashMap<Head_strs, Vector<String> >();
 
-		HashMap<String, HashSet<String>> citation_strings = new HashMap<String, HashSet<String>>();
-		
-		HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String, Vector<Integer> >();
-		
-		HashMap<Integer, Vector<Lambda_term>> query_lambda_str = new HashMap<Integer, Vector<Lambda_term>>();
-		
-		HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping = new HashMap<Integer, HashMap<Head_strs, HashSet<String>>>();
-		
+		HashMap<String, HashSet<String>> citation_strings = new HashMap<String, HashSet<String>>();		
 		
 		int group_num = 0;
 		
@@ -1877,7 +1792,13 @@ public class Tuple_reasoning1 {
 				Head_strs h_vals = new Head_strs(vals);
 				
 ////				System.out.println(h_vals);
-//				if(h_vals.toString().equals("12 12 15 6"))
+//				if(h_vals.toString().equals("10 2 15 6"))
+//				{
+//					int y = 0;
+//					y++;
+//				}
+////				
+//				if(h_vals.toString().equals("6 5 5 16"))
 //				{
 //					int y = 0;
 //					y++;
@@ -1910,11 +1831,44 @@ public class Tuple_reasoning1 {
 //					System.out.println(h_vals);
 					
 					c_view_template = new Vector<citation_view_vector>();
+										
+					HashMap<String, Vector<Tuple>> curr_tuple_mapping = (HashMap<String, Vector<Tuple>>) tuple_mapping.clone();
+					
+					int i = pos1;
+					
+					for(Iterator iter = valid_conditions.iterator(); iter.hasNext();)
+					{
+						boolean condition = rs.getBoolean(i + 1);
+						
+						Conditions curr_condition = (Conditions) iter.next();
+						
+						if(!condition)
+						{							
+							String condition_str = curr_condition.toString();
+							
+							Vector<Tuple> invalid_views = conditions_map.get(condition_str);
+							
+							for(int k = 0; k<invalid_views.size(); k++)
+							{
+								Tuple tuple = invalid_views.get(k);
+								
+								Vector<Tuple> curr_tuples = (Vector<Tuple>) curr_tuple_mapping.get(tuple.name).clone();
+								
+								curr_tuples.remove(tuple);
+								
+								curr_tuple_mapping.put(tuple.name, curr_tuples);
+							}
+							
+							
+							
+						}
+						i++;
+					}	
 					
 					citation_strings = new HashMap<String, HashSet<String>>();
 					
 					Vector<String[]> c_units = new Vector<String[]>();
-					for(int i = query.head.args.size(); i<query.body.size() + query.head.args.size();i++)
+					for(i = query.head.args.size(); i<query.body.size() + query.head.args.size();i++)
 					{
 						String citation_vec = rs.getString(i + 1);
 						
@@ -1927,7 +1881,7 @@ public class Tuple_reasoning1 {
 						c_units.add(c_unit);
 					}
 										
-					Vector<Vector<citation_view>> c_unit_vec = get_citation_units_condition(c_units, rs, query.body.size() + query.head.args.size(), query);
+					Vector<Vector<citation_view>> c_unit_vec = get_citation_units_condition(c_units, curr_tuple_mapping, rs, query.body.size() + query.head.args.size(), query);
 					
 //					output_vec(c_unit_vec);				
 					
@@ -1935,9 +1889,9 @@ public class Tuple_reasoning1 {
 
 					c_views.add(c_unit_combinaton);
 					
-//					HashSet<String> citations = gen_citation(c_unit_combinaton, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
+					HashSet<String> citations = gen_citation(c_unit_combinaton, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
 					
-					HashSet<String> citations = new HashSet<String>();
+//					HashSet<String> citations = new HashSet<String>();
 					
 //					Vector<String> citations = new Vector<String>();
 //					
@@ -2012,9 +1966,9 @@ public class Tuple_reasoning1 {
 					
 					c_views.add(update_c_view);
 					
-//					HashSet<String> citations = gen_citation(update_c_view, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
+					HashSet<String> citations = gen_citation(update_c_view, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
 					
-					HashSet<String> citations = new HashSet<String>();
+//					HashSet<String> citations = new HashSet<String>();
 					
 //					HashSet<String> citations = populate_citation(update_c_view, vals, c, pst, citation_strings, h_vals);
 					
@@ -2085,30 +2039,72 @@ public class Tuple_reasoning1 {
 				
 				Head_strs h_vals = new Head_strs(vals);
 				
+				int pos1 = query.body.size() + query.head.args.size() + lambda_term_num;
+				
 				if(first)
 				{
 					group_num ++;
 					
 					c_view_template = new Vector<citation_view_vector>();
 					
+					HashMap<String, Vector<Tuple>> curr_tuple_mapping = (HashMap<String, Vector<Tuple>>) tuple_mapping.clone();
+					
+					int i = pos1;
+					
+					for(Iterator iter = valid_conditions.iterator(); iter.hasNext();)
+					{
+						boolean condition = rs.getBoolean(i + 1);
+						
+						Conditions curr_condition = (Conditions) iter.next();
+						
+						if(!condition)
+						{							
+							String condition_str = curr_condition.toString();
+							
+							Vector<Tuple> invalid_views = conditions_map.get(condition_str);
+							
+							for(int k = 0; k<invalid_views.size(); k++)
+							{
+								Tuple tuple = invalid_views.get(k);
+								
+								Vector<Tuple> curr_tuples = curr_tuple_mapping.get(tuple.name);
+								
+								curr_tuples.remove(tuple);
+								
+								curr_tuple_mapping.put(tuple.name, curr_tuples);
+							}
+							
+							
+							
+						}
+						i++;
+					}	
+					
 					citation_strings.clear();
 					
 					Vector<String[]> c_units = new Vector<String[]>();
-					for(int i = query.head.args.size(); i<query.body.size() + query.head.args.size();i++)
+					for(i = query.head.args.size(); i<query.body.size() + query.head.args.size();i++)
 					{
-						String[] c_unit= rs.getString(i+1).split("\\"+ populate_db.separator);
+						String c_view_str = rs.getString(i+1);
+						
+						if(c_view_str == null)
+						{
+							c_view_str = new String();
+						}
+						
+						String[] c_unit= c_view_str.split("\\"+ populate_db.separator);
 						c_units.add(c_unit);
 					}
 					
 
 					
-					Vector<Vector<citation_view>> c_unit_vec = get_citation_units_condition(c_units, rs, query.body.size() + query.head.args.size(), query);
+					Vector<Vector<citation_view>> c_unit_vec = get_citation_units_condition(c_units, curr_tuple_mapping, rs, query.body.size() + query.head.args.size(), query);
 					
 					Vector<citation_view_vector> c_unit_combinaton = get_valid_citation_combination(c_view_template, c_unit_vec,query);
 					
-//					HashSet<String> citations = gen_citation(c_unit_combinaton, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
+					HashSet<String> citations = gen_citation(c_unit_combinaton, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
 					
-					HashSet<String> citations = new HashSet<String>();
+//					HashSet<String> citations = new HashSet<String>();
 					
 //					Vector<String> citations = new Vector<String>();
 //					
@@ -2176,9 +2172,9 @@ public class Tuple_reasoning1 {
 					
 					c_views.add(update_c_view);
 					
-//					HashSet<String> citations = gen_citation(update_c_view, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
+					HashSet<String> citations = gen_citation(update_c_view, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
 
-					HashSet<String> citations = new HashSet<String>();
+//					HashSet<String> citations = new HashSet<String>();
 					
 //					HashSet<String> citations = populate_citation(update_c_view, vals, c, pst, citation_strings, h_vals);
 					
@@ -2424,9 +2420,12 @@ public class Tuple_reasoning1 {
 			
 			insert_c_view.add(i, c_vec);
 		}
+		
+		
 				
 		insert_c_view = remove_duplicate_final(insert_c_view);
-
+//
+//		insert_c_view = remove_duplicate(insert_c_view);
 		
 //		Vector<citation_view_vector> update_c_views = new Vector<citation_view_vector>();
 //		
@@ -2814,7 +2813,7 @@ public class Tuple_reasoning1 {
 		return correct;
 	}
 	
-	public static Vector<Vector<citation_view>> get_citation_units_condition(Vector<String[]> c_units, ResultSet rs, int start_pos, Query q) throws ClassNotFoundException, SQLException
+	public static Vector<Vector<citation_view>> get_citation_units_condition(Vector<String[]> c_units, HashMap<String, Vector<Tuple>> curr_tuple_mapping, ResultSet rs, int start_pos, Query q) throws ClassNotFoundException, SQLException
 	{
 		Vector<Vector<citation_view>> c_views = new Vector<Vector<citation_view>>();
 		
@@ -2848,75 +2847,104 @@ public class Tuple_reasoning1 {
 //				}
 					
 					
-					Vector<Tuple> available_tuples = tuple_mapping.get(c_view_name);
+					Vector<Tuple> available_tuples = curr_tuple_mapping.get(c_view_name);
 					
 					if(available_tuples != null)
 					{
-						Vector<Tuple> valid_tuples = new Vector<Tuple> ();
+//						Vector<Tuple> valid_tuples = new Vector<Tuple> ();
 						
 						for(int k = 0; k<available_tuples.size(); k++)
 						{
-							Tuple curr_tuple = available_tuples.get(k);
+							Tuple valid_tuple = available_tuples.get(k);
 							
-							if(correct_tuple(curr_tuple, subgoal))
+							if(valid_tuple.mapSubgoals_str.get(q.subgoal_name_mapping.get(subgoal.name)).equals(subgoal.name))
 							{
+//								valid_tuples.add(curr_tuple);
 								
-								valid_tuples.add(curr_tuple);
+								if(valid_tuple.lambda_terms.size() > 0)
+								{
+									Vector<String> lambda_term_values = new Vector<String>();
+									
+									for(int p = 0; p<valid_tuple.lambda_terms.size(); p++)
+									{
+										int l_id = lambda_term_id_mapping.get(valid_tuple.lambda_terms.get(p).toString());
+										
+										int pos = start_pos + l_id + 1;
+										
+										lambda_term_values.add(rs.getString(pos));
+										
+									}
+									
+									citation_view_parametered c = new citation_view_parametered(c_view_name, view_mapping.get(c_view_name), valid_tuple, lambda_term_values);
+				
+									c_view.add(c);
+								}	
+								else
+								{
+									
+									c_view.add(new citation_view_unparametered(c_unit_str[j], valid_tuple));
+								}
 							}
+							
+//							if(correct_tuple(curr_tuple, subgoal))
+//							{
+//								
+//								
+//							}
 						}
 						
-						int k = 0;
+//						int k = 0;
 						
-						for(int p = 0; p < valid_tuples.size(); p++)
-						{
-							Tuple valid_tuple = valid_tuples.get(p);
-							for(k = 0; k < valid_tuple.conditions.size(); k++)
-							{
-								if(condition_id_mapping.get(valid_tuple.conditions.get(k).toString()) != null)
-								{
-									int condition_id = condition_id_mapping.get(valid_tuple.conditions.get(k).toString());
-									
-									int pos = start_pos + valid_lambda_terms.size() + condition_id + 1;
-									
-									boolean b = rs.getBoolean(pos);
-									
-									if(b)
-										continue;
-									else
-										break;
-								}
-								
-							}
-							
-							if(k < valid_tuple.conditions.size())
-								continue;
-						
-							if(valid_tuple.lambda_terms.size() > 0)
-							{
-								Vector<String> lambda_term_values = new Vector<String>();
-								
-								for(k = 0; k<valid_tuple.lambda_terms.size(); k++)
-								{
-									int l_id = lambda_term_id_mapping.get(valid_tuple.lambda_terms.get(k).toString());
-									
-									int pos = start_pos + l_id + 1;
-									
-									lambda_term_values.add(rs.getString(pos));
-									
-								}
-								
-								citation_view_parametered c = new citation_view_parametered(c_view_name, view_mapping.get(c_view_name), valid_tuple, lambda_term_values);
-			
-								c_view.add(c);
-							}	
-							else
-							{
-								
-								c_view.add(new citation_view_unparametered(c_unit_str[j], valid_tuple));
-							}
-
-							
-						}
+//						for(int p = 0; p < valid_tuples.size(); p++)
+//						{
+//							Tuple valid_tuple = valid_tuples.get(p);
+////							for(k = 0; k < valid_tuple.conditions.size(); k++)
+////							{
+////								if(condition_id_mapping.get(valid_tuple.conditions.get(k).toString()) != null)
+////								{
+////									int condition_id = condition_id_mapping.get(valid_tuple.conditions.get(k).toString());
+////									
+////									int pos = start_pos + valid_lambda_terms.size() + condition_id + 1;
+////									
+////									boolean b = rs.getBoolean(pos);
+////									
+////									if(b)
+////										continue;
+////									else
+////										break;
+////								}
+////								
+////							}
+////							
+////							if(k < valid_tuple.conditions.size())
+////								continue;
+//						
+//							if(valid_tuple.lambda_terms.size() > 0)
+//							{
+//								Vector<String> lambda_term_values = new Vector<String>();
+//								
+//								for(k = 0; k<valid_tuple.lambda_terms.size(); k++)
+//								{
+//									int l_id = lambda_term_id_mapping.get(valid_tuple.lambda_terms.get(k).toString());
+//									
+//									int pos = start_pos + l_id + 1;
+//									
+//									lambda_term_values.add(rs.getString(pos));
+//									
+//								}
+//								
+//								citation_view_parametered c = new citation_view_parametered(c_view_name, view_mapping.get(c_view_name), valid_tuple, lambda_term_values);
+//			
+//								c_view.add(c);
+//							}	
+//							else
+//							{
+//								
+//								c_view.add(new citation_view_unparametered(c_unit_str[j], valid_tuple));
+//							}
+//
+//							
+//						}
 						
 
 							
@@ -3070,24 +3098,22 @@ public class Tuple_reasoning1 {
 	public static Vector<citation_view_vector> get_valid_citation_combination(Vector<citation_view_vector> c_view_template, Vector<Vector<citation_view>>c_unit_vec, Query query)
 	{
 		Vector<citation_view_vector> c_combinations = new Vector<citation_view_vector>();
-				
-		Vector<String> subgoal_names = new Vector<String>();
-		
+						
 //		int valid_subgoal_num = 0;
 		
-		for(int i = 0; i<c_unit_vec.size(); i++)
-		{
-			Vector<citation_view> curr_c_unit_vec = c_unit_vec.get(i);
-			
-			Subgoal subgoal = (Subgoal) query.body.get(i); 
-			
-			if(curr_c_unit_vec.size() != 0)
-			{
-				subgoal_names.add(subgoal.name);
-//				valid_subgoal_num ++;
-			}
-			
-		}
+//		for(int i = 0; i<c_unit_vec.size(); i++)
+//		{
+//			Vector<citation_view> curr_c_unit_vec = c_unit_vec.get(i);
+//			
+//			Subgoal subgoal = (Subgoal) query.body.get(i); 
+//			
+//			if(curr_c_unit_vec.size() != 0)
+//			{
+//				subgoal_names.add(subgoal.name);
+////				valid_subgoal_num ++;
+//			}
+//			
+//		}
 		
 		
 //		boolean final_col = false;
@@ -3106,9 +3132,9 @@ public class Tuple_reasoning1 {
 //					final_col = true;
 //			}
 			
-			c_combinations = join_operation(c_combinations, curr_c_unit_vec, subgoal_names, c_combinations.size());
+			c_combinations = join_operation(c_combinations, curr_c_unit_vec, c_combinations.size());
 			
-//			remove_duplicate_view_combinations(c_combinations);
+			remove_duplicate_view_combinations(c_combinations);
 			
 			
 		}
@@ -3119,9 +3145,9 @@ public class Tuple_reasoning1 {
 		
 		
 		c_combinations = remove_duplicate_final(c_combinations);
-
-		c_combinations = remove_duplicate(c_combinations);
-		
+//
+//		c_combinations = remove_duplicate(c_combinations);
+				
 		
 		return (c_combinations);
 	}
@@ -3149,7 +3175,17 @@ public class Tuple_reasoning1 {
 					citation_view_vector curr_combination = c_view_template.get(j);
 					
 					
-					
+//					if(c_combination.c_vec.size() == 3)
+//					{
+//						
+//						System.out.println(c_combination);
+//						
+//						System.out.println(curr_combination);
+//						
+//						int k = 0;
+//						
+//						k++;
+//					}
 					
 //					if((c_combination.index_vec.containsAll(curr_combination.index_vec) && c_combination.index_vec.size() > curr_combination.index_vec.size()) || (c_combination.index_vec.equals(curr_combination.index_vec)))
 					if((view_vector_contains(c_combination, curr_combination) && table_names_contains(c_combination, curr_combination) && c_combination.index_vec.size() > curr_combination.index_vec.size()))
@@ -3163,6 +3199,15 @@ public class Tuple_reasoning1 {
 							
 							break;
 						}
+					}
+					
+					if(c_combination.index_str.equals(curr_combination.index_str) && c_combination.table_name_str.equals(curr_combination.table_name_str))
+					{
+						c_view_template.remove(i);
+						
+						i--;
+						
+						break;
 					}
 				}
 				
@@ -3197,7 +3242,7 @@ public class Tuple_reasoning1 {
 					
 					
 //					if((c_combination.index_vec.containsAll(curr_combination.index_vec) && c_combination.index_vec.size() > curr_combination.index_vec.size()) || (c_combination.index_vec.equals(curr_combination.index_vec)))
-					if((view_vector_contains(c_combination, curr_combination) && table_names_contains(c_combination, curr_combination)))
+					if((view_vector_contains(c_combination, curr_combination) && table_names_contains(c_combination, curr_combination) && c_combination.c_vec.size() > curr_combination.c_vec.size()))
 					{
 						
 //						if(c_combination.table_names.equals(curr_combination.table_names))
@@ -3228,9 +3273,7 @@ public class Tuple_reasoning1 {
 		for(int i = 0; i<c_combinations.size(); i++)
 		{
 //			String str = (String) iter.next();
-			
-			boolean contains = false;
-			
+						
 			citation_view_vector c_combination = c_combinations.get(i);
 			
 			
@@ -3374,7 +3417,7 @@ public class Tuple_reasoning1 {
 					citation_view_vector curr_combination = c_combinations.get(j);
 					
 //					if((c_combination.index_vec.containsAll(curr_combination.index_vec) && c_combination.index_vec.size() > curr_combination.index_vec.size()) || (c_combination.index_vec.equals(curr_combination.index_vec)))
-					if((view_vector_contains(c_combination, curr_combination) && c_combination.index_vec.size() > curr_combination.index_vec.size()))
+					if((view_vector_contains(c_combination, curr_combination)))
 					{
 						
 //						if(c_combination.table_names.equals(curr_combination.table_names))
@@ -3522,7 +3565,7 @@ public class Tuple_reasoning1 {
 //		return update_combinations;
 //	}
 //	
-	public static Vector<citation_view_vector> join_operation(Vector<citation_view_vector> c_combinations, Vector<citation_view> insert_citations,  Vector<String> subgoal_names, int i)
+	public static Vector<citation_view_vector> join_operation(Vector<citation_view_vector> c_combinations, Vector<citation_view> insert_citations, int i)
 	{
 		if(i == 0)
 		{
@@ -3532,7 +3575,7 @@ public class Tuple_reasoning1 {
 				
 				c.add(insert_citations.get(k));
 				
-				String str = String.valueOf(insert_citations.get(k).get_index());
+//				String str = String.valueOf(insert_citations.get(k).get_index());
 				
 				c_combinations.add(new citation_view_vector(c));
 				

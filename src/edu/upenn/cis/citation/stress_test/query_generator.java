@@ -52,7 +52,7 @@ public class query_generator {
 	
 	static double citatble_rate = 0.3;
 	
-	static double local_predicates_rate = 0.5;
+	static double local_predicates_rate = 0.9;
 	
 	static double lambda2head_rate = 0.3;
 	
@@ -553,7 +553,7 @@ public class query_generator {
 		{
 			Integer index = (Integer) iter.next();
 			
-			Argument l = new Argument(relation_name+ "_" + attr_list.get(index), relation_name);
+			Argument l = new Argument(relation_name+ populate_db.separator + attr_list.get(index), relation_name);
 			
 			head_vars.add(l);
 			
@@ -588,7 +588,7 @@ public class query_generator {
 			
 			Argument arg = head_vars.get(index);
 			
-			l_terms.add(new Lambda_term(arg.relation_name + "_" + arg.name, arg.relation_name));
+			l_terms.add(new Lambda_term(arg.relation_name + populate_db.separator + arg.name, arg.relation_name));
 		}
 		
 		return l_terms;
@@ -610,40 +610,40 @@ public class query_generator {
 		
 		double value = r.nextDouble();
 		
-		String attr_name = primary_key_type[0];
-		
-		String type = primary_key_type[1];
-				
-		Conditions insert_condition = new Conditions(new Argument(attr_name, relation_name) , relation_name, new op_less_equal(), new Argument("'2'"), new String());
-		
-		conditions.add(insert_condition);
-		
-		return conditions;
-
-		
-//		if(value < local_predicates_rate)
-//		{
-//			String attr_name = primary_key_type[0];
-//			
-//			String type = primary_key_type[1];
-//			
-//			if(comparable_data_type_vec.contains(type))
-//			{
-//				Conditions insert_condition = do_gen_condition_comparable(relation, relation_name, attr_name, c, pst);
+//		String attr_name = primary_key_type[0];
+//		
+//		String type = primary_key_type[1];
 //				
-//				if(insert_condition != null)
-//					conditions.add(insert_condition); 
-//			}
-//			else
-//			{
-//				Conditions insert_condition = do_gen_condition_uncomparable(relation, relation_name, attr_name, c, pst);
-//				
-//				if(insert_condition != null)
-//					conditions.add(insert_condition);
-//			}
-//		}
+//		Conditions insert_condition = new Conditions(new Argument(attr_name, relation_name) , relation_name, new op_less_equal(), new Argument("'2'"), new String());
+//		
+//		conditions.add(insert_condition);
 //		
 //		return conditions;
+
+		
+		if(value < local_predicates_rate)
+		{
+			String attr_name = primary_key_type[0];
+			
+			String type = primary_key_type[1];
+			
+			if(comparable_data_type_vec.contains(type))
+			{
+				Conditions insert_condition = do_gen_condition_comparable(relation, relation_name, attr_name, c, pst);
+				
+				if(insert_condition != null)
+					conditions.add(insert_condition); 
+			}
+			else
+			{
+				Conditions insert_condition = do_gen_condition_uncomparable(relation, relation_name, attr_name, c, pst);
+				
+				if(insert_condition != null)
+					conditions.add(insert_condition);
+			}
+		}
+		
+		return conditions;
 	}
 	
 	

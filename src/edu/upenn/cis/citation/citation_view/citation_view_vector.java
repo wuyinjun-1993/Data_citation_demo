@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.sort_citation_view_vec.binary_compare;
 import edu.upenn.cis.citation.sort_citation_view_vec.sort_insert;
 
@@ -79,7 +80,7 @@ public class citation_view_vector {
 			{
 				table_names.addAll(vec.get(i).get_table_names());
 				
-				insert_sort(index_vec, vec.get(i).toString());
+//				insert_sort(index_vec, vec.get(i).toString());
 				
 				insert_sort(c_vec, vec.get(i));
 				
@@ -87,11 +88,13 @@ public class citation_view_vector {
 
 		}
 		
-		for(int i = 0; i< index_vec.size(); i++)
+		for(int i = 0; i< c_vec.size(); i++)
 		{
-			index_str += index_vec.get(i);
+			index_str += c_vec.get(i).toString();
 			
-			view_name_str += index_vec.get(i).replaceFirst("\\(.*\\)", "");
+			index_vec.add(c_vec.get(i).toString());
+			
+			view_name_str += c_vec.get(i).toString().replaceFirst("\\(.*\\)", "");
 			
 			table_name_str += c_vec.get(i).get_table_name_string();
 		}
@@ -103,7 +106,7 @@ public class citation_view_vector {
 		
 		Vector<citation_view> vec_new = (Vector<citation_view>) c_vec.clone();
 				
-		Vector<String> index_new = (Vector<String>) index_vec.clone();
+		Vector<String> index_new = new Vector<String>();
 //				
 		HashSet<String> table_names_new = (HashSet<String>) table_names.clone();
 		
@@ -117,7 +120,7 @@ public class citation_view_vector {
 		{
 			table_names_new.addAll(c.get_table_names());
 			
-			insert_sort(index_new, c.toString());
+//			insert_sort(index_new, c.toString());
 			
 			insert_sort(vec_new, c);
 			
@@ -134,11 +137,13 @@ public class citation_view_vector {
 
 		}
 		
-		for(int i = 0; i< index_new.size(); i++)
+		for(int i = 0; i< vec_new.size(); i++)
 		{
-			index_str_new += index_new.get(i);
+			index_str_new += vec_new.get(i).toString();
 			
-			String str = index_new.get(i).replaceFirst("\\(.*\\)", "");
+			index_new.add(vec_new.get(i).toString());
+			
+			String str = vec_new.get(i).toString().replaceFirst("\\(.*\\)", "");
 						
 			view_name_str_new += str;
 			
@@ -215,9 +220,13 @@ public class citation_view_vector {
 		
 		}
 		
+		String s1 = insert_str.toString() + insert_str.get_table_name_string();
+		
 		citation_view first_str = index_vec.firstElement();
 		
-		if(insert_str.toString().compareTo(first_str.toString()) < 0)
+		String s2 = first_str.toString() + first_str.get_table_name_string();
+		
+		if(s1.compareTo(s2) < 0)
 		{
 			index_vec.insertElementAt(insert_str, 0);
 			
@@ -226,7 +235,9 @@ public class citation_view_vector {
 		
 		citation_view last_str = index_vec.lastElement();
 		
-		if(insert_str.toString().compareTo(last_str.toString()) > 0)
+		s2 = last_str.toString() + last_str.get_table_name_string();
+		
+		if(s1.compareTo(s2) > 0)
 		{
 			index_vec.add(insert_str);
 			
@@ -239,11 +250,15 @@ public class citation_view_vector {
 			@Override			
 			public int compare(citation_view a, citation_view b)
 			{
-				if(a.toString().compareTo(b.toString()) > 0)
+				String s1 = b.toString() + b.get_table_name_string();
+				
+				String s2 = a.toString() + a.get_table_name_string();
+
+				if(s2.compareTo(s1) > 0)
 					return 1;
 				else
 				{
-					if(a.toString().compareTo(b.toString()) < 0)
+					if(s2.compareTo(s1) < 0)
 						return -1;
 					else
 						return 0;
@@ -255,6 +270,63 @@ public class citation_view_vector {
 		index_vec.insertElementAt(insert_str, pos);
 		
 	}
+	
+//	public static int binary_search(Vector<citation_view> list, citation_view item, binary_compare bc)
+//	{
+//		
+////		int pos = list.size()/2;
+//		
+//		int start = 0;
+//		
+//		int end = list.size() - 1;
+//		
+//		int pos = (start + end) /2;
+//		
+//		while(start < end)
+//		{
+//			
+//			
+//			
+//			int cmp_v = bc.compare(item, list.get(pos)); 
+//			
+//			if(cmp_v < 0)
+//			{
+//				end = pos - 1;
+//			}
+//			else
+//			{
+//				if(cmp_v > 0)
+//				{
+//					start = pos + 1;
+//				}
+//				else
+//					break;
+//			}
+//			
+//			pos = (start + end) /2;
+//			
+//		}
+//		
+//		int cmp_v = bc.compare(item, list.get(pos)); 
+//		
+//		if(cmp_v > 0)
+//		{
+//			pos = pos + 1;
+//		}
+//		else
+//		{
+//			if(cmp_v == 0)
+//			{
+//				if(item.toString().compareTo(list.get(pos).toString()) > 0)
+//				{
+//					pos = pos + 1;
+//				}
+//			}
+//		}
+//		
+//		
+//		return pos;
+//	}
 	
 	public citation_view_vector(Vector<citation_view> vec, Vector<String> index_vec, HashSet<String> table_names){
 		

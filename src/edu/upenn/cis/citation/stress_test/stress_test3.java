@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
 
@@ -35,6 +36,8 @@ public class stress_test3 {
 	static int num_views = 3;
 	
 	static int view_max_size = 40;
+	
+	static int query_num = 4;
 	
 	static Vector<String> get_unique_relation_names(Query query)
 	{
@@ -69,6 +72,46 @@ public class stress_test3 {
 		
 		
 		
+				
+//		Query query = query_storage.get_query_by_id(1);
+		
+		for(int k = 0; k<query_num; k++)
+		{
+			reset();
+			
+			Random r = new Random();
+			
+			int size = r.nextInt(query_num);
+			
+			while(size <= 0)
+			{
+				size = r.nextInt(query_num);
+			}
+			
+//			Query query = query_storage.get_query_by_id(1);
+			
+			Query query = query_generator.gen_query(size, c, pst);
+			
+			query_storage.store_query(query, new Vector<Integer>());
+			
+			System.out.println(query);
+			
+			stress_testing(query, c, pst);
+
+		}
+		
+
+		
+		
+		
+		c.close();
+		
+		
+	}
+	
+	static void stress_testing(Query query, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException, IOException, InterruptedException
+	{
+		
 		HashMap<Head_strs, HashSet<String> > citation_strs = new HashMap<Head_strs, HashSet<String>>();
 		
 		HashMap<Head_strs, HashSet<String> > citation_strs2 = new HashMap<Head_strs, HashSet<String>>();
@@ -83,12 +126,11 @@ public class stress_test3 {
 		Vector<Vector<citation_view_vector>> citation_view1 = new Vector<Vector<citation_view_vector>>();
 
 		Vector<Vector<citation_view_vector>> citation_view2 = new Vector<Vector<citation_view_vector>>();
-		
-		Query query = query_storage.get_query_by_id(1);
+
 		
 		Vector<String> relation_names = get_unique_relation_names(query);
 		
-		HashSet<Query> views = view_generator.generate_store_views(relation_names, num_views, query.body.size());
+		HashSet<Query> views = view_generator.generate_store_views(relation_names, num_views, query.body.size(), query);
 		
 		for(int j = 0; j<view_max_size; j++)
 		{
@@ -281,14 +323,10 @@ public class stress_test3 {
 			
 			
 			
-			view_generator.gen_one_additional_view(views, relation_names, query.body.size());
+			view_generator.gen_one_additional_view(views, relation_names, query.body.size(), query);
 			
 			
 		}
-		
-		c.close();
-		
-		
 	}
 	
 	static void reset() throws SQLException, ClassNotFoundException

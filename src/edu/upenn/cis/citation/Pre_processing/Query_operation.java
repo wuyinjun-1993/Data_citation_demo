@@ -21,6 +21,7 @@ import edu.upenn.cis.citation.Operation.op_less;
 import edu.upenn.cis.citation.Operation.op_less_equal;
 import edu.upenn.cis.citation.Operation.op_not_equal;
 import edu.upenn.cis.citation.datalog.Parse_datalog;
+import edu.upenn.cis.citation.datalog.Query_converter;
 
 public class Query_operation {
 	
@@ -28,11 +29,18 @@ public class Query_operation {
 	public static void main(String [] args) throws ClassNotFoundException, SQLException
 	{
 
-		Vector<String> block_names = new Vector<String>();
+//		Vector<String> block_names = new Vector<String>();
+//		
+//		Vector<String> table_names = get_connection_citation_with_query("c1", block_names);
+//		
+//		System.out.println(table_names);
 		
-		Vector<String> table_names = get_connection_citation_with_query("c1", block_names);
 		
-		System.out.println(table_names);
+		Query query = get_query_by_name("q2");
+		
+		String query_str = Query_converter.datalog2sql(query);
+		
+		System.out.println(query);
 		
 //		delete_query_by_id(10);
 		
@@ -55,6 +63,30 @@ public class Query_operation {
             
             insert_citation_query_connection(cid, qid, qname_block.get(i)[1], c, pst);
         }
+        
+        
+        
+        c.close();
+        
+	}
+	
+	public static void add_connection_citation_with_query(String cname, String qname, String block) throws SQLException, ClassNotFoundException
+	{
+		Class.forName("org.postgresql.Driver");
+        Connection c = DriverManager
+           .getConnection(populate_db.db_url,
+       	        populate_db.usr_name,populate_db.passwd);
+        
+        PreparedStatement pst = null;
+        
+        int cid = citation_view_operation.get_citation_id(cname, c, pst);
+        
+//        for(int i = 0; i<qname_block.size(); i++)
+//        {
+        	int qid = get_query_id(qname, c, pst);
+            
+            insert_citation_query_connection(cid, qid, block, c, pst);
+//        }
         
         
         
@@ -665,9 +697,9 @@ public class Query_operation {
 	{
 		head_var_str = head_var_str.trim();
 		
-		String relation_name = head_var_str.substring(0, head_var_str.indexOf("_"));
+		String relation_name = head_var_str.substring(0, head_var_str.indexOf(populate_db.separator));
 		
-		String attr_name = head_var_str.substring(head_var_str.indexOf("_") + 1, head_var_str.length());
+		String attr_name = head_var_str.substring(head_var_str.indexOf(populate_db.separator) + 1, head_var_str.length());
 		
 		String [] values = {relation_name, attr_name};
 		
@@ -752,11 +784,11 @@ public class Query_operation {
 			
 			String str2 = strs[1];
 			
-			String relation_name1 = str1.substring(0, str1.indexOf("_")).trim();
+			String relation_name1 = str1.substring(0, str1.indexOf(populate_db.separator)).trim();
 			
 			String relation_name2 = new String();
 			
-			String arg1 = str1.substring(str1.indexOf("_") + 1, str1.length()).trim();
+			String arg1 = str1.substring(str1.indexOf(populate_db.separator) + 1, str1.length()).trim();
 
 			String arg2 = new String ();
 			
@@ -770,11 +802,11 @@ public class Query_operation {
 			}
 			else
 			{
-				arg2 = str2.substring(str2.indexOf("_") + 1, str2.length()).trim();
+				arg2 = str2.substring(str2.indexOf(populate_db.separator) + 1, str2.length()).trim();
 				
 //				subgoal2 = strs2[0] + "_" + strs2[1];
 				
-				relation_name2 = str2.substring(0, str2.indexOf("_")).trim();
+				relation_name2 = str2.substring(0, str2.indexOf(populate_db.separator)).trim();
 				
 				condition = new Conditions(new Argument(arg1, relation_name1), relation_name1, op, new Argument(arg2, relation_name2), relation_name2);
 

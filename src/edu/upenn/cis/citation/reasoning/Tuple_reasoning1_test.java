@@ -38,7 +38,7 @@ import edu.upenn.cis.citation.output.output2excel;
 import edu.upenn.cis.citation.user_query.query_storage;
 import sun.util.resources.cldr.ur.CurrencyNames_ur;
 
-public class Tuple_reasoning1 {
+public class Tuple_reasoning1_test {
 		
 	static int max_author_num = 10;
 			
@@ -371,7 +371,7 @@ public class Tuple_reasoning1 {
 //			System.out.println(c_views1);
 //			
 //			System.out.println(c_views2);
-//			
+			
 			compare(c_views1, c_views2);
 		}
 		
@@ -1706,7 +1706,7 @@ public class Tuple_reasoning1 {
 		
 		remove_conflict_duplicate_view_mapping(query);
 					
-		String sql = Query_converter.datalog2sql_citation(query, valid_lambda_terms, valid_conditions);
+		String sql = Query_converter.datalog2sql_citation_test(query, valid_lambda_terms, valid_conditions);
 		
 		reasoning(c_views, query, c, pst, sql, citation_view_map1, citation_strs, viewTuples);
 		
@@ -1750,9 +1750,13 @@ public class Tuple_reasoning1 {
 	public static void reasoning(Vector<Vector<citation_view_vector>> c_views, Query query, Connection c, PreparedStatement pst, String sql, HashMap<Head_strs, Vector<Vector<citation_view_vector> > > citation_view_map1, HashMap<Head_strs, HashSet<String> > citation_strs, HashSet<Tuple> viewTuples) throws SQLException, ClassNotFoundException, IOException, InterruptedException
 	{
 		pst = c.prepareStatement(sql);
+		
+//		System.out.println(sql);
+
 				
 		ResultSet rs = pst.executeQuery();
 					
+		
 		int lambda_term_num = valid_lambda_terms.size();
 
 		String old_value = new String();
@@ -1767,10 +1771,11 @@ public class Tuple_reasoning1 {
 		
 		int tuple_num = 0;
 		
+		Vector<citation_view_vector> c_view_template = null;
+		
 		if(!valid_conditions.isEmpty())
 		{
 			
-			Vector<citation_view_vector> c_view_template = null;
 
 			
 			
@@ -1790,6 +1795,8 @@ public class Tuple_reasoning1 {
 				values.add(vals);
 				
 				Head_strs h_vals = new Head_strs(vals);
+				
+				vals.clear();
 				
 ////				System.out.println(h_vals);
 //				if(h_vals.toString().equals("10 2 15 6"))
@@ -2032,9 +2039,7 @@ public class Tuple_reasoning1 {
 		{
 			
 			boolean first = true;
-			
-			Vector<citation_view_vector> c_view_template = null;
-			
+						
 			while(rs.next())
 			{				
 				
@@ -2050,6 +2055,8 @@ public class Tuple_reasoning1 {
 				values.add(vals);
 				
 				Head_strs h_vals = new Head_strs(vals);
+				
+				vals.clear();
 				
 				int pos1 = query.body.size() + query.head.args.size() + lambda_term_num;
 				
@@ -2245,6 +2252,11 @@ public class Tuple_reasoning1 {
 
 			}
 		}
+		
+		
+		if(c_view_template != null)
+		c_view_template.clear();
+
 		
 		System.out.print(group_num + "	");
 		
@@ -2448,6 +2460,8 @@ public class Tuple_reasoning1 {
 //			
 //			insert_c_view.add(i, c_vec);
 		}
+		
+		insert_c_view.clear();
 		
 		return update_c_views;
 		
@@ -3174,6 +3188,8 @@ public class Tuple_reasoning1 {
 		remove_duplicate_view_combinations_final(temp_combinations);
 		
 		c_view_template.addAll(temp_combinations);
+		
+		temp_combinations.clear();
 		
 		c_combinations.addAll(c_view_template);
 		

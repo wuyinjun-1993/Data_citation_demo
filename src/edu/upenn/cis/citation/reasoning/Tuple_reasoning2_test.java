@@ -36,7 +36,7 @@ import edu.upenn.cis.citation.gen_citation.gen_citation1;
 import edu.upenn.cis.citation.output.output2excel;
 import sun.util.resources.cldr.ur.CurrencyNames_ur;
 
-public class Tuple_reasoning2 {
+public class Tuple_reasoning2_test {
 	
 	
 	static HashMap<String, Query> view_mapping = new HashMap<String, Query>();
@@ -106,13 +106,13 @@ public class Tuple_reasoning2 {
 		
 		Vector<Vector<String>> head_vals = new Vector<Vector<String>>();
 		
-		Vector<Vector<citation_view_vector>> c_views = Tuple_reasoning2.tuple_reasoning(q, citation_strs, citation_view_map2, c, pst);
+		Vector<Vector<citation_view_vector>> c_views = Tuple_reasoning2_test.tuple_reasoning(q, citation_strs, citation_view_map2, c, pst);
 		
-		Vector<String> agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views);
+		Vector<String> agg_citations = Tuple_reasoning2_test.tuple_gen_agg_citations(c_views);
 		
 		Vector<Integer> ids = new Vector<Integer>();
 		
-		Vector<String> subset_agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views, ids);
+		Vector<String> subset_agg_citations = Tuple_reasoning2_test.tuple_gen_agg_citations(c_views, ids);
 
 		c.close();
 	}
@@ -826,7 +826,7 @@ public class Tuple_reasoning2 {
 		
 		remove_conflict_duplicate_view_mapping(query);
 			
-		String sql = Query_converter.datalog2sql_citation2(query, valid_conditions, valid_lambda_terms);
+		String sql = Query_converter.datalog2sql_citation2_test(query, valid_conditions, valid_lambda_terms);
 
 		reasoning(views, c_views, query, c, pst, sql, citation_strs, citation_view_map2);
 		
@@ -1261,6 +1261,8 @@ public class Tuple_reasoning2 {
 				
 				Head_strs h_vals = new Head_strs(vals);
 				
+				vals.clear();
+				
 //				if(h_vals.toString().equals("2 1 1 2 1 1 2 1 1"))
 //				{
 //					int y= 0;
@@ -1460,11 +1462,7 @@ public class Tuple_reasoning2 {
 				
 				Head_strs h_vals = new Head_strs(vals);
 				
-//				if(h_vals.toString().equals("8 12 9 4"))
-//				{
-//					int y = 0;
-//					y++;
-//				}
+				vals.clear();
 				
 				int pos1 = query.head.args.size() + valid_lambda_terms.size();
 
@@ -1590,6 +1588,9 @@ public class Tuple_reasoning2 {
 				}
 			}
 		}
+		
+		if(c_view_template != null)
+			c_view_template.clear();
 			
 //		output2excel.citation_output(rs, query, values, c_views, file_name, values);
 		System.out.print(group_num + "	");

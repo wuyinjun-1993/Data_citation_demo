@@ -2,6 +2,8 @@ package edu.upenn.cis.citation.Corecover;
 
 import java.util.Vector;
 
+import edu.upenn.cis.citation.Pre_processing.populate_db;
+
 public class Lambda_term {
 	
 	public String name;
@@ -36,7 +38,7 @@ public class Lambda_term {
 	{
 		table_name = new_table_name;
 		
-		name = table_name + "_" + name.substring(name.indexOf("_") + 1, name.length());
+		name = table_name + populate_db.separator + name.substring(name.indexOf(populate_db.separator) + 1, name.length());
 	}
 
 	@Override

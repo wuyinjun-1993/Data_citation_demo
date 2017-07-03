@@ -20,8 +20,10 @@ import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.reasoning.Tuple_reasoning1;
 import edu.upenn.cis.citation.reasoning.Tuple_reasoning1_citation_opt;
 import edu.upenn.cis.citation.reasoning.Tuple_reasoning1_citation_opt2;
+import edu.upenn.cis.citation.reasoning.Tuple_reasoning1_test;
 import edu.upenn.cis.citation.reasoning.Tuple_reasoning2;
 import edu.upenn.cis.citation.reasoning.Tuple_reasoning2_citation_opt;
+import edu.upenn.cis.citation.reasoning.Tuple_reasoning2_test;
 import edu.upenn.cis.citation.user_query.query_storage;
 
 public class stress_test2 {
@@ -30,9 +32,9 @@ public class stress_test2 {
 	
 	static int times = 1;
 	
-	static int size_upper_bound = 5;
+	static int size_upper_bound = 40;
 	
-	static int num_views = 10;
+	static int num_views = 5;
 	
 	static Vector<String> get_unique_relation_names(Query query)
 	{
@@ -82,46 +84,48 @@ public class stress_test2 {
 
 		Vector<Vector<citation_view_vector>> citation_view2 = new Vector<Vector<citation_view_vector>>();
 		
+		reset();
+		
+//		Vector<Query> queries = query_generator.gen_queries(j, size_range);
+		
+		Query query = query_generator.gen_query(4, c, pst);
+//		
+//		System.out.println(queries.get(0));
+
+		
+		Vector<String> relation_names = get_unique_relation_names(query);
+		
+		HashSet<Query> views = view_generator.generate_store_views(relation_names, num_views, query.body.size(), query);
+		
+//		query_storage.store_query(queries.get(0), new Vector<Integer>());
+		
+		System.out.println("start");
+		
 		for(int j = 4; j<size_upper_bound; j++)
 		{
 			
-			Vector<Query> queries = new Vector<Query>();
-			
-			Query query = query_storage.get_query_by_id(1);
+//			Vector<Query> queries = new Vector<Query>();
 //			
-			queries.add(query);
+//			Query query = query_storage.get_query_by_id(1);
+////			
+//			queries.add(query);
 			
-//			reset();
-//			
-//			Vector<Query> queries = query_generator.gen_queries(j, size_range);
-//			
-//			Query query = query_generator.gen_query(j, c, pst);
-			
-//			System.out.println(queries.get(0));
 
 			
-//			Vector<String> relation_names = get_unique_relation_names(queries.get(0));
-			
-//			view_generator.generate_store_views(relation_names, num_views);
-			
-//			query_storage.store_query(queries.get(0), new Vector<Integer>());
-			
-			System.out.println("start");
-			
-			for(int i = 0; i<queries.size(); i++)
-			{
-				
-				Query q = queries.get(i);
+//			for(int i = 0; i<queries.size(); i++)
+//			{
+//				
+				Query q = query;
 
 				
-				if(i == 0)
-				{
-					System.out.println(q);
-					
-					System.out.println(Query_converter.datalog2sql(q));
-								
-					System.out.println(q.body.size());
-				}
+//				if(i == 0)
+//				{
+//					System.out.println(q);
+//					
+//					System.out.println(Query_converter.datalog2sql(q));
+//								
+//					System.out.println(q.body.size());
+//				}
 				
 				System.out.print(q.conditions + "	");
 				
@@ -138,7 +142,7 @@ public class stress_test2 {
 					
 					citation_strs.clear();
 					
-					citation_view1 = Tuple_reasoning1.tuple_reasoning(q, citation_strs,  citation_view_map1, c, pst);
+					citation_view1 = Tuple_reasoning1_test.tuple_reasoning(q, citation_strs,  citation_view_map1, c, pst);
 					
 				}
 				
@@ -220,7 +224,7 @@ public class stress_test2 {
 					
 					citation_strs2.clear();
 					
-					Tuple_reasoning2.tuple_reasoning(q, citation_strs2, citation_view_map2, c, pst);
+					Tuple_reasoning2_test.tuple_reasoning(q, citation_strs2, citation_view_map2, c, pst);
 				}
 				
 				end_time = System.nanoTime();
@@ -293,8 +297,10 @@ public class stress_test2 {
 //				Tuple_reasoning1.compare_citation(citation_strs, citation_strs2);
 				
 				System.out.println();
+				
+				view_generator.gen_one_additional_view(views, relation_names, query.body.size(), query);
 
-			}
+//			}
 		}
 		
 		c.close();

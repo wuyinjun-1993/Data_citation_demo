@@ -312,17 +312,17 @@ public class gen_citation1 {
 			citation = author_str + ".";
 		}
 		
-		String value_str = new String();
+//		String value_str = new String();
+//		
+//		for(int i = 0; i<vals.size(); i++)
+//		{
+//			if( i >= 1)
+//				value_str += ",";
+//			
+//			value_str += vals.get(i);
+//		}
 		
-		for(int i = 0; i<vals.size(); i++)
-		{
-			if( i >= 1)
-				value_str += ",";
-			
-			value_str += vals.get(i);
-		}
-		
-		citation += value_str + "." + db_name;
+		citation += "." + db_name;
 		
 		return citation;
 	}

@@ -2226,7 +2226,7 @@ public class Query_converter {
 			
 			String name = lambda_terms.get(i).name;
 			
-			str += lambda_terms.get(i).table_name + "." + name.substring(lambda_terms.get(i).table_name.length() + 1, name.length());
+			str += lambda_terms.get(i).table_name + "." + name.substring(name.indexOf(populate_db.separator) + 1, name.length());
 		}
 		
 		return str;
@@ -2263,6 +2263,63 @@ public class Query_converter {
 		String citation_table = get_relations_with_citation_table(query);
 		
 		String condition = get_condition(query);
+		
+		String citation_condition = get_citation_condition(query, c, pst);
+		
+		sql = "select " + sel_item + "," + citation_unit;
+		
+		if(sel_lambda_terms != null && !sel_lambda_terms.isEmpty())
+			sql += "," + sel_lambda_terms;
+		
+		if(condition_str[0] != null && !condition_str[0].isEmpty())
+			sql += "," + condition_str[0];
+		
+		sql += " from " + citation_table + " where " +  citation_condition;
+		
+		if(condition != null && !condition.isEmpty())
+			sql += " and " + condition;
+		
+		if(condition_str[1] != null && !condition_str[1].isEmpty())
+			sql += " order by " + condition_str[1]; 
+		
+//		System.out.println("sql:::" + sql);
+		
+		c.close();
+		
+		return sql;
+	}
+	
+	public static String datalog2sql_citation_test(Query query, Vector<Lambda_term> lambda_terms, HashSet<Conditions> valid_conditions) throws SQLException, ClassNotFoundException
+	{
+				
+//		String sel_item = new String();
+				
+		Connection c = null;
+		
+	    PreparedStatement pst = null;
+	      
+		Class.forName("org.postgresql.Driver");
+		
+	    c = DriverManager
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
+	    
+	    
+		
+		String sql = new String();
+
+		String sel_item = get_sel_item(query);
+		
+		String citation_unit = get_sel_citation_unit(query);
+		
+		String sel_lambda_terms = get_lambda_str(query, lambda_terms);
+		
+		String [] condition_str = get_condition_boolean_value(query, valid_conditions);
+		
+		
+		String citation_table = get_relations_with_citation_table(query);
+		
+		String condition = query.lambda_term.get(0).name;
 		
 		String citation_condition = get_citation_condition(query, c, pst);
 		
@@ -2397,6 +2454,64 @@ public class Query_converter {
 		return sql;
 	}
 	
+	
+	public static String datalog2sql_citation2_test(Query query, HashSet<Conditions> valid_conditions, Vector<Lambda_term> lambda_terms) throws SQLException, ClassNotFoundException
+	{
+				
+		String sel_item = new String();
+				
+		Connection c = null;
+		
+	    PreparedStatement pst = null;
+	      
+		Class.forName("org.postgresql.Driver");
+		
+	    c = DriverManager
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
+		
+		String sql = new String();
+		
+		sel_item = get_sel_item(query);
+		
+//		String citation_unit = get_sel_citation_unit(query);
+		
+		String sel_lambda_terms = get_lambda_str(query, lambda_terms);
+		
+		String [] condition_str = get_condition_boolean_value(query, valid_conditions);
+		
+		
+		String citation_table = get_relations_without_citation_table(query);
+		
+		String condition = query.lambda_term.get(0).name;
+		
+//		String citation_condition = get_citation_condition(query, c, pst);
+		
+		sql = "select " + sel_item;
+		
+		if(sel_lambda_terms != null && !sel_lambda_terms.isEmpty())
+			sql += "," + sel_lambda_terms;
+		
+		if(condition_str[0] != null && !condition_str[0].isEmpty())
+			sql += "," + condition_str[0];
+		
+		sql += " from " + citation_table;
+		
+		if(condition != null && !condition.isEmpty())
+			sql += " where " + condition;
+		
+		if(condition_str[1] != null && !condition_str[1].isEmpty())
+			sql += " order by " + condition_str[1]; 
+		
+//		System.out.println("sql:::" + sql);
+		
+		c.close();
+		
+		return sql;
+		
+		
+		
+	}
 	
 	public static String datalog2sql_citation2(Query query, HashSet<Conditions> valid_conditions, Vector<Lambda_term> lambda_terms) throws SQLException, ClassNotFoundException
 	{

@@ -66,6 +66,49 @@ public class view_operation {
 		
 	}
 	
+	public static void save_view_by_name(String old_name, String new_name, Query view) throws SQLException, ClassNotFoundException
+	{
+		Class.forName("org.postgresql.Driver");
+        Connection c = DriverManager
+           .getConnection(populate_db.db_url,
+       	        populate_db.usr_name,populate_db.passwd);
+        
+        PreparedStatement pst = null;
+        
+        int id = get_view_id(old_name, c, pst);
+        
+//        String id = name;
+        
+        boolean has_lambda = delete_lambda_terms(id, c, pst);
+        
+        HashMap<String, String> subgoal_name_mapping = new HashMap<String, String>();
+        
+        Vector<Subgoal> subgoals = get_view_subgoals(id, subgoal_name_mapping, c, pst);
+                
+        delete_subgoals(id, c, pst);
+        
+        delete_conditions(id, c, pst);
+        
+        delete_citation_view(id, c, pst);
+        
+        populate_db.delete("v" + id, subgoals, subgoal_name_mapping, has_lambda);
+        
+        update_view_table(id, new_name, view, c, pst);
+        
+        insert_view_conditions(id, view, c, pst);
+        
+        insert_view_lambda_term(id, view, c, pst);
+        
+        insert_view_subgoals(id, view, c, pst);
+        
+        view.name = "v" + id;
+        
+        populate_db.update(view);
+        
+        c.close();
+        
+	}
+	
 	static Query gen_sample_view() throws ClassNotFoundException, SQLException
 	{
 		Vector<Argument> head_args = new Vector<Argument>();
@@ -389,6 +432,29 @@ public class view_operation {
 	static void delete_view_table(int id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query = "delete from view_table where view = '" + id + "'";
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+	}
+	
+	static void update_view_table(int id, String name, Query view, Connection c, PreparedStatement pst) throws SQLException
+	{
+		String view_name = name;
+		
+		String head_vars_str = new String();
+		
+		for(int i = 0; i<view.head.args.size(); i++)
+		{
+			Argument arg = (Argument)view.head.args.get(i);
+			
+			if(i >= 1)
+				head_vars_str += ",";
+			
+			head_vars_str += arg.name;
+		}
+		
+		String query = "update view_table set head_variables ='" + head_vars_str + "',name ='" + view_name + "' where view = " + id;
 		
 		pst = c.prepareStatement(query);
 		

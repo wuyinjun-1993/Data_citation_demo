@@ -117,6 +117,8 @@ public class QBEApp extends Application {
 	final TableView<ObservableList> dataView = new TableView(); 
 	// data preview shown after run in citation builder
 	final TableView<ObservableList> dataViewNew = new TableView(); 
+	// data preview in user scene
+	final TableView<ObservableList> userDataView = new TableView();
 	// lambda vbox shown after run in dba and user
 	final HBox hBoxLambda = new HBox();
 	// lambda vbox shown after run in citation builder
@@ -653,12 +655,12 @@ private Object String;
 		GridPane.setHgrow(searchBox, Priority.NEVER);
 		gridUser.add(searchBox, 0, 0);
 
-		final TableView<ObservableList> dataView = new TableView();
-		GridPane.setVgrow(dataView, Priority.ALWAYS);
-		GridPane.setHgrow(dataView, Priority.ALWAYS);
-		dataView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-		dataView.setItems(dataViewList);
-		gridUserSub.add(dataView, 0, 3, 2, 1);
+//		final TableView<ObservableList> userDataView = new TableView();
+		GridPane.setVgrow(userDataView, Priority.ALWAYS);
+		GridPane.setHgrow(userDataView, Priority.ALWAYS);
+		userDataView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+		userDataView.setItems(dataViewList);
+		gridUserSub.add(userDataView, 0, 3, 2, 1);
 		
 		// Pane
 		TableView<Entry> tableViewUser = new TableView<Entry>();
@@ -667,7 +669,7 @@ private Object String;
 		GridPane.setVgrow(splitPaneQbe, Priority.ALWAYS);
 		splitPaneQbe.getItems().add(tableViewUser);
 		
-		gridUserSub.add(buildTopMenu(null, null, dataView, true), 1, 0);
+		gridUserSub.add(buildTopMenu(null, null, userDataView, true), 1, 0);
 		gridUserSub.add(splitPaneQbe, 0, 1, 2, 1);
 
 		// Table View
@@ -726,7 +728,7 @@ private Object String;
 		nextButton.setId("prevnext");
 		nextButton.setOnAction(e -> {
 			next();
-			setDataView(null, dataView, true);
+			setDataView(null, userDataView, true);
 		});
 		hBoxPrevNext.getChildren().addAll(prevButton, nextButton);
 		GridPane.setHgrow(hBoxPrevNext, Priority.ALWAYS);
@@ -747,7 +749,7 @@ private Object String;
 			}
 //			System.out.println(dataView.getSelectionModel().getSelectedItems().size());
 			ObservableList<String> listCitations = FXCollections.observableArrayList();
-			ObservableList<Integer> indices = dataView.getSelectionModel().getSelectedIndices();
+			ObservableList<Integer> indices = userDataView.getSelectionModel().getSelectedIndices();
 			if (indices == null || indices.isEmpty()) {
 				try {
 					// generate all citations
@@ -1782,7 +1784,32 @@ private Object String;
 			}
 			try {
 				int query_list_id = query_storage.store_query(citeQuery, id_list);
-				
+				if (query_list_id > 0) {
+					// saved before
+					Vector<Integer> selected_rows = new Vector<Integer>();
+					System.out.println("[query id] " + query_list_id);
+					selected_rows = query_storage.get_query_list_by_id(query_list_id);
+					citeStage.hide();
+					userDataView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+					userDataView.getSelectionModel().setCellSelectionEnabled(true);
+					if (selected_rows == null || selected_rows.isEmpty()) {
+						userDataView.getSelectionModel().selectAll();
+					} else {
+						for (int row : selected_rows) {
+							userDataView.getSelectionModel().select(row);
+							System.out.println(row);
+						}
+					}
+					// TODO
+				} else {
+					// successful save
+					Alert alert = new Alert(Alert.AlertType.INFORMATION);
+		            alert.setTitle("Succeed");
+		            alert.setHeaderText(null);
+		            alert.setContentText("The citation query is successfully saved");
+		            alert.showAndWait();
+					
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -2210,8 +2237,10 @@ private Object String;
 							return;
 						} else {
 							String field = node.getValue().getName();
-							if (!citeStage.isShowing() && (stage.getScene() == dbaScene || stage.getScene() == userScene))
+							if (!citeStage.isShowing() && (stage.getScene() == dbaScene || stage.getScene() == userScene)) {
+								// TODO check duplicate
 								data.add(new Entry(table, field, true, "", "", false));
+							}
 							// add data to citation builder
 							else if (citeStage.isShowing())
 								dataNew.add(new Entry(table, field, true, "", "", false));

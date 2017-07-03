@@ -212,7 +212,7 @@ public class query_storage {
         {
         	String values = rs.getString(1);
         	
-        	if(values == null && values.isEmpty())
+        	if(values == null || values.isEmpty())
         		return int_list;
         	
         	String [] value_list = values.split(",");

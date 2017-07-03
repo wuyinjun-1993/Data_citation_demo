@@ -1760,6 +1760,7 @@ private Object String;
 
 		// DataLog content
 		TextArea datalogField = new TextArea();
+		
 		gridQuerySub.add(datalogField, 0, 1);
 		
 		// build Top menu
@@ -1776,9 +1777,12 @@ private Object String;
 		} catch (ClassNotFoundException | SQLException e1) {
 			e1.printStackTrace();
 		}
-		
+		gridQuerySub.add(dataView, 0, 4);
 		final HBox hBox = buildTopMenu(null, hBoxLambda, dataView, false);
 		
+		List<Entry> list = new ArrayList<>();
+		list.addAll(data);
+		datalogField.setText(Util.convertToDatalogOriginal(list));
 		gridQuerySub.add(hBox, 1, 0);
 		
 		// Label data preview

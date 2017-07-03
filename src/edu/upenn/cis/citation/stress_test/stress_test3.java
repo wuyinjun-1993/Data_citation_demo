@@ -95,7 +95,7 @@ public class stress_test3 {
 				
 //		Query query = query_storage.get_query_by_id(1);
 		
-		for(int k = 3; k<=query_num; k++)
+		for(int k = 2; k<=query_num; k++)
 		{
 			reset();
 			

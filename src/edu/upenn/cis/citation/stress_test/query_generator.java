@@ -64,11 +64,16 @@ public class query_generator {
 	
 	static int view_nums = 100;
 	
+	static int query_result_size = 100000;
+	
+	static HashMap<String, String> relation_primary_key_mapping = new HashMap<String, String>();
+	
+	static HashMap<String, Vector<Integer>> relation_primary_key_ranges = new HashMap<String, Vector<Integer>>();
+	
 	
 	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException
 	{
-				
 		Connection c = null;
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");
@@ -262,12 +267,46 @@ public class query_generator {
 	    }
 	}
 	
-	
+	static void build_relation_primary_key_mapping(Connection c, PreparedStatement pst) throws SQLException
+	{
+		relation_primary_key_mapping.put("family", "family_id");
+		
+		relation_primary_key_mapping.put("introduction", "family_id");
+		
+		relation_primary_key_mapping.put("object", "object_id");
+		
+		relation_primary_key_mapping.put("ligand", "ligand_id");
+		
+		relation_primary_key_mapping.put("gpcr", "object_id");
+		
+		Set<String> set = relation_primary_key_mapping.keySet();
+		
+		for(Iterator iter = set.iterator(); iter.hasNext();)
+		{
+			String relation = (String) iter.next();
+			
+			String query = "select distinct " + relation_primary_key_mapping.get(relation) + " from " + relation;
+			
+			pst = c.prepareStatement(query);
+			
+			ResultSet rs = pst.executeQuery();
+			
+			Vector<Integer> ids = new Vector<Integer>();
+			
+			while(rs.next())
+			{
+				ids.add(rs.getInt(1));
+			}
+			
+			relation_primary_key_ranges.put(relation, ids);
+			
+		}
+	}
 	
 	public static Query gen_query(int size, Connection c, PreparedStatement pst) throws SQLException
 	{		
 		
-		
+		build_relation_primary_key_mapping(c, pst);
 								
 			Query query = generate_query(size, c, pst);
 		
@@ -279,7 +318,7 @@ public class query_generator {
 		Random r = new Random();
 		
 		HashSet<String> relation_names = new HashSet<String>();
-		
+				
 		Vector<Argument> heads = new Vector<Argument>();
 		
 		Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();
@@ -289,6 +328,8 @@ public class query_generator {
 		HashMap<String, String> maps = new HashMap<String, String>();
 		
 		Vector<Subgoal> body = new Vector<Subgoal>();
+		
+//		String [] tables = {"object", "object", "ligand"};
 		
 		for(int i = 0; i<size; i++)
 		{
@@ -339,20 +380,13 @@ public class query_generator {
 			int selection_size = rand.nextInt((int)(attr_list.size() * local_predicates_rate + 1));
 			
 			String [] primary_key_type = get_primary_key(relation, c, pst);
-			
-			Vector<Conditions> conditions = gen_local_predicates(selection_size, attr_types, attr_list, relation, relation_name, primary_key_type, c, pst);
-					
-			local_predicates.addAll(conditions);
-			
+											
 			int head_size = rand.nextInt((int)(attr_list.size() * head_var_rate + 1)) + 1;
 									
 			Vector<Argument> head_vars = gen_head_vars(relation, relation_name, attr_list, head_size, c, pst);
 			
 			heads.addAll(head_vars);
 			
-			Vector<Lambda_term> l_terms = new Vector<Lambda_term> ();//gen_lambda_terms(head_vars, relation, relation_name);
-			
-			lambda_terms.addAll(l_terms);
 			
 //			Vector<Argument> args = new Vector<Argument>();
 			
@@ -361,16 +395,14 @@ public class query_generator {
 			body.add(new Subgoal(relation_name, args));
 		}
 		
+		String query_local_predicate = gen_local_predicates_with_fixed_size(maps, relation_names, c, pst);
+		
 		String name = "Q";
-		
-//		Vector<Conditions> global_predicates = gen_global_conditions(body, maps);
-		
+				
 		Vector<Conditions> predicates = new Vector<Conditions>();
 		
-//		predicates.addAll(global_predicates);
-		
-		predicates.addAll(local_predicates);
-		
+		lambda_terms.add(new Lambda_term(query_local_predicate));
+						
 		return new Query(name, new Subgoal(name, heads), body, lambda_terms, predicates, maps);
 	}
 	
@@ -593,6 +625,92 @@ public class query_generator {
 		
 		return l_terms;
 		
+	}
+
+	
+	static String gen_local_predicates_with_fixed_size(HashMap<String, String> relation_mapping, HashSet<String> relation_names, Connection c, PreparedStatement pst) throws SQLException
+	{
+		
+		long total_range = 1;
+		
+		Vector<String> relations = new Vector<String>();
+		
+		relations.addAll(relation_names);
+		
+		for(int i = 0; i<relations.size(); i++)
+		{
+			
+//			System.out.println(relation_mapping.get(relations.get(i)));
+			
+//			System.out.println(relation_primary_key_ranges.get(relation_mapping.get(relations.get(i))).size());
+			
+			total_range = total_range * relation_primary_key_ranges.get(relation_mapping.get(relations.get(i))).size();
+		}
+		
+		int selected_size = (int)(Math.pow(query_result_size, 1.0/relations.size()) + 0.5);
+		
+		String selection_strings = new String();
+		
+		int real_size = 1;
+		
+//		if(ratio < 1)
+		{
+			
+			for(int i = 0; i<relations.size(); i++)
+			{
+				
+				if(i >= 1)
+					selection_strings += " and ";
+				
+				String selection_string = "(";
+				
+				int max_size = relation_primary_key_ranges.get(relation_mapping.get(relations.get(i))).size();
+				
+//				int selected_size = (int)(max_size * ratio + 0.5);
+				
+				real_size *= selected_size;
+				
+//				System.out.println(selected_size);
+				
+				HashSet<Integer> id_list = new HashSet<Integer>();
+				
+				while(id_list.size() < selected_size)
+				{
+					Random r = new Random();
+					
+					int id = r.nextInt(max_size);
+					
+					id_list.add(relation_primary_key_ranges.get(relation_mapping.get(relations.get(i))).get(id));
+				}
+				
+				int num = 0;
+				
+				for(Iterator iter = id_list.iterator(); iter.hasNext();)
+				{
+					Integer id = (Integer) iter.next();
+					
+					if(num >= 1)
+					{
+						selection_string += " or ";
+					}
+					
+					selection_string += relations.get(i) + "." + relation_primary_key_mapping.get(relation_mapping.get(relations.get(i))) + "=" + id;
+					
+					num++;
+					
+				}
+				
+				selection_string += ")";
+				
+				selection_strings += selection_string;
+			}
+		}
+		
+//		System.out.println(real_size);
+//		
+//		System.out.println("selection_string:::" + selection_strings);
+		
+		return selection_strings;
 	}
 	
 	static Vector<Conditions> gen_local_predicates(int selection_size, HashMap<String, String> attr_types, Vector<String> attr_list, String relation, String relation_name, String [] primary_key_type, Connection c, PreparedStatement pst) throws SQLException

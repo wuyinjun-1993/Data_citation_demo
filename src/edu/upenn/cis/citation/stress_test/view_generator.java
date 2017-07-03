@@ -92,9 +92,9 @@ public class view_generator {
 		
 		Vector<Argument> head_variables = new Vector<Argument>();
 		
-		head_variables.add(new Argument("contributor_first_names", "contributor"));
+		head_variables.add(new Argument("contributor" + populate_db.separator + "first_names", "contributor"));
 		
-		head_variables.add(new Argument("contributor_surname", "contributor"));
+		head_variables.add(new Argument("contributor" + populate_db.separator + "surname", "contributor"));
 		
 		query_table_names.put("object", table_names);
 		
@@ -120,9 +120,9 @@ public class view_generator {
 		
 		head_variables = new Vector<Argument>();
 		
-		head_variables.add(new Argument("contributor_first_names", "contributor"));
+		head_variables.add(new Argument("contributor" + populate_db.separator + "first_names", "contributor"));
 		
-		head_variables.add(new Argument("contributor_surname", "contributor"));
+		head_variables.add(new Argument("contributor" + populate_db.separator + "surname", "contributor"));
 		
 		query_table_names.put("gpcr", table_names);
 		
@@ -148,9 +148,9 @@ public class view_generator {
 		
 		head_variables = new Vector<Argument>();
 		
-		head_variables.add(new Argument("contributor_first_names", "contributor"));
+		head_variables.add(new Argument("contributor" + populate_db.separator + "first_names", "contributor"));
 		
-		head_variables.add(new Argument("contributor_surname", "contributor"));
+		head_variables.add(new Argument("contributor" + populate_db.separator + "surname", "contributor"));
 		
 		query_table_names.put("family", table_names);
 		
@@ -176,9 +176,9 @@ public class view_generator {
 		
 		head_variables = new Vector<Argument>();
 		
-		head_variables.add(new Argument("contributor_first_names", "contributor"));
+		head_variables.add(new Argument("contributor" + populate_db.separator + "first_names", "contributor"));
 		
-		head_variables.add(new Argument("contributor_surname", "contributor"));
+		head_variables.add(new Argument("contributor" + populate_db.separator + "surname", "contributor"));
 		
 		query_table_names.put("introduction", table_names);
 		
@@ -200,9 +200,9 @@ public class view_generator {
 		
 		head_variables = new Vector<Argument>();
 		
-		head_variables.add(new Argument("contributor2ligand_first_names", "contributor2ligand"));
+		head_variables.add(new Argument("contributor2ligand" + populate_db.separator + "first_names", "contributor2ligand"));
 		
-		head_variables.add(new Argument("contributor2ligand_surname", "contributor2ligand"));
+		head_variables.add(new Argument("contributor2ligand" + populate_db.separator + "surname", "contributor2ligand"));
 		
 		query_table_names.put("ligand", table_names);
 		
@@ -350,7 +350,7 @@ public class view_generator {
 		
 		for(int i = 0; i<citatable_tables.length; i++)
 		{
-			Query view = generate_default_view(citatable_tables[i], i, c, pst);
+			Query view = generate_default_view(citatable_tables[i], i + 1, c, pst);
 			
 			views.add(view);
 		}
@@ -360,7 +360,7 @@ public class view_generator {
 		return views;
 	}
 	
-	public static int gen_views_with_n_subgoals(int n, int id, int upper_bound) throws SQLException, ClassNotFoundException
+	public static Vector<Query> gen_views_with_n_subgoals(Vector<String> unique_relation_names, int n, int id) throws SQLException, ClassNotFoundException
 	{
 		Connection c = null;
 	      PreparedStatement pst = null;
@@ -372,7 +372,7 @@ public class view_generator {
 		
 		Vector<Query> queries = new Vector<Query>();
 		
-		relation_names.addAll(Arrays.asList(citatable_tables));
+		relation_names.addAll(unique_relation_names);
 		
 		HashSet relation_sets = UserLib.genSubsets(relation_names, n);
 		
@@ -390,16 +390,32 @@ public class view_generator {
 			
 			id++;
 			
-			if(id == upper_bound)
-			{
-				break;
-			}
 		}
 				
 		c.close();
 		
-		return id;
+		return queries;
 		
+	}
+	
+	public static void store_single_view(Query view, int id) throws ClassNotFoundException, SQLException
+	{
+		
+		Connection c = null;
+	      PreparedStatement pst = null;
+		Class.forName("org.postgresql.Driver");
+	    c = DriverManager
+	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
+		
+		view_operation.add(view, view.name);
+		
+		citation_view_operation.add_citation_view("c" + id);
+		
+		citation_view_operation.add_connection_view_with_citations("c" + id, view.name);
+		
+		store_citation_queries(view, id, c, pst);
+		
+		Query_operation.add_connection_citation_with_query("c" + id, "q" + id , "author");
 	}
 	
 	public static void clear_other_tables(Connection c, PreparedStatement pst) throws SQLException
@@ -734,6 +750,35 @@ public class view_generator {
 		return queries;
 	}
 	
+	static Vector<Query> gen_views(Vector<String> subgoal_names, int num_views, int sizeofview, int id, Query q) throws SQLException, ClassNotFoundException
+	{
+//		Vector<Integer> sizes = generator_random_numbers(num_views, sizeofquety);
+		
+		Connection c = null;
+	      PreparedStatement pst = null;
+		Class.forName("org.postgresql.Driver");
+	    c = DriverManager
+	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
+		
+		Vector<Query> queries = new Vector<Query>();
+		
+		for(int k = 0; k<num_views; k++)
+		{
+			
+//			int size = sizes.get(num);
+						
+			Query query = generate_view_fixed_size_without_predicates(subgoal_names, id, sizeofview, c, pst, q);
+			
+			queries.add(query);
+			
+			id++;
+		}
+		
+		c.close();
+		
+		return queries;
+	}
+	
 	static HashSet<Query> gen_views_without_predicates(Vector<String> subgoal_names, int num_views, int sizeofquety, Connection c, PreparedStatement pst) throws SQLException
 	{
 		Vector<Integer> sizes = generator_random_numbers(num_views, sizeofquety);
@@ -1033,6 +1078,87 @@ public class view_generator {
 		return new Query(name, new Subgoal(name, heads), body, lambda_terms, predicates, maps);
 	}
 	
+	static Query generate_view_fixed_size_without_predicates(Vector<String> subgoal_names, int id, int size, Connection c, PreparedStatement pst, Query q) throws SQLException
+	{
+		Random r = new Random();
+		
+		HashSet<String> relation_names = new HashSet<String>();
+		
+		Vector<Argument> heads = new Vector<Argument>();
+		
+		Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();
+		
+		Vector<Conditions> local_predicates = new Vector<Conditions>();
+		
+		HashMap<String, String> maps = new HashMap<String, String>();
+		
+		Vector<Subgoal> body = new Vector<Subgoal>();
+		
+		for(int i = 0; i<size; i++)
+		{
+			int index = r.nextInt((int) (subgoal_names.size()));
+			
+			String relation = subgoal_names.get(index);
+			
+			if(relation_names.contains(relation))
+			{
+				continue;
+			}
+			else
+			{
+				relation_names.add(relation);
+				
+				maps.put(relation, relation);
+			}
+			
+			HashMap<String, String> attr_types = get_attr_types(relation, c, pst);
+			
+			
+			Set<String> attr_names = attr_types.keySet();
+			
+			Vector<String> attr_list = new Vector<String> ();
+			
+			attr_list.addAll(attr_names);
+			
+			Random rand = new Random();
+			
+//			int selection_size = rand.nextInt((int)(attr_list.size() * local_predicates_rate + 1));
+			
+//			String [] primary_key_type = get_primary_key(relation, c, pst);
+			
+//			Vector<Conditions> conditions = gen_local_predicates(selection_size, attr_types, attr_list, relation, primary_key_type, c, pst, q);
+					
+//			local_predicates.addAll(conditions);
+			
+			int head_size = rand.nextInt((int)(attr_list.size() * head_var_rate + 1)) + 1;
+									
+			Vector<Argument> head_vars = gen_head_vars(relation, attr_list, head_size, c, pst);
+			
+			
+			Vector<Lambda_term> l_terms = gen_lambda_terms(head_vars, relation, c, pst);
+			
+			heads.addAll(head_vars);
+			
+			lambda_terms.addAll(l_terms);
+			
+			Vector<Argument> args = new Vector<Argument>();
+			
+			body.add(new Subgoal(relation, args));
+		}
+		
+		String name = "v" + id;
+		
+//		Vector<Conditions> global_predicates = gen_global_conditions(body);
+		
+		Vector<Conditions> predicates = new Vector<Conditions>();
+		
+//		predicates.addAll(global_predicates);
+		
+		predicates.addAll(local_predicates);
+		
+		return new Query(name, new Subgoal(name, heads), body, lambda_terms, predicates, maps);
+	}
+	
 	static Query generate_default_view(String subgoal_name, int id, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{		
 		Vector<Argument> heads = new Vector<Argument>();
@@ -1235,15 +1361,7 @@ public class view_generator {
 		
 		Query view = new Query(name, new Subgoal(name, heads), body, lambda_terms, predicates, maps);
 		
-		view_operation.add(view, view.name);
 		
-		citation_view_operation.add_citation_view("c" + id);
-		
-		citation_view_operation.add_connection_view_with_citations("c" + id, name);
-		
-		store_citation_queries(view, id, c, pst);
-		
-		Query_operation.add_connection_citation_with_query("c" + id, "q" + id , "author");
 		
 		
 		return view;
@@ -1458,7 +1576,7 @@ public class view_generator {
 				
 				Argument arg = head_vars.get(index);
 				
-				if(arg.name.equals("introduction_text"))
+				if(arg.name.equals("introduction" + populate_db.separator +"text"))
 				{
 					if(int_list.size() == 1)
 					{

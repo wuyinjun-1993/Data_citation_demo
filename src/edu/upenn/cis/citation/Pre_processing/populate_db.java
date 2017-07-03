@@ -43,7 +43,7 @@ public class populate_db {
 
 //	public static String db_url = "jdbc:postgresql://localhost:5432/test";
 //	public static String db_url = "jdbc:postgresql://citedb.cx9xmwhyomib.us-east-1.rds.amazonaws.com:5432/iuphar";
-	public static String []default_table_names = {"view_table", "view2subgoals", "view2lambda_term", "view2conditions", "citation_table", "citation2view", "citation2query", "query2head_variables", "query2conditions", "query2head_variables", "query2subgoal", "user_query_table", "user_query2conditions", "user_query2subgoals"};
+	public static String []default_table_names = {"view_table", "view2subgoals", "view2lambda_term", "view2conditions", "citation_table", "citation2view", "citation2query", "query2head_variables", "query2conditions", "query2head_variables", "query2subgoal", "user_query_table", "user_query2conditions", "user_query2subgoals", "user_query_conditions"};
 	
 	public static String db_url = "jdbc:postgresql://localhost:5432/test";
 
@@ -394,7 +394,7 @@ public class populate_db {
 			
 			query += "primary key (" + primary_key_string + "), foreign key (" + primary_key_string + ") references " + relation_names.get(i) + "(" + primary_key_string + ") on update cascade )";
 			
-			System.out.println(query);
+//			System.out.println(query);
 			
 			pst = c.prepareStatement(query);
 			

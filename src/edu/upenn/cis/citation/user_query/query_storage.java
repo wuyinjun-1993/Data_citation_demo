@@ -177,7 +177,11 @@ public class query_storage {
         
         Vector<Subgoal> subgoals = get_query_subgoals(id, subgoal_name_mapping, c, pst);
         
+        String predicate = get_query_predicate(id, c, pst);
+        
         Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();//get_query_lambda_terms(id, c, pst);
+        
+        lambda_terms.add(new Lambda_term(predicate));
         
         Subgoal head = new Subgoal("q" + id, head_var);
         
@@ -187,6 +191,22 @@ public class query_storage {
         c.close();
                 
         return view;
+	}
+	
+	static String get_query_predicate(int id, Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "select string from user_query_conditions where query_id = " + id;
+		
+		pst = c.prepareStatement(query);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		if(rs.next())
+		{
+			return rs.getString(1);
+		}
+		
+		return null;
 	}
 	
 	public static Vector<Integer> get_query_list_by_id(int id) throws SQLException, ClassNotFoundException
@@ -212,7 +232,7 @@ public class query_storage {
         {
         	String values = rs.getString(1);
         	
-        	if(values == null && values.isEmpty())
+        	if(values == null || values.isEmpty())
         		return int_list;
         	
         	String [] value_list = values.split(",");
@@ -348,11 +368,11 @@ public class query_storage {
 			
 			String str2 = strs[1];
 			
-			String relation_name1 = str1.substring(0, str1.indexOf("_")).trim();
+			String relation_name1 = str1.substring(0, str1.indexOf(populate_db.separator)).trim();
 			
 			String relation_name2 = new String();
 			
-			String arg1 = str1.substring(str1.indexOf("_") + 1, str1.length()).trim();
+			String arg1 = str1.substring(str1.indexOf(populate_db.separator) + 1, str1.length()).trim();
 
 			String arg2 = new String ();
 			
@@ -366,11 +386,11 @@ public class query_storage {
 			}
 			else
 			{
-				arg2 = str2.substring(str2.indexOf("_") + 1, str2.length()).trim();
+				arg2 = str2.substring(str2.indexOf(populate_db.separator) + 1, str2.length()).trim();
 				
 //				subgoal2 = strs2[0] + "_" + strs2[1];
 				
-				relation_name2 = str2.substring(0, str2.indexOf("_")).trim();
+				relation_name2 = str2.substring(0, str2.indexOf(populate_db.separator)).trim();
 				
 				condition = new Conditions(new Argument(arg1, relation_name1), relation_name1, op, new Argument(arg2, relation_name2), relation_name2);
 
@@ -419,9 +439,9 @@ public class query_storage {
 	{
 		head_var_str = head_var_str.trim();
 		
-		String relation_name = head_var_str.substring(0, head_var_str.indexOf("_"));
+		String relation_name = head_var_str.substring(0, head_var_str.indexOf(populate_db.separator));
 		
-		String attr_name = head_var_str.substring(head_var_str.indexOf("_") + 1, head_var_str.length());
+		String attr_name = head_var_str.substring(head_var_str.indexOf(populate_db.separator) + 1, head_var_str.length());
 		
 		String [] values = {relation_name, attr_name};
 		
@@ -454,12 +474,23 @@ public class query_storage {
 			
 			store_query_subgoals(query, query_num, query.body, c, pst);
 			
+			store_query_predicates(query, query_num, c, pst);
+			
 	    }
 	    
 	    return id;
 		
 		
 		
+	}
+	
+	static void store_query_predicates(Query query, int id, Connection c, PreparedStatement pst) throws SQLException
+	{
+		String sql = "insert into user_query_conditions values ('" + id + "','" + query.lambda_term.get(0) + "')";
+		
+		pst = c.prepareStatement(sql);
+		
+		pst.execute();
 	}
 	
 	static int check_existence(int hashcode, Connection c, PreparedStatement pst) throws SQLException

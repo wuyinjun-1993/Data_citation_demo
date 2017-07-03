@@ -270,7 +270,6 @@ public class citation_view_vector {
 		index_vec.insertElementAt(insert_str, pos);
 		
 	}
-	
 //	public static int binary_search(Vector<citation_view> list, citation_view item, binary_compare bc)
 //	{
 //		
@@ -442,50 +441,56 @@ public class citation_view_vector {
 	{
 		citation_view_vector c_vec = (citation_view_vector) o;
 		
-		if(c_vec.c_vec.size() != this.c_vec.size())
-			return false;
+//		if(c_vec.c_vec.size() != this.c_vec.size())
+//			return false;
+//		
+//		for(int i = 0; i < c_vec.c_vec.size(); i++)
+//		{
+//			citation_view c1 = c_vec.c_vec.get(i);
+//			
+//			int j = 0;
+//			
+//			for(j = 0; j< this.c_vec.size(); j++)
+//			{
+//				citation_view c2 = this.c_vec.get(j);
+//				
+//				if(c1.equals(c2))
+//					break;
+//			}
+//			
+//			if(j < this.c_vec.size())
+//				continue;
+//			else
+//				return false;
+//		}
+//		
+//		for(int i = 0; i < this.c_vec.size(); i++)
+//		{
+//			citation_view c1 = this.c_vec.get(i);
+//			
+//			int j = 0;
+//			
+//			for(j = 0; j< c_vec.c_vec.size(); j++)
+//			{
+//				citation_view c2 = c_vec.c_vec.get(j);
+//				
+//				if(c1.equals(c2))
+//					break;
+//			}
+//			
+//			if(j < c_vec.c_vec.size())
+//				continue;
+//			else
+//				return false;
+//		}
 		
-		for(int i = 0; i < c_vec.c_vec.size(); i++)
-		{
-			citation_view c1 = c_vec.c_vec.get(i);
-			
-			int j = 0;
-			
-			for(j = 0; j< this.c_vec.size(); j++)
-			{
-				citation_view c2 = this.c_vec.get(j);
-				
-				if(c1.equals(c2))
-					break;
-			}
-			
-			if(j < this.c_vec.size())
-				continue;
-			else
-				return false;
-		}
-		
-		for(int i = 0; i < this.c_vec.size(); i++)
-		{
-			citation_view c1 = this.c_vec.get(i);
-			
-			int j = 0;
-			
-			for(j = 0; j< c_vec.c_vec.size(); j++)
-			{
-				citation_view c2 = c_vec.c_vec.get(j);
-				
-				if(c1.equals(c2))
-					break;
-			}
-			
-			if(j < c_vec.c_vec.size())
-				continue;
-			else
-				return false;
-		}
-		
-		return true;
+		return c_vec.index_str.equals(this.index_str);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return this.index_str.hashCode();
 	}
 
 }

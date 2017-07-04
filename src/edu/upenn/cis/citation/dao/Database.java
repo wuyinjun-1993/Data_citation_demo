@@ -9,6 +9,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sun.org.apache.bcel.internal.generic.Select;
+
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 
 public class Database {
@@ -33,6 +35,32 @@ public class Database {
 			}
 		} catch (SQLException | ClassNotFoundException e) {
 			
+		} finally {
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return list;
+	}
+	
+	public static List<String> getGeneratedQueryList() {
+		List<String> list = new ArrayList<>();
+		Connection conn = null;
+		try {
+			Class.forName("org.postgresql.Driver");
+			conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+			Statement statement = conn.createStatement();
+			statement.execute(String.format("select query_id from user_query_table"));
+			ResultSet rs = statement.getResultSet();
+			while (rs.next()) {
+				list.add(rs.getString(1));
+			}
+		} catch (SQLException | ClassNotFoundException e) {
+
 		} finally {
 			if (conn != null) {
 				try {

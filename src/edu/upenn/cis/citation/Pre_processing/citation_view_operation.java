@@ -94,9 +94,39 @@ public class citation_view_operation {
 		
 		delete_citation_table(citation_view_id, c, pst);
 		
-		
+		c.close();
 	}
 
+	public static void update_citation_view(String old_name, String new_name) throws SQLException, ClassNotFoundException
+	{
+		
+		Class.forName("org.postgresql.Driver");
+        Connection c = DriverManager
+           .getConnection(populate_db.db_url,
+       	        populate_db.usr_name,populate_db.passwd);
+        
+        PreparedStatement pst = null;
+		
+		int citation_view_id = get_citation_id(old_name, c, pst);
+		
+		update_citation_view_name(citation_view_id, new_name, c, pst);
+		
+		c.close();
+		
+		
+	}
+	
+	static void update_citation_view_name(int id, String new_name, Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "update citation_table set citation_view_name ='" + new_name + "' where citation_view_id = " + id;
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+		
+		
+	}
+	
 //	public static void add_citation2query(String citation_name, String citation_block, )
 	
 	

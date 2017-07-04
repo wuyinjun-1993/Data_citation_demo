@@ -193,6 +193,41 @@ public class query_storage {
         return view;
 	}
 	
+	public static Query get_user_query_by_id(int id) throws SQLException, ClassNotFoundException
+	{
+		Class.forName("org.postgresql.Driver");
+        Connection c = DriverManager
+           .getConnection(populate_db.db_url,
+       	        populate_db.usr_name,populate_db.passwd);
+        
+        PreparedStatement pst = null;
+        
+        Vector<Argument> head_var = new Vector<Argument>();
+        
+//        String id = get_id_head_vars(name, head_var, c, pst);
+
+        head_var = get_head_vars(id, c, pst);
+        
+        HashMap<String, String> subgoal_name_mapping = new HashMap<String, String> ();
+        
+        Vector<Conditions> conditions = get_query_conditions(id, c, pst);
+        
+        Vector<Subgoal> subgoals = get_query_subgoals(id, subgoal_name_mapping, c, pst);
+        
+//        String predicate = get_query_predicate(id, c, pst);
+        
+        Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();
+        
+        Subgoal head = new Subgoal("q" + id, head_var);
+        
+        Query view = new Query("q" + id, head, subgoals,lambda_terms, conditions, subgoal_name_mapping);
+        
+        
+        c.close();
+                
+        return view;
+	}
+	
 	static String get_query_predicate(int id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query = "select string from user_query_conditions where query_id = " + id;

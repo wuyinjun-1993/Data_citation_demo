@@ -872,6 +872,8 @@ public class gen_citation1 {
 						
 						Head_strs h_str = new Head_strs(head_strs);
 						
+						head_strs.clear();
+						
 						HashSet<String> author_set = curr_author_mapping.get(h_str); 
 						
 						if(author_set == null)
@@ -927,6 +929,8 @@ public class gen_citation1 {
 			}
 			
 			Head_strs h_str = new Head_strs(head_strs);
+			
+			head_strs.clear();
 			
 			HashSet<String> curr_author_list = curr_authors.get(h_str);
 			
@@ -1010,6 +1014,8 @@ public class gen_citation1 {
 						}
 						
 						Head_strs h_str = new Head_strs(head_strs);
+						
+						head_strs.clear();
 						
 						HashSet<String> author_set = curr_author_mapping.get(h_str); 
 						

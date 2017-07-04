@@ -478,6 +478,8 @@ public class query_storage {
 			
 	    }
 	    
+	    c.close();
+	    
 	    return id;
 		
 		

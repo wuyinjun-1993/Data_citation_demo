@@ -1229,7 +1229,6 @@ public class Tuple_reasoning2 {
 		String old_value = new String();
 		
 				
-		Vector<Vector<String>> values = new Vector<Vector<String>>();
 		
 //		Vector<Vector<String>> citation_strs = new Vector<Vector<String>>();
 		
@@ -1256,10 +1255,10 @@ public class Tuple_reasoning2 {
 				{
 					vals.add(rs.getString(i+1));
 				}
-				
-				values.add(vals);
-				
+								
 				Head_strs h_vals = new Head_strs(vals);
+				
+				vals.clear();
 				
 //				if(h_vals.toString().equals("2 1 1 2 1 1 2 1 1"))
 //				{
@@ -1455,11 +1454,10 @@ public class Tuple_reasoning2 {
 				{
 					vals.add(rs.getString(i+1));
 				}
-				
-				values.add(vals);
-				
+								
 				Head_strs h_vals = new Head_strs(vals);
 				
+				vals.clear();
 //				if(h_vals.toString().equals("8 12 9 4"))
 //				{
 //					int y = 0;

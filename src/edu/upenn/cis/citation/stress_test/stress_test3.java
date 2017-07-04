@@ -95,9 +95,11 @@ public class stress_test3 {
 				
 //		Query query = query_storage.get_query_by_id(1);
 		
-		for(int k = 2; k<=query_num; k++)
+		for(int k = 3; k<=query_num; k++)
 		{
-			reset();
+			reset(c, pst);
+			
+			System.out.println("finish resetting");
 			
 //			Query query = query_storage.get_query_by_id(1);
 			
@@ -137,9 +139,6 @@ public class stress_test3 {
 		Vector<Vector<citation_view_vector>> citation_view1 = new Vector<Vector<citation_view_vector>>();
 
 		Vector<Vector<citation_view_vector>> citation_view2 = new Vector<Vector<citation_view_vector>>();
-
-		
-		Vector<String> relation_names = get_unique_relation_names(query);
 		
 		Vector<Query> views = view_generator.gen_default_views();
 		
@@ -172,6 +171,8 @@ public class stress_test3 {
 			citation_view1.clear();
 			
 			citation_view1 = Tuple_reasoning1_test.tuple_reasoning(query, citation_strs,  citation_view_map1, c, pst);
+			
+			System.gc();
 			
 		}
 		
@@ -260,6 +261,8 @@ public class stress_test3 {
 			citation_view2.clear();
 			
 			citation_view2 = Tuple_reasoning2_test.tuple_reasoning(query, citation_strs2, citation_view_map2, c, pst);
+			
+			System.gc();
 		}
 		
 		end_time = System.nanoTime();
@@ -371,6 +374,7 @@ public class stress_test3 {
 					
 					citation_view1 = Tuple_reasoning1_test.tuple_reasoning(query, citation_strs,  citation_view_map1, c, pst);
 					
+					System.gc();
 				}
 				
 				
@@ -458,6 +462,8 @@ public class stress_test3 {
 					citation_view2.clear();
 					
 					citation_view2 = Tuple_reasoning2_test.tuple_reasoning(query, citation_strs2, citation_view_map2, c, pst);
+					
+					System.gc();
 				}
 				
 				end_time = System.nanoTime();
@@ -550,18 +556,8 @@ public class stress_test3 {
 		}
 	}
 	
-	static void reset() throws SQLException, ClassNotFoundException
+	static void reset(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
-		
-		Connection c = null;
-		
-	    PreparedStatement pst = null;
-	      
-		Class.forName("org.postgresql.Driver");
-		
-	    c = DriverManager
-	        .getConnection(populate_db.db_url,
-	    	        populate_db.usr_name,populate_db.passwd);
 		
 		String query = "delete from user_query2conditions";
 		

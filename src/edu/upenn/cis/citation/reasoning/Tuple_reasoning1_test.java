@@ -1948,8 +1948,13 @@ public class Tuple_reasoning1_test {
 						
 						curr_citations.addAll(citations);
 						
+						citations.clear();
+						
 						citation_strs.put(h_vals, curr_citations);
 					}
+					
+					c_units.clear();
+
 					
 //					output2excel.citation_output_row(rs, query, vals, c_unit_combinaton, file_name, tuple_num, citations);
 
@@ -2024,6 +2029,8 @@ public class Tuple_reasoning1_test {
 						curr_c_view_vector.add(update_c_view);
 						
 						curr_citations.addAll(citations);
+						
+						citations.clear();
 						
 						citation_view_map1.put(h_vals, curr_c_view_vector);
 						
@@ -2114,9 +2121,7 @@ public class Tuple_reasoning1_test {
 						String[] c_unit= c_view_str.split("\\"+ populate_db.separator);
 						c_units.add(c_unit);
 					}
-					
-
-					
+										
 					Vector<Vector<citation_view>> c_unit_vec = get_citation_units_condition(c_units, curr_tuple_mapping, rs, query.body.size() + query.head.args.size(), query);
 					
 					HashSet<citation_view_vector> c_unit_com = get_valid_citation_combination(c_view_template, c_unit_vec,query);
@@ -2175,8 +2180,13 @@ public class Tuple_reasoning1_test {
 						
 						curr_citations.addAll(citations);
 						
+						citations.clear();
+						
 						citation_strs.put(h_vals, curr_citations);
 					}
+					
+					c_units.clear();
+
 				}
 				
 				else
@@ -2244,6 +2254,8 @@ public class Tuple_reasoning1_test {
 						citation_view_map1.put(h_vals, curr_c_view_vector);
 						
 						curr_citations.addAll(citations);
+						
+						citations.clear();
 						
 						citation_strs.put(h_vals, curr_citations);
 					}

@@ -1107,38 +1107,6 @@ public class Tuple_reasoning2_test {
 	}
 	
 	
-	static boolean view_vector_contains(citation_view_vector c_vec1, citation_view_vector c_vec2)
-	{
-		
-		Vector<String> c1 = new Vector<String>();
-		
-		c1.addAll(c_vec1.index_vec);
-		
-		
-		Vector<String> c2 = new Vector<String>();
-		
-		c2.addAll(c_vec2.index_vec);
-		
-		for(int i = 0; i < c2.size(); i++)
-		{
-			int id = c1.indexOf(c2.get(i));
-			
-			if(id >= 0)
-			{
-				c1.remove(id);
-				
-				c2.remove(i);
-				
-				i --;
-			}
-			
-		}
-		
-		if(c2.size() == 0)
-			return true;
-		else
-			return false;
-	}
 	
 	public static Vector<citation_view_vector> remove_duplicate_final(Vector<citation_view_vector> c_combinations)
 	{
@@ -1374,6 +1342,8 @@ public class Tuple_reasoning2_test {
 						
 						curr_citations.addAll(citations);
 						
+						citations.clear();
+						
 						citation_strs.put(h_vals, curr_citations);
 					}
 					
@@ -1432,6 +1402,8 @@ public class Tuple_reasoning2_test {
 						citation_view_map2.put(h_vals, curr_c_view_vector);
 						
 						curr_citations.addAll(citations);
+						
+						citations.clear();
 						
 						citation_strs.put(h_vals, curr_citations);
 					}
@@ -1524,6 +1496,8 @@ public class Tuple_reasoning2_test {
 						
 						curr_citations.addAll(citations);
 						
+						citations.clear();
+						
 						citation_strs.put(h_vals, curr_citations);
 					}
 					
@@ -1580,6 +1554,8 @@ public class Tuple_reasoning2_test {
 						curr_c_view_vector.add(update_c_view);
 						
 						curr_citations.addAll(citations);
+						
+						citations.clear();
 						
 						citation_view_map2.put(h_vals, curr_c_view_vector);
 						

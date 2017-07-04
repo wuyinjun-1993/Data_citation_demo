@@ -64,11 +64,11 @@ public class query_generator {
 	
 	static int view_nums = 100;
 	
-	static int query_result_size = 100000;
+	static int query_result_size = 1000000;
 	
 	static HashMap<String, String> relation_primary_key_mapping = new HashMap<String, String>();
 	
-	static HashMap<String, Vector<Integer>> relation_primary_key_ranges = new HashMap<String, Vector<Integer>>();
+	public static HashMap<String, Vector<Integer>> relation_primary_key_ranges = new HashMap<String, Vector<Integer>>();
 	
 	
 	
@@ -285,7 +285,7 @@ public class query_generator {
 		{
 			String relation = (String) iter.next();
 			
-			String query = "select distinct " + relation_primary_key_mapping.get(relation) + " from " + relation;
+			String query = "select distinct " + relation_primary_key_mapping.get(relation) + " from " + relation + " order by " + relation_primary_key_mapping.get(relation);
 			
 			pst = c.prepareStatement(query);
 			
@@ -765,7 +765,7 @@ public class query_generator {
 	}
 	
 	
-	static Vector<String> get_all_values(String relation_name, String attr_name, Connection c, PreparedStatement pst) throws SQLException
+	public static Vector<String> get_all_values(String relation_name, String attr_name, Connection c, PreparedStatement pst) throws SQLException
 	{
 		Vector<String> all_values = new Vector<String>();
 		

@@ -22,9 +22,11 @@ import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.reasoning.Tuple_reasoning1;
 import edu.upenn.cis.citation.reasoning.Tuple_reasoning1_citation_opt;
 import edu.upenn.cis.citation.reasoning.Tuple_reasoning1_citation_opt2;
+import edu.upenn.cis.citation.reasoning.Tuple_reasoning1_test;
 import edu.upenn.cis.citation.reasoning.Tuple_reasoning2;
 import edu.upenn.cis.citation.reasoning.Tuple_reasoning2_citation_opt;
 import edu.upenn.cis.citation.reasoning.Tuple_reasoning2_opt;
+import edu.upenn.cis.citation.reasoning.Tuple_reasoning2_test;
 import edu.upenn.cis.citation.user_query.query_storage;
 
 public class stress_test4 {
@@ -80,22 +82,22 @@ public class stress_test4 {
 				
 		
 		
-		for(int k = 0; k<query_num; k++)
+		for(int k = 3; k<query_num; k++)
 		{
 			reset();
 			
-			Random r = new Random();
-			
-			int size = r.nextInt(query_num);
-			
-			while(size <= 0)
-			{
-				size = r.nextInt(query_num);
-			}
+//			Random r = new Random();
+//			
+//			int size = r.nextInt(query_num);
+//			
+//			while(size <= 0)
+//			{
+//				size = r.nextInt(query_num);
+//			}
 			
 //			Query query = query_storage.get_query_by_id(1);
 			
-			Query query = query_generator.gen_query(size, c, pst);
+			Query query = query_generator.gen_query(k, c, pst);
 			
 			query_storage.store_query(query, new Vector<Integer>());
 			
@@ -103,22 +105,22 @@ public class stress_test4 {
 			
 			HashSet<Query> views = view_generator.generate_store_views_without_predicates(relation_names, num_views, query.body.size());
 
-			for(Iterator iter = views.iterator(); iter.hasNext();)
-			{
-				Query view = (Query) iter.next();
-				
-				view_generator.gen_one_local_predicate(view, c, pst, query);
-//				view_generator.gen_one_additional_predicates(views, relation_names, query.body.size(), query);
-				
-				view_operation.delete_view_by_name(view.name);
-				
-				view_operation.add(view, view.name);
-				
-				System.out.println(view);
-
-			}
-			
-			System.out.println(query);
+//			for(Iterator iter = views.iterator(); iter.hasNext();)
+//			{
+//				Query view = (Query) iter.next();
+//				
+//				view_generator.gen_one_local_predicate(view, c, pst, query);
+////				view_generator.gen_one_additional_predicates(views, relation_names, query.body.size(), query);
+//				
+//				view_operation.delete_view_by_name(view.name);
+//				
+//				view_operation.add(view, view.name);
+//				
+//				System.out.println(view);
+//
+//			}
+//			
+//			System.out.println(query);
 			
 			stress_test(query, c, pst, views, relation_names);
 
@@ -153,9 +155,11 @@ public class stress_test4 {
 		Vector<Vector<citation_view_vector>> citation_view2 = new Vector<Vector<citation_view_vector>>();
 
 		
-		for(int j = 0; j<view_max_size; j++)
+		while(views.size() < view_max_size)
 		{
 		
+			System.gc();
+			
 			System.out.println("start");
 			
 			double end_time = 0;
@@ -171,7 +175,11 @@ public class stress_test4 {
 				
 				citation_strs.clear();
 				
-				citation_view1 = Tuple_reasoning1.tuple_reasoning(query, citation_strs,  citation_view_map1, c, pst);
+				citation_view1.clear();
+				
+				citation_view1 = Tuple_reasoning1_test.tuple_reasoning(query, citation_strs,  citation_view_map1, c, pst);
+				
+				System.gc();
 				
 			}
 			
@@ -253,7 +261,11 @@ public class stress_test4 {
 				
 				citation_strs2.clear();
 				
-				Tuple_reasoning2.tuple_reasoning(query, citation_strs2, citation_view_map2, c, pst);
+				citation_view2.clear();
+				
+				citation_view2 = Tuple_reasoning2_test.tuple_reasoning(query, citation_strs2, citation_view_map2, c, pst);
+				
+				System.gc();
 			}
 			
 			end_time = System.nanoTime();
@@ -321,7 +333,7 @@ public class stress_test4 {
 			System.out.print(origin_citation_size + "	");
 			
 			
-			Tuple_reasoning1.compare(citation_view_map1, citation_view_map2);
+//			Tuple_reasoning1.compare(citation_view_map1, citation_view_map2);
 			
 //			Tuple_reasoning1.compare_citation(citation_strs, citation_strs2);
 			
@@ -345,6 +357,13 @@ public class stress_test4 {
 			
 			
 			view_generator.gen_one_additional_predicates(views, relation_names, query.body.size(), query);
+			
+			for(Iterator iter = views.iterator(); iter.hasNext();)
+			{
+				Query view = (Query) iter.next();
+				
+				System.out.println(view);
+			}
 			
 			
 		}
@@ -370,6 +389,12 @@ public class stress_test4 {
 		pst.execute();
 		
 		query = "delete from user_query2subgoals";
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+		
+		query = "delete from user_query_conditions";
 		
 		pst = c.prepareStatement(query);
 		

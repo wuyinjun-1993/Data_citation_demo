@@ -416,6 +416,30 @@ public class view_generator {
 		store_citation_queries(view, id, c, pst);
 		
 		Query_operation.add_connection_citation_with_query("c" + id, "q" + id , "author");
+		
+		c.close();
+	}
+	
+	public static void store_single_citation_view(Query view, int id) throws ClassNotFoundException, SQLException
+	{
+		
+		Connection c = null;
+	      PreparedStatement pst = null;
+		Class.forName("org.postgresql.Driver");
+	    c = DriverManager
+	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
+		
+//		view_operation.add(view, view.name);
+		
+		citation_view_operation.add_citation_view("c" + id);
+		
+		citation_view_operation.add_connection_view_with_citations("c" + id, view.name);
+		
+		store_citation_queries(view, id, c, pst);
+		
+		Query_operation.add_connection_citation_with_query("c" + id, "q" + id , "author");
+		
+		c.close();
 	}
 	
 	public static void clear_other_tables(Connection c, PreparedStatement pst) throws SQLException
@@ -826,10 +850,10 @@ public class view_generator {
 		
 		Query view = null;
 		
+		
 		while(true)
 		{
 			int index_for_change = r.nextInt(views.size());
-
 			
 			for(Iterator iter = views.iterator(); iter.hasNext();)
 			{
@@ -845,25 +869,398 @@ public class view_generator {
 				id++;
 			}
 			
-			if(!gen_one_local_predicate(view, c, pst, query))
+			
+			
+			if(split_view(views, view, c, pst))
 			{
+				view_operation.delete_view_by_name(view.name);
 				
-				views.add(view);
+				citation_view_operation.delete_citation_views(view.name);
 				
-			}
-			else
 				break;
+			}
 		}
 		
-		views.add(view);
 		
-		System.out.println(view);
 		
-		view_operation.delete_view_by_name(view.name);
 		
-		view_operation.add(view, view.name);
+//		while(true)
+//		{
+//			
+//
+//			
+//			
+//			
+//			if(!gen_one_local_predicate(view, c, pst, query))
+//			
+//				
+//				views.add(view);
+//				
+//			
+//		}
+//		
+//		views.add(view);
+//		
+//		System.out.println(view);
+//		
+//		
+//		
+//		view_operation.add(view, view.name);
 				
 		c.close();
+	}
+	
+	static boolean check_duplicated_conditions(HashSet<Query> views, String relation, String attr_name, String constant)
+	{
+		
+		for(Iterator iter = views.iterator(); iter.hasNext();)
+		{
+			Query view = (Query) iter.next();
+			
+			for(int i = 0; i<view.conditions.size(); i++)
+			{
+				Conditions condition = view.conditions.get(i);
+				
+				if(condition.arg2.isConst())
+				{
+					if(view.subgoal_name_mapping.get(condition.subgoal1).equals(relation) && condition.arg1.name.equals(attr_name) && condition.arg2.name.equals(constant))
+						return true;
+				}
+			}
+			
+		}
+		
+		return false;
+	}
+	
+	static Vector<Integer> find_conflict_condition(Query view, String relation, String attr_name, Vector<Integer> list)
+	{
+		
+		Vector<Conditions> conditions = new Vector<Conditions>();
+		
+		for(int i = 0; i<view.conditions.size(); i++)
+		{
+			Conditions condition = view.conditions.get(i);
+			
+			if(condition.subgoal1.equals(relation) && condition.arg1.name.equals(attr_name) && condition.arg2.isConst())
+			{		
+				
+				conditions.add(condition);
+//				{
+//								
+//					String value_str = condition.arg2.name;
+//					
+//					int value = Integer.valueOf(value_str.substring(1, value_str.length() - 1));
+//					
+//					if(condition.op.get_op_name().equals(">"))
+//					{
+//						return list.size();
+//					}
+//					else
+//					{
+//						if(condition.op.get_op_name().equals("<="))
+//						{
+//							return 0;
+//						}
+//					}
+//				}
+			}
+		}
+		
+		
+		
+		if(conditions.size() == 0)
+			return new Vector<Integer>();
+		else
+		{
+			if(conditions.size() == 1)
+			{
+				if(conditions.get(0).op.get_op_name().equals(">"))
+				{
+					String value_str = conditions.get(0).arg2.name;
+					
+					int value = Integer.valueOf(value_str.substring(1, value_str.length() - 1));
+					
+					int id = list.indexOf(value);
+										
+					Vector<Integer> ids = new Vector<Integer>();
+					
+					if(id + 1 >= list.size())
+						return null;
+					
+					ids.add(id + 1);
+					
+					ids.add(list.size());
+					
+					return ids;
+				}
+				else
+				{
+					if(conditions.get(0).op.get_op_name().equals("<="))
+					{
+						String value_str = conditions.get(0).arg2.name;
+						
+						int value = Integer.valueOf(value_str.substring(1, value_str.length() - 1));
+						
+						int id = list.indexOf(value);
+												
+						Vector<Integer> ids = new Vector<Integer>();
+						
+						if(id <= 1)
+							return null;
+						
+						ids.add(0);
+						
+						ids.add(id);
+						
+						return ids;
+					}
+				}
+			}
+			else
+			{
+				Vector<Integer> ids = new Vector<Integer>();
+				
+				if(conditions.get(0).op.get_op_name().equals(">"))
+				{
+					String value_str1 = conditions.get(0).arg2.name;
+					
+					String value_str2 = conditions.get(1).arg2.name;
+					
+					int value1 = Integer.valueOf(value_str1.substring(1, value_str1.length() - 1));
+					
+					int value2 = Integer.valueOf(value_str2.substring(1, value_str2.length() - 1));
+					
+					int id1 = list.indexOf(value1);
+					
+					int id2 = list.indexOf(value2);
+																
+					if(id1 + 1 >= id2)
+					{
+						return null;
+					}
+					
+						ids.add(id1 + 1);
+						
+						ids.add(id2);
+					
+					return ids;
+				}
+				else
+				{
+					String value_str1 = conditions.get(1).arg2.name;
+					
+					String value_str2 = conditions.get(0).arg2.name;
+					
+					int value1 = Integer.valueOf(value_str1.substring(1, value_str1.length() - 1));
+					
+					int value2 = Integer.valueOf(value_str2.substring(1, value_str2.length() - 1));
+					
+					int id1 = list.indexOf(value1);
+					
+					int id2 = list.indexOf(value2);
+																
+					if(id1 + 1 >= id2)
+					{
+						return null;
+					}
+					
+						ids.add(id1 + 1);
+						
+						ids.add(id2);
+					
+					return ids;
+				}
+			}
+		}
+		
+		return new Vector<Integer>();
+		
+	}
+	
+	static void remove_duplicate_predicates(Query view, Vector<Integer> list, String relation, String attr_name)
+	{
+		Vector<Integer> ids1 = new Vector<Integer>();
+		
+		Vector<Integer> ids2 = new Vector<Integer>();
+		
+		int smallest_id = -1;
+		
+		int smallest_value = -1;
+		
+		int largest_id = list.size();
+		
+		int largest_value = list.lastElement();
+		
+		for(int i = 0; i<view.conditions.size(); i++)
+		{
+			Conditions condition = view.conditions.get(i);
+			
+			if(condition.subgoal1.equals(relation) && condition.arg1.name.equals(attr_name) && condition.arg2.isConst())
+			{
+				String value_str = condition.arg2.name;
+				
+				int value = Integer.valueOf(value_str.substring(1, value_str.length() - 1));
+				
+				if(condition.op.get_op_name().equals(">"))
+				{
+					if(value > smallest_value)
+					{
+						smallest_id = i;
+						
+						smallest_value = value;
+					}
+					
+					ids1.add(i);
+				}
+				else
+				{
+					if(value < largest_value)
+					{
+						largest_id = i;
+						
+						largest_value = value;
+					}
+					
+					ids2.add(i);
+				}
+			}
+			
+			
+			
+		}
+		
+		if(ids1.size() >= 2)
+		{
+			ids1.removeElement(smallest_id);
+			
+			view.conditions.removeElementAt(ids1.get(0));
+			
+		}
+		
+		if(ids2.size() >= 2)
+		{
+			ids2.removeElement(largest_id);
+			
+			view.conditions.removeElementAt(ids2.get(0));
+		}
+	}
+	
+	static boolean split_view(HashSet<Query> views, Query view, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	{
+		
+		String relation = null;
+		
+		String origin_name = null;
+		
+		Random r = new Random();
+		
+		if(view.conditions.isEmpty())
+		{
+			
+			int index = r.nextInt(view.body.size());
+			
+			Subgoal subgoal = (Subgoal) view.body.get(index);
+			
+			origin_name = subgoal.name;
+			
+			relation = view.subgoal_name_mapping.get(subgoal.name);
+			
+			
+		}
+		else
+		{
+			origin_name = view.conditions.get(0).subgoal1;
+			
+			relation = view.subgoal_name_mapping.get(origin_name);
+		}
+		
+		String [] primary_key_type = get_primary_key(relation, c, pst);
+		
+		Vector<Integer> ranges = query_generator.relation_primary_key_ranges.get(relation);
+		
+		Vector<Integer> conflict_ids = find_conflict_condition(view, origin_name, primary_key_type[0], ranges);
+		
+		if(conflict_ids == null)
+			return false;
+		
+//		while(conflict_ids == null)
+//		{
+//			index = r.nextInt(view.body.size());
+//			
+//			subgoal = (Subgoal) view.body.get(index);
+//			
+//			relation = view.subgoal_name_mapping.get(subgoal.name);
+//			
+//			primary_key_type = get_primary_key(relation, c, pst);
+//			
+//			ranges = query_generator.relation_primary_key_ranges.get(relation);
+//			
+//			conflict_ids = find_conflict_condition(view, subgoal.name, primary_key_type[0], ranges);
+//		}
+		
+		
+		int const_id = 0;
+		
+		if(conflict_ids.isEmpty())
+			const_id = r.nextInt(ranges.size() - 1);
+		else
+		{
+			int range = conflict_ids.get(1) - conflict_ids.get(0);
+			
+			const_id = conflict_ids.get(0) + r.nextInt(range);
+		}
+		
+		
+		
+		while(check_duplicated_conditions(views, relation, primary_key_type[0], "'" + ranges.get(const_id) + "'"))
+		{
+			int range = conflict_ids.get(1) - conflict_ids.get(0);
+			
+			const_id = conflict_ids.get(0) + r.nextInt(range);
+		}
+		
+		Conditions condition1 = new Conditions(new Argument(primary_key_type[0], origin_name), origin_name, new op_greater(), new Argument("'" + ranges.get(const_id) + "'"), new String());
+		
+		Conditions condition2 = new Conditions(new Argument(primary_key_type[0], origin_name), origin_name, new op_less_equal(), new Argument("'" + ranges.get(const_id) + "'"), new String());
+		
+		Query view1 = (Query) view.clone();
+		
+		
+		view1.conditions.add(condition1);
+		
+		remove_duplicate_predicates(view1, ranges, relation, primary_key_type[0]);
+
+		
+		view1.name = view.name + "1";
+				
+		Query view2 = (Query) view.clone();
+		
+		
+		view2.name = view.name + "2";
+						
+		view2.conditions.add(condition2);
+		
+		remove_duplicate_predicates(view2, ranges, relation, primary_key_type[0]);
+
+				
+		int v1_id = view_operation.add(view1, view1.name);
+		
+		view1.name = view.name + "1";
+		
+		store_single_citation_view(view1, v1_id);
+		
+		int v2_id = view_operation.add(view2, view2.name);
+		
+		view2.name = view.name + "2";
+		
+		store_single_citation_view(view2, v2_id);
+		
+		views.add(view1);
+		
+		views.add(view2);
+		
+		return true;
 	}
 	
 	public static void gen_one_additional_view(HashSet<Query> views, Vector<String> subgoal_names, int sizeofquery, Query q) throws SQLException, ClassNotFoundException
@@ -1291,11 +1688,11 @@ public class view_generator {
 		
 		String name = "v" + id;
 		
-		Vector<Conditions> global_predicates = gen_global_conditions(body);
+//		Vector<Conditions> global_predicates = gen_global_conditions(body);
 		
 		Vector<Conditions> predicates = new Vector<Conditions>();
 		
-		predicates.addAll(global_predicates);
+//		predicates.addAll(global_predicates);
 		
 		predicates.addAll(local_predicates);
 		

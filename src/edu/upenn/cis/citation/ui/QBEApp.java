@@ -110,6 +110,8 @@ public class QBEApp extends Application {
 	private final ObservableList<Entry> dataNew = FXCollections.observableArrayList();
 	// all citation queries
 	private final ObservableList<CQuery> dataQuery = FXCollections.observableArrayList();
+	// all generated queries
+	private final ObservableList<GQuery> dataGenerated = FXCollections.observableArrayList();
 	List<String> lambdas = new ArrayList<>();
 
 	VBox vboxRightCQ = new VBox();
@@ -394,12 +396,24 @@ private Object String;
 		});
 		HBox hboxSignout = new HBox();
 		hboxSignout.setSpacing(5);
+		hboxSignout.setAlignment(Pos.CENTER_RIGHT);
 		Button btgeneratedQueries = new Button("Show Generated Queries");
+		btgeneratedQueries.setId("buttonGen");
+		btgeneratedQueries.setFont(Font.font("Courier New", FontWeight.BLACK, 14));
 		hboxSignout.getChildren().addAll(btgeneratedQueries, signOut);
+		
+		// Show generated queries button
+		btgeneratedQueries.setOnAction(e -> {
+			dataGenerated.clear();
+			setGQ();
+			buildGeneratedScene();
+			this.citeStage.setScene(generatedScene);
+			citeStage.show();
+		});
 		
         VBox vboxBottom = new VBox();
         vboxBottom.setSpacing(5);
-        vboxBottom.getChildren().addAll(hbox, signOut);
+        vboxBottom.getChildren().addAll(hbox, hboxSignout);
         vboxBottom.setAlignment(Pos.CENTER_RIGHT);
 
 		// Adding HBox
@@ -623,11 +637,6 @@ private Object String;
 		// Generated query views
 		//TODO
 		
-		// Show generated queries button
-		btgeneratedQueries.setOnAction(e -> {
-			buildGeneratedScene();
-		});
-		
 		GridPane gridPaneQueryViews = new GridPane();
 		gridPaneQueryViews.setPadding(new Insets(0, 20, 0, 20));
 		gridPaneQueryViews.setAlignment(Pos.CENTER);
@@ -678,13 +687,6 @@ private Object String;
 //			}
 			
 		});
-		
-//		Button btShowQuery = new Button("Show");
-		Button btDeleteQuery = new Button("Delete");
-		HBox hboxButton3 = new HBox();
-//		hboxButton3.getChildren().addAll( btDeleteQuery);
-		hboxButton3.setSpacing(5);
-//		gridPaneQueryViews.add(hboxButton3, 0, 2);
 		
 		// Add HBox and GridPane layout to BorderPane Layout
 		gridPaneDataViews.setPrefWidth(800);
@@ -1835,12 +1837,48 @@ private Object String;
 		citationScene = new Scene(gridCitation);
 		citationScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
     }
+    /*
+     * Build the scene to show generated citation query
+     */
     private void buildGeneratedScene() {
     	GridPane gridGenerated = new GridPane();
-    	// vbox to layout the content of queries
-    	VBox vboxContent = new VBox();
-    	
-    	
+    	gridGenerated.setPrefSize(500, 400);
+    	gridGenerated.setPadding(new Insets(10));
+    	Label labelQuery = new Label("Generated Queries");
+    	labelQuery.setFont(Font.font("Courier New", FontWeight.BLACK, 18));
+		gridGenerated.add(labelQuery, 0, 0);
+		// build generated table view
+    	TableView<GQuery> generatedTable = new TableView<GQuery>();
+    	GridPane.setVgrow(generatedTable, Priority.ALWAYS);
+		GridPane.setHgrow(generatedTable, Priority.ALWAYS);
+//		generatedTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+		generatedTable.setItems(dataGenerated);
+		// generated query col
+		TableColumn<GQuery, String> idCol = new TableColumn<GQuery, String>("ID");
+		idCol.prefWidthProperty().bind(generatedTable.widthProperty().multiply(0.3));
+		idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+		// query content col
+		TableColumn<GQuery, String> contentCol = new TableColumn<GQuery, String>("DataLog");
+		contentCol.prefWidthProperty().bind(generatedTable.widthProperty().multiply(0.7));
+		contentCol.setCellValueFactory(new PropertyValueFactory<>("content"));
+		contentCol.setCellFactory(new Callback<TableColumn<GQuery,String>, TableCell<GQuery,String>>() {
+			public TableCell<GQuery, String> call(TableColumn<GQuery,String> tc) {
+				TableCell<GQuery, String> cell = new TextFieldTableCell<GQuery, String>() {
+					public void updateItem(String content, boolean empty) {
+						super.updateItem(content, empty);
+						if (empty) return;
+						else {
+							String sub1 = content.split(":")[0];
+							String sub2 = content.split(":")[1];
+							setText(sub1 + ":\n" + sub2);
+						}
+					}
+				};
+				return cell;
+			}
+		});
+		generatedTable.getColumns().addAll(idCol, contentCol);
+		gridGenerated.add(generatedTable, 0, 1);
     	
     	generatedScene = new Scene(gridGenerated);
 		generatedScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
@@ -1983,11 +2021,9 @@ private Object String;
 			}
 			try {
 				int query_list_id = query_storage.store_user_query(citeQuery, id_list);
-				if (query_list_id > 0) {
 					if (!listQueries.contains(query_list_id)) {
 						listQueries.add(Integer.toString(query_list_id));
 					}
-				}
 //				if (query_list_id > 0) {
 					// saved before
 					Vector<Integer> selected_rows = new Vector<Integer>();
@@ -2912,6 +2948,20 @@ private Object String;
         }
         return returnData;
         
+	}
+	
+	private void setGQ() {
+		if (listQueries!=null && !listQueries.isEmpty()) {
+			for (int i = 0; i < listQueries.size(); i++) {
+				String id = listQueries.get(i);
+					try {
+						Query content = query_storage.get_user_query_by_id(Integer.parseInt(id));
+						dataGenerated.add(new GQuery(id, content.toString()));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+			}
+		}
 	}
 	
 	private void setCQ(String dv) {

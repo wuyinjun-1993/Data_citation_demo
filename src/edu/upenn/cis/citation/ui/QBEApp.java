@@ -96,7 +96,7 @@ public class QBEApp extends Application {
 	private ObservableList<String> dbaListBlock = FXCollections.observableArrayList();
 	
 	// private Scene newScene;
-	private Stage stage, citeStage;
+	private Stage stage, citeStage, queryStage;
 	// private TableView<ObservableList> dataSelectedView = new TableView<>();
 	// data shown in data preview table in dba or user, added in setDataView()
 	private ObservableList dataViewList = FXCollections.observableArrayList();
@@ -142,6 +142,7 @@ public class QBEApp extends Application {
 	private Scene queryScene;
 	private GridPane gridQuery;
 	
+	private Scene generatedScene;
 	
 	// TreeView share across user & dba screens
 	private TreeItem<TreeNode> root;
@@ -201,11 +202,12 @@ private Object String;
 	public void start(Stage stage) {
 		this.stage = stage;
 		this.citeStage = new Stage();
+		this.queryStage = new Stage();
 		buildLoginScene();
 //		buildDbaScene();
 //		buildUserScene();
-		buildViewScene();
-		buildCitationScene();
+//		buildViewScene();
+//		buildCitationScene();
 		stage.setScene(loginScene);
 		stage.setMinWidth(400);
 		stage.setMinHeight(400);
@@ -340,6 +342,7 @@ private Object String;
 //				lblMessage.setTextFill(Color.RED);
 //				return;
 //			}
+			buildViewScene();
 			txtUserName.setText("");
 			pf.setText("");
 			this.stage.setScene(viewScene);
@@ -380,6 +383,7 @@ private Object String;
         hbox.setAlignment(Pos.CENTER);
         hbox.setPadding(new Insets(5,0,0,0));
         
+        
         Button signOut = new Button("Sign Out");
 		signOut.setFont(Font.font("Courier New", FontWeight.BLACK, 14));
 		signOut.setId("buttonGen");
@@ -388,6 +392,11 @@ private Object String;
 			dataViewList.clear();
 			this.stage.setScene(loginScene);
 		});
+		HBox hboxSignout = new HBox();
+		hboxSignout.setSpacing(5);
+		Button btgeneratedQueries = new Button("Show Generated Queries");
+		hboxSignout.getChildren().addAll(btgeneratedQueries, signOut);
+		
         VBox vboxBottom = new VBox();
         vboxBottom.setSpacing(5);
         vboxBottom.getChildren().addAll(hbox, signOut);
@@ -460,6 +469,7 @@ private Object String;
 //            dbaListCitationViews.setAll(Database.getCitationViews(dv));
             Query currentQuery;
 			data.clear();
+			searchBox.clear();
 			try {
 //				// show view info in dba scene
 				currentQuery = view_operation.get_view_by_name(dv);
@@ -473,6 +483,7 @@ private Object String;
 		Button buttonAddDataView = new Button("Add");
 		buttonAddDataView.setOnAction(event -> {
 			dataQuery.clear();
+			searchBox.clear();
 			dbaListCitationViews = FXCollections.observableArrayList();
 			dbaListCitationViews.clear();
 			dbaListBlock.clear();
@@ -565,8 +576,10 @@ private Object String;
 		});
 		Button buttonAddCitationView = new Button("Add");
 		buttonAddCitationView.setOnAction(event -> {
+			buildCitationScene();
 			dv = "";
 			dataNew.clear();
+			searchBox.clear();
 			datalogTextAreaNew.clear();
 			hBoxLambdaNew.getChildren().clear();
 			dataViewNew.getItems().clear();
@@ -609,8 +622,14 @@ private Object String;
 		
 		// Generated query views
 		//TODO
+		
+		// Show generated queries button
+		btgeneratedQueries.setOnAction(e -> {
+			buildGeneratedScene();
+		});
+		
 		GridPane gridPaneQueryViews = new GridPane();
-		gridPaneQueryViews.setPadding(new Insets(20, 20, 20, 20));
+		gridPaneQueryViews.setPadding(new Insets(0, 20, 0, 20));
 		gridPaneQueryViews.setAlignment(Pos.CENTER);
 		gridPaneQueryViews.setHgap(5);
 		gridPaneQueryViews.setVgap(5);
@@ -623,27 +642,61 @@ private Object String;
 		listViewQuery.setStyle("-fx-font-size:15.0;");
 		listViewQuery.setItems(listQueries);
 		gridPaneQueryViews.add(listViewQuery, 0, 1, 2, 1);
+		GridPane.setHgrow(listViewQuery, Priority.ALWAYS);
+		GridPane.setVgrow(listViewQuery, Priority.ALWAYS);
 		listViewQuery.setOnMouseClicked(event ->{
 			String qv = listViewQuery.getSelectionModel().getSelectedItem();
-			buildGeneratedQueryScene(qv);
-			data.clear();
-			dataView.getItems().clear();
-			this.stage.setScene(queryScene);
+			if (qv == null || qv.isEmpty()) return;
+			else {
+				hbox.getChildren().clear();
+				hbox.getChildren().addAll(textDataLog2, textFieldDataViewDataLog);
+				if (!hbox.isVisible()) hbox.setVisible(true);
+				try {
+					Query query = query_storage.get_user_query_by_id(Integer.parseInt(qv));
+					if (textFieldDataViewDataLog != null) textFieldDataViewDataLog.setText(query.toString());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+			}
+//			buildGeneratedQueryScene(qv);
+//			data.clear();
+//			dataView.getItems().clear();
+//			hBoxLambda.getChildren().clear();
+//			dataView.getColumns().clear();
+//			queryStage.setScene(queryScene);
+//			queryStage.setTitle("Query Content");
+//			queryStage.show();
+//			stage.hide();
+//			int query_id = Integer.parseInt(qv);
+//			try {
+//				Query query = query_storage.get_user_query_by_id(query_id);
+//				addDataFromQuery(query);
+//			} catch (Exception e1) {
+//				e1.printStackTrace();
+//				System.out.println("List generated query info error");
+//			}
+			
 		});
-
-//		SplitPane splitPane = new SplitPane();
-//		splitPane.setId("root");
-//		splitPane.getItems().add(gridPaneDataViews);
-//		splitPane.getItems().add(gridPaneCitationViews);
-//		splitPane.getItems().add(gridPaneQueryViews);
+		
+//		Button btShowQuery = new Button("Show");
+		Button btDeleteQuery = new Button("Delete");
+		HBox hboxButton3 = new HBox();
+//		hboxButton3.getChildren().addAll( btDeleteQuery);
+		hboxButton3.setSpacing(5);
+//		gridPaneQueryViews.add(hboxButton3, 0, 2);
+		
 		// Add HBox and GridPane layout to BorderPane Layout
-		gridPaneDataViews.setPrefWidth(500);
-		gridPaneCitationViews.setPrefWidth(500);
+		gridPaneDataViews.setPrefWidth(800);
+		gridPaneCitationViews.setPrefWidth(800);
+//		gridPaneQueryViews.setPrefWidth(500);
+		listViewDataViews.setPrefWidth(400);
+		listViewCitationView.setPrefWidth(400);
 		
 		HBox hboxCenter = new HBox();
 		hboxCenter.setSpacing(5);
-		hboxCenter.setId("root");
-		hboxCenter.getChildren().addAll(gridPaneDataViews, gridPaneCitationViews, gridPaneQueryViews);
+		hboxCenter.setId("bp");
+		hboxCenter.getChildren().addAll(gridPaneDataViews, gridPaneCitationViews);
 		bp.setTop(hb);
 		bp.setCenter(hboxCenter);
         hbox.setVisible(false);
@@ -836,6 +889,33 @@ private Object String;
 		runButton.setId("bevel-grey");
 		clearButton.setId("bevel-grey");
 		backButton.setId("bevel-grey");
+		
+		if(stage.getScene() == queryScene) {
+			System.out.println("[queryScene: TRUE]");
+			runButton.setVisible(false);
+			clearButton.setVisible(false);
+//			backButton.setVisible(false);
+			if (!data.isEmpty() ) {
+				List<Entry> list = new ArrayList<>();
+				list.addAll(data);
+				lambdasAll.clear();
+				lambdaIndex.clear();
+				lambdaSQL = Util.convertToSQLWithLambda(list, false);
+				System.out.println("[DEBUG] lambdaSQL: " + lambdaSQL);
+				lambdas = Util.getLambda(list);
+				for (String lambda : lambdas) {
+					System.out.println(lambda);
+					String table = lambda.substring(0, lambda.indexOf('.'));
+					String field = lambda.substring(lambda.indexOf('.') + 1);
+					List<String> temp = Database.getDistincts(table, field);
+					lambdasAll.add(temp);
+					lambdaIndex.add(0);
+				}
+				setDataView(hBoxLambda, dataView, false);
+			}
+			
+		}
+		
 		runButton.setOnAction(e -> {
 			if (stage.getScene() == dbaScene || stage.getScene() == userScene) {
 				if (data.isEmpty() ) return;
@@ -901,6 +981,15 @@ private Object String;
 				dataViewListNew.clear();
 				citeStage.hide();
 				stage.show();
+			}
+			else if(queryStage.isShowing()) {
+				data.clear();
+				dataViewList.clear();
+				dataView.getColumns().clear();
+				queryStage.hide();
+				stage.show();
+				buildViewScene();
+				this.stage.setScene(viewScene);
 			}
 			else if (stage.getScene() == dbaScene && !citeStage.isShowing()){
 //				System.out.println("dbaScene");
@@ -1110,11 +1199,11 @@ private Object String;
                 return;
 			}
 			// save a valid view before save the corresponding queries
-			if (data == null || data.isEmpty()) {
+			if (data == null || data.isEmpty() || !listDataViews.contains(dv)) {
 				Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Alert");
                 alert.setHeaderText(null);
-                alert.setContentText("Pls save the view first!");
+                alert.setContentText("Pls save a valid view first!");
                 alert.showAndWait();
                 return;
 			}
@@ -1123,7 +1212,7 @@ private Object String;
 				CQuery CQ = listViewCv.getItems().get(i);
 				String q_name = CQ.getName();
 				String b_name = CQ.getBlock();
-				if (b_name == null || b_name.isEmpty()) {
+				if (b_name == null || b_name.isEmpty() || b_name.equals("Undef")) {
 					Alert alert = new Alert(Alert.AlertType.WARNING);
 		            alert.setHeaderText(null);
 		            alert.setContentText("Specify block to each query before save!");
@@ -1254,6 +1343,7 @@ private Object String;
 		Button btDataView = new Button("Add New");
 		btDataView.setId("buttonGen");
         btDataView.setOnAction(e -> {
+        	buildCitationScene();
 			dataNew.clear();
 			datalogTextAreaNew.clear();
 			hBoxLambdaNew.getChildren().clear();
@@ -1422,16 +1512,17 @@ private Object String;
         saveViewButton.setOnAction(event -> {
         	// Edited: Yan
 //    		ObservableList<String> listDataViews = FXCollections.observableArrayList(Database.getDataViews());
-        	if (listDataViews.contains(dv)) {
-        		try {
-    				view_operation.delete_view_by_name(dv);
-    				listDataViews.remove(dv);
-    				citation_view_operation.delete_connection_view_with_citations(dv, dv);
-    				citation_view_operation.delete_citation_views(dv);
-    			} catch (Exception e2) {
-    				e2.printStackTrace();
-    			}
-        	}
+//        	if (listDataViews.contains(dv)) {
+//        		try {
+//    				view_operation.delete_view_by_name(dv);
+//    				listDataViews.remove(dv);
+//    				citation_view_operation.delete_connection_view_with_citations(dv, dv);
+//    				citation_view_operation.delete_citation_views(dv);
+//    			} catch (Exception e2) {
+//    				e2.printStackTrace();
+//    			}
+//        	}
+        	String oldName = dv;
             TextInputDialog dialog = new TextInputDialog(dv);
             dialog.setContentText("Please enter the view query name:");
             dialog.setHeaderText(null);
@@ -1439,12 +1530,14 @@ private Object String;
             if (result.isPresent()) {
                 String tempName = result.get();
                 if (listDataViews.contains(tempName)) {
-                	Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Alert");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Duplicate name, pls re-enter!");
-                    alert.showAndWait();
-                    return;
+                	if(!tempName.equals(dv)) {
+                		Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("Alert");
+                        alert.setHeaderText(null);
+                        alert.setContentText("Duplicate name, pls re-enter!");
+                        alert.showAndWait();
+                        return;
+                	}
                 } else
                 	dv = result.get();
             } else {
@@ -1453,19 +1546,36 @@ private Object String;
             if (data.isEmpty()) return;
             
             Query generatedQuery = addQueryByName(dv,data);
-            try {
-				view_operation.add(generatedQuery,dv);
-				citation_view_operation.add_citation_view(dv);
-				citation_view_operation.add_connection_view_with_citations(dv, dv);
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Succeed");
-            alert.setHeaderText(null);
-            alert.setContentText("The view queries are successfully saved as " + dv);
-            alert.showAndWait();
-            listDataViews.add(dv);
+            if (listDataViews.contains(dv)) {
+            	try {
+                	view_operation.save_view_by_name(oldName, dv, generatedQuery);
+                	citation_view_operation.update_citation_view(oldName, dv);
+                	listDataViews.add(dv);
+                	Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Succeed");
+                    alert.setHeaderText(null);
+                    alert.setContentText("The view queries are successfully saved as " + dv);
+                    alert.showAndWait();
+    			} catch (Exception e1) {
+    				e1.printStackTrace();
+    			}
+            } else {
+            	// add new view
+            	try {
+					view_operation.add(generatedQuery, dv);
+					citation_view_operation.add_citation_view(dv);
+					citation_view_operation.add_connection_view_with_citations(dv, dv);
+					listDataViews.add(dv);
+					Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Succeed");
+                    alert.setHeaderText(null);
+                    alert.setContentText("The new view queries are successfully saved as " + dv);
+                    alert.showAndWait();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+            	
+            }
         });
         
 
@@ -1725,6 +1835,16 @@ private Object String;
 		citationScene = new Scene(gridCitation);
 		citationScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
     }
+    private void buildGeneratedScene() {
+    	GridPane gridGenerated = new GridPane();
+    	// vbox to layout the content of queries
+    	VBox vboxContent = new VBox();
+    	
+    	
+    	
+    	generatedScene = new Scene(gridGenerated);
+		generatedScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
+    }
     /*
      * Build the scene to show generated citation query
      */
@@ -1733,7 +1853,7 @@ private Object String;
         gridQuery.setPadding(new Insets(5, 10, 10, 10));
         gridQuery.setHgap(10);
         gridQuery.setVgap(10);
-        gridQuery.setMaxSize(1000, 600);
+        gridQuery.setMaxSize(800, 500);
         
 		// TabPane
 		TabPane tabPane = new TabPane();
@@ -1760,6 +1880,7 @@ private Object String;
 
 		// DataLog content
 		TextArea datalogField = new TextArea();
+		datalogField.setEditable(false);
 		
 		gridQuerySub.add(datalogField, 0, 1);
 		
@@ -1772,13 +1893,20 @@ private Object String;
 		int query_id = Integer.parseInt(qv);
 		try {
 			System.out.println("query_id: " + query_id);
-			Query query = query_storage.get_query_by_id(query_id);
+			Query query = query_storage.get_user_query_by_id(query_id);
+			
 			addDataFromQuery(query);
 		} catch (ClassNotFoundException | SQLException e1) {
 			e1.printStackTrace();
 		}
-		gridQuerySub.add(dataView, 0, 4);
+		GridPane.setVgrow(dataView, Priority.ALWAYS);
+		GridPane.setHgrow(dataView, Priority.ALWAYS);
+		dataView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+		this.stage.setScene(queryScene);
 		final HBox hBox = buildTopMenu(null, hBoxLambda, dataView, false);
+		System.out.println(dataViewList.get(0));
+		dataView.setItems(dataViewList);
+		gridQuerySub.add(dataView, 0, 4);
 		
 		List<Entry> list = new ArrayList<>();
 		list.addAll(data);
@@ -1805,16 +1933,9 @@ private Object String;
 		hBoxPrevNext.getChildren().addAll(prevButton, nextButton);
 		GridPane.setHgrow(hBoxPrevNext, Priority.ALWAYS);
 		gridQuerySub.add(hBoxPrevNext, 1, 5);
-
-		queryScene = new Scene(gridQuery);
+		
+		queryScene = new Scene(gridQuerySub);
 		queryScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
-    }
-    
-    private ComboBox<String> buildBlock() {
-    	ComboBox<String> block = new ComboBox<>();
-    	block.getItems().addAll("Author","Title");
-		block.setValue("Select Block");
-    	return block;
     }
     
 	/* ===================================================================
@@ -1853,6 +1974,7 @@ private Object String;
 		save.setOnAction(event ->{
 			String name = "CiteQ" + count;
 			Query citeQuery = addQueryByName(name, data);
+			System.out.println("[citeQuery ]" + citeQuery);
 			Vector<Integer> id_list = new Vector<Integer>();
 			if (ids != null || !ids.isEmpty()) {
 				for (int id : ids) {
@@ -1860,17 +1982,27 @@ private Object String;
 				}
 			}
 			try {
-				int query_list_id = query_storage.store_query(citeQuery, id_list);
+				int query_list_id = query_storage.store_user_query(citeQuery, id_list);
 				if (query_list_id > 0) {
+					if (!listQueries.contains(query_list_id)) {
+						listQueries.add(Integer.toString(query_list_id));
+					}
+				}
+//				if (query_list_id > 0) {
 					// saved before
 					Vector<Integer> selected_rows = new Vector<Integer>();
 					System.out.println("[query id] " + query_list_id);
 					selected_rows = query_storage.get_query_list_by_id(query_list_id);
+					citeStage.hide();
 					Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		            alert.setTitle("Succeed");
 		            alert.setHeaderText(null);
 		            alert.setContentText("The citation query is successfully saved");
 		            alert.showAndWait();
+//		            Optional<ButtonType> result = alert.showAndWait();
+//		            if (result.get() == ButtonType.OK){
+		                // ... user chose OK
+//		            }
 //					citeStage.hide();
 //					userDataView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 //					userDataView.getSelectionModel().setCellSelectionEnabled(true);
@@ -1882,14 +2014,19 @@ private Object String;
 //							System.out.println(row);
 //						}
 //					}
-				} else {
-					// successful save
-					Alert alert = new Alert(Alert.AlertType.INFORMATION);
-		            alert.setTitle("Succeed");
-		            alert.setHeaderText(null);
-		            alert.setContentText("The citation query is successfully saved");
-		            alert.showAndWait();
-				}
+//				} else {
+//					// successful save
+//					Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//		            alert.setTitle("Succeed");
+//		            alert.setHeaderText(null);
+//		            alert.setContentText("The citation query is successfully saved");
+//		            alert.showAndWait();
+//		            Optional<ButtonType> result = alert.showAndWait();
+//		            if (result.get() == ButtonType.OK){
+//		                // ... user chose OK
+//		            	citeStage.hide();
+//		            }
+//				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -2393,7 +2530,7 @@ private Object String;
 //			dataViewList.clear();
 			dataView.getColumns().clear();
 			int num_rows = 0;
-			if ((stage.getScene() == dbaScene || stage.getScene() == userScene) && !citeStage.isShowing() ) {
+			if ((stage.getScene() == dbaScene || stage.getScene() == userScene || stage.getScene() == queryScene) && !citeStage.isShowing() ) {
 				dataViewList.clear();
 				while (rs.next()) {
 					ids.add(num_rows);

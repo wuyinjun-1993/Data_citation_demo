@@ -519,6 +519,41 @@ public class query_storage {
 		
 	}
 	
+	public static int store_user_query(Query query, Vector<Integer> id_list) throws SQLException, ClassNotFoundException
+	{
+		
+		Connection c = null;
+	      PreparedStatement pst = null;
+		Class.forName("org.postgresql.Driver");
+	    c = DriverManager
+	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
+	    
+	    query_graph q_graph = new query_graph(query);
+	    
+	    int hashcode = q_graph.hashCode();
+	    
+	    int id = check_existence(hashcode, c, pst);
+	    
+	    if(id <= 0)
+	    {
+	    	int query_num = gen_query_id(c, pst) + 1;
+			
+			store_query_head_variables(query.head.args, id_list, query_num, hashcode, c, pst);
+			
+			store_query_conditions(query.conditions, query_num, c, pst);
+			
+			store_query_subgoals(query, query_num, query.body, c, pst);
+			
+//			store_query_predicates(query, query_num, c, pst);
+			
+	    }
+	    
+	    return id;
+		
+		
+		
+	}
+	
 	static void store_query_predicates(Query query, int id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String sql = "insert into user_query_conditions values ('" + id + "','" + query.lambda_term.get(0) + "')";

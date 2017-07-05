@@ -183,7 +183,7 @@ public class view_operation {
 		populate_db.initial();
 	}
 	
-	public static void add(Query v, String name) throws ClassNotFoundException, SQLException
+	public static int add(Query v, String name) throws ClassNotFoundException, SQLException
 	{
 		int id = insert_view(v, name);
 		
@@ -202,7 +202,7 @@ public class view_operation {
 		
 		populate_db.update(v);
 		
-//		return id;
+		return id;
 
 	}
 	

@@ -386,7 +386,7 @@ public class query_generator {
 									
 //			Vector<Argument> head_vars = gen_head_vars(relation, relation_name, attr_list, head_size, c, pst);
 			
-			Argument head_arg = new Argument(primary_key_type[0], relation_name);
+			Argument head_arg = new Argument(relation_name + populate_db.separator + primary_key_type[0], relation_name);
 			
 			Vector<Argument> head_vars = new Vector<Argument>();
 			

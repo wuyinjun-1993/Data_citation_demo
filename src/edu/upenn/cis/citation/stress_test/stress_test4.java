@@ -77,17 +77,17 @@ public class stress_test4 {
 					
 //		Query query = query_storage.get_query_by_id(1);
 		
-		int k = Integer.valueOf(args[0]);
+		int k = 3;//Integer.valueOf(args[0]);
 		
-		int view_size = Integer.valueOf(args[1]);
+		int view_size = 5;//Integer.valueOf(args[1]);
 		
-		boolean new_query = Boolean.valueOf(args[2]);
+		boolean new_query = false;//Boolean.valueOf(args[2]);
 		
-		boolean new_rounds = Boolean.valueOf(args[3]);
+		boolean new_rounds = false;//Boolean.valueOf(args[3]);
 		
-		boolean tuple_level = Boolean.valueOf(args[4]);
+		boolean tuple_level = true;//Boolean.valueOf(args[4]);
 		
-		boolean new_start = Boolean.valueOf(args[5]);
+		boolean new_start = false;//Boolean.valueOf(args[5]);
 		
 		if(new_query)
 			reset();

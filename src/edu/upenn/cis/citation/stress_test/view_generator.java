@@ -327,7 +327,7 @@ public class view_generator {
 		
 	}
 	
-	public static Vector<Query> gen_default_views() throws SQLException, ClassNotFoundException
+	public static Vector<Query> gen_default_views(Vector<String> relations) throws SQLException, ClassNotFoundException
 	{
 		initial();
 		
@@ -348,9 +348,9 @@ public class view_generator {
 	    
 	    Vector<Query> views = new Vector<Query>();
 		
-		for(int i = 0; i<citatable_tables.length; i++)
+		for(int i = 0; i<relations.size(); i++)
 		{
-			Query view = generate_default_view(citatable_tables[i], i + 1, c, pst);
+			Query view = generate_default_view(relations.get(i), i + 1, c, pst);
 			
 			views.add(view);
 		}
@@ -531,7 +531,7 @@ public class view_generator {
 		
 		
 		String [] primary_key_type = get_primary_key(subgoal.name, c, pst);
-
+		
 		
 		Vector<Conditions> conditions = query_conditions.get(subgoal.name);
 		
@@ -1178,6 +1178,13 @@ public class view_generator {
 		String [] primary_key_type = get_primary_key(relation, c, pst);
 		
 		Vector<Integer> ranges = query_generator.relation_primary_key_ranges.get(relation);
+		
+		if(ranges == null)
+		{
+			query_generator.build_relation_primary_key_mapping(c, pst);
+			
+			ranges = query_generator.relation_primary_key_ranges.get(relation);
+		}
 		
 		Vector<Integer> conflict_ids = find_conflict_condition(view, origin_name, primary_key_type[0], ranges);
 		

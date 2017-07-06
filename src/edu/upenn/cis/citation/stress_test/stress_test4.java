@@ -74,18 +74,28 @@ public class stress_test4 {
 		Class.forName("org.postgresql.Driver");
 	    c = DriverManager
 	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
-		
-		
-				
+					
 //		Query query = query_storage.get_query_by_id(1);
 		
-				
+		int k = 3;//Integer.valueOf(args[0]);
 		
+		int view_size = 5;//Integer.valueOf(args[1]);
 		
-		for(int k = 3; k<query_num; k++)
-		{
+		boolean new_query = false;//Boolean.valueOf(args[2]);
+		
+		boolean new_rounds = false;//Boolean.valueOf(args[3]);
+		
+		boolean tuple_level = true;//Boolean.valueOf(args[4]);
+		
+		boolean new_start = false;//Boolean.valueOf(args[5]);
+		
+		if(new_query)
 			reset();
-			
+		
+//		for(int k = 3; k<query_num; k++)
+		{
+//			reset();
+//			
 //			Random r = new Random();
 //			
 //			int size = r.nextInt(query_num);
@@ -95,16 +105,54 @@ public class stress_test4 {
 //				size = r.nextInt(query_num);
 //			}
 			
-//			Query query = query_storage.get_query_by_id(1);
+			Query query = null;
 			
-			Query query = query_generator.gen_query(k, c, pst);
+			try{
+				query = query_storage.get_query_by_id(1);
+			}
+			catch(Exception e)
+			{
+				query = query_generator.gen_query(k, c, pst);
+				query_storage.store_query(query, new Vector<Integer>());
+				System.out.println(query);
+			}
 			
-			query_storage.store_query(query, new Vector<Integer>());
+			
+			HashSet<Query> views = null;
 			
 			Vector<String> relation_names = get_unique_relation_names(query);
 			
-			HashSet<Query> views = view_generator.generate_store_views_without_predicates(relation_names, num_views, query.body.size());
-
+			if(new_rounds)
+			{
+				views = view_generator.generate_store_views_without_predicates(relation_names, view_size, query.body.size());
+				
+				for(Iterator iter = views.iterator(); iter.hasNext();)
+				{
+					Query view = (Query) iter.next();
+					
+					System.out.println(view);
+				}
+			}
+			else
+			{
+				views = view_operation.get_all_views();
+				
+				if(new_start)
+				{
+					view_generator.initial();
+					
+					view_generator.gen_one_additional_predicates(views, relation_names, query.body.size(), query);
+					
+					for(Iterator iter = views.iterator(); iter.hasNext();)
+					{
+						Query view = (Query) iter.next();
+						
+						System.out.println(view);
+					}
+				}
+			}
+			
+			
 //			for(Iterator iter = views.iterator(); iter.hasNext();)
 //			{
 //				Query view = (Query) iter.next();
@@ -122,7 +170,7 @@ public class stress_test4 {
 //			
 //			System.out.println(query);
 			
-			stress_test(query, c, pst, views, relation_names);
+			stress_test(query, c, pst, views, relation_names, tuple_level);
 
 		}
 		
@@ -137,7 +185,7 @@ public class stress_test4 {
 		
 	}
 	
-	static void stress_test(Query query, Connection c, PreparedStatement pst, HashSet<Query> views, Vector<String> relation_names) throws ClassNotFoundException, SQLException, IOException, InterruptedException
+	static void stress_test(Query query, Connection c, PreparedStatement pst, HashSet<Query> views, Vector<String> relation_names, boolean tuple_level) throws ClassNotFoundException, SQLException, IOException, InterruptedException
 	{
 		HashMap<Head_strs, HashSet<String> > citation_strs = new HashMap<Head_strs, HashSet<String>>();
 		
@@ -155,7 +203,8 @@ public class stress_test4 {
 		Vector<Vector<citation_view_vector>> citation_view2 = new Vector<Vector<citation_view_vector>>();
 
 		
-		while(views.size() < view_max_size)
+//		while(views.size() < view_max_size)
+		if(tuple_level)
 		{
 		
 			System.gc();
@@ -245,15 +294,11 @@ public class stress_test4 {
 			System.out.print(row_num + "	");
 			
 			System.out.print(origin_citation_size + "	");
+		}
+		else
+		{
 			
-			
-			
-			
-			
-			
-			
-			
-			start_time = System.nanoTime();
+			double start_time = System.nanoTime();
 			
 			for(int k = 0; k<times; k++)
 			{
@@ -268,9 +313,9 @@ public class stress_test4 {
 				System.gc();
 			}
 			
-			end_time = System.nanoTime();
+			double end_time = System.nanoTime();
 			
-			time = (end_time - start_time);
+			double time = (end_time - start_time);
 			
 			
 			time = time /(times * 1.0 *1000000000);
@@ -278,11 +323,11 @@ public class stress_test4 {
 			System.out.print(time + "s	");
 			
 			
-			h_l = citation_strs2.keySet();
+			Set<Head_strs> h_l = citation_strs2.keySet();
 			
 			double citation_size2 = 0.0;
 			
-			row = 0;
+			int row = 0;
 			
 			for(Iterator iter = h_l.iterator(); iter.hasNext();)
 			{
@@ -302,11 +347,11 @@ public class stress_test4 {
 			System.out.print(citation_size2 + "	");
 
 			
-			head = citation_view_map2.keySet();
+			Set<Head_strs> head = citation_view_map2.keySet();
 			
-			row_num = 0;
+			int row_num = 0;
 			
-			origin_citation_size = 0.0;
+			double origin_citation_size = 0.0;
 			
 			for(Iterator iter = head.iterator(); iter.hasNext();)
 			{
@@ -353,17 +398,6 @@ public class stress_test4 {
 //			view_generator.generate_store_views(relation_names, num_views);
 			
 //			query_storage.store_query(queries.get(0), new Vector<Integer>());
-			
-			
-			
-			view_generator.gen_one_additional_predicates(views, relation_names, query.body.size(), query);
-			
-			for(Iterator iter = views.iterator(); iter.hasNext();)
-			{
-				Query view = (Query) iter.next();
-				
-				System.out.println(view);
-			}
 			
 			
 		}

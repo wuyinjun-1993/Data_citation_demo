@@ -268,7 +268,7 @@ public class query_generator {
 	    }
 	}
 	
-	static void build_relation_primary_key_mapping(Connection c, PreparedStatement pst) throws SQLException
+	public static void build_relation_primary_key_mapping(Connection c, PreparedStatement pst) throws SQLException
 	{
 		relation_primary_key_mapping.put("family", "family_id");
 		

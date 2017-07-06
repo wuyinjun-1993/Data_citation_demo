@@ -43,6 +43,8 @@ public class stress_test3 {
 	
 	static int query_num = 8;
 	
+	static boolean store_covering_set = true;
+	
 	static Vector<String> get_unique_relation_names(Query query)
 	{
 		Vector<String> relation_names = new Vector<String>();
@@ -140,7 +142,9 @@ public class stress_test3 {
 
 		Vector<Vector<citation_view_vector>> citation_view2 = new Vector<Vector<citation_view_vector>>();
 		
-		Vector<Query> views = view_generator.gen_default_views();
+		Vector<String> relations = get_unique_relation_names(query);
+		
+		Vector<Query> views = view_generator.gen_default_views(relations);
 		
 		for(int i = 0; i<views.size(); i++)
 		{

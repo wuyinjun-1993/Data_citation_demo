@@ -268,7 +268,7 @@ public class query_generator {
 	    }
 	}
 	
-	static void build_relation_primary_key_mapping(Connection c, PreparedStatement pst) throws SQLException
+	public static void build_relation_primary_key_mapping(Connection c, PreparedStatement pst) throws SQLException
 	{
 		relation_primary_key_mapping.put("family", "family_id");
 		
@@ -384,7 +384,13 @@ public class query_generator {
 											
 			int head_size = rand.nextInt((int)(attr_list.size() * head_var_rate + 1)) + 1;
 									
-			Vector<Argument> head_vars = gen_head_vars(relation, relation_name, attr_list, head_size, c, pst);
+//			Vector<Argument> head_vars = gen_head_vars(relation, relation_name, attr_list, head_size, c, pst);
+			
+			Argument head_arg = new Argument(relation_name + populate_db.separator + primary_key_type[0], relation_name);
+			
+			Vector<Argument> head_vars = new Vector<Argument>();
+			
+			head_vars.add(head_arg);
 			
 			heads.addAll(head_vars);
 			

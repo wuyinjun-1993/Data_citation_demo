@@ -1320,25 +1320,25 @@ public class Tuple_reasoning2_test {
 					
 //					HashSet<String> citations = new HashSet<String>();
 					
-					if(citation_view_map2.get(h_vals) == null)
+					if(citation_strs.get(h_vals) == null)
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = new Vector<Vector<citation_view_vector>>();
-						
-						curr_c_view_vector.add(c_vec);
-						
-						citation_view_map2.put(h_vals, curr_c_view_vector);
+//						Vector<Vector<citation_view_vector>> curr_c_view_vector = new Vector<Vector<citation_view_vector>>();
+//						
+//						curr_c_view_vector.add(c_vec);
+//						
+//						citation_view_map2.put(h_vals, curr_c_view_vector);
 						
 						citation_strs.put(h_vals, citations);
 					}
 					else
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = citation_view_map2.get(h_vals);
+//						Vector<Vector<citation_view_vector>> curr_c_view_vector = citation_view_map2.get(h_vals);
 						
 						HashSet<String> curr_citations = citation_strs.get(h_vals);
 						
-						curr_c_view_vector.add(c_vec);
-						
-						citation_view_map2.put(h_vals, curr_c_view_vector);
+//						curr_c_view_vector.add(c_vec);
+//						
+//						citation_view_map2.put(h_vals, curr_c_view_vector);
 						
 						curr_citations.addAll(citations);
 						
@@ -1381,25 +1381,25 @@ public class Tuple_reasoning2_test {
 					
 //					HashSet<String> citations = new HashSet<String>();
 					
-					if(citation_view_map2.get(h_vals) == null)
+					if(citation_strs.get(h_vals) == null)
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = new Vector<Vector<citation_view_vector>>();
-						
-						curr_c_view_vector.add(update_c_view);
-						
-						citation_view_map2.put(h_vals, curr_c_view_vector);
+//						Vector<Vector<citation_view_vector>> curr_c_view_vector = new Vector<Vector<citation_view_vector>>();
+//						
+//						curr_c_view_vector.add(update_c_view);
+//						
+//						citation_view_map2.put(h_vals, curr_c_view_vector);
 						
 						citation_strs.put(h_vals, citations);
 					}
 					else
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = citation_view_map2.get(h_vals);
+//						Vector<Vector<citation_view_vector>> curr_c_view_vector = citation_view_map2.get(h_vals);
 						
 						HashSet<String> curr_citations = citation_strs.get(h_vals);
 						
-						curr_c_view_vector.add(update_c_view);
-						
-						citation_view_map2.put(h_vals, curr_c_view_vector);
+//						curr_c_view_vector.add(update_c_view);
+//						
+//						citation_view_map2.put(h_vals, curr_c_view_vector);
 						
 						curr_citations.addAll(citations);
 						
@@ -1474,25 +1474,25 @@ public class Tuple_reasoning2_test {
 					
 					first = false;
 					
-					if(citation_view_map2.get(h_vals) == null)
+					if(citation_strs.get(h_vals) == null)
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = new Vector<Vector<citation_view_vector>>();
-						
-						curr_c_view_vector.add(curr_c_views);
-						
-						citation_view_map2.put(h_vals, curr_c_view_vector);
+//						Vector<Vector<citation_view_vector>> curr_c_view_vector = new Vector<Vector<citation_view_vector>>();
+//						
+//						curr_c_view_vector.add(curr_c_views);
+//						
+//						citation_view_map2.put(h_vals, curr_c_view_vector);
 						
 						citation_strs.put(h_vals, citations);
 					}
 					else
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = citation_view_map2.get(h_vals);
+//						Vector<Vector<citation_view_vector>> curr_c_view_vector = citation_view_map2.get(h_vals);
 						
 						HashSet<String> curr_citations = citation_strs.get(h_vals);
 						
-						curr_c_view_vector.add(curr_c_views);
-						
-						citation_view_map2.put(h_vals, curr_c_view_vector);
+//						curr_c_view_vector.add(curr_c_views);
+//						
+//						citation_view_map2.put(h_vals, curr_c_view_vector);
 						
 						curr_citations.addAll(citations);
 						
@@ -1535,29 +1535,29 @@ public class Tuple_reasoning2_test {
 //					Vector<String> citations = populate_citation(update_c_view, vals, c, pst, citation_strings);
 					
 					
-					if(citation_view_map2.get(h_vals) == null)
+					if(citation_strs.get(h_vals) == null)
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = new Vector<Vector<citation_view_vector>>();
-						
-						curr_c_view_vector.add(update_c_view);
-						
-						citation_view_map2.put(h_vals, curr_c_view_vector);
-						
+//						Vector<Vector<citation_view_vector>> curr_c_view_vector = new Vector<Vector<citation_view_vector>>();
+//						
+//						curr_c_view_vector.add(update_c_view);
+//						
+//						citation_view_map2.put(h_vals, curr_c_view_vector);
+//						
 						citation_strs.put(h_vals, citations);
 					}
 					else
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = citation_view_map2.get(h_vals);
+//						Vector<Vector<citation_view_vector>> curr_c_view_vector = citation_view_map2.get(h_vals);
 						
 						HashSet<String> curr_citations = citation_strs.get(h_vals);
 						
-						curr_c_view_vector.add(update_c_view);
+//						curr_c_view_vector.add(update_c_view);
 						
 						curr_citations.addAll(citations);
 						
 						citations.clear();
 						
-						citation_view_map2.put(h_vals, curr_c_view_vector);
+//						citation_view_map2.put(h_vals, curr_c_view_vector);
 						
 						citation_strs.put(h_vals, curr_citations);
 					}

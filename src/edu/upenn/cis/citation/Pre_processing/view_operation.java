@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
@@ -336,6 +337,47 @@ public class view_operation {
         
         populate_db.delete("v" + id, subgoals, subgoal_name_mapping, has_lambda);
 
+	}
+	
+	public static HashSet<Query> get_all_views() throws SQLException, ClassNotFoundException
+	{
+		Class.forName("org.postgresql.Driver");
+        Connection c = DriverManager
+           .getConnection(populate_db.db_url,
+       	        populate_db.usr_name,populate_db.passwd);
+        
+        PreparedStatement pst = null;
+        
+        HashSet<Query> views = new HashSet<Query>();
+        
+        Vector<Integer> ids = get_all_view_ids(c, pst);
+        
+        for(int i = 0; i<ids.size(); i++)
+        {
+        	views.add(get_view_by_id(ids.get(i)));
+        }
+        
+        c.close();
+        
+        return views;
+	}
+	
+	static Vector<Integer> get_all_view_ids(Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "select view from view_table order by view";
+		
+		Vector<Integer> ids = new Vector<Integer>();
+		
+		pst = c.prepareStatement(query);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		while(rs.next())
+		{
+			ids.add(rs.getInt(1));
+		}
+		
+		return ids;
 	}
 	
 	public static void delete_view_by_id(int id) throws SQLException, ClassNotFoundException

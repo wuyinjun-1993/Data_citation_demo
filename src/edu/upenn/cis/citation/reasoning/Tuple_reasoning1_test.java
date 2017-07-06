@@ -1753,10 +1753,17 @@ public class Tuple_reasoning1_test {
 		
 //		System.out.println(sql);
 
+//		long t1 = System.nanoTime();
 				
 		ResultSet rs = pst.executeQuery();
-					
-		
+//					
+//		long t2 = System.nanoTime();
+//		
+//		double time = (t2 - t1)*1.0/1000000000;
+//		
+//		System.out.println("time::" + time + "s");
+//		
+//		
 		int lambda_term_num = valid_lambda_terms.size();
 
 		String old_value = new String();
@@ -1902,9 +1909,9 @@ public class Tuple_reasoning1_test {
 
 					c_views.add(c_unit_combinaton);
 					
-					HashSet<String> citations = gen_citation(c_unit_combinaton, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
+//					HashSet<String> citations = gen_citation(c_unit_combinaton, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
 					
-//					HashSet<String> citations = new HashSet<String>();
+					HashSet<String> citations = new HashSet<String>();
 					
 //					Vector<String> citations = new Vector<String>();
 //					
@@ -1926,25 +1933,25 @@ public class Tuple_reasoning1_test {
 //					first = false;
 					old_value = curr_str;
 					
-					if(citation_view_map1.get(h_vals) == null)
+					if(citation_strs.get(h_vals) == null)
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = new Vector<Vector<citation_view_vector>>();
-						
-						curr_c_view_vector.add(c_unit_combinaton);
-						
-						citation_view_map1.put(h_vals, curr_c_view_vector);
+//						Vector<Vector<citation_view_vector>> curr_c_view_vector = new Vector<Vector<citation_view_vector>>();
+//						
+//						curr_c_view_vector.add(c_unit_combinaton);
+//						
+//						citation_view_map1.put(h_vals, curr_c_view_vector);
 						
 						citation_strs.put(h_vals, citations);
 					}
 					else
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = citation_view_map1.get(h_vals);
+//						Vector<Vector<citation_view_vector>> curr_c_view_vector = citation_view_map1.get(h_vals);
 						
 						HashSet<String> curr_citations = citation_strs.get(h_vals);
 						
-						curr_c_view_vector.add(c_unit_combinaton);
-						
-						citation_view_map1.put(h_vals, curr_c_view_vector);
+//						curr_c_view_vector.add(c_unit_combinaton);
+//						
+//						citation_view_map1.put(h_vals, curr_c_view_vector);
 						
 						curr_citations.addAll(citations);
 						
@@ -1990,9 +1997,9 @@ public class Tuple_reasoning1_test {
 					
 					c_views.add(update_c_view);
 					
-					HashSet<String> citations = gen_citation(update_c_view, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
+//					HashSet<String> citations = gen_citation(update_c_view, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
 					
-//					HashSet<String> citations = new HashSet<String>();
+					HashSet<String> citations = new HashSet<String>();
 					
 //					HashSet<String> citations = populate_citation(update_c_view, vals, c, pst, citation_strings, h_vals);
 					
@@ -2010,29 +2017,29 @@ public class Tuple_reasoning1_test {
 					
 					
 					
-					if(citation_view_map1.get(h_vals) == null)
+					if(citation_strs.get(h_vals) == null)
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = new Vector<Vector<citation_view_vector>>();
-						
-						curr_c_view_vector.add(update_c_view);
-						
-						citation_view_map1.put(h_vals, curr_c_view_vector);
+//						Vector<Vector<citation_view_vector>> curr_c_view_vector = new Vector<Vector<citation_view_vector>>();
+//						
+//						curr_c_view_vector.add(update_c_view);
+//						
+//						citation_view_map1.put(h_vals, curr_c_view_vector);
 						
 						citation_strs.put(h_vals, citations);
 					}
 					else
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = citation_view_map1.get(h_vals);
+//						Vector<Vector<citation_view_vector>> curr_c_view_vector = citation_view_map1.get(h_vals);
 						
 						HashSet<String> curr_citations = citation_strs.get(h_vals);
 						
-						curr_c_view_vector.add(update_c_view);
+//						curr_c_view_vector.add(update_c_view);
 						
 						curr_citations.addAll(citations);
 						
 						citations.clear();
 						
-						citation_view_map1.put(h_vals, curr_c_view_vector);
+//						citation_view_map1.put(h_vals, curr_c_view_vector);
 						
 						citation_strs.put(h_vals, curr_citations);
 					}
@@ -2132,9 +2139,9 @@ public class Tuple_reasoning1_test {
 					
 					c_unit_com.clear();
 					
-					HashSet<String> citations = gen_citation(c_unit_combinaton, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
+//					HashSet<String> citations = gen_citation(c_unit_combinaton, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
 					
-//					HashSet<String> citations = new HashSet<String>();
+					HashSet<String> citations = new HashSet<String>();
 					
 //					Vector<String> citations = new Vector<String>();
 //					
@@ -2158,25 +2165,25 @@ public class Tuple_reasoning1_test {
 
 					first = false;
 					
-					if(citation_view_map1.get(h_vals) == null)
+					if(citation_strs.get(h_vals) == null)
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = new Vector<Vector<citation_view_vector>>();
-						
-						curr_c_view_vector.add(c_unit_combinaton);
-						
-						citation_view_map1.put(h_vals, curr_c_view_vector);
+//						Vector<Vector<citation_view_vector>> curr_c_view_vector = new Vector<Vector<citation_view_vector>>();
+//						
+//						curr_c_view_vector.add(c_unit_combinaton);
+//						
+//						citation_view_map1.put(h_vals, curr_c_view_vector);
 						
 						citation_strs.put(h_vals, citations);
 					}
 					else
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = citation_view_map1.get(h_vals);
+//						Vector<Vector<citation_view_vector>> curr_c_view_vector = citation_view_map1.get(h_vals);
 						
 						HashSet<String> curr_citations = citation_strs.get(h_vals);
 						
-						curr_c_view_vector.add(c_unit_combinaton);
-						
-						citation_view_map1.put(h_vals, curr_c_view_vector);
+//						curr_c_view_vector.add(c_unit_combinaton);
+//						
+//						citation_view_map1.put(h_vals, curr_c_view_vector);
 						
 						curr_citations.addAll(citations);
 						
@@ -2213,9 +2220,9 @@ public class Tuple_reasoning1_test {
 					
 					c_views.add(update_c_view);
 					
-					HashSet<String> citations = gen_citation(update_c_view, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
+//					HashSet<String> citations = gen_citation(update_c_view, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
 
-//					HashSet<String> citations = new HashSet<String>();
+					HashSet<String> citations = new HashSet<String>();
 					
 //					HashSet<String> citations = populate_citation(update_c_view, vals, c, pst, citation_strings, h_vals);
 					
@@ -2233,25 +2240,25 @@ public class Tuple_reasoning1_test {
 					
 					
 					
-					if(citation_view_map1.get(h_vals) == null)
+					if(citation_strs.get(h_vals) == null)
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = new Vector<Vector<citation_view_vector>>();
-						
-						curr_c_view_vector.add(update_c_view);
-						
-						citation_view_map1.put(h_vals, curr_c_view_vector);
+//						Vector<Vector<citation_view_vector>> curr_c_view_vector = new Vector<Vector<citation_view_vector>>();
+//						
+//						curr_c_view_vector.add(update_c_view);
+//						
+//						citation_view_map1.put(h_vals, curr_c_view_vector);
 						
 						citation_strs.put(h_vals, citations);
 					}
 					else
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = citation_view_map1.get(h_vals);
+//						Vector<Vector<citation_view_vector>> curr_c_view_vector = citation_view_map1.get(h_vals);
 						
 						HashSet<String> curr_citations = citation_strs.get(h_vals);
 						
-						curr_c_view_vector.add(update_c_view);
-						
-						citation_view_map1.put(h_vals, curr_c_view_vector);
+//						curr_c_view_vector.add(update_c_view);
+//						
+//						citation_view_map1.put(h_vals, curr_c_view_vector);
 						
 						curr_citations.addAll(citations);
 						

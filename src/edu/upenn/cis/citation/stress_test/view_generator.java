@@ -1900,14 +1900,15 @@ public class view_generator {
 		
 		for(int i = 0; i<size; i++)
 		{
-			int index = r.nextInt(attr_list.size());
+			int index = 0;
+			if(i == 0)
+				index = 0;
+			else
+			{
+				index = r.nextInt(attr_list.size());
+			}
 			
-			
-			id_set.add(index);
-			
-			
-				
-			
+			id_set.add(index);			
 		}
 		
 		for(Iterator iter = id_set.iterator(); iter.hasNext();)

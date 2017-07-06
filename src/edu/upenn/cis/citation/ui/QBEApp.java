@@ -96,7 +96,7 @@ public class QBEApp extends Application {
 	private ObservableList<String> dbaListBlock = FXCollections.observableArrayList();
 	
 	// private Scene newScene;
-	private Stage stage, citeStage, queryStage;
+	private Stage stage, citeStage, queryStage, formatStage;
 	// private TableView<ObservableList> dataSelectedView = new TableView<>();
 	// data shown in data preview table in dba or user, added in setDataView()
 	private ObservableList dataViewList = FXCollections.observableArrayList();
@@ -140,11 +140,10 @@ public class QBEApp extends Application {
 	private GridPane gridCitation, gridCitationSub;
 	private Tab citationDataViewDataTab;
 	
-	// the queryScene used to show generated citation query
-	private Scene queryScene;
-	private GridPane gridQuery;
-	
+	// the generatedScene used to show generated citation query
 	private Scene generatedScene;
+	// the format Scene to show different format of citations
+	private Scene formatScene;
 	
 	// TreeView share across user & dba screens
 	private TreeItem<TreeNode> root;
@@ -205,6 +204,8 @@ private Object String;
 		this.stage = stage;
 		this.citeStage = new Stage();
 		this.queryStage = new Stage();
+		this.formatStage = new Stage();
+		
 		buildLoginScene();
 //		buildDbaScene();
 //		buildUserScene();
@@ -220,8 +221,9 @@ private Object String;
 		stage.show();
 	}
 	
-    /* ===================================================================
-     * Build the Login Scene */
+    /** ===================================================================
+     * Build the Login Scene 
+     */
 	private void buildLoginScene() {		
 		GridPane gp = new GridPane();
 		gp.setPadding(new Insets(10, 50, 50, 50));
@@ -358,7 +360,7 @@ private Object String;
 		loginScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
 	}
 	
-	/* ===================================================================
+	/** ===================================================================
 	 * Build the View scene 
 	 * Show all data view and citation views */
 	private void buildViewScene() {
@@ -668,23 +670,6 @@ private Object String;
 				}
 				
 			}
-//			buildGeneratedQueryScene(qv);
-//			data.clear();
-//			dataView.getItems().clear();
-//			hBoxLambda.getChildren().clear();
-//			dataView.getColumns().clear();
-//			queryStage.setScene(queryScene);
-//			queryStage.setTitle("Query Content");
-//			queryStage.show();
-//			stage.hide();
-//			int query_id = Integer.parseInt(qv);
-//			try {
-//				Query query = query_storage.get_user_query_by_id(query_id);
-//				addDataFromQuery(query);
-//			} catch (Exception e1) {
-//				e1.printStackTrace();
-//				System.out.println("List generated query info error");
-//			}
 			
 		});
 		
@@ -708,7 +693,7 @@ private Object String;
 		viewScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
 	}
 
-	/* ===================================================================
+	/** ===================================================================
 	 * Build the User scene
 	 */
 	private void buildUserScene() {
@@ -892,32 +877,6 @@ private Object String;
 		clearButton.setId("bevel-grey");
 		backButton.setId("bevel-grey");
 		
-		if(stage.getScene() == queryScene) {
-			System.out.println("[queryScene: TRUE]");
-			runButton.setVisible(false);
-			clearButton.setVisible(false);
-//			backButton.setVisible(false);
-			if (!data.isEmpty() ) {
-				List<Entry> list = new ArrayList<>();
-				list.addAll(data);
-				lambdasAll.clear();
-				lambdaIndex.clear();
-				lambdaSQL = Util.convertToSQLWithLambda(list, false);
-				System.out.println("[DEBUG] lambdaSQL: " + lambdaSQL);
-				lambdas = Util.getLambda(list);
-				for (String lambda : lambdas) {
-					System.out.println(lambda);
-					String table = lambda.substring(0, lambda.indexOf('.'));
-					String field = lambda.substring(lambda.indexOf('.') + 1);
-					List<String> temp = Database.getDistincts(table, field);
-					lambdasAll.add(temp);
-					lambdaIndex.add(0);
-				}
-				setDataView(hBoxLambda, dataView, false);
-			}
-			
-		}
-		
 		runButton.setOnAction(e -> {
 			if (stage.getScene() == dbaScene || stage.getScene() == userScene) {
 				if (data.isEmpty() ) return;
@@ -1040,7 +999,7 @@ private Object String;
 		return searchBox;
 	}
 
-	/* ===================================================================
+	/** ===================================================================
 	 * Build the Dba scene
 	 */
 	private void buildDbaScene() {
@@ -1083,11 +1042,6 @@ private Object String;
 //			editItem.setOnAction(event -> {
 //				String item = cell.getItem();
 //				// code to edit item...
-//				listQuery = item;
-//				buildQueryScene();
-//				citeStage.setScene(queryScene);
-//				citeStage.setTitle("Citation Query Content");
-//				citeStage.show();
 //			});
 //			MenuItem deleteItem = new MenuItem();
 //			deleteItem.textProperty().bind(Bindings.format("Delete \"%s\"", cell.itemProperty()));
@@ -1603,7 +1557,7 @@ private Object String;
 		dbaScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
 	}
 	
-	/* ===================================================================
+	/** ===================================================================
 	 * Build the new citation scene
 	 */
     private void buildCitationScene() {
@@ -1837,8 +1791,8 @@ private Object String;
 		citationScene = new Scene(gridCitation);
 		citationScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
     }
-    /*
-     * Build the scene to show generated citation query
+    /**
+     * Build the scene to show all the generated citation query for admin
      */
     private void buildGeneratedScene() {
     	GridPane gridGenerated = new GridPane();
@@ -1883,101 +1837,54 @@ private Object String;
     	generatedScene = new Scene(gridGenerated);
 		generatedScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
     }
-    /*
-     * Build the scene to show generated citation query
+    /**
+     * Build the format Scene to show different format of citations
      */
-    private void buildGeneratedQueryScene(String qv) {
-    	gridQuery = new GridPane();
-        gridQuery.setPadding(new Insets(5, 10, 10, 10));
-        gridQuery.setHgap(10);
-        gridQuery.setVgap(10);
-        gridQuery.setMaxSize(800, 500);
-        
-		// TabPane
-		TabPane tabPane = new TabPane();
-		Tab queryDataViewTab = new Tab();
-		queryDataViewTab.setText("Query: " + qv);
-		queryDataViewTab.setClosable(false);
-		tabPane.getTabs().setAll(queryDataViewTab);
-		tabPane.setTabClosingPolicy(TabClosingPolicy.SELECTED_TAB);
-		tabPane.getStyleClass().add(TabPane.STYLE_CLASS_FLOATING);
-		GridPane.setHgrow(tabPane, Priority.ALWAYS);
-		GridPane.setVgrow(tabPane, Priority.ALWAYS);
-		gridQuery.add(tabPane, 0, 0);
-		
-        GridPane gridQuerySub = new GridPane();
-        gridQuerySub.setPadding(new Insets(2, 5, 2, 5));
-        gridQuerySub.setHgap(5);
-        gridQuerySub.setVgap(5);
-        queryDataViewTab.setContent(gridQuerySub);
-        
-		Label label_0 = new Label("DataLog");
-		label_0.setId("prompt-text");
-		GridPane.setHgrow(label_0, Priority.ALWAYS);
-		gridQuerySub.add(label_0, 0, 0);
-
-		// DataLog content
-		TextArea datalogField = new TextArea();
-		datalogField.setEditable(false);
-		
-		gridQuerySub.add(datalogField, 0, 1);
-		
-		// build Top menu
-		hBoxLambda.getChildren().add(new Label("Lambda Terms:  "));
-		hBoxLambda.getStyleClass().add("hBoxLambda");
-		GridPane.setHgrow(hBoxLambda, Priority.ALWAYS);
-		gridQuerySub.add(hBoxLambda, 0, 5);
-		
-		int query_id = Integer.parseInt(qv);
-		try {
-			System.out.println("query_id: " + query_id);
-			Query query = query_storage.get_user_query_by_id(query_id);
-			
-			addDataFromQuery(query);
-		} catch (ClassNotFoundException | SQLException e1) {
-			e1.printStackTrace();
+    private void buildFormatScene(String citation, String type) {
+    	GridPane gridFormat = new GridPane();
+    	gridFormat.setPrefSize(500, 400);
+    	gridFormat.setPadding(new Insets(10));
+    	// build the textField
+    	TextArea content = new TextArea();
+    	content.setEditable(false);
+    	GridPane.setVgrow(content, Priority.ALWAYS);
+		GridPane.setHgrow(content, Priority.ALWAYS);
+		if (type.equals("json: ")) {
+			content.setText(type + citation);
+		} else if (type.equals("xml")) {
+			content.setText(type + citation);
 		}
-		GridPane.setVgrow(dataView, Priority.ALWAYS);
-		GridPane.setHgrow(dataView, Priority.ALWAYS);
-		dataView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-		this.stage.setScene(queryScene);
-		final HBox hBox = buildTopMenu(null, hBoxLambda, dataView, false);
-		System.out.println(dataViewList.get(0));
-		dataView.setItems(dataViewList);
-		gridQuerySub.add(dataView, 0, 4);
+		gridFormat.add(content, 0, 1);
+		// build format switch link
+    	Hyperlink labelJson = new Hyperlink("JSON");
+    	labelJson.setId("link");
+    	labelJson.setOnMouseClicked(event -> {
+    		content.setText("json: " + citation);
+    	});
+    	Hyperlink labelXml = new Hyperlink("XML");
+    	labelXml.setId("link");
+    	labelXml.setOnMouseClicked(event -> {
+    		content.setText("xml" + citation);
+    	});
+    	HBox hboxSwitch = new HBox();
+    	hboxSwitch.setSpacing(5);
+    	hboxSwitch.setAlignment(Pos.CENTER_RIGHT);
+    	hboxSwitch.getChildren().addAll(labelJson, labelXml);
+    	gridFormat.add(hboxSwitch, 0, 0);
+		// build the download link
+		Hyperlink download = new Hyperlink("Download");
+		download.setId("link");
+		HBox hboxDown = new HBox();
+		hboxDown.getChildren().add(download);
+		hboxDown.setAlignment(Pos.CENTER_RIGHT);
+		gridFormat.add(hboxDown, 0, 2);
 		
-		List<Entry> list = new ArrayList<>();
-		list.addAll(data);
-		datalogField.setText(Util.convertToDatalogOriginal(list));
-		gridQuerySub.add(hBox, 1, 0);
-		
-		// Label data preview
-		final Label label_1 = new Label("Data Preview");
-		label_1.setId("prompt-text");
-		GridPane.setHgrow(label_1, Priority.ALWAYS);
-		gridQuerySub.add(label_1, 0, 3);
-		
-
-		hBoxPrevNext = new HBox();
-		hBoxPrevNext.setAlignment(Pos.CENTER_RIGHT);
-		final Button prevButton = new Button("<<");
-		final Button nextButton = new Button(">>");
-		prevButton.setId("prevnext");
-		nextButton.setId("prevnext");
-		nextButton.setOnAction(e -> {
-			next();
-			setDataView(hBoxLambda, dataView, false);
-		});
-		hBoxPrevNext.getChildren().addAll(prevButton, nextButton);
-		GridPane.setHgrow(hBoxPrevNext, Priority.ALWAYS);
-		gridQuerySub.add(hBoxPrevNext, 1, 5);
-		
-		queryScene = new Scene(gridQuerySub);
-		queryScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
+    	formatScene = new Scene(gridFormat);
+		formatScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
     }
     
-	/* ===================================================================
-	 * Supplement methods
+	/** ===================================================================
+	 * Build the gridScene to show generated citations
 	 */
 	private GridPane buildGridCg(ObservableList<String> observableList) {
 		GridPane gridCg = new GridPane();
@@ -1986,15 +1893,60 @@ private Object String;
         gridCg.setVgap(5);
 		
 		ListView<String> list = new ListView<>();
-		list.setCellFactory(list1 -> new ListCell<String>() {
-            {
-                Text text = new Text();
-                text.wrappingWidthProperty().bind(list1.widthProperty().subtract(15));
-                text.textProperty().bind(itemProperty());
-                setPrefWidth(0);
-                setGraphic(text);
-            }
-        });
+//		list.setCellFactory(list1 -> new ListCell<String>() {
+//            {
+//                Text text = new Text();
+//                text.wrappingWidthProperty().bind(list1.widthProperty().subtract(15));
+//                text.textProperty().bind(itemProperty());
+//                setPrefWidth(0);
+//                setGraphic(text);
+//            }
+//        });
+		list.setCellFactory(lv -> {
+			ListCell<String> cell = new ListCell<String>() {
+				public void updateItem (String name, boolean empty) {
+					super.updateItem(name, empty);
+					if(name == null|| name.isEmpty()) {
+						
+					} else {
+							Text text = new Text();
+			                text.wrappingWidthProperty().bind(list.widthProperty().subtract(15));
+			                text.textProperty().bind(itemProperty());
+			                setPrefWidth(0);
+			                setGraphic(text);
+					}
+				}
+			};
+			ContextMenu contextMenu = new ContextMenu();
+			MenuItem jsonItem = new MenuItem();
+			jsonItem.textProperty().bind(Bindings.format("Export as JSON"));
+			jsonItem.setOnAction(event -> {
+				String item = cell.getItem();
+				buildFormatScene(item, "json");
+				this.formatStage.setScene(formatScene);
+				this.formatStage.setTitle("Export Formats");
+				this.formatStage.show();
+			});
+			MenuItem xmlItem = new MenuItem();
+			xmlItem.textProperty().bind(Bindings.format("Export as XML"));
+			xmlItem.setOnAction(event -> {
+				String item = cell.getItem();
+				buildFormatScene(item, "xml");
+				this.formatStage.setScene(formatScene);
+				this.formatStage.setTitle("Export Formats");
+				this.formatStage.show();
+			});
+			contextMenu.getItems().addAll(jsonItem, xmlItem);
+			cell.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
+				if (isNowEmpty) {
+					cell.setContextMenu(null);
+				} else {
+					cell.setContextMenu(contextMenu);
+				}
+			});
+			cell.textProperty().bind(cell.itemProperty());
+			return cell;
+		});
 		list.setItems(observableList);
 		GridPane.setHgrow(list, Priority.ALWAYS);
 		GridPane.setVgrow(list, Priority.ALWAYS);
@@ -2073,7 +2025,9 @@ private Object String;
 		
 		return gridCg;
 	}
-
+	/** ===================================================================
+	 * Supplement methods
+	 */
 	// table editor for citation builder
 	private HBox createEditor(TableRowExpanderColumn.TableRowDataFeatures<Entry> param) {
 		HBox hboxPane = new HBox();
@@ -2566,7 +2520,7 @@ private Object String;
 //			dataViewList.clear();
 			dataView.getColumns().clear();
 			int num_rows = 0;
-			if ((stage.getScene() == dbaScene || stage.getScene() == userScene || stage.getScene() == queryScene) && !citeStage.isShowing() ) {
+			if ((stage.getScene() == dbaScene || stage.getScene() == userScene) && !citeStage.isShowing() ) {
 				dataViewList.clear();
 				while (rs.next()) {
 					ids.add(num_rows);
@@ -3029,6 +2983,4 @@ private Object String;
 		return splitSQL;
 	}
 	
-
-
 }

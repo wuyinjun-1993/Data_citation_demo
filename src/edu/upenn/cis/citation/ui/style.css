@@ -126,3 +126,13 @@
     -fx-padding: 3;
     /*-fx-shape: "M150 0 L150 0 L0 280 L300 280 M0 370 L300 370 L150 670 L150 670 Z";*/
 }
+
+#link {
+	-fx-text-fill: #000066;
+	-fx-underline: true;
+	-fx-border-color: transparent;
+}
+
+#link:hover {
+	-fx-text-fill: #3366ff;
+}

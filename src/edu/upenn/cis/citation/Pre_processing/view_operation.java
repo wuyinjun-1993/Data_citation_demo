@@ -90,7 +90,7 @@ public class view_operation {
         
         delete_conditions(id, c, pst);
         
-        delete_citation_view(id, c, pst);
+//        delete_citation_view(id, c, pst);
         
         populate_db.delete("v" + id, subgoals, subgoal_name_mapping, has_lambda);
         

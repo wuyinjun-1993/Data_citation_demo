@@ -683,7 +683,8 @@ public class CitationConverter {
 	//		System.out.println(tempKey);
 			if(tempKey.contains("name")) 
 			{
-				citationKey = jsArray.getJSONObject(i).getJSONArray("name").toString();
+//				citationKey = jsArray.getJSONObject(i).getJSONArray("name").toString();
+				citationKey = jsArray.getJSONObject(i).getJSONArray("author").toString();
 				break;
 			}
 		}
@@ -806,7 +807,7 @@ public class CitationConverter {
 		System.out.println("\n"+"TY"+ "  - " + "DBASE");
 		// array stores the two letter tags used in RIS 
 		String[][] abbrevation = {{"name","TI"},{"developerName","AU"},{"usedBy", "DP"},{"URL","UR"},{"eagle-i_ID","ID"},{"type","M3"},{"softVer","M2"},
-				{"manuName","AU"},{"performedBy", "AU"},{"location","DP"},{"researchProvider","DP"},{"serviceProvider","DP"},{"inventoryNumber","M1"}
+				{"manuName","AU"},{"performedBy", "AU"},{"location","DP"},{"researchProvider","DP"},{"serviceProvider","DP"},{"inventoryNumber","M1"},{"author", "AU"},{"title","TI"}
 				};
 		
 		JSONObject jsObj = new JSONObject(jsonStr);

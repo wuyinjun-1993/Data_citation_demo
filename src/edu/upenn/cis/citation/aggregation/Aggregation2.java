@@ -172,7 +172,7 @@ public class Aggregation2 {
 				
 				if(selected_row_ids.get(i) < interval[1] && selected_row_ids.get(i) >= interval[0])
 				{
-					rs.absolute(selected_row_ids.get(i));
+					rs.absolute(selected_row_ids.get(i) + 1);
 					
 					Tuple_reasoning1_test.update_valid_citation_combination(c_view, rs, start_pos);
 					

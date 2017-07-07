@@ -1089,7 +1089,7 @@ public class stress_test5 {
 				
 				citation_strs.clear();
 				
-				citation_view1 = Tuple_reasoning1.tuple_reasoning(queries.get(i), citation_strs,  citation_view_map1, c, pst);
+				Tuple_reasoning1.tuple_reasoning(queries.get(i), citation_strs,  citation_view_map1, c, pst);
 
 				
 			}

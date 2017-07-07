@@ -74,6 +74,8 @@ public class Tuple_reasoning2_test {
 	
 	static ResultSet rs = null;
 	
+	public static int covering_set_num = 0;
+	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException, IOException, InterruptedException, JSONException
 	{
 		
@@ -688,7 +690,7 @@ public class Tuple_reasoning2_test {
 		
 	}
 	
-	public static void reset()
+	public static void reset() throws SQLException
 	{
 		view_mapping.clear();
 		
@@ -709,6 +711,11 @@ public class Tuple_reasoning2_test {
 		query_lambda_str.clear();
 		
 		author_mapping.clear();
+		
+		if(rs!=null)
+			rs.close();
+		
+		covering_set_num = 0;
 												
 	}
 	
@@ -879,11 +886,11 @@ public class Tuple_reasoning2_test {
 	}
 	
 	
-	static HashSet<citation_view_vector> reasoning_single_tuple(HashSet views, Query query, ResultSet rs, Vector<citation_view_vector> c_view_template) throws ClassNotFoundException, SQLException
+	static void reasoning_single_tuple(HashSet views, Query query, ResultSet rs, Vector<citation_view_vector> c_view_template) throws ClassNotFoundException, SQLException
 	{
 		HashSet<Rewriting> rewritings = CoreCover.coverQuerySubgoals(views, query);
 		
-		HashSet<citation_view_vector> c_view_vec = new HashSet<citation_view_vector>();
+//		HashSet<citation_view_vector> c_view_vec = new HashSet<citation_view_vector>();
 		
 		int num = 0;
 		
@@ -980,13 +987,13 @@ public class Tuple_reasoning2_test {
 		
 		Tuple_reasoning1.remove_duplicate_view_combinations_final(c_view_template);
 		
-		c_view_vec.addAll(c_view_template);
+//		c_view_vec.addAll(c_view_template);
 				
 //		c_view_vec = remove_duplicate_final(c_view_vec);
 //		
 //		c_view_vec = remove_duplicate(c_view_vec);
 		
-		return (c_view_vec);
+//		return (c_view_vec);
 	}
 	
 	public static Vector<citation_view_vector> remove_duplicate(Vector<citation_view_vector> c_combinations)
@@ -1348,13 +1355,15 @@ public class Tuple_reasoning2_test {
 //						System.out.println(curr_str);
 
 						
-						HashSet<citation_view_vector> c_v = reasoning_single_tuple(curr_views, query, rs, c_view_template);
+						reasoning_single_tuple(curr_views, query, rs, c_view_template);
 						
-						Vector<citation_view_vector> c_vec = new Vector<citation_view_vector>();
+						covering_set_num += c_view_template.size();
 						
-						c_vec.addAll(c_v);
-						
-						c_v.clear();
+//						Vector<citation_view_vector> c_vec = new Vector<citation_view_vector>();
+//						
+//						c_vec.addAll(c_v);
+//						
+//						c_v.clear();
 
 						old_value = curr_str;
 						
@@ -1362,7 +1371,7 @@ public class Tuple_reasoning2_test {
 												
 //						Vector<String> citations = new Vector<String>();
 						
-						HashSet<String> citations = gen_citation(c_vec, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
+						HashSet<String> citations = gen_citation(c_view_template, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
 						
 //						HashSet<String> citations = new HashSet<String>();
 						
@@ -1417,6 +1426,8 @@ public class Tuple_reasoning2_test {
 //					HashSet<citation_view_vector> update_c = update_valid_citation_combination(c_view_template, rs, query.head.args.size() + query.body.size());
 					
 					update_valid_citation_combination(c_view_template, rs);
+					
+					covering_set_num += c_view_template.size();
 					
 //					update_valid_citation_combination(c_view_template, rs, query.head.args.size() + query.body.size());
 					
@@ -1521,18 +1532,20 @@ public class Tuple_reasoning2_test {
 					group_num ++;
 //					remove_invalid_web_view(curr_views, pos2, col_num,  rs);
 					
-					HashSet<citation_view_vector> c_v = reasoning_single_tuple(curr_views, query, rs, c_view_template);
+					reasoning_single_tuple(curr_views, query, rs, c_view_template);
 					
-					Vector<citation_view_vector> curr_c_views = new Vector<citation_view_vector>();
+					covering_set_num += c_view_template.size();
 					
-					curr_c_views.addAll(c_v);
-					
-					c_v.clear();
+//					Vector<citation_view_vector> curr_c_views = new Vector<citation_view_vector>();
+//					
+//					curr_c_views.addAll(c_v);
+//					
+//					c_v.clear();
 											
 //					output_vec_com(curr_c_views);
 														
 //					Vector<String> citations = gen_citation(curr_c_views, vals, c, pst, citation_strings);
-					HashSet<String> citations = gen_citation(curr_c_views, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
+					HashSet<String> citations = gen_citation(c_view_template, vals, c, pst, h_vals, view_query_mapping, query_lambda_str, author_mapping);
 					
 //					HashSet<String> citations = new HashSet<String>();
 					
@@ -1585,6 +1598,8 @@ public class Tuple_reasoning2_test {
 //					HashSet<citation_view_vector> update_c = update_valid_citation_combination(c_view_template, rs, query.head.args.size() + query.body.size());
 					
 					update_valid_citation_combination(c_view_template, rs);
+					
+					covering_set_num += c_view_template.size();
 					
 //					Vector<citation_view_vector> update_c_view = new Vector<citation_view_vector>();
 //					

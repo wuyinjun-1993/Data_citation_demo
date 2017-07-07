@@ -281,35 +281,37 @@ public class stress_test4 {
 			
 			System.out.print(citation_size1 + "	");
 			
-			Set<Head_strs> head = citation_view_map1.keySet();
+			System.out.print(row + "	");
 			
-			int row_num = 0;
+//			Set<Head_strs> head = citation_view_map1.keySet();
+//			
+//			int row_num = 0;
+//			
+//			double origin_citation_size = 0.0;
+//			
+//			for(Iterator iter = head.iterator(); iter.hasNext();)
+//			{
+//				Head_strs head_val = (Head_strs) iter.next();
+//				
+//				Vector<Vector<citation_view_vector>> c_view = citation_view_map1.get(head_val);
+//				
+//				row_num++;
+//				
+//				for(int p = 0; p<c_view.size(); p++)
+//				{
+//					origin_citation_size += c_view.get(p).size();
+//				}
+//				
+//			}
+//			
+//			
+//			
+//			if(row_num !=0)
+//				origin_citation_size = origin_citation_size / row_num;
+//			
 			
-			double origin_citation_size = 0.0;
 			
-			for(Iterator iter = head.iterator(); iter.hasNext();)
-			{
-				Head_strs head_val = (Head_strs) iter.next();
-				
-				Vector<Vector<citation_view_vector>> c_view = citation_view_map1.get(head_val);
-				
-				row_num++;
-				
-				for(int p = 0; p<c_view.size(); p++)
-				{
-					origin_citation_size += c_view.get(p).size();
-				}
-				
-			}
-			
-			
-			
-			if(row_num !=0)
-				origin_citation_size = origin_citation_size / row_num;
-			
-			System.out.print(row_num + "	");
-			
-			System.out.print(origin_citation_size + "	");
+			System.out.print(Tuple_reasoning1_test.covering_set_num * 1.0/query_generator.query_result_size + "	");
 		}
 		else
 		{
@@ -362,37 +364,37 @@ public class stress_test4 {
 
 			System.out.print(citation_size2 + "	");
 
+			System.out.print(row + "	");
 			
-			Set<Head_strs> head = citation_view_map2.keySet();
+//			Set<Head_strs> head = citation_view_map2.keySet();
+//			
+//			int row_num = 0;
+//			
+//			double origin_citation_size = 0.0;
+//			
+//			for(Iterator iter = head.iterator(); iter.hasNext();)
+//			{
+//				Head_strs head_val = (Head_strs) iter.next();
+//				
+//				Vector<Vector<citation_view_vector>> c_view = citation_view_map2.get(head_val);
+//				
+//				row_num++;
+//				
+//				for(int p = 0; p<c_view.size(); p++)
+//				{
+//					origin_citation_size += c_view.get(p).size();
+//				}
+//				
+//			}
+//			
+//			
+//			
+//			if(row_num !=0)
+//				origin_citation_size = origin_citation_size / row_num;
+//						
+//			System.out.print(origin_citation_size + "	");
 			
-			int row_num = 0;
-			
-			double origin_citation_size = 0.0;
-			
-			for(Iterator iter = head.iterator(); iter.hasNext();)
-			{
-				Head_strs head_val = (Head_strs) iter.next();
-				
-				Vector<Vector<citation_view_vector>> c_view = citation_view_map2.get(head_val);
-				
-				row_num++;
-				
-				for(int p = 0; p<c_view.size(); p++)
-				{
-					origin_citation_size += c_view.get(p).size();
-				}
-				
-			}
-			
-			
-			
-			if(row_num !=0)
-				origin_citation_size = origin_citation_size / row_num;
-			
-			System.out.print(row_num + "	");
-			
-			System.out.print(origin_citation_size + "	");
-			
+			System.out.print(Tuple_reasoning2_test.covering_set_num * 1.0/query_generator.query_result_size + "	");
 			
 //			Tuple_reasoning1.compare(citation_view_map1, citation_view_map2);
 			

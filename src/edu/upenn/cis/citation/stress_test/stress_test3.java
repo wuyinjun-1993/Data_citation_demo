@@ -264,7 +264,7 @@ public class stress_test3 {
 			
 			citation_view2.clear();
 			
-			citation_view2 = Tuple_reasoning2_test.tuple_reasoning(query, citation_strs2, citation_view_map2, c, pst);
+			Tuple_reasoning2_test.tuple_reasoning(query, citation_strs2,  citation_view_map2, c, pst);
 			
 			System.gc();
 		}
@@ -344,9 +344,9 @@ public class stress_test3 {
 		
 		citation_view2.clear();
 		
-		Tuple_reasoning1.compare(citation_view_map1, citation_view_map2);
+//		Tuple_reasoning1.compare(citation_view_map1, citation_view_map2);
 		
-//		Tuple_reasoning1.compare_citation(citation_strs, citation_strs2);
+		Tuple_reasoning1.compare_citation(citation_strs, citation_strs2);
 		
 		System.out.println();
 		

@@ -65,6 +65,7 @@ import net.sf.jsqlparser.statement.select.FromItem;
 import org.apache.poi.poifs.property.Child;
 import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 import org.controlsfx.control.table.TableRowExpanderColumn;
+import org.json.JSONException;
 
 import sun.tools.jar.resources.jar;
 
@@ -837,7 +838,7 @@ private Object String;
 					for (String s : agg_citations) {
 						listCitations.add(s);
 					}
-				} catch (ClassNotFoundException | SQLException e1) {
+				} catch (ClassNotFoundException | SQLException | JSONException e1) {
 					e1.printStackTrace();
 				}
 			} else {
@@ -2587,7 +2588,7 @@ private Object String;
 				HashMap<Head_strs, HashSet<String> > citation_strs = new HashMap<Head_strs, HashSet<String> >();
 				try {
 					c_views = Tuple_reasoning2.tuple_reasoning(generatedQuery, citation_strs, citation_view_map, conn, st);
-				} catch (IOException | InterruptedException e) {
+				} catch (IOException | InterruptedException | JSONException e) {
 					e.printStackTrace();
 				}
 

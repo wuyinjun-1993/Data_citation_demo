@@ -64,7 +64,7 @@ public class query_generator {
 	
 	static int view_nums = 100;
 	
-	static int query_result_size = 500000;
+	static int query_result_size = 50000;
 
 	
 	static HashMap<String, String> relation_primary_key_mapping = new HashMap<String, String>();

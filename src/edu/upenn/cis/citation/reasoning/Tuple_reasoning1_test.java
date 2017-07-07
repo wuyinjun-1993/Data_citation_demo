@@ -2400,11 +2400,7 @@ public class Tuple_reasoning1_test {
 //		return citation_strs;
 
 	}
-	
-	static void do_agg_intersection(HashMap<int[], Vector<citation_view_vector> > c_view_map, Vector<Integer> selected_row_ids)
-	{
-		
-	}
+
 	
 	
 	static HashSet<String> gen_citation(Vector<citation_view_vector> c_views, Vector<String> vals, Connection c, PreparedStatement pst, Head_strs h_vals, HashMap<String, Vector<Integer> > view_query_mapping, HashMap<Integer, Vector<Lambda_term>> query_lambda_str, HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping) throws ClassNotFoundException, SQLException, JSONException

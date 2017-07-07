@@ -1575,6 +1575,7 @@ public class Query_converter {
 		if(condition != null && !condition.isEmpty())
 			sql += " where " + condition;
 		
+		sql += " order by " + sel_item;
 //		if(condition_str[1] != null && !condition_str[1].isEmpty())
 //			sql += " order by " + condition_str[1]; 
 		

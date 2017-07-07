@@ -15,6 +15,9 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
+
+import org.json.JSONException;
+
 import static org.junit.Assert.*;
 
 
@@ -74,7 +77,7 @@ public class Tuple_reasoning1_citation_opt2 {
 	static HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping = new HashMap<Integer, HashMap<Head_strs, HashSet<String>>>();
 
 	
-	public static void main(String [] args) throws SQLException, ClassNotFoundException, IOException, InterruptedException
+	public static void main(String [] args) throws SQLException, ClassNotFoundException, IOException, InterruptedException, JSONException
 	{
 		
 		Vector<String> s1 = new Vector<String>();
@@ -442,9 +445,9 @@ public class Tuple_reasoning1_citation_opt2 {
 		
 	}
 	
-	public static Vector<String> tuple_gen_agg_citations(Vector<Vector<citation_view_vector>> c_views) throws ClassNotFoundException, SQLException
+	public static Vector<String> tuple_gen_agg_citations(Vector<Vector<citation_view_vector>> c_views) throws ClassNotFoundException, SQLException, JSONException
 	{
-		Vector<Vector<citation_view_vector>> agg_res = Aggregation1.aggegate(c_views);
+		Vector<Vector<citation_view_vector>> agg_res = Aggregation1.aggregate(c_views);
 		
 		Vector<String> citation_aggs = new Vector<String>();
 		
@@ -465,7 +468,7 @@ public class Tuple_reasoning1_citation_opt2 {
 		return citation_aggs;
 	}
 	
-	public static Vector<String> tuple_gen_agg_citations(Vector<Vector<citation_view_vector>> c_views, Vector<Integer> ids) throws ClassNotFoundException, SQLException
+	public static Vector<String> tuple_gen_agg_citations(Vector<Vector<citation_view_vector>> c_views, Vector<Integer> ids) throws ClassNotFoundException, SQLException, JSONException
 	{
 		Vector<Vector<citation_view_vector>> agg_res = Aggregation1.aggegate(c_views, ids);
 		

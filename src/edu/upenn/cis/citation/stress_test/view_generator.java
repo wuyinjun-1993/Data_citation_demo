@@ -1663,9 +1663,9 @@ public class view_generator {
 			
 			Set<String> attr_names = attr_types.keySet();
 			
-			Vector<String> attr_list = new Vector<String> ();
+			Vector<String> attr_list = get_attrs(relation, c, pst);
 			
-			attr_list.addAll(attr_names);
+//			attr_list.addAll(attr_names);
 			
 			Random rand = new Random();
 			
@@ -1682,11 +1682,13 @@ public class view_generator {
 			Vector<Argument> head_vars = gen_head_vars(relation, attr_list, head_size, c, pst);
 			
 			
-			Vector<Lambda_term> l_terms = gen_lambda_terms(head_vars, relation, c, pst);
+//			Vector<Lambda_term> l_terms = gen_lambda_terms(head_vars, relation, c, pst);
 			
 			heads.addAll(head_vars);
+						
+			lambda_terms.add(new Lambda_term(relation + populate_db.separator + primary_key_type[0], relation));
 			
-			lambda_terms.addAll(l_terms);
+//			lambda_terms.addAll(l_terms);
 			
 			Vector<Argument> args = new Vector<Argument>();
 			
@@ -1902,13 +1904,19 @@ public class view_generator {
 		{
 			int index = 0;
 			if(i == 0)
+			{
 				index = 0;
+				
+				id_set.add(index);			
+			}
 			else
 			{
 				index = r.nextInt(attr_list.size());
+				
+				if(index != 0)
+					id_set.add(index);			
 			}
 			
-			id_set.add(index);			
 		}
 		
 		for(Iterator iter = id_set.iterator(); iter.hasNext();)
@@ -2421,6 +2429,28 @@ public class view_generator {
 		}
 		
 		return attr_type_mapping;
+	}
+	
+	static Vector<String> get_attrs(String relation_name, Connection c, PreparedStatement pst) throws SQLException
+	{
+		Vector<String> attr_names = new Vector<String>();
+		
+		String query_attr_name = "SELECT column_name "
+				+ "FROM information_schema.columns "
+				+ "WHERE table_name = '"+ relation_name + "' "
+				+ "ORDER BY ordinal_position";
+		pst = c.prepareStatement(query_attr_name);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		HashMap<String, String> attr_type_mapping = new HashMap<String, String>();
+		
+		while(rs.next())
+		{
+			attr_names.add(rs.getString(1));
+		}
+		
+		return attr_names;
 	}
 	
 	private static class string_array

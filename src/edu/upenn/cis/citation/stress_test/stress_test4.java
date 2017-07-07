@@ -12,6 +12,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
 
+import org.json.JSONException;
+
 import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Corecover.Subgoal;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
@@ -28,12 +30,15 @@ import edu.upenn.cis.citation.reasoning.Tuple_reasoning2_citation_opt;
 import edu.upenn.cis.citation.reasoning.Tuple_reasoning2_opt;
 import edu.upenn.cis.citation.reasoning.Tuple_reasoning2_test;
 import edu.upenn.cis.citation.user_query.query_storage;
+import java.lang.instrument.Instrumentation;
+//import net.sourceforge.sizeof.*;
+
 
 public class stress_test4 {
 	
 	static int size_range = 100;
 	
-	static int times = 3;
+	static int times = 1;
 	
 	static int size_upper_bound = 5;
 	
@@ -64,10 +69,19 @@ public class stress_test4 {
 		
 	}
 	
-	public static void main(String [] args) throws ClassNotFoundException, SQLException, IOException, InterruptedException
+	public static void main(String [] args) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
 	{
 		
 //		reset();
+		
+//		long a = 6;
+//		
+//		
+//		
+//		 SizeOf.skipStaticField(true); //java.sizeOf will not compute static fields
+//		 SizeOf.skipFinalField(true); //java.sizeOf will not compute final fields
+//		 SizeOf.skipFlyweightObject(true); //java.sizeOf will not compute well-known flyweight objects
+		 //this will print the object size in bytes
 		
 		Connection c = null;
 	      PreparedStatement pst = null;
@@ -77,17 +91,17 @@ public class stress_test4 {
 					
 //		Query query = query_storage.get_query_by_id(1);
 		
-		int k = 3;//Integer.valueOf(args[0]);
+		int k = Integer.valueOf(args[0]);
 		
-		int view_size = 5;//Integer.valueOf(args[1]);
+		int view_size = Integer.valueOf(args[1]);
 		
-		boolean new_query = false;//Boolean.valueOf(args[2]);
+		boolean new_query = Boolean.valueOf(args[2]);
 		
-		boolean new_rounds = false;//Boolean.valueOf(args[3]);
+		boolean new_rounds = Boolean.valueOf(args[3]);
 		
-		boolean tuple_level = true;//Boolean.valueOf(args[4]);
+		boolean tuple_level = Boolean.valueOf(args[4]);
 		
-		boolean new_start = false;//Boolean.valueOf(args[5]);
+		boolean new_start = Boolean.valueOf(args[5]);
 		
 		if(new_query)
 			reset();
@@ -139,6 +153,8 @@ public class stress_test4 {
 				
 				if(new_start)
 				{
+					System.out.println();
+					
 					view_generator.initial();
 					
 					view_generator.gen_one_additional_predicates(views, relation_names, query.body.size(), query);
@@ -185,7 +201,7 @@ public class stress_test4 {
 		
 	}
 	
-	static void stress_test(Query query, Connection c, PreparedStatement pst, HashSet<Query> views, Vector<String> relation_names, boolean tuple_level) throws ClassNotFoundException, SQLException, IOException, InterruptedException
+	static void stress_test(Query query, Connection c, PreparedStatement pst, HashSet<Query> views, Vector<String> relation_names, boolean tuple_level) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
 	{
 		HashMap<Head_strs, HashSet<String> > citation_strs = new HashMap<Head_strs, HashSet<String>>();
 		
@@ -208,9 +224,7 @@ public class stress_test4 {
 		{
 		
 			System.gc();
-			
-			System.out.println("start");
-			
+						
 			double end_time = 0;
 
 			
@@ -224,15 +238,17 @@ public class stress_test4 {
 				
 				citation_strs.clear();
 				
-				citation_view1.clear();
+//				citation_view1.clear();
 				
-				citation_view1 = Tuple_reasoning1_test.tuple_reasoning(query, citation_strs,  citation_view_map1, c, pst);
+				Tuple_reasoning1_test.tuple_reasoning(query, citation_strs,  citation_view_map1, c, pst);
 				
 				System.gc();
 				
 			}
 			
 			
+			
+//			System.out.println(SizeOf.humanReadable(SizeOf.deepSizeOf(citation_strs))); 
 			
 			end_time = System.nanoTime();
 			
@@ -382,7 +398,7 @@ public class stress_test4 {
 			
 //			Tuple_reasoning1.compare_citation(citation_strs, citation_strs2);
 			
-			System.out.println();
+			
 //						
 //			reset();
 //			

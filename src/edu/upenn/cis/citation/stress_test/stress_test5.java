@@ -11,6 +11,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
+import org.json.JSONException;
+
 import edu.upenn.cis.citation.Corecover.Argument;
 import edu.upenn.cis.citation.Corecover.Lambda_term;
 import edu.upenn.cis.citation.Corecover.Query;
@@ -1031,7 +1033,7 @@ public class stress_test5 {
 		return queries;
 	}
 	
-	public static void main(String [] args) throws ClassNotFoundException, SQLException, IOException, InterruptedException
+	public static void main(String [] args) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
 	{
 		
 		Connection c = null;

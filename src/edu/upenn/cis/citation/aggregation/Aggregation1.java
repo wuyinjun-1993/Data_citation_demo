@@ -77,7 +77,7 @@ public class Aggregation1 {
 		
 	}
 	
-	public static Vector<Vector<citation_view_vector>> aggegate(Vector<Vector<citation_view_vector>> c_views)
+	public static Vector<Vector<citation_view_vector>> aggregate(Vector<Vector<citation_view_vector>> c_views)
 	{
 		Vector<Vector<citation_view_vector>> agg_res = new Vector<Vector<citation_view_vector>>();
 		

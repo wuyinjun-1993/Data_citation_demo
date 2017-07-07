@@ -11,6 +11,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
+import org.json.JSONException;
+
 import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Corecover.Subgoal;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
@@ -56,7 +58,7 @@ public class stress_test2 {
 		
 	}
 	
-	public static void main(String [] args) throws ClassNotFoundException, SQLException, IOException, InterruptedException
+	public static void main(String [] args) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
 	{
 		
 //		reset();
@@ -142,7 +144,7 @@ public class stress_test2 {
 					
 					citation_strs.clear();
 					
-					citation_view1 = Tuple_reasoning1_test.tuple_reasoning(q, citation_strs,  citation_view_map1, c, pst);
+					Tuple_reasoning1_test.tuple_reasoning(q, citation_strs,  citation_view_map1, c, pst);
 					
 				}
 				

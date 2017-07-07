@@ -12,6 +12,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
 
+import org.json.JSONException;
+
 import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Corecover.Subgoal;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
@@ -31,7 +33,7 @@ public class stress_test3 {
 	
 	static int size_range = 100;
 	
-	static int times = 3;
+	static int times = 1;
 	
 	static int size_upper_bound = 5;
 	
@@ -81,7 +83,7 @@ public class stress_test3 {
 		
 	}
 	
-	public static void main(String [] args) throws ClassNotFoundException, SQLException, IOException, InterruptedException
+	public static void main(String [] args) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
 	{
 		
 //		reset();
@@ -124,7 +126,7 @@ public class stress_test3 {
 		
 	}
 	
-	static void stress_testing(Query query, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException, IOException, InterruptedException
+	static void stress_testing(Query query, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
 	{
 		
 		HashMap<Head_strs, HashSet<String> > citation_strs = new HashMap<Head_strs, HashSet<String>>();
@@ -171,16 +173,14 @@ public class stress_test3 {
 			citation_view_map1.clear();
 			
 			citation_strs.clear();
-			
-			citation_view1.clear();
-			
-			citation_view1 = Tuple_reasoning1_test.tuple_reasoning(query, citation_strs,  citation_view_map1, c, pst);
+						
+			Tuple_reasoning1_test.tuple_reasoning(query, citation_strs,  citation_view_map1, c, pst);
 			
 			System.gc();
 			
 		}
 		
-		
+		Vector<String> agg_citations1 = Tuple_reasoning1_test.tuple_gen_agg_citations(query);
 		
 		end_time = System.nanoTime();
 		
@@ -270,6 +270,11 @@ public class stress_test3 {
 		}
 		
 		end_time = System.nanoTime();
+		
+		Vector<String> agg_citations2 = Tuple_reasoning2_test.tuple_gen_agg_citations(citation_view2);
+		
+		System.out.println(agg_citations2);
+		
 		
 		time = (end_time - start_time);
 		
@@ -374,9 +379,7 @@ public class stress_test3 {
 					
 					citation_strs.clear();
 					
-					citation_view1.clear();
-					
-					citation_view1 = Tuple_reasoning1_test.tuple_reasoning(query, citation_strs,  citation_view_map1, c, pst);
+					Tuple_reasoning1_test.tuple_reasoning(query, citation_strs,  citation_view_map1, c, pst);
 					
 					System.gc();
 				}

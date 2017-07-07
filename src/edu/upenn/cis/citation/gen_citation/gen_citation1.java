@@ -14,6 +14,10 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import edu.upenn.cis.citation.Corecover.Lambda_term;
 import edu.upenn.cis.citation.Corecover.Mapping;
 import edu.upenn.cis.citation.Corecover.Query;
@@ -46,7 +50,7 @@ public class gen_citation1 {
 	
 	public static String db_name = "IUPHAR/BPS Guide to PHARMACOLOGY";
 	
-	public static String get_citation_agg(Vector<citation_view_vector> c_views, int max_num, HashMap<String, Vector<Integer> > view_query_mapping, HashMap<Integer, Vector<Lambda_term>> query_lambda_str, HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping) throws ClassNotFoundException, SQLException
+	public static String get_citation_agg(Vector<citation_view_vector> c_views, int max_num, HashMap<String, Vector<Integer> > view_query_mapping, HashMap<Integer, Vector<Lambda_term>> query_lambda_str, HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping) throws ClassNotFoundException, SQLException, JSONException
 	{
 		
 		Connection c = null;
@@ -143,35 +147,43 @@ public class gen_citation1 {
 	}
 	
 	
-	static String combine_blocks(HashSet<String> authors, int max_num, Vector<String> vals)
+	static String combine_blocks(HashSet<String> authors, int max_num, Vector<String> vals) throws JSONException
 	{
 		
-		String author_str = new String();
+		JSONObject json_obj = new JSONObject();
+		
+		JSONArray json_arr = new JSONArray();
+		
+//		String author_str = new String();
 		
 		int num = 0;
 		
 		for(Iterator iter = authors.iterator(); iter.hasNext();)
 		{
 			
-			if(num >= 1)
-				author_str += ",";
+//			if(num >= 1)
+//				author_str += ",";
+//			
+//			author_str += iter.next();
+			json_arr.put(iter.next());
 			
-			author_str += iter.next();
 			num++;
 			
 			if(max_num > 0 && num >= max_num)
 			{
-				author_str += ", etc.";
+//				author_str += ", etc.";
 				break;
 			}
 		}
 		
-		String citation = author_str;
+		json_obj.put("author", json_arr);
 		
-		if(!author_str.isEmpty())
-		{
-			citation = author_str + ".";
-		}
+//		String citation = author_str;
+//		
+//		if(!author_str.isEmpty())
+//		{
+//			citation = author_str + ".";
+//		}
 		
 //		String value_str = new String();
 //		
@@ -185,14 +197,18 @@ public class gen_citation1 {
 //		
 //		citation = value_str;
 		
-		citation += "Accessed on " + getCurrentDate() + ". ";
+		json_obj.put("Accessed on", getCurrentDate());
 		
-		citation += db_name;
+//		citation += "Accessed on " + getCurrentDate() + ". ";
+
+		json_obj.put("db_name", db_name);
 		
-		return citation;
+//		citation += db_name;
+		
+		return json_obj.toString();
 	}
 	
-	private static String getCurrentDate() {
+	public static String getCurrentDate() {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         java.util.Date date = new java.util.Date();
         return dateFormat.format(date);
@@ -262,13 +278,16 @@ public class gen_citation1 {
 	}
 	
 	
-	public static String get_citations2(citation_view_vector c_vec, Vector<String> vals, Connection c, PreparedStatement pst, HashMap<String, Vector<Integer> > view_query_mapping, HashMap<Integer, Vector<Lambda_term>> query_lambda_str, HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping, int max_num, HashSet<String> authors) throws ClassNotFoundException, SQLException
+	public static String get_citations2(citation_view_vector c_vec, Vector<String> vals, Connection c, PreparedStatement pst, HashMap<String, Vector<Integer> > view_query_mapping, HashMap<Integer, Vector<Lambda_term>> query_lambda_str, HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping, int max_num, HashSet<String> authors) throws ClassNotFoundException, SQLException, JSONException
 	{
-		String author_str = new String();
+//		String author_str = new String();
 		
 //		HashSet<String> authors = new HashSet<String>();
 		
 //		System.out.println(c_vec.toString());
+		
+		JSONObject json_obj = new JSONObject();
+		
 		
 		for(int i = 0; i<c_vec.c_vec.size(); i++)
 		{
@@ -289,28 +308,38 @@ public class gen_citation1 {
 		
 		int num = 0;
 		
+		JSONArray json_author = new JSONArray();
+		
 		for(Iterator iter = authors.iterator(); iter.hasNext();)
 		{
 			
-			if(num >= 1)
-				author_str += ",";
-			
-			author_str += iter.next();
-			num++;
+//			if(num >= 1)
+//				author_str += ",";
+//			
+//			author_str += iter.next();
+			json_author.put(iter.next());
+
+			num ++;
 			
 			if(max_num > 0 && num >= max_num)
 			{
-				author_str += ", etc.";
+				
+				
+//				author_str += ", etc.";
 				break;
 			}
 		}
 		
-		String citation = author_str;
+		json_obj.put("author", json_author);
 		
-		if(!author_str.isEmpty())
-		{
-			citation = author_str + ".";
-		}
+//		String citation = author_str;
+//		
+//		if(!author_str.isEmpty())
+//		{
+//			citation = author_str + ".";
+//		}
+		
+		authors.clear();
 		
 //		String value_str = new String();
 //		
@@ -321,10 +350,9 @@ public class gen_citation1 {
 //			
 //			value_str += vals.get(i);
 //		}
+		json_obj.put("db_name", db_name);
 		
-		citation += "." + db_name;
-		
-		return citation;
+		return json_obj.toString();
 	}
 	
 	
@@ -849,7 +877,7 @@ public class gen_citation1 {
 					
 //					System.out.println(q);
 					
-					String sql = Query_converter.datalog2sql_citation_query(q, max_num);
+					String sql = Query_converter.datalog2sql_citation_query(q);
 					
 					pst = c.prepareStatement(sql);
 					
@@ -886,9 +914,13 @@ public class gen_citation1 {
 						}
 						else
 						{
-							author_set.add(author_name);
 							
-							curr_author_mapping.put(h_str, author_set);
+							if((max_num > 0 && author_set.size() <= max_num) || max_num == 0)
+							{
+								author_set.add(author_name);
+								
+								curr_author_mapping.put(h_str, author_set);
+							}
 						}
 						
 						
@@ -933,6 +965,8 @@ public class gen_citation1 {
 			head_strs.clear();
 			
 			HashSet<String> curr_author_list = curr_authors.get(h_str);
+			
+			h_str.clear();
 			
 			if(curr_author_list != null)
 				authors.addAll(curr_author_list);
@@ -1029,9 +1063,12 @@ public class gen_citation1 {
 						}
 						else
 						{
-							author_set.add(author_name);
-							
-							curr_author_mapping.put(h_str, author_set);
+							if((max_num > 0 && author_set.size() <= max_num) || max_num == 0)
+							{
+								author_set.add(author_name);
+								
+								curr_author_mapping.put(h_str, author_set);
+							}
 						}
 						
 						

@@ -74,5 +74,10 @@ public class Head_strs {
 		
 		return output;
 	}
+	
+	public void clear()
+	{
+		this.head_vals.clear();
+	}
 
 }

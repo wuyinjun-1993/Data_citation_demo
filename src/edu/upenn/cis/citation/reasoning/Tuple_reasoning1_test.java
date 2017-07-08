@@ -1781,7 +1781,7 @@ public class Tuple_reasoning1_test {
 		
 		remove_conflict_duplicate_view_mapping(query);
 					
-		String sql = Query_converter.datalog2sql_citation_test(query, valid_lambda_terms, valid_conditions);
+		String sql = Query_converter.datalog2sql_citation(query, valid_lambda_terms, valid_conditions);
 		
 		reasoning(query, c, pst, sql, citation_view_map1, citation_strs, viewTuples);
 		

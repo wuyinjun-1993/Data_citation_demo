@@ -11,6 +11,7 @@ import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.dao.Database;
 import edu.upenn.cis.citation.datalog.Query_converter;
+import edu.upenn.cis.citation.reasoning.Tuple_reasoning1_test;
 import edu.upenn.cis.citation.reasoning.Tuple_reasoning2;
 import edu.upenn.cis.citation.user_query.query_storage;
 import java_cup.internal_error;
@@ -29,6 +30,8 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -68,9 +71,11 @@ import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.json.JSONException;
 
 import sun.tools.jar.resources.jar;
+import ucar.ma2.ArrayDouble.D3.IF;
 
 import com.sun.javafx.geom.RectangularShape;
 import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 import com.sun.xml.internal.bind.v2.TODO;
 
 import java.awt.*;
@@ -149,6 +154,7 @@ public class QBEApp extends Application {
 	// TreeView share across user & dba screens
 	private TreeItem<TreeNode> root;
 	List<TreeItem<TreeNode>> removedTreeItems = new ArrayList<>();
+	Query userGeneratedQuery =  null;
 
 	// view names
 	ObservableList<String> listDataViews = FXCollections.observableArrayList(Database.getDataViews());
@@ -189,6 +195,10 @@ public class QBEApp extends Application {
 
 	// Dropdown Table Field
     ObservableList<String> optionsField = FXCollections.observableArrayList(Database.getTableList());
+    
+    final Clipboard clipboard = Clipboard.getSystemClipboard();
+    final ClipboardContent content = new ClipboardContent();
+    
 private Object String;
 
 	/**
@@ -834,7 +844,8 @@ private Object String;
 			if (indices == null || indices.isEmpty()) {
 				try {
 					// generate all citations
-					Vector<String> agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views);
+					
+					Vector<String> agg_citations = Tuple_reasoning1_test.tuple_gen_agg_citations(userGeneratedQuery);
 					for (String s : agg_citations) {
 						listCitations.add(s);
 					}
@@ -846,7 +857,7 @@ private Object String;
 				ids.addAll(indices);
 				// generated selected citations
 				try {
-					Vector<String> subset_agg_citations = Tuple_reasoning2.tuple_gen_agg_citations(c_views, ids);
+					Vector<String> subset_agg_citations = Tuple_reasoning1_test.tuple_gen_agg_citations(ids, userGeneratedQuery);
 					for (String s : subset_agg_citations) {
 						listCitations.add(s);
 					}
@@ -1507,7 +1518,6 @@ private Object String;
             	try {
                 	view_operation.save_view_by_name(oldName, dv, generatedQuery);
                 	citation_view_operation.update_citation_view(oldName, dv);
-                	listDataViews.add(dv);
                 	Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("Succeed");
                     alert.setHeaderText(null);
@@ -1841,49 +1851,157 @@ private Object String;
     /**
      * Build the format Scene to show different format of citations
      */
+ // string that is set to the clipboard
+    String citationString = "";
     private void buildFormatScene(String citation, String type) {
     	GridPane gridFormat = new GridPane();
     	gridFormat.setPrefSize(500, 400);
     	gridFormat.setPadding(new Insets(10));
     	// build the textField
-    	TextArea content = new TextArea();
-    	content.setEditable(false);
-    	GridPane.setVgrow(content, Priority.ALWAYS);
-		GridPane.setHgrow(content, Priority.ALWAYS);
-		if (type.equals("json: ")) {
-			content.setText(type + citation);
+    	TextArea contentString = new TextArea();
+    	contentString.setEditable(false);
+    	GridPane.setVgrow(contentString, Priority.ALWAYS);
+		GridPane.setHgrow(contentString, Priority.ALWAYS);
+		String formatedCitation = formatCitation(citation);
+		if (type.equals("json")) {
+			String jsonString = formatJson(citation);
+			contentString.setText(jsonString);
+			citationString = jsonString;
 		} else if (type.equals("xml")) {
-			content.setText(type + citation);
+			try {
+				String xmlString = CitationConverter.convertToXML(formatedCitation);
+				contentString.setText(xmlString);
+				citationString = xmlString;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (type.equals("biblatex")) {
+			try {
+				String biblatexString = CitationConverter.convertToBiblatex(formatedCitation, "others");
+				contentString.setText(biblatexString);
+				citationString = biblatexString;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (type.equals("ris")) {
+			try {
+				String risString = CitationConverter.convertToRIS(formatedCitation);
+				contentString.setText(risString);
+				citationString = risString;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
-		gridFormat.add(content, 0, 1);
+		gridFormat.add(contentString, 0, 1);
 		// build format switch link
     	Hyperlink labelJson = new Hyperlink("JSON");
     	labelJson.setId("link");
     	labelJson.setOnMouseClicked(event -> {
-    		content.setText("json: " + citation);
+    		String jsonString = formatJson(citation);
+			contentString.setText(jsonString);
+			citationString = jsonString;
     	});
     	Hyperlink labelXml = new Hyperlink("XML");
     	labelXml.setId("link");
     	labelXml.setOnMouseClicked(event -> {
-    		content.setText("xml" + citation);
+    		try {
+				String xmlString = CitationConverter.convertToXML(formatedCitation);
+				contentString.setText(xmlString);
+				citationString = xmlString;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+    	});
+    	Hyperlink labelBiblatex = new Hyperlink("Biblatex");
+    	labelBiblatex.setId("link");
+    	labelBiblatex.setOnMouseClicked(event -> {
+    		try {
+    			String biblatexString = CitationConverter.convertToBiblatex(formatedCitation, "others");
+				contentString.setText(biblatexString);
+				citationString = biblatexString;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+    	});
+    	Hyperlink labelRis = new Hyperlink("RIS");
+    	labelRis.setId("link");
+    	labelRis.setOnMouseClicked(event -> {
+    		try {
+    			String risString = CitationConverter.convertToRIS(formatedCitation);
+				contentString.setText(risString);
+				citationString = risString;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
     	});
     	HBox hboxSwitch = new HBox();
     	hboxSwitch.setSpacing(5);
     	hboxSwitch.setAlignment(Pos.CENTER_RIGHT);
-    	hboxSwitch.getChildren().addAll(labelJson, labelXml);
+    	hboxSwitch.getChildren().addAll(labelJson, labelXml, labelBiblatex, labelRis);
     	gridFormat.add(hboxSwitch, 0, 0);
 		// build the download link
-		Hyperlink download = new Hyperlink("Download");
-		download.setId("link");
+		Hyperlink copy = new Hyperlink("Copy");
+		copy.setId("link");
+		copy.setOnAction(event->{
+			if (citationString != null && !citationString.isEmpty()) {
+			    content.putString(citationString);
+			    clipboard.setContent(content);
+			}
+		});
 		HBox hboxDown = new HBox();
-		hboxDown.getChildren().add(download);
+		hboxDown.getChildren().add(copy);
 		hboxDown.setAlignment(Pos.CENTER_RIGHT);
 		gridFormat.add(hboxDown, 0, 2);
 		
     	formatScene = new Scene(gridFormat);
 		formatScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
     }
-    
+    private String formatCitation(String citation) {
+    	String[] split = citation.split("\\},");
+		String jsonString = "";
+    	for (int i = 0; i < split.length; i++ ) {
+    		if(i == 0)
+    			jsonString += "{\"citation\":[" + split[i];
+    		else {
+    			jsonString += split[i] + "},";
+    		}
+    	}
+    	jsonString += "]}";
+    	return jsonString;
+    }
+    private String formatJson(String citation) {
+    	String[] split = citation.split("\\{");
+    	String jsonString = "";
+    	for (int i = 0; i < split.length; i++ ) {
+    		if(!split[i].isEmpty())
+    			jsonString += "{\n    " + split[i];
+    	}
+    	split = jsonString.split("\\[");
+    	jsonString = "";
+    	for (int i = 0; i < split.length; i++) {
+    		jsonString  += split[i] + "[\n        ";
+    	}
+    	jsonString = jsonString.substring(0, jsonString.length()-10);
+    	split = jsonString.split("\\,");
+    	jsonString = "";
+    	for (int i = 0; i < split.length; i++) {
+    		jsonString += split[i] + ",\n        ";
+    	}
+    	jsonString = jsonString.substring(0, jsonString.length()-10);
+    	split = jsonString.split("\\]");
+    	jsonString = "";
+    	for (int i = 0; i < split.length; i++) {
+    		if(!split[i].isEmpty())
+    			jsonString += split[i] + "\n        ]";
+    	}
+    	jsonString = jsonString.substring(0, jsonString.length()-10);
+    	split = jsonString.split("\\}");
+    	jsonString = "";
+    	for (int i = 0; i < split.length; i++) {
+    		jsonString += split[i] + "\n}";
+    	}
+    	return jsonString;
+    }
 	/** ===================================================================
 	 * Build the gridScene to show generated citations
 	 */
@@ -1937,7 +2055,25 @@ private Object String;
 				this.formatStage.setTitle("Export Formats");
 				this.formatStage.show();
 			});
-			contextMenu.getItems().addAll(jsonItem, xmlItem);
+			MenuItem biblatexItem = new MenuItem();
+			biblatexItem.textProperty().bind(Bindings.format("Export as Biblatex"));
+			biblatexItem.setOnAction(event -> {
+				String item = cell.getItem();
+				buildFormatScene(item, "biblatex");
+				this.formatStage.setScene(formatScene);
+				this.formatStage.setTitle("Export Formats");
+				this.formatStage.show();
+			});
+			MenuItem risItem = new MenuItem();
+			risItem.textProperty().bind(Bindings.format("Export as RIS"));
+			risItem.setOnAction(event -> {
+				String item = cell.getItem();
+				buildFormatScene(item, "ris");
+				this.formatStage.setScene(formatScene);
+				this.formatStage.setTitle("Export Formats");
+				this.formatStage.show();
+			});
+			contextMenu.getItems().addAll(jsonItem, xmlItem, biblatexItem, risItem);
 			cell.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
 				if (isNowEmpty) {
 					cell.setContextMenu(null);
@@ -1958,6 +2094,13 @@ private Object String;
 		hBox.setSpacing(5);
 		Button button = new Button("Copy Selected Citation");
 		button.setId("prevnext");
+		button.setOnAction( event-> {
+			String citationString = list.getSelectionModel().getSelectedItem();
+			if (citationString != null && !citationString.isEmpty()) {
+			    content.putString(citationString);
+			    clipboard.setContent(content);
+			}
+		});
 		GridPane.setHgrow(hBox, Priority.ALWAYS);
 		
 		Button save = new Button("Save Citation");
@@ -2583,11 +2726,11 @@ private Object String;
 				
 				String qname = "qname" + count;
 				count++;
-				Query generatedQuery = addQueryByName(qname, data);
+				userGeneratedQuery = addQueryByName(qname, data);
 				HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
 				HashMap<Head_strs, HashSet<String> > citation_strs = new HashMap<Head_strs, HashSet<String> >();
 				try {
-					c_views = Tuple_reasoning2.tuple_reasoning(generatedQuery, citation_strs, citation_view_map, conn, st);
+					Tuple_reasoning1_test.tuple_reasoning(userGeneratedQuery, citation_strs, citation_view_map, conn, st);
 				} catch (IOException | InterruptedException | JSONException e) {
 					e.printStackTrace();
 				}

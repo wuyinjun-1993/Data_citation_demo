@@ -339,7 +339,7 @@ public class view_operation {
 
 	}
 	
-	public static HashSet<Query> get_all_views() throws SQLException, ClassNotFoundException
+	public static Vector<Query> get_all_views() throws SQLException, ClassNotFoundException
 	{
 		Class.forName("org.postgresql.Driver");
         Connection c = DriverManager
@@ -348,18 +348,40 @@ public class view_operation {
         
         PreparedStatement pst = null;
         
-        HashSet<Query> views = new HashSet<Query>();
+        Vector<Query> views = new Vector<Query>();
         
         Vector<Integer> ids = get_all_view_ids(c, pst);
         
         for(int i = 0; i<ids.size(); i++)
         {
-        	views.add(get_view_by_id(ids.get(i)));
+        	Query view = get_view_by_id(ids.get(i));
+        	
+        	update_name(view, ids.get(i), c, pst);
+        	
+        	views.add(view);
         }
         
         c.close();
         
         return views;
+	}
+	
+	static void update_name(Query view, int id, Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "select name from view_table where view = " + id;
+		
+		pst = c.prepareStatement(query);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		if(rs.next())
+		{
+			String name = rs.getString(1);
+			
+			view.name = name;
+			
+			return;
+		}
 	}
 	
 	static Vector<Integer> get_all_view_ids(Connection c, PreparedStatement pst) throws SQLException

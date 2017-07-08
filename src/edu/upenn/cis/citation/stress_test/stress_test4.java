@@ -91,7 +91,7 @@ public class stress_test4 {
 					
 //		Query query = query_storage.get_query_by_id(1);
 		
-		int k = Integer.valueOf(args[0]);
+		int k =  Integer.valueOf(args[0]);
 		
 		int view_size = Integer.valueOf(args[1]);
 		
@@ -132,13 +132,15 @@ public class stress_test4 {
 			}
 			
 			
-			HashSet<Query> views = null;
+			Vector<Query> views = null;
 			
 			Vector<String> relation_names = get_unique_relation_names(query);
 			
 			if(new_rounds)
 			{
 				views = view_generator.generate_store_views_without_predicates(relation_names, view_size, query.body.size());
+				
+//				view_generator.gen_default_views(relation_names);
 				
 				for(Iterator iter = views.iterator(); iter.hasNext();)
 				{
@@ -150,6 +152,13 @@ public class stress_test4 {
 			else
 			{
 				views = view_operation.get_all_views();
+				
+//				for(Iterator iter = views.iterator(); iter.hasNext();)
+//				{
+//					Query view = (Query) iter.next();
+//					
+//					System.out.println(view);
+//				}
 				
 				if(new_start)
 				{
@@ -201,7 +210,7 @@ public class stress_test4 {
 		
 	}
 	
-	static void stress_test(Query query, Connection c, PreparedStatement pst, HashSet<Query> views, Vector<String> relation_names, boolean tuple_level) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
+	static void stress_test(Query query, Connection c, PreparedStatement pst, Vector<Query> views, Vector<String> relation_names, boolean tuple_level) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
 	{
 		HashMap<Head_strs, HashSet<String> > citation_strs = new HashMap<Head_strs, HashSet<String>>();
 		
@@ -311,7 +320,7 @@ public class stress_test4 {
 //			
 			
 			
-			System.out.print(Tuple_reasoning1_test.covering_set_num * 1.0/query_generator.query_result_size + "	");
+			System.out.print(Tuple_reasoning1_test.covering_set_num * 1.0/row + "	");
 		}
 		else
 		{
@@ -394,7 +403,7 @@ public class stress_test4 {
 //						
 //			System.out.print(origin_citation_size + "	");
 			
-			System.out.print(Tuple_reasoning2_test.covering_set_num * 1.0/query_generator.query_result_size + "	");
+			System.out.print(Tuple_reasoning2_test.covering_set_num * 1.0/row + "	");
 			
 //			Tuple_reasoning1.compare(citation_view_map1, citation_view_map2);
 			

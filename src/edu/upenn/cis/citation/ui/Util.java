@@ -10,7 +10,7 @@ import java.util.Vector;
 
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.dao.Database;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning2;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2;
 
 public class Util {
 	

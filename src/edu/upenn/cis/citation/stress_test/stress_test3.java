@@ -21,13 +21,13 @@ import edu.upenn.cis.citation.Pre_processing.view_operation;
 import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.datalog.Query_converter;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning1;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning1_citation_opt;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning1_citation_opt2;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning1_test;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning2;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning2_citation_opt;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning2_test;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_citation_opt;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_citation_opt2;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_citation_opt;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_test;
 import edu.upenn.cis.citation.user_query.query_storage;
 
 public class stress_test3 {
@@ -134,7 +134,7 @@ public class stress_test3 {
 			
 			Vector<String> relations = get_unique_relation_names(query);
 			
-			HashSet<Query> views = null;
+			Vector<Query> views = null;
 			
 			if(new_rounds)
 			{
@@ -185,7 +185,7 @@ public class stress_test3 {
 	}
 	
 	
-	static void stress_test(Query query, Connection c, PreparedStatement pst, HashSet<Query> views, boolean tuple_level) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
+	static void stress_test(Query query, Connection c, PreparedStatement pst, Vector<Query> views, boolean tuple_level) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
 	{
 		HashMap<Head_strs, HashSet<String> > citation_strs = new HashMap<Head_strs, HashSet<String>>();
 		
@@ -295,7 +295,7 @@ public class stress_test3 {
 //			
 			
 			
-			System.out.print(Tuple_reasoning1_test.covering_set_num * 1.0/query_generator.query_result_size + "	");
+			System.out.print(Tuple_reasoning1_test.covering_set_num * 1.0/row + "	");
 		}
 		else
 		{
@@ -378,7 +378,7 @@ public class stress_test3 {
 //						
 //			System.out.print(origin_citation_size + "	");
 			
-			System.out.print(Tuple_reasoning2_test.covering_set_num * 1.0/query_generator.query_result_size + "	");
+			System.out.print(Tuple_reasoning2_test.covering_set_num * 1.0/row + "	");
 			
 //			Tuple_reasoning1.compare(citation_view_map1, citation_view_map2);
 			

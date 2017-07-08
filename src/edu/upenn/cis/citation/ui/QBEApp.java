@@ -11,8 +11,9 @@ import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.dao.Database;
 import edu.upenn.cis.citation.datalog.Query_converter;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning1_test;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning2;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2;
 import edu.upenn.cis.citation.user_query.query_storage;
 import java_cup.internal_error;
 import javafx.application.Application;
@@ -845,7 +846,7 @@ private Object String;
 				try {
 					// generate all citations
 					
-					Vector<String> agg_citations = Tuple_reasoning1_test.tuple_gen_agg_citations(userGeneratedQuery);
+					Vector<String> agg_citations = Tuple_reasoning1.tuple_gen_agg_citations(userGeneratedQuery);
 					for (String s : agg_citations) {
 						listCitations.add(s);
 					}
@@ -857,7 +858,7 @@ private Object String;
 				ids.addAll(indices);
 				// generated selected citations
 				try {
-					Vector<String> subset_agg_citations = Tuple_reasoning1_test.tuple_gen_agg_citations(ids, userGeneratedQuery);
+					Vector<String> subset_agg_citations = Tuple_reasoning1.tuple_gen_agg_citations(ids, userGeneratedQuery);
 					for (String s : subset_agg_citations) {
 						listCitations.add(s);
 					}
@@ -2730,7 +2731,7 @@ private Object String;
 				HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
 				HashMap<Head_strs, HashSet<String> > citation_strs = new HashMap<Head_strs, HashSet<String> >();
 				try {
-					Tuple_reasoning1_test.tuple_reasoning(userGeneratedQuery, citation_strs, citation_view_map, conn, st);
+					Tuple_reasoning1.tuple_reasoning(userGeneratedQuery, citation_strs, citation_view_map, conn, st);
 				} catch (IOException | InterruptedException | JSONException e) {
 					e.printStackTrace();
 				}

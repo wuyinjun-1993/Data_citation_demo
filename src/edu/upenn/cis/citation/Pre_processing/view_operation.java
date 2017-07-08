@@ -26,7 +26,7 @@ import edu.upenn.cis.citation.Operation.op_less;
 import edu.upenn.cis.citation.Operation.op_less_equal;
 import edu.upenn.cis.citation.Operation.op_not_equal;
 import edu.upenn.cis.citation.datalog.Parse_datalog;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning2;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2;
 
 public class view_operation {
 	

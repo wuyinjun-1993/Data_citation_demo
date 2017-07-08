@@ -22,7 +22,7 @@ import edu.upenn.cis.citation.citation_view.citation_view_parametered;
 import edu.upenn.cis.citation.citation_view.citation_view_unparametered;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.gen_citation.gen_citation1;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning1_test;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
 
 public class Aggregation2 {
 	

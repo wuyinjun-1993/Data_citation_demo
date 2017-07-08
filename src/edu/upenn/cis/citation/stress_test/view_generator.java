@@ -327,7 +327,7 @@ public class view_generator {
 		
 	}
 	
-	public static HashSet<Query> gen_default_views(Vector<String> relations) throws SQLException, ClassNotFoundException
+	public static Vector<Query> gen_default_views(Vector<String> relations) throws SQLException, ClassNotFoundException
 	{
 		initial();
 		
@@ -346,7 +346,7 @@ public class view_generator {
 	    
 	    populate_db.renew_table(c, pst);
 	    
-	    HashSet<Query> views = new HashSet<Query>();
+	    Vector<Query> views = new Vector<Query>();
 		
 		for(int i = 0; i<relations.size(); i++)
 		{

@@ -30,7 +30,7 @@ import edu.upenn.cis.citation.citation_view.citation_view_unparametered;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.datalog.Parse_datalog;
 import edu.upenn.cis.citation.datalog.Query_converter;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning1;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
 
 public class gen_citation1 {
 	

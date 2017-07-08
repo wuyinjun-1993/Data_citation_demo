@@ -97,7 +97,7 @@ public class stress_test2 {
 		
 		Vector<String> relation_names = get_unique_relation_names(query);
 		
-		HashSet<Query> views = view_generator.generate_store_views(relation_names, num_views, query.body.size(), query);
+		Vector<Query> views = view_generator.generate_store_views(relation_names, num_views, query.body.size(), query);
 		
 //		query_storage.store_query(queries.get(0), new Vector<Integer>());
 		

@@ -1297,7 +1297,7 @@ public class Tuple_reasoning2_test {
 				
 				vals.clear();
 										
-				int pos1 = query.body.size() + query.head.args.size() + lambda_term_num;
+				int pos1 = query.head.args.size() + valid_lambda_terms.size();
 				
 				for(int i = pos1; i< pos1 + valid_conditions.size(); i++)
 				{

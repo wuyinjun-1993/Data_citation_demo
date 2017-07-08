@@ -527,7 +527,7 @@ public class Query {
     // body
     for (int i = 0; i < body.size(); i++) {
       Subgoal subgoal = (Subgoal) body.elementAt(i);
-      result.append(subgoal.toString());
+      result.append(subgoal.name);
       if ( i != body.size() - 1 ) result.append(",");
     }
 

@@ -19,13 +19,13 @@ import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.datalog.Query_converter;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning1;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning1_citation_opt;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning1_citation_opt2;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning1_test;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning2;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning2_citation_opt;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning2_test;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_citation_opt;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_citation_opt2;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_citation_opt;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_test;
 import edu.upenn.cis.citation.user_query.query_storage;
 
 public class stress_test2 {
@@ -97,7 +97,7 @@ public class stress_test2 {
 		
 		Vector<String> relation_names = get_unique_relation_names(query);
 		
-		HashSet<Query> views = view_generator.generate_store_views(relation_names, num_views, query.body.size(), query);
+		Vector<Query> views = view_generator.generate_store_views(relation_names, num_views, query.body.size(), query);
 		
 //		query_storage.store_query(queries.get(0), new Vector<Integer>());
 		

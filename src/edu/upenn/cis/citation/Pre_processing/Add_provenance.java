@@ -13,7 +13,7 @@ import java.util.Vector;
 import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.datalog.Parse_datalog;
 import edu.upenn.cis.citation.datalog.Query_converter;
-import edu.upenn.cis.citation.reasoning.*;
+import edu.upenn.cis.citation.reasoning1.*;
 
 public class Add_provenance {
 	

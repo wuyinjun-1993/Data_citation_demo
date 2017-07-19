@@ -17,16 +17,17 @@ import org.json.JSONException;
 import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Corecover.Subgoal;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
+import edu.upenn.cis.citation.Pre_processing.view_operation;
 import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.datalog.Query_converter;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning1;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning1_citation_opt;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning1_citation_opt2;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning1_test;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning2;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning2_citation_opt;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning2_test;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_citation_opt;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_citation_opt2;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_citation_opt;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_test;
 import edu.upenn.cis.citation.user_query.query_storage;
 
 public class stress_test3 {
@@ -95,25 +96,82 @@ public class stress_test3 {
 	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
 		
 		
+	    int k = Integer.valueOf(args[0]);
+	    
+	    boolean new_query = Boolean.valueOf(args[1]);
+		
+		boolean new_rounds = Boolean.valueOf(args[2]);
+		
+		boolean tuple_level = Boolean.valueOf(args[3]);
+		
+		boolean new_start = Boolean.valueOf(args[4]);
 		
 				
 //		Query query = query_storage.get_query_by_id(1);
 		
-		for(int k = 3; k<=query_num; k++)
+//		for(int k = 3; k<=query_num; k++)
 		{
-			reset(c, pst);
+			if(new_query)
+			{
+				System.out.println("new query");
+				
+				reset(c, pst);
+			}
 			
 			System.out.println("finish resetting");
 			
-//			Query query = query_storage.get_query_by_id(1);
+			Query query = null;
 			
-			Query query = query_generator.gen_query(k, c, pst);
+			try{
+				query = query_storage.get_query_by_id(1);
+			}
+			catch(Exception e)
+			{
+				query = query_generator.gen_query(k, c, pst);
+				query_storage.store_query(query, new Vector<Integer>());
+				System.out.println(query);
+			}
 			
-			query_storage.store_query(query, new Vector<Integer>());
+			Vector<String> relations = get_unique_relation_names(query);
 			
-			System.out.println(query);
+			Vector<Query> views = null;
 			
-			stress_testing(query, c, pst);
+			if(new_rounds)
+			{
+				
+				views = view_generator.gen_default_views(relations);
+				
+//				views = view_generator.generate_store_views_without_predicates(relation_names, view_size, query.body.size());
+				
+				for(Iterator iter = views.iterator(); iter.hasNext();)
+				{
+					Query view = (Query) iter.next();
+					
+					System.out.println(view);
+				}
+			}
+			else
+			{
+				views = view_operation.get_all_views();
+				
+				if(new_start)
+				{
+					System.out.println();
+					
+					view_generator.initial();
+					
+					view_generator.gen_one_additional_view(views, relations, query.body.size(), query);
+					
+					for(Iterator iter = views.iterator(); iter.hasNext();)
+					{
+						Query view = (Query) iter.next();
+						
+						System.out.println(view);
+					}
+				}
+			}
+			
+			stress_test(query, c, pst, views, tuple_level);
 
 		}
 		
@@ -126,9 +184,9 @@ public class stress_test3 {
 		
 	}
 	
-	static void stress_testing(Query query, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
+	
+	static void stress_test(Query query, Connection c, PreparedStatement pst, Vector<Query> views, boolean tuple_level) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
 	{
-		
 		HashMap<Head_strs, HashSet<String> > citation_strs = new HashMap<Head_strs, HashSet<String>>();
 		
 		HashMap<Head_strs, HashSet<String> > citation_strs2 = new HashMap<Head_strs, HashSet<String>>();
@@ -143,425 +201,210 @@ public class stress_test3 {
 		Vector<Vector<citation_view_vector>> citation_view1 = new Vector<Vector<citation_view_vector>>();
 
 		Vector<Vector<citation_view_vector>> citation_view2 = new Vector<Vector<citation_view_vector>>();
-		
-		Vector<String> relations = get_unique_relation_names(query);
-		
-		Vector<Query> views = view_generator.gen_default_views(relations);
-		
-		for(int i = 0; i<views.size(); i++)
-		{
-			System.out.println(views.get(i));
-		}
-		
-//		HashSet<Query> views = view_generator.generate_store_views(relation_names, num_views, query.body.size(), query);
-		
-		int view_size = 2;
-		
-		int view_id = views.size() + 1;
-		
-		System.out.println("start");
-		
-		double end_time = 0;
 
 		
-		double start_time = System.nanoTime();
-		
-		
-		for(int k = 0; k<times; k++)
+//		while(views.size() < view_max_size)
+		if(tuple_level)
 		{
-			
-			citation_view_map1.clear();
-			
-			citation_strs.clear();
+		
+			System.gc();
 						
-			Tuple_reasoning1_test.tuple_reasoning(query, citation_strs,  citation_view_map1, c, pst);
-			
-			System.gc();
-			
-		}
-		
-		Vector<String> agg_citations1 = Tuple_reasoning1_test.tuple_gen_agg_citations(query);
-		
-		end_time = System.nanoTime();
-		
-		double time = (end_time - start_time);
-		
-		time = time /(times * 1.0 *1000000000);
-		
-		System.out.print(time + "s	");
-		
-		Set<Head_strs> h_l = citation_strs.keySet();
-		
-		double citation_size1 = 0;
-		
-		int row = 0;
-		
-		for(Iterator iter = h_l.iterator(); iter.hasNext();)
-		{
-			Head_strs h_value = (Head_strs) iter.next();
-			
-			HashSet<String> citations = citation_strs.get(h_value);
-			
-			citation_size1 += citations.size();
-			
-			row ++;
-			
-		}
-		
-		if(row !=0)
-		citation_size1 = citation_size1 / row;
-		
-		System.out.print(citation_size1 + "	");
-		
-		Set<Head_strs> head = citation_view_map1.keySet();
-		
-		int row_num = 0;
-		
-		double origin_citation_size = 0.0;
-		
-		for(Iterator iter = head.iterator(); iter.hasNext();)
-		{
-			Head_strs head_val = (Head_strs) iter.next();
-			
-			Vector<Vector<citation_view_vector>> c_view = citation_view_map1.get(head_val);
-			
-			row_num++;
-			
-			for(int p = 0; p<c_view.size(); p++)
-			{
-				origin_citation_size += c_view.get(p).size();
-			}
-			
-		}
-		
-		
-		
-		if(row_num !=0)
-			origin_citation_size = origin_citation_size / row_num;
-		
-		System.out.print(row_num + "	");
-		
-		System.out.print(origin_citation_size + "	");
-		
-		
-		citation_view_map1.clear();
-		
-		citation_strs.clear();
-		
-		citation_view1.clear();
-		
-		
-		
-		
-		
-		start_time = System.nanoTime();
-		
-		for(int k = 0; k<times; k++)
-		{
-			citation_view_map2.clear();
-			
-			citation_strs2.clear();
-			
-			citation_view2.clear();
-			
-			Tuple_reasoning2_test.tuple_reasoning(query, citation_strs2,  citation_view_map2, c, pst);
-			
-			System.gc();
-		}
-		
-		end_time = System.nanoTime();
-		
-		Vector<String> agg_citations2 = Tuple_reasoning2_test.tuple_gen_agg_citations(citation_view2);
-		
-		System.out.println(agg_citations2);
-		
-		
-		time = (end_time - start_time);
-		
-		
-		time = time /(times * 1.0 *1000000000);
-		
-		System.out.print(time + "s	");
-		
-		
-		h_l = citation_strs2.keySet();
-		
-		double citation_size2 = 0.0;
-		
-		row = 0;
-		
-		for(Iterator iter = h_l.iterator(); iter.hasNext();)
-		{
-			Head_strs h_value = (Head_strs) iter.next();
-			
-			HashSet<String> citations = citation_strs2.get(h_value);
-			
-			citation_size2 += citations.size();
-			
-			row ++;
-			
-		}
-		
-		if(row !=0)
-			citation_size2 = citation_size2 / row;
+			double end_time = 0;
 
-		System.out.print(citation_size2 + "	");
-
-		
-		head = citation_view_map2.keySet();
-		
-		row_num = 0;
-		
-		origin_citation_size = 0.0;
-		
-		for(Iterator iter = head.iterator(); iter.hasNext();)
-		{
-			Head_strs head_val = (Head_strs) iter.next();
 			
-			Vector<Vector<citation_view_vector>> c_view = citation_view_map2.get(head_val);
+			double start_time = System.nanoTime();
 			
-			row_num++;
 			
-			for(int p = 0; p<c_view.size(); p++)
+			for(int k = 0; k<times; k++)
 			{
-				origin_citation_size += c_view.get(p).size();
-			}
-			
-		}
-		
-		
-		
-		if(row_num !=0)
-			origin_citation_size = origin_citation_size / row_num;
-		
-		System.out.print(row_num + "	");
-		
-		System.out.print(origin_citation_size + "	");
-		
-		citation_view_map2.clear();
-		
-		citation_strs2.clear();
-		
-		citation_view2.clear();
-		
-//		Tuple_reasoning1.compare(citation_view_map1, citation_view_map2);
-		
-		Tuple_reasoning1.compare_citation(citation_strs, citation_strs2);
-		
-		System.out.println();
-		
-		Vector<String> unique_relation_names = get_relation_names(query);
-		
-		for(; view_size <= query.body.size(); )
-		{				
-			Vector<Query> curr_views = view_generator.gen_views(unique_relation_names, 5, view_size, view_id, query);view_generator.gen_views_with_n_subgoals(unique_relation_names, view_size, view_id);
-			
-			int m = 0;
-			
-			for(m = 0; m<curr_views.size(); m++)
-			{
-				view_generator.store_single_view(curr_views.get(m), view_id);
-				
-				System.out.println("start");
-				
-				System.out.println(curr_views.get(m));
-				
-				end_time = 0;
-
-				
-				start_time = System.nanoTime();
-				
-				
-				for(int k = 0; k<times; k++)
-				{
-					
-					citation_view_map1.clear();
-					
-					citation_strs.clear();
-					
-					Tuple_reasoning1_test.tuple_reasoning(query, citation_strs,  citation_view_map1, c, pst);
-					
-					System.gc();
-				}
-				
-				
-				
-				end_time = System.nanoTime();
-				
-				time = (end_time - start_time);
-				
-				time = time /(times * 1.0 *1000000000);
-				
-				System.out.print(time + "s	");
-				
-				h_l = citation_strs.keySet();
-				
-				citation_size1 = 0;
-				
-				row = 0;
-				
-				for(Iterator iter = h_l.iterator(); iter.hasNext();)
-				{
-					Head_strs h_value = (Head_strs) iter.next();
-					
-					HashSet<String> citations = citation_strs.get(h_value);
-					
-					citation_size1 += citations.size();
-					
-					row ++;
-					
-				}
-				
-				if(row !=0)
-				citation_size1 = citation_size1 / row;
-				
-				System.out.print(citation_size1 + "	");
-				
-				head = citation_view_map1.keySet();
-				
-				row_num = 0;
-				
-				origin_citation_size = 0.0;
-				
-				for(Iterator iter = head.iterator(); iter.hasNext();)
-				{
-					Head_strs head_val = (Head_strs) iter.next();
-					
-					Vector<Vector<citation_view_vector>> c_view = citation_view_map1.get(head_val);
-					
-					row_num++;
-					
-					for(int p = 0; p<c_view.size(); p++)
-					{
-						origin_citation_size += c_view.get(p).size();
-					}
-					
-				}
-				
-				
-				
-				if(row_num !=0)
-					origin_citation_size = origin_citation_size / row_num;
-				
-				System.out.print(row_num + "	");
-				
-				System.out.print(origin_citation_size + "	");
-				
 				
 				citation_view_map1.clear();
 				
 				citation_strs.clear();
 				
-				citation_view1.clear();
+//				citation_view1.clear();
 				
+				Tuple_reasoning1_test.tuple_reasoning(query, citation_strs,  citation_view_map1, c, pst);
 				
+				System.gc();
 				
+			}
+			
+			
+			
+//			System.out.println(SizeOf.humanReadable(SizeOf.deepSizeOf(citation_strs))); 
+			
+			end_time = System.nanoTime();
+			
+			double time = (end_time - start_time);
+			
+			time = time /(times * 1.0 *1000000000);
+			
+			System.out.print(time + "s	");
+			
+			Set<Head_strs> h_l = citation_strs.keySet();
+			
+			double citation_size1 = 0;
+			
+			int row = 0;
+			
+			for(Iterator iter = h_l.iterator(); iter.hasNext();)
+			{
+				Head_strs h_value = (Head_strs) iter.next();
 				
+				HashSet<String> citations = citation_strs.get(h_value);
 				
-				start_time = System.nanoTime();
+				citation_size1 += citations.size();
 				
-				for(int k = 0; k<times; k++)
-				{
-					citation_view_map2.clear();
-					
-					citation_strs2.clear();
-					
-					citation_view2.clear();
-					
-					citation_view2 = Tuple_reasoning2_test.tuple_reasoning(query, citation_strs2, citation_view_map2, c, pst);
-					
-					System.gc();
-				}
+				row ++;
 				
-				end_time = System.nanoTime();
-				
-				time = (end_time - start_time);
-				
-				
-				time = time /(times * 1.0 *1000000000);
-				
-				System.out.print(time + "s	");
-				
-				
-				h_l = citation_strs2.keySet();
-				
-				citation_size2 = 0.0;
-				
-				row = 0;
-				
-				for(Iterator iter = h_l.iterator(); iter.hasNext();)
-				{
-					Head_strs h_value = (Head_strs) iter.next();
-					
-					HashSet<String> citations = citation_strs2.get(h_value);
-					
-					citation_size2 += citations.size();
-					
-					row ++;
-					
-				}
-				
-				if(row !=0)
-					citation_size2 = citation_size2 / row;
-
-				System.out.print(citation_size2 + "	");
-
-				
-				head = citation_view_map2.keySet();
-				
-				row_num = 0;
-				
-				origin_citation_size = 0.0;
-				
-				for(Iterator iter = head.iterator(); iter.hasNext();)
-				{
-					Head_strs head_val = (Head_strs) iter.next();
-					
-					Vector<Vector<citation_view_vector>> c_view = citation_view_map2.get(head_val);
-					
-					row_num++;
-					
-					for(int p = 0; p<c_view.size(); p++)
-					{
-						origin_citation_size += c_view.get(p).size();
-					}
-					
-				}
-				
-				
-				
-				if(row_num !=0)
-					origin_citation_size = origin_citation_size / row_num;
-				
-				System.out.print(row_num + "	");
-				
-				System.out.print(origin_citation_size + "	");
-				
+			}
+			
+			if(row !=0)
+			citation_size1 = citation_size1 / row;
+			
+			System.out.print(citation_size1 + "	");
+			
+			System.out.print(row + "	");
+			
+//			Set<Head_strs> head = citation_view_map1.keySet();
+//			
+//			int row_num = 0;
+//			
+//			double origin_citation_size = 0.0;
+//			
+//			for(Iterator iter = head.iterator(); iter.hasNext();)
+//			{
+//				Head_strs head_val = (Head_strs) iter.next();
+//				
+//				Vector<Vector<citation_view_vector>> c_view = citation_view_map1.get(head_val);
+//				
+//				row_num++;
+//				
+//				for(int p = 0; p<c_view.size(); p++)
+//				{
+//					origin_citation_size += c_view.get(p).size();
+//				}
+//				
+//			}
+//			
+//			
+//			
+//			if(row_num !=0)
+//				origin_citation_size = origin_citation_size / row_num;
+//			
+			
+			
+			System.out.print(Tuple_reasoning1_test.covering_set_num * 1.0/row + "	");
+		}
+		else
+		{
+			
+			double start_time = System.nanoTime();
+			
+			for(int k = 0; k<times; k++)
+			{
 				citation_view_map2.clear();
 				
 				citation_strs2.clear();
 				
 				citation_view2.clear();
 				
-				Tuple_reasoning1.compare(citation_view_map1, citation_view_map2);
+				citation_view2 = Tuple_reasoning2_test.tuple_reasoning(query, citation_strs2, citation_view_map2, c, pst);
 				
-//				Tuple_reasoning1.compare_citation(citation_strs, citation_strs2);
-				
-				System.out.println();
-				
-				view_id ++;
-				
-				if(view_id >= upper_bound)
-					break;
+				System.gc();
 			}
 			
-			if(m < curr_views.size())
-				break;
+			double end_time = System.nanoTime();
+			
+			double time = (end_time - start_time);
 			
 			
-			view_size ++;
+			time = time /(times * 1.0 *1000000000);
+			
+			System.out.print(time + "s	");
+			
+			
+			Set<Head_strs> h_l = citation_strs2.keySet();
+			
+			double citation_size2 = 0.0;
+			
+			int row = 0;
+			
+			for(Iterator iter = h_l.iterator(); iter.hasNext();)
+			{
+				Head_strs h_value = (Head_strs) iter.next();
+				
+				HashSet<String> citations = citation_strs2.get(h_value);
+				
+				citation_size2 += citations.size();
+				
+				row ++;
+				
+			}
+			
+			if(row !=0)
+				citation_size2 = citation_size2 / row;
+
+			System.out.print(citation_size2 + "	");
+
+			System.out.print(row + "	");
+			
+//			Set<Head_strs> head = citation_view_map2.keySet();
+//			
+//			int row_num = 0;
+//			
+//			double origin_citation_size = 0.0;
+//			
+//			for(Iterator iter = head.iterator(); iter.hasNext();)
+//			{
+//				Head_strs head_val = (Head_strs) iter.next();
+//				
+//				Vector<Vector<citation_view_vector>> c_view = citation_view_map2.get(head_val);
+//				
+//				row_num++;
+//				
+//				for(int p = 0; p<c_view.size(); p++)
+//				{
+//					origin_citation_size += c_view.get(p).size();
+//				}
+//				
+//			}
+//			
+//			
+//			
+//			if(row_num !=0)
+//				origin_citation_size = origin_citation_size / row_num;
+//						
+//			System.out.print(origin_citation_size + "	");
+			
+			System.out.print(Tuple_reasoning2_test.covering_set_num * 1.0/row + "	");
+			
+//			Tuple_reasoning1.compare(citation_view_map1, citation_view_map2);
+			
+//			Tuple_reasoning1.compare_citation(citation_strs, citation_strs2);
+			
+			
+//						
+//			reset();
+//			
+//			Vector<Query> queries = query_generator.gen_queries(j, size_range);
+//			
+//			Query query = query_generator.gen_query(j, c, pst);
+			
+//			System.out.println(queries.get(0));
+
+			
+//			Vector<String> relation_names = get_unique_relation_names(queries.get(0));
+			
+//			view_generator.generate_store_views(relation_names, num_views);
+			
+//			query_storage.store_query(queries.get(0), new Vector<Integer>());
+			
+			
 		}
 	}
+	
 	
 	static void reset(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{

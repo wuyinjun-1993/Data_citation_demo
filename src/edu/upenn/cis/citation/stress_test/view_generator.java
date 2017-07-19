@@ -264,7 +264,7 @@ public class view_generator {
 	}
 	
 	
-	public static HashSet<Query> generate_store_views(Vector<String> subgoal_names, int num_views, int sizeofquery, Query q) throws SQLException, ClassNotFoundException
+	public static Vector<Query> generate_store_views(Vector<String> subgoal_names, int num_views, int sizeofquery, Query q) throws SQLException, ClassNotFoundException
 	{
 		initial();
 		
@@ -282,14 +282,14 @@ public class view_generator {
 	    
 	    get_joinable_relations(c, pst);
 	    
-	    HashSet<Query> views = gen_views(subgoal_names, num_views, sizeofquery,  c, pst, q);
+	    Vector<Query> views = gen_views(subgoal_names, num_views, sizeofquery,  c, pst, q);
 	    
 	    store_views(views, c, pst);
 	    
 	    return views;
 	}
 	
-	public static HashSet<Query> generate_store_views_without_predicates(Vector<String> subgoal_names, int num_views, int sizeofquery) throws SQLException, ClassNotFoundException
+	public static Vector<Query> generate_store_views_without_predicates(Vector<String> subgoal_names, int num_views, int sizeofquery) throws SQLException, ClassNotFoundException
 	{
 		initial();
 		
@@ -307,7 +307,7 @@ public class view_generator {
 	    
 	    get_joinable_relations(c, pst);
 	    
-	    HashSet<Query> views = gen_views_without_predicates(subgoal_names, num_views, sizeofquery,  c, pst);
+	    Vector<Query> views = gen_views_without_predicates(subgoal_names, num_views, sizeofquery,  c, pst);
 	    
 	    store_views(views, c, pst);
 	    
@@ -475,7 +475,7 @@ public class view_generator {
 		return ids;
 	}
 	
-	public static void store_views(HashSet<Query> views, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	public static void store_views(Vector<Query> views, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
 		
 		int num = 1;
@@ -744,11 +744,11 @@ public class view_generator {
 		return queries;
 	}
 	
-	static HashSet<Query> gen_views(Vector<String> subgoal_names, int num_views, int sizeofquety, Connection c, PreparedStatement pst, Query q) throws SQLException
+	static Vector<Query> gen_views(Vector<String> subgoal_names, int num_views, int sizeofquety, Connection c, PreparedStatement pst, Query q) throws SQLException
 	{
 		Vector<Integer> sizes = generator_random_numbers(num_views, sizeofquety);
 		
-		HashSet<Query> queries = new HashSet<Query>();
+		Vector<Query> queries = new Vector<Query>();
 		
 		int num = 0;
 		
@@ -803,13 +803,16 @@ public class view_generator {
 		return queries;
 	}
 	
-	static HashSet<Query> gen_views_without_predicates(Vector<String> subgoal_names, int num_views, int sizeofquety, Connection c, PreparedStatement pst) throws SQLException
+	static Vector<Query> gen_views_without_predicates(Vector<String> subgoal_names, int num_views, int sizeofquety, Connection c, PreparedStatement pst) throws SQLException
 	{
 		Vector<Integer> sizes = generator_random_numbers(num_views, sizeofquety);
 		
-		HashSet<Query> queries = new HashSet<Query>();
+		Vector<Query> queries = new Vector<Query>();
 		
 		int num = 0;
+		
+		if(!sizes.contains(1))
+			sizes.set(0, 1);
 		
 		while(queries.size() < sizes.size())
 		{
@@ -833,7 +836,7 @@ public class view_generator {
 		return queries;
 	}
 	
-	public static void gen_one_additional_predicates(HashSet<Query> views, Vector<String> subgoal_names, int sizeofquery, Query query) throws SQLException, ClassNotFoundException
+	public static void gen_one_additional_predicates(Vector<Query> views, Vector<String> subgoal_names, int sizeofquery, Query query) throws SQLException, ClassNotFoundException
 	{
 //		Vector<Integer> sizes = generator_random_numbers(1, sizeofquery);
 		
@@ -850,29 +853,41 @@ public class view_generator {
 		
 		Query view = null;
 		
+		Vector<Query> useful_views = new Vector<Query>();
+		
+		for(Iterator iter = views.iterator(); iter.hasNext();)
+		{
+			Query v = (Query) iter.next();
+			
+			if(v.body.size() == 1)
+				useful_views.add(v);
+		}
+		
 		
 		while(true)
 		{
-			int index_for_change = r.nextInt(views.size());
+			int index_for_change = r.nextInt(useful_views.size());
 			
-			for(Iterator iter = views.iterator(); iter.hasNext();)
-			{
-				if(id == index_for_change)
-				{
-					view = (Query) iter.next();
-					
-					views.remove(view);
-					
-					break;
-				}
-				
-				id++;
-			}
+//			for(Iterator iter = useful_views.iterator(); iter.hasNext();)
+//			{
+//				if(id == index_for_change)
+//				{
+//					view = (Query) iter.next();
+//					
+//					
+//					
+//					break;
+//				}
+//				
+//				id++;
+//			}
 			
-			
+			view = useful_views.get(index_for_change);
 			
 			if(split_view(views, view, c, pst))
 			{
+				views.remove(view);
+				
 				view_operation.delete_view_by_name(view.name);
 				
 				citation_view_operation.delete_citation_views(view.name);
@@ -910,7 +925,7 @@ public class view_generator {
 		c.close();
 	}
 	
-	static boolean check_duplicated_conditions(HashSet<Query> views, String relation, String attr_name, String constant)
+	static boolean check_duplicated_conditions(Vector<Query> views, String relation, String attr_name, String constant)
 	{
 		
 		for(Iterator iter = views.iterator(); iter.hasNext();)
@@ -1146,7 +1161,7 @@ public class view_generator {
 		}
 	}
 	
-	static boolean split_view(HashSet<Query> views, Query view, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	static boolean split_view(Vector<Query> views, Query view, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
 		
 		String relation = null;
@@ -1270,7 +1285,7 @@ public class view_generator {
 		return true;
 	}
 	
-	public static void gen_one_additional_view(HashSet<Query> views, Vector<String> subgoal_names, int sizeofquery, Query q) throws SQLException, ClassNotFoundException
+	public static void gen_one_additional_view(Vector<Query> views, Vector<String> subgoal_names, int sizeofquery, Query q) throws SQLException, ClassNotFoundException
 	{
 		Vector<Integer> sizes = generator_random_numbers(1, sizeofquery);
 		
@@ -1287,7 +1302,7 @@ public class view_generator {
 			
 			int size = sizes.get(0);
 						
-			Query query = generate_view(subgoal_names, views.size() + 1, sizes.get(0), c, pst, q);
+			Query query = generate_view_without_predicates(subgoal_names, views.size() + 1, sizes.get(0), c, pst);
 						
 			if(!views.contains(query))
 			{

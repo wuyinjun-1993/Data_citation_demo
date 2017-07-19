@@ -9,7 +9,7 @@ import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Pre_processing.Gen_query;
 import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning1;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
 
 public class test_output {
 	

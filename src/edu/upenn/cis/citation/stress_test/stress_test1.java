@@ -17,9 +17,9 @@ import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.datalog.Query_converter;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning1;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning1_citation_opt;
-import edu.upenn.cis.citation.reasoning.Tuple_reasoning2_citation_opt;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_citation_opt;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_citation_opt;
 import edu.upenn.cis.citation.user_query.query_storage;
 
 public class stress_test1 {

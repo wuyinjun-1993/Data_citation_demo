@@ -546,11 +546,47 @@ public class query_storage {
 			
 			store_query_subgoals(query, query_num, query.body, c, pst);
 			
+//			return query_num;
 //			store_query_predicates(query, query_num, c, pst);
 			
 	    }
 	    
+	    c.close();
+	    
 	    return id;
+		
+		
+		
+	}
+	
+	public static  Vector<Integer> store_user_query_ids() throws SQLException, ClassNotFoundException
+	{
+		
+		Connection c = null;
+	      PreparedStatement pst = null;
+		Class.forName("org.postgresql.Driver");
+	    c = DriverManager
+	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
+	    
+	    String query_ids = "select query_id from user_query_table";
+	    
+	    pst = c.prepareStatement(query_ids);
+	    
+	    ResultSet rs = pst.executeQuery();
+	    
+	    Vector<Integer> ids = new Vector<Integer>();
+	    
+	    while(rs.next())
+	    {
+	    	ids.add(rs.getInt(1));
+	    }
+	    
+	    
+	    
+	    
+	    c.close();
+	    
+	    return ids;
 		
 		
 		

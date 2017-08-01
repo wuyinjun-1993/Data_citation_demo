@@ -3049,12 +3049,22 @@ private Object String;
 	}
 	
 	private void setGQ() {
-		if (listQueries!=null && !listQueries.isEmpty()) {
-			for (int i = 0; i < listQueries.size(); i++) {
-				String id = listQueries.get(i);
+		
+		Vector<Integer> query_ids = null;
+		
+		try {
+			query_ids = query_storage.store_user_query_ids();
+		} catch (ClassNotFoundException | SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		if (query_ids!=null && !query_ids.isEmpty()) {
+			for (int i = 0; i < query_ids.size(); i++) {
+				int id = query_ids.get(i);
 					try {
-						Query content = query_storage.get_user_query_by_id(Integer.parseInt(id));
-						dataGenerated.add(new GQuery(id, content.toString()));
+						Query content = query_storage.get_user_query_by_id(id);
+						dataGenerated.add(new GQuery(query_ids.get(i).toString(), content.toString()));
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -3125,6 +3135,44 @@ private Object String;
 		} else
 			splitSQL = query;
 		return splitSQL;
+	}
+	
+	static void reset() throws SQLException, ClassNotFoundException
+	{
+		
+		Connection c;
+		Class.forName("org.postgresql.Driver");
+		c = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+		
+		PreparedStatement pst = null;
+		
+		String query = "delete from user_query2conditions";
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+		
+		query = "delete from user_query2subgoals";
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+		
+//		query = "delete from user_query_conditions";
+//		
+//		pst = c.prepareStatement(query);
+//		
+//		pst.execute();
+		
+		query = "delete from user_query_table";
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+		
+		c.close();
+		
+		
 	}
 	
 }

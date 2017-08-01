@@ -2216,6 +2216,58 @@ public class Query_converter {
 		return str;
 	}
 	
+	static String get_condition_statistics(Query q, HashSet<Conditions> valid_conditions)
+	{
+		
+		String  str = new String();
+		
+		
+		int condition_num = 0;
+		
+//		for(int i = 0; i<valid_conditions.size(); i++)
+		int i = 0;
+		
+		for(Iterator iter = valid_conditions.iterator(); iter.hasNext();)
+		{
+			Conditions condition = (Conditions) iter.next();
+			
+			if(i >= 1)
+			{
+				str += ",";
+				str += ",";
+			}
+			
+			if(condition.subgoal2 == null || condition.subgoal2.isEmpty())
+			{
+				String arg2_str = condition.arg2.name;
+				
+				if(arg2_str.length() > 2)
+				{
+					arg2_str = "'" + arg2_str.substring(1, condition.arg2.name.length() - 1).replaceAll("'", "''") + "'";
+				}
+				
+				
+				
+				str += "count(distinct(" + condition.subgoal1 + "." + condition.arg1 + condition.op + arg2_str + ")) as condition" + condition_num;
+				
+				str += ", every(" + condition.subgoal1 + "." + condition.arg1 + condition.op + arg2_str + ")";
+				
+			}
+			else
+			{
+				str += "count(distinct(" + condition.subgoal1 + "." + condition.arg1 + condition.op + condition.subgoal2 + "." + condition.arg2 + ")) as condition" + condition_num;
+				
+				str += ", every(" + condition.subgoal1 + "." + condition.arg1 + condition.op + condition.subgoal2 + "." + condition.arg2 + ")";
+			}
+						
+			condition_num ++;
+
+			i++;
+		}
+		
+		return str;
+	}
+	
 	static String get_lambda_str(Query v, Vector<Lambda_term> lambda_terms)
 	{
 		String str = new String();
@@ -2286,6 +2338,58 @@ public class Query_converter {
 //		System.out.println("sql:::" + sql);
 		
 		c.close();
+		
+		return sql;
+	}
+	
+	public static String datalog2sql_citation_statistics(Query query, HashSet<Conditions> valid_conditions, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	{
+				
+//		String sel_item = new String();
+				
+//		Connection c = null;
+//		
+//	    PreparedStatement pst = null;
+//	      
+//		Class.forName("org.postgresql.Driver");
+//		
+//	    c = DriverManager
+//	        .getConnection(populate_db.db_url,
+//	    	        populate_db.usr_name,populate_db.passwd);
+	    
+	    
+		
+		String sql = new String();
+
+//		String sel_item = get_sel_item(query);
+		
+		
+		String condition_str = get_condition_statistics(query, valid_conditions);
+//		String citation_unit = get_sel_citation_unit(query);
+		
+//		String sel_lambda_terms = get_lambda_str(query, lambda_terms);
+		
+//		String [] condition_str = get_condition_boolean_value(query, valid_conditions);
+		
+		
+//		String citation_table = get_relations_with_citation_table(query);
+		
+		String tables = get_relations_without_citation_table(query);
+		
+		String condition = get_condition(query);
+		
+//		String citation_condition = get_citation_condition(query, c, pst);
+		
+		sql = "select " + condition_str;
+		
+		sql += " from " + tables;
+		
+		if(condition != null && !condition.isEmpty())
+			sql += " where " + condition; 
+		
+//		System.out.println("sql:::" + sql);
+		
+//		c.close();
 		
 		return sql;
 	}

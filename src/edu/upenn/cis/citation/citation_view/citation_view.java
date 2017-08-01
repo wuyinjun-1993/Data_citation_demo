@@ -3,6 +3,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Vector;
 
+import edu.upenn.cis.citation.Corecover.Query;
+import edu.upenn.cis.citation.Corecover.Tuple;
+
 public abstract class citation_view {
 	
 	public abstract String get_full_query() throws ClassNotFoundException, SQLException;
@@ -29,6 +32,12 @@ public abstract class citation_view {
 	public abstract citation_view clone();
 	
 	public abstract String get_table_name_string();
+	
+	public abstract double get_weight_value();
+	
+	public abstract void calculate_weight(Query query);
+	
+	public abstract Tuple get_view_tuple();
 	
 	@Override
 	public abstract boolean equals(Object o);

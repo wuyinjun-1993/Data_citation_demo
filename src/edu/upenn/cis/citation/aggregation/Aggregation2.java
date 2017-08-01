@@ -22,6 +22,7 @@ import edu.upenn.cis.citation.citation_view.citation_view_parametered;
 import edu.upenn.cis.citation.citation_view.citation_view_unparametered;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.gen_citation.gen_citation1;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
 
 public class Aggregation2 {
@@ -174,7 +175,7 @@ public class Aggregation2 {
 				{
 					rs.absolute(selected_row_ids.get(i) + 1);
 					
-					Tuple_reasoning1_test.update_valid_citation_combination(c_view, rs, start_pos);
+					Tuple_reasoning1.update_valid_citation_combination(c_view, rs, start_pos);
 					
 					do_aggregate(curr_res, c_view, i, author_lists, view_query_mapping, query_lambda_str, author_mapping, max_num, c, pst);
 				}
@@ -254,7 +255,7 @@ public class Aggregation2 {
 				{
 					rs.absolute(i + 1);
 					
-					Tuple_reasoning1_test.update_valid_citation_combination(c_view, rs, start_pos);
+					Tuple_reasoning1.update_valid_citation_combination(c_view, rs, start_pos);
 					
 					do_aggregate(curr_res, c_view, i, author_lists, view_query_mapping, query_lambda_str, author_mapping, max_num, c, pst);
 				}

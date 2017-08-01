@@ -29,6 +29,15 @@ public class Conditions {
 	
 	static final String[] ops = {"<>",">=","<=",">","<","="};
 	
+	public static void main(String [] args)
+	{
+		String str1 = "other_protein";
+		
+		String str2 = "gpcr";
+		
+		System.out.println(str1.compareTo(str2));
+	}
+	
 	@Override
 	public String toString()
 	{
@@ -142,11 +151,78 @@ public class Conditions {
 	public static boolean compare(Conditions c1, Conditions c2)
 	{
 //		if((c1.arg1.origin_name.equals(c2.arg1.origin_name) && c1.arg2.origin_name.equals(c2.arg2.origin_name) && c1.subgoal1.equals(c2.subgoal1) && c1.subgoal2.equals(c2.subgoal2) ))
+		
 		if(c1.toString().equals(c2.toString()))
-		 return true;
+			 return true;
+		
+		if(c1.toString().equals(reverse_condition(c2).toString()))
+			return true;
+		
+		if(c1.arg2.isConst() && c2.arg2.isConst() && (c1.subgoal1.toString() + populate_db.separator + c1.arg1.name).equals(c2.subgoal1.toString() + populate_db.separator + c2.arg1.name))
+		{
+			try{
+				double c1_arg2 = Double.valueOf(c1.arg2.name);
+				
+				double c2_arg2 = Double.valueOf(c2.arg2.name);
+				
+				if(c1.op.equals(c2.op))
+				{
+					if((c1.op.toString().equals(">") || c1.op.toString().equals(">=")) && (c1_arg2 >= c2_arg2))
+						return true;
+					
+					if((c1.op.toString().equals("<") || c1.op.toString().equals("<=")) && (c1_arg2 <= c2_arg2))
+						return true;
+				}
+				
+				if(c1.op.toString().equals(">") && c2.op.toString().equals(">=") && c1_arg2 >= c2_arg2)
+					return true;
+				
+				if(c1.op.toString().equals("<") && c2.op.toString().equals("<=") && c1_arg2 <= c2_arg2)
+					return true;
+				
+				if(c1.op.toString().equals(">=") && c2.op.toString().equals(">") && c1_arg2 > c2_arg2)
+					return true;
+				
+				if(c1.op.toString().equals("<=") && c2.op.toString().equals("<") && c1_arg2 < c2_arg2)
+					return true;
+				
+				
+			}
+			catch(Exception e)
+			{
+				String c1_arg2 = c1.arg2.name;
+				
+				String c2_arg2 = c2.arg2.name;
+				
+				if(c1.op.equals(c2.op))
+				{
+					if((c1.op.toString().equals(">") || c1.op.toString().equals(">=")) && (c1_arg2.compareTo(c2_arg2)) >= 0)
+						return true;
+					
+					if((c1.op.toString().equals("<") || c1.op.toString().equals("<=")) && (c1_arg2.compareTo(c2_arg2)) <= 0)
+						return true;
+				}
+				
+				if(c1.op.toString().equals(">") && c2.op.toString().equals(">=") && (c1_arg2.compareTo(c2_arg2)) >= 0)
+					return true;
+				
+				if(c1.op.toString().equals("<") && c2.op.toString().equals("<=") && (c1_arg2.compareTo(c2_arg2)) <= 0)
+					return true;
+				
+				if(c1.op.toString().equals(">=") && c2.op.toString().equals(">") && (c1_arg2.compareTo(c2_arg2)) > 0)
+					return true;
+				
+				if(c1.op.toString().equals("<=") && c2.op.toString().equals("<") && (c1_arg2.compareTo(c2_arg2)) < 0)
+					return true;
+			}
+			
+			
+		}
+		
+		
+		return false;
 		
 //		if((c1.arg2.origin_name.equals(c2.arg1.origin_name) && c1.arg1.origin_name.equals(c2.arg2.origin_name) && c1.subgoal2.equals(c2.subgoal1) && c1.subgoal1.equals(c2.subgoal2) ))
-        return c1.toString().equals(reverse_condition(c2).toString());
     }
 	
 	static Conditions reverse_condition(Conditions c)

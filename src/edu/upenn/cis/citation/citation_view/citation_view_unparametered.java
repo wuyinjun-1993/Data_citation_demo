@@ -26,12 +26,17 @@ public class citation_view_unparametered extends citation_view{
 	
 	public String table_name_str = new String();
 	
+	public double weight = 0.0;
+	
+	public Tuple view_tuple = null;
+	
 	public citation_view_unparametered(String name, Tuple tuple) throws ClassNotFoundException, SQLException
 	{
 		this.name = name;
 		
 		set_table_name(tuple);
-		
+	
+		this.view_tuple = tuple;
 //		Connection c = null;
 //		
 //	    PreparedStatement pst = null;
@@ -334,6 +339,24 @@ public class citation_view_unparametered extends citation_view{
 	public String get_table_name_string() {
 		// TODO Auto-generated method stub
 		return table_name_str;
+	}
+	
+	@Override
+	public double get_weight_value() {
+		// TODO Auto-generated method stub
+		return weight;
+	}
+
+	@Override
+	public void calculate_weight(Query query) {
+		// TODO Auto-generated method stub
+		this.weight = this.table_names.size() * 1.0/query.body.size();
+	}
+	
+	@Override
+	public Tuple get_view_tuple() {
+		// TODO Auto-generated method stub
+		return view_tuple;
 	}
 
 }

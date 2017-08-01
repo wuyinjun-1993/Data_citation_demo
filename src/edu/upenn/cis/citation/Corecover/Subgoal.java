@@ -147,4 +147,21 @@ public class Subgoal {
     
     return result.toString();
   }
+  
+  @Override
+  public boolean equals(Object o)
+  {
+	  Subgoal subgoal = (Subgoal) o;
+	  
+	  if(subgoal.name.equals(this.name))
+		  return true;
+	  
+	  return false;
+  }
+  
+  @Override
+  public int hashCode()
+  {
+	  return this.toString().hashCode();
+  }
 }

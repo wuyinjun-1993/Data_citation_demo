@@ -97,6 +97,54 @@ public class sort_insert {
 		return pos;
 	}
 	
+	public static <T> int binary_search(T[] list, T item, int len, binary_compare bc)
+	{
+		
+//		int pos = list.size()/2;
+		
+		int start = 0;
+		
+		int end = len - 1;
+		
+		int pos = (start + end) /2;
+		
+		while(start < end)
+		{
+			
+			
+			
+			int cmp_v = bc.compare(item, list[pos]); 
+			
+			if(cmp_v < 0)
+			{
+				end = pos - 1;
+			}
+			else
+			{
+				if(cmp_v > 0)
+				{
+					start = pos + 1;
+				}
+				else
+					break;
+			}
+			
+			pos = (start + end) /2;
+			
+		}
+		
+		int cmp_v = bc.compare(item, list[pos]); 
+		
+		if(cmp_v > 0)
+		{
+			pos = pos + 1;
+		}
+		
+		
+		
+		return pos;
+	}
+	
 	public static <T> void insert_sort(Vector<T> index_vec, T insert)
 	{
 		if(index_vec.size() == 0)

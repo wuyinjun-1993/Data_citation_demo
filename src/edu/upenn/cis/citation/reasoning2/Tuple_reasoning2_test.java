@@ -1,4 +1,4 @@
-package edu.upenn.cis.citation.reasoning1;
+package edu.upenn.cis.citation.reasoning2;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -75,22 +75,6 @@ public class Tuple_reasoning2_test {
 	static ResultSet rs = null;
 	
 	public static int covering_set_num = 0;
-	
-	static long start = 0;
-	
-	static long end = 0;	
-	
-	public static double pre_processing_time = 0.0;
-	
-	public static double query_time = 0.0;
-	
-	public static double reasoning_time = 0.0;
-	
-	public static double population_time = 0.0;
-	
-	public static double aggregation_time = 0.0;
-	
-	public static long second2nano = 1000000000;
 	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException, IOException, InterruptedException, JSONException
 	{
@@ -250,9 +234,6 @@ public class Tuple_reasoning2_test {
 	
 	public static Vector<String> tuple_gen_agg_citations(Query query) throws ClassNotFoundException, SQLException, JSONException
 	{
-		
-		start = System.nanoTime();
-		
 		int start_pos = query.head.args.size() + query.body.size();
 		
 		Connection c = null;
@@ -268,10 +249,6 @@ public class Tuple_reasoning2_test {
 		Vector<String> citations = Aggregation2.do_agg_intersection(rs, c_view_map, start_pos, view_query_mapping, query_lambda_str, author_mapping, max_author_num, c, pst);
 		
 		c.close();
-		
-		end = System.nanoTime();
-		
-		aggregation_time = (end - start) * 1.0/second2nano;
 		
 		return citations;
 	}
@@ -434,6 +411,27 @@ public class Tuple_reasoning2_test {
 			
 			System.out.println();
 		}
+	}
+	
+	
+		
+	static String get_args_web_view(String subgoal, Connection c, PreparedStatement pst) throws SQLException
+	{
+		String q = "select arguments from subgoal_arguments where subgoal_names ='" + subgoal + "'";
+		
+		pst = c.prepareStatement(q);
+		
+		ResultSet r = pst.executeQuery();
+		
+		String subgoal_args = new String();
+		
+		if(r.next())
+		{
+			subgoal_args += r.getString(1);
+		}
+		
+		return subgoal_args;
+		
 	}
 	
 		
@@ -718,16 +716,6 @@ public class Tuple_reasoning2_test {
 			rs.close();
 		
 		covering_set_num = 0;
-		
-		pre_processing_time = 0.0;
-		
-		query_time = 0.0;
-		
-		reasoning_time = 0.0;
-		
-		population_time = 0.0;
-		
-		aggregation_time = 0.0;
 												
 	}
 	
@@ -736,8 +724,6 @@ public class Tuple_reasoning2_test {
 				
 		reset();
 	    
-		start = System.nanoTime();
-		
 		HashSet views = pre_processing(q,c,pst);
 		
 		Vector<Vector<citation_view_vector>> citation_views = get_citation_views(views, q, c, pst, citation_strs, citation_view_map2);
@@ -892,10 +878,6 @@ public class Tuple_reasoning2_test {
 			
 		String sql = Query_converter.datalog2sql_citation2_test(query, valid_conditions, valid_lambda_terms);
 
-		end = System.nanoTime();
-		
-		pre_processing_time += (end - start) * 1.0/second2nano;
-		
 		reasoning(query, c, pst, sql, citation_strs, views);
 		
 //		reasoning(views, c_views, query, c, pst, sql, citation_strs, citation_view_map2);
@@ -1256,9 +1238,6 @@ public class Tuple_reasoning2_test {
 	
 	public static void reasoning(Query query, Connection c, PreparedStatement pst, String sql, HashMap<Head_strs, HashSet<String> > citation_strs, HashSet<Tuple> views) throws SQLException, ClassNotFoundException, IOException, InterruptedException, JSONException
 	{
-		
-		start = System.nanoTime();
-		
 		pst = c.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
 		
 //		System.out.println(sql);
@@ -1266,10 +1245,6 @@ public class Tuple_reasoning2_test {
 //		long t1 = System.nanoTime();
 				
 		rs = pst.executeQuery();
-		
-		end = System.nanoTime();
-		
-		query_time += (end - start) * 1.0/second2nano;
 //					
 //		long t2 = System.nanoTime();
 //		
@@ -1344,10 +1319,8 @@ public class Tuple_reasoning2_test {
 				
 				if(!curr_str.equals(old_value))
 				{		
-					
-					start = System.nanoTime();
-//					if(!curr_str.equals(old_value))
-					
+					if(!curr_str.equals(old_value))
+					{
 											
 //						System.out.println(h_vals);
 						
@@ -1429,9 +1402,7 @@ public class Tuple_reasoning2_test {
 							citation_strs.put(h_vals, curr_citations);
 						}
 						
-						end = System.nanoTime();
-						
-						reasoning_time += (end - start) * 1.0/second2nano;
+					}
 									
 				}
 				
@@ -1453,8 +1424,6 @@ public class Tuple_reasoning2_test {
 //					}
 					
 //					HashSet<citation_view_vector> update_c = update_valid_citation_combination(c_view_template, rs, query.head.args.size() + query.body.size());
-					
-					start = System.nanoTime();
 					
 					update_valid_citation_combination(c_view_template, rs);
 					
@@ -1521,10 +1490,6 @@ public class Tuple_reasoning2_test {
 						citation_strs.put(h_vals, curr_citations);
 					}
 					
-					end = System.nanoTime();
-					
-					population_time += (end - start) * 1.0/second2nano;
-					
 //					output2excel.citation_output_row(rs, query, vals, update_c_view, file_name, tuple_num, citations);
 
 				}
@@ -1557,8 +1522,6 @@ public class Tuple_reasoning2_test {
 				
 				if(first)
 				{
-					
-					start = System.nanoTime();
 					
 //					System.out.println(h_vals);
 					
@@ -1615,9 +1578,7 @@ public class Tuple_reasoning2_test {
 						citation_strs.put(h_vals, curr_citations);
 					}
 					
-					end = System.nanoTime();
 					
-					reasoning_time += (end - start) * 1.0/second2nano;
 				}
 				
 				else
@@ -1635,8 +1596,6 @@ public class Tuple_reasoning2_test {
 //					}
 					
 //					HashSet<citation_view_vector> update_c = update_valid_citation_combination(c_view_template, rs, query.head.args.size() + query.body.size());
-					
-					start = System.nanoTime();
 					
 					update_valid_citation_combination(c_view_template, rs);
 					
@@ -1697,10 +1656,6 @@ public class Tuple_reasoning2_test {
 						
 						citation_strs.put(h_vals, curr_citations);
 					}
-					
-					end = System.nanoTime();
-					
-					population_time += (end - start) * 1.0/second2nano;
 					
 				}
 

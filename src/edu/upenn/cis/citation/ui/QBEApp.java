@@ -3049,12 +3049,21 @@ private Object String;
 	}
 	
 	private void setGQ() {
-		if (listQueries!=null && !listQueries.isEmpty()) {
-			for (int i = 0; i < listQueries.size(); i++) {
-				String id = listQueries.get(i);
+		Vector<Integer> ids = new Vector<Integer>();
+		try {
+			ids = query_storage.store_user_query_ids();
+		} catch (ClassNotFoundException | SQLException e1) {
+			e1.printStackTrace();
+		}
+//		if (listQueries!=null && !listQueries.isEmpty()) {
+		if (ids!=null && !ids.isEmpty()) {
+			for (int i = 0; i < ids.size(); i++) {
+				int id = ids.get(i);
 					try {
-						Query content = query_storage.get_user_query_by_id(Integer.parseInt(id));
-						dataGenerated.add(new GQuery(id, content.toString()));
+						System.out.println(id);
+						Query content = query_storage.get_user_query_by_id(id);
+						System.out.println(content);
+						dataGenerated.add(new GQuery(Integer.toString(id), content.toString()));
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

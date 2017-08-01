@@ -12,6 +12,7 @@ import java.util.Vector;
 import com.sun.org.apache.xml.internal.dtm.ref.DTMDefaultBaseIterators.ParentIterator;
 
 import edu.upenn.cis.citation.Corecover.*;
+import edu.upenn.cis.citation.Operation.Conditions;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.datalog.Parse_datalog;
 import edu.upenn.cis.citation.datalog.Query_converter;
@@ -41,6 +42,8 @@ public class citation_view_parametered extends citation_view{
 	//relation_name in the body of query
 	public Vector<String> table_names = new Vector<String>();
 		
+	public double weight = 0.0;
+	
 	void gen_lambda_terms(Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
 		
@@ -278,6 +281,8 @@ public class citation_view_parametered extends citation_view{
 		this.view = view;
 		
 		this.view_tuple = tuple;
+		
+		Vector<Conditions> conditions = tuple.conditions;
 		
 		put_paramters(lambda_term_values);
 		
@@ -607,6 +612,24 @@ public class citation_view_parametered extends citation_view{
 	public String get_table_name_string() {
 		// TODO Auto-generated method stub
 		return table_name_str;
+	}
+
+	@Override
+	public double get_weight_value() {
+		// TODO Auto-generated method stub
+		return weight;
+	}
+
+	@Override
+	public void calculate_weight(Query query) {
+		// TODO Auto-generated method stub
+		this.weight = this.table_names.size() * 1.0/query.body.size();
+	}
+
+	@Override
+	public Tuple get_view_tuple() {
+		// TODO Auto-generated method stub
+		return view_tuple;
 	}
 	
 

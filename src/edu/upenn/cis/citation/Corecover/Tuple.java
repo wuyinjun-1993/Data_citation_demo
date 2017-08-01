@@ -22,9 +22,7 @@ public class Tuple {
   public HashMap mapSubgoals_str = null;
   public Query   query = null;
   public HashSet core = new HashSet();
-  
-  public boolean web_view = false;
-  
+    
   public Vector<Conditions> conditions = null;
 
   HashSet equTuples = new HashSet(); // set of view tuples with the same tuple-core

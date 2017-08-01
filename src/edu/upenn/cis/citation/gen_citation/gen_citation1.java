@@ -8,6 +8,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -28,6 +30,9 @@ import edu.upenn.cis.citation.citation_view.citation_view;
 import edu.upenn.cis.citation.citation_view.citation_view_parametered;
 import edu.upenn.cis.citation.citation_view.citation_view_unparametered;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
+import edu.upenn.cis.citation.data_structure.IntList;
+import edu.upenn.cis.citation.data_structure.StringList;
+import edu.upenn.cis.citation.data_structure.Unique_StringList;
 import edu.upenn.cis.citation.datalog.Parse_datalog;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
@@ -293,11 +298,14 @@ public class gen_citation1 {
 		{
 			if(c_vec.c_vec.get(i).has_lambda_term())
 			{
-				authors.addAll(get_authors2((citation_view_parametered)c_vec.c_vec.get(i), c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num));
+				
+				if(authors.size() < max_num)
+					authors.addAll(get_authors2((citation_view_parametered)c_vec.c_vec.get(i), c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num));
 			}
 			else
 			{
-				authors.addAll(get_authors2((citation_view_unparametered)c_vec.c_vec.get(i), c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num));
+				if(authors.size() < max_num)
+					authors.addAll(get_authors2((citation_view_unparametered)c_vec.c_vec.get(i), c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num));
 			}
 			
 			
@@ -351,6 +359,92 @@ public class gen_citation1 {
 //			value_str += vals.get(i);
 //		}
 		json_obj.put("db_name", db_name);
+		
+		return json_obj.toString();
+	}
+	
+	
+	public static String get_citations3(citation_view_vector c_vec, Connection c, PreparedStatement pst, StringList view_list, ArrayList<IntList> view_query_mapping, ArrayList<ArrayList<Lambda_term>> query_lambda_str, ArrayList<HashMap<Head_strs, Unique_StringList>> author_mapping, int max_num, HashSet<String> authors, JSONObject json_obj) throws ClassNotFoundException, SQLException, JSONException
+	{
+//		String author_str = new String();
+		
+//		HashSet<String> authors = new HashSet<String>();
+		
+//		System.out.println(c_vec.toString());
+		
+		
+		
+		
+		for(int i = 0; i<c_vec.c_vec.size(); i++)
+		{
+			
+			int view_index = view_list.find(c_vec.c_vec.get(i).get_name());
+			
+			
+			if(c_vec.c_vec.get(i).has_lambda_term())
+			{
+				if(authors.size() < max_num)
+					authors.addAll(get_authors3((citation_view_parametered)c_vec.c_vec.get(i), c, pst, view_index, view_query_mapping, query_lambda_str, author_mapping, max_num));
+			}
+			else
+			{
+				if(authors.size() < max_num)
+					authors.addAll(get_authors3((citation_view_unparametered)c_vec.c_vec.get(i), c, pst, view_index, view_query_mapping, query_lambda_str, author_mapping, max_num));
+			}
+			
+			
+			
+		}
+		
+
+		
+		int num = 0;
+		
+		JSONArray json_author = new JSONArray();
+		
+		for(Iterator iter = authors.iterator(); iter.hasNext();)
+		{
+			
+//			if(num >= 1)
+//				author_str += ",";
+//			
+//			author_str += iter.next();
+			json_author.put(iter.next());
+
+			num ++;
+			
+			if(max_num > 0 && num >= max_num)
+			{
+				
+				
+//				author_str += ", etc.";
+				break;
+			}
+		}
+		
+		
+		json_obj.put("author", json_author);
+		
+//		String citation = author_str;
+//		
+//		if(!author_str.isEmpty())
+//		{
+//			citation = author_str + ".";
+//		}
+		
+		authors.clear();
+		
+//		String value_str = new String();
+//		
+//		for(int i = 0; i<vals.size(); i++)
+//		{
+//			if( i >= 1)
+//				value_str += ",";
+//			
+//			value_str += vals.get(i);
+//		}
+		json_obj.put("db_name", db_name);
+		
 		
 		return json_obj.toString();
 	}
@@ -638,6 +732,52 @@ public class gen_citation1 {
 		while(rs.next())
 		{
 			query_ids.add(rs.getInt(1));
+		}
+		
+		return query_ids;
+		
+	}
+	
+	public static ArrayList<Integer> get_query_id2(String c_view_name, Connection c, PreparedStatement pst) throws SQLException
+	{
+		ArrayList<Integer> query_ids = new ArrayList<Integer>();
+		
+		int id = Integer.valueOf(c_view_name.substring(1));
+		
+		String query = "select citation2query.query_id from citation2view, citation2query where citation2view.citation_view_id = citation2query.citation_view_id and citation2view.view = '" + id + "'";
+		
+		pst = c.prepareStatement(query);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		while(rs.next())
+		{
+			query_ids.add(rs.getInt(1));
+		}
+		
+		return query_ids;
+		
+	}
+	
+	public static IntList get_query_id3(String c_view_name, IntList all_query_ids, Connection c, PreparedStatement pst) throws SQLException
+	{
+		IntList query_ids = new IntList();
+		
+		int id = Integer.valueOf(c_view_name.substring(1));
+		
+		String query = "select citation2query.query_id from citation2view, citation2query where citation2view.citation_view_id = citation2query.citation_view_id and citation2view.view = '" + id + "'";
+		
+		pst = c.prepareStatement(query);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		while(rs.next())
+		{
+			int query_id = rs.getInt(1);
+			
+			int query_id_id = all_query_ids.find(query_id);
+			
+			query_ids.add(query_id_id);
 		}
 		
 		return query_ids;
@@ -976,6 +1116,490 @@ public class gen_citation1 {
 		return authors;
 		
 	}
+	
+	public static HashSet<String> get_authors3(citation_view_parametered c_view, Connection c, PreparedStatement pst, int view_id, ArrayList<IntList> view_query_mapping, ArrayList<ArrayList<Lambda_term>> query_lambda_str, ArrayList<HashMap<Head_strs, Unique_StringList>> author_mapping, int max_num) throws SQLException, ClassNotFoundException
+	{
+		HashSet<String> authors = new HashSet<String>();
+		
+		
+		
+		
+//		Vector<String []> query_components= get_query(c_view.name, c, pst);
+		
+		
+//		String lambda_term_str = new String();
+//		
+//		for(int i = 0; i<c_view.lambda_terms.size(); i++)
+//		{
+//			if(i >= 1)
+//				lambda_term_str += " and ";
+//			
+//			lambda_term_str += c_view.view.subgoal_name_mapping.get(c_view.lambda_terms.get(i).table_name) + "." + c_view.lambda_terms.get(i).name + "::text= ?";// + c_view.map.get(c_view.lambda_terms.get(i)) + "'"; 
+//		}
+//		
+//		HashSet<String> curr_sql = new HashSet<String>();
+//		ArrayList<Integer> curr_query_ids = view_query_mapping.get(c_view.name);
+//				
+//		if(curr_query_ids == null)
+//		{						
+//			curr_query_ids = get_query_id2(c_view.name, c, pst);
+//			
+//			view_query_mapping.put(c_view.name, curr_query_ids);
+//			
+//			for(int k = 0; k<curr_query_ids.size(); k++)
+//			{
+//				HashMap<Head_strs, HashSet<String>> curr_author_mapping = author_mapping.get(curr_query_ids.get(k));
+//				
+//				if(curr_author_mapping == null)
+//				{
+//					
+//					curr_author_mapping = new HashMap<Head_strs, HashSet<String>>();
+//					
+//					Query q = Query_operation.get_query_by_id(curr_query_ids.get(k), c, pst);
+//					
+//					ArrayList<Lambda_term> l_terms = new ArrayList<Lambda_term>();
+//					
+//					l_terms.addAll(q.lambda_term);
+//					
+//					query_lambda_str.put(curr_query_ids.get(k), l_terms);
+//					
+////					HashMap<Head_strs, HashSet<String>> curr_query_author_mapping = new HashMap<Head_strs, HashSet<String>>();
+//					
+////					System.out.println(q);
+//					
+//					String sql = Query_converter.datalog2sql_citation_query(q);
+//					
+//					pst = c.prepareStatement(sql);
+//					
+//					ResultSet rs = pst.executeQuery();
+//					
+//					ResultSetMetaData meta = rs.getMetaData();
+//					
+//					int col_num = meta.getColumnCount();
+//					
+//					while(rs.next())
+//					{
+//						String author_name = rs.getString(1) + " " + rs.getString(2);
+//						
+//						Vector<String> head_strs = new Vector<String>();
+//						
+//						for(int i = 0; i<col_num -2; i++)
+//						{
+//							head_strs.add(rs.getString(i + 3));
+//						}
+//						
+//						Head_strs h_str = new Head_strs(head_strs);
+//						
+//						head_strs.clear();
+//						
+//						HashSet<String> author_set = curr_author_mapping.get(h_str); 
+//						
+//						if(author_set == null)
+//						{
+//							author_set = new HashSet<String>();
+//							
+//							author_set.add(author_name);
+//							
+//							curr_author_mapping.put(h_str, author_set);
+//						}
+//						else
+//						{
+//							
+//							if((max_num > 0 && author_set.size() <= max_num) || max_num == 0)
+//							{
+//								author_set.add(author_name);
+//								
+//								curr_author_mapping.put(h_str, author_set);
+//							}
+//						}
+//						
+//						
+//						
+//						
+//					}
+//					
+//								
+//					
+//				}
+//				
+//				author_mapping.put(curr_query_ids.get(k), curr_author_mapping);	
+//				
+//			}
+//		}
+						
+//		for(Iterator it = query_id_set.iterator(); it.hasNext();)
+		IntList curr_query_ids = view_query_mapping.get(view_id);
+		
+		for(int k = 0; k<curr_query_ids.size; k++)
+		{
+			HashMap<Head_strs, Unique_StringList> curr_authors =  author_mapping.get(curr_query_ids.list[k]);
+			
+			ArrayList<Lambda_term> l_terms = query_lambda_str.get(curr_query_ids.list[k]);
+			
+			HashMap subgoal_mapping = c_view.view_tuple.mapSubgoals_str;
+			
+			Vector<String> head_strs = new Vector<String>();
+			
+			for(int i = 0; i<l_terms.size(); i++)
+			{
+				
+				Lambda_term l_term = (Lambda_term) l_terms.get(i);
+				
+				String table_name = (String)subgoal_mapping.get(l_term.table_name);
+								
+				String temp =  c_view.map.get(table_name + populate_db.separator + l_term.name.substring(l_term.name.indexOf(populate_db.separator) + 1, l_term.name.length()));
+				
+				head_strs.add(temp);
+			}
+			
+			Head_strs h_str = new Head_strs(head_strs);
+			
+			head_strs.clear();
+			
+			Unique_StringList curr_author_list = curr_authors.get(h_str);
+			
+			h_str.clear();
+			
+			if(curr_author_list != null)
+			{
+				for(int p = 0; p<curr_author_list.size; p++)
+				{
+					authors.add(curr_author_list.list[p]);
+				}
+				
+				
+//				authors.addAll(Arrays.asList(Arrays.copyOfRange(curr_author_list.list, 0, curr_author_list.size)));
+			}
+			
+		}
+		
+		return authors;
+		
+	}
+	
+	static void get_all_query_ids(IntList query_ids, Connection c, PreparedStatement pst) throws SQLException
+	{
+		String sql = "select query_id from query2head_variables";
+		
+		pst = c.prepareStatement(sql);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		while(rs.next())
+		{
+			int id = rs.getInt(1);
+			
+			query_ids.add(id);
+		}
+	}
+	
+	public static void init_author_mapping(StringList view_list, ArrayList<IntList> view_query_mapping, IntList query_ids, ArrayList<ArrayList<Lambda_term> > query_lambda_str, ArrayList<HashMap<Head_strs, Unique_StringList>> author_mapping, int max_num, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	{
+		
+		get_all_query_ids(query_ids, c, pst);
+		
+		for(int i = 0; i < view_list.size; i++)
+		{
+			IntList curr_query_ids = get_query_id3(view_list.list[i], query_ids, c, pst);
+			
+			view_query_mapping.add(curr_query_ids);
+		}
+		
+		
+		for(int j = 0; j<query_ids.size; j++)
+		{
+			HashMap<Head_strs, Unique_StringList> curr_author_mapping = new HashMap<Head_strs, Unique_StringList>(); 
+			
+			Query q = Query_operation.get_query_by_id(query_ids.list[j], c, pst);
+			
+			ArrayList<Lambda_term> l_terms = new ArrayList<Lambda_term>();
+			
+			l_terms.addAll(q.lambda_term);
+			
+			query_lambda_str.add(l_terms);
+			
+			String sql = Query_converter.datalog2sql_citation_query(q);
+			
+			pst = c.prepareStatement(sql);
+			
+			ResultSet rs = pst.executeQuery();
+			
+			ResultSetMetaData meta = rs.getMetaData();
+			
+			int col_num = meta.getColumnCount();
+			
+			while(rs.next())
+			{
+				String author_name = rs.getString(1) + " " + rs.getString(2);
+				
+				Vector<String> head_strs = new Vector<String>();
+				
+				for(int i = 0; i<col_num -2; i++)
+				{
+					head_strs.add(rs.getString(i + 3));
+				}
+				
+				Head_strs h_str = new Head_strs(head_strs);
+				
+				head_strs.clear();
+				
+				Unique_StringList author_set = curr_author_mapping.get(h_str); 
+				
+				if(author_set == null)
+				{
+					author_set = new Unique_StringList();
+					
+					author_set.add(author_name);
+					
+					curr_author_mapping.put(h_str, author_set);
+				}
+				else
+				{
+					
+					if((max_num > 0 && author_set.size <= max_num) || max_num == 0)
+					{
+						author_set.add(author_name);
+								
+						curr_author_mapping.put(h_str, author_set);
+					}
+				}
+				
+				
+				
+				
+			}
+			
+			author_mapping.add(curr_author_mapping);
+		}
+		
+		
+		
+//		for(int k = 0; k<curr_query_ids.size(); k++)
+//		{
+//			HashMap<Head_strs, HashSet<String>> curr_author_mapping = author_mapping.get(curr_query_ids.get(k));
+//			
+//			if(curr_author_mapping == null)
+//			{
+//				
+//				curr_author_mapping = new HashMap<Head_strs, HashSet<String>>();
+//				
+//				Query q = Query_operation.get_query_by_id(curr_query_ids.get(k), c, pst);
+//				
+//				ArrayList<Lambda_term> l_terms = new ArrayList<Lambda_term>();
+//				
+//				l_terms.addAll(q.lambda_term);
+//				
+//				query_lambda_str.put(curr_query_ids.get(k), l_terms);
+//				
+////				HashMap<Head_strs, HashSet<String>> curr_query_author_mapping = new HashMap<Head_strs, HashSet<String>>();
+//				
+////				System.out.println(q);
+//				
+//				String sql = Query_converter.datalog2sql_citation_query(q);
+//				
+//				pst = c.prepareStatement(sql);
+//				
+//				ResultSet rs = pst.executeQuery();
+//				
+//				ResultSetMetaData meta = rs.getMetaData();
+//				
+//				int col_num = meta.getColumnCount();
+//				
+//				while(rs.next())
+//				{
+//					String author_name = rs.getString(1) + " " + rs.getString(2);
+//					
+//					Vector<String> head_strs = new Vector<String>();
+//					
+//					for(int i = 0; i<col_num -2; i++)
+//					{
+//						head_strs.add(rs.getString(i + 3));
+//					}
+//					
+//					Head_strs h_str = new Head_strs(head_strs);
+//					
+//					head_strs.clear();
+//					
+//					HashSet<String> author_set = curr_author_mapping.get(h_str); 
+//					
+//					if(author_set == null)
+//					{
+//						author_set = new HashSet<String>();
+//						
+//						author_set.add(author_name);
+//						
+//						curr_author_mapping.put(h_str, author_set);
+//					}
+//					else
+//					{
+//						
+//						if((max_num > 0 && author_set.size() <= max_num) || max_num == 0)
+//						{
+//							author_set.add(author_name);
+//							
+//							curr_author_mapping.put(h_str, author_set);
+//						}
+//					}
+//					
+//					
+//					
+//					
+//				}
+//				
+//							
+//				
+//			}
+//			
+//			author_mapping.put(curr_query_ids.get(k), curr_author_mapping);	
+//			
+//		}
+	}
+	
+	
+	public static HashSet<String> get_authors3(citation_view_unparametered c_view, Connection c, PreparedStatement pst, int view_id, ArrayList<IntList> view_query_mapping, ArrayList<ArrayList<Lambda_term>> query_lambda_str, ArrayList<HashMap<Head_strs, Unique_StringList>> author_mapping, int max_num) throws SQLException, ClassNotFoundException
+	{
+		HashSet<String> authors = new HashSet<String>();
+		
+		
+		
+		
+//		Vector<String []> query_components= get_query(c_view.name, c, pst);
+		
+		
+//		String lambda_term_str = new String();
+//		
+//		for(int i = 0; i<c_view.lambda_terms.size(); i++)
+//		{
+//			if(i >= 1)
+//				lambda_term_str += " and ";
+//			
+//			lambda_term_str += c_view.view.subgoal_name_mapping.get(c_view.lambda_terms.get(i).table_name) + "." + c_view.lambda_terms.get(i).name + "::text= ?";// + c_view.map.get(c_view.lambda_terms.get(i)) + "'"; 
+//		}
+//		
+//		HashSet<String> curr_sql = new HashSet<String>();
+		
+//		ArrayList<Integer> curr_query_ids = view_query_mapping.get(c_view.name);
+//		
+//		if(curr_query_ids == null)
+//		{						
+//			curr_query_ids = get_query_id2(c_view.name, c, pst);
+//			
+//			view_query_mapping.put(c_view.name, curr_query_ids);
+//			
+//			for(int k = 0; k<curr_query_ids.size(); k++)
+//			{
+//				HashMap<Head_strs, HashSet<String>> curr_author_mapping = author_mapping.get(curr_query_ids.get(k));
+//				
+//				if(curr_author_mapping == null)
+//				{
+//					
+//					curr_author_mapping = new HashMap<Head_strs, HashSet<String>>();
+//					
+//					Query q = Query_operation.get_query_by_id(curr_query_ids.get(k), c, pst);
+//					
+//					ArrayList<Lambda_term> l_terms = new ArrayList<Lambda_term>();
+//					
+//					l_terms.addAll(q.lambda_term);
+//					
+//					query_lambda_str.put(curr_query_ids.get(k), l_terms);
+//					
+////					HashMap<Head_strs, HashSet<String>> curr_query_author_mapping = new HashMap<Head_strs, HashSet<String>>();
+//					
+////					System.out.println(q);
+//					
+//					String sql = Query_converter.datalog2sql_citation_query(q, max_num);
+//					
+//					pst = c.prepareStatement(sql);
+//					
+//					ResultSet rs = pst.executeQuery();
+//					
+//					ResultSetMetaData meta = rs.getMetaData();
+//					
+//					int col_num = meta.getColumnCount();
+//					
+//					while(rs.next())
+//					{
+//						String author_name = rs.getString(1) + " " + rs.getString(2);
+//						
+//						Vector<String> head_strs = new Vector<String>();
+//						
+//						for(int i = 0; i<col_num -2; i++)
+//						{
+//							head_strs.add(rs.getString(i + 3));
+//						}
+//						
+//						Head_strs h_str = new Head_strs(head_strs);
+//						
+//						head_strs.clear();
+//						
+//						HashSet<String> author_set = curr_author_mapping.get(h_str); 
+//						
+//						if(author_set == null)
+//						{
+//							author_set = new HashSet<String>();
+//							
+//							author_set.add(author_name);
+//							
+//							curr_author_mapping.put(h_str, author_set);
+//						}
+//						else
+//						{
+//							if((max_num > 0 && author_set.size() <= max_num) || max_num == 0)
+//							{
+//								author_set.add(author_name);
+//								
+//								curr_author_mapping.put(h_str, author_set);
+//							}
+//						}
+//						
+//						
+//						
+//						
+//					}
+//					
+//								
+//					
+//				}
+//				
+//				author_mapping.put(curr_query_ids.get(k), curr_author_mapping);	
+//				
+//			}
+//		}
+						
+//		for(Iterator it = query_id_set.iterator(); it.hasNext();)
+		
+		IntList curr_query_ids = view_query_mapping.get(view_id);
+		
+		for(int k = 0; k<curr_query_ids.size; k++)
+		{
+			HashMap<Head_strs, Unique_StringList> curr_authors =  author_mapping.get(curr_query_ids.list[k]);
+			
+			ArrayList<Lambda_term> l_terms = query_lambda_str.get(curr_query_ids.list[k]);
+						
+			Vector<String> head_strs = new Vector<String>();
+			
+			Head_strs h_str = new Head_strs(head_strs);
+			
+			Unique_StringList curr_author_list = curr_authors.get(h_str);
+			
+			if(curr_author_list != null)
+			{
+				for(int p = 0; p<curr_author_list.size; p++)
+				{
+					authors.add(curr_author_list.list[p]);
+				}
+					
+				
+				
+//				authors.addAll(Arrays.asList(Arrays.copyOfRange(curr_author_list.list, 0, curr_author_list.size)));
+			}
+			
+		}
+		
+		return authors;
+		
+	}
+	
 	
 	public static HashSet<String> get_authors2(citation_view_unparametered c_view, Connection c, PreparedStatement pst, HashMap<String, Vector<Integer>> view_query_mapping, HashMap<Integer, Vector<Lambda_term>> query_lambda_str, HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping, int max_num) throws SQLException, ClassNotFoundException
 	{

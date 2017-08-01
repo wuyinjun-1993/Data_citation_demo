@@ -19,6 +19,7 @@ import edu.upenn.cis.citation.Corecover.Subgoal;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.Pre_processing.view_operation;
 import edu.upenn.cis.citation.citation_view.Head_strs;
+import edu.upenn.cis.citation.citation_view.Head_strs2;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
@@ -117,9 +118,7 @@ public class stress_test3 {
 				
 				reset(c, pst);
 			}
-			
-			System.out.println("finish resetting");
-			
+						
 			Query query = null;
 			
 			try{
@@ -296,6 +295,14 @@ public class stress_test3 {
 			
 			
 			System.out.print(Tuple_reasoning1_test.covering_set_num * 1.0/row + "	");
+			
+			System.out.println("pre_processing::" + Tuple_reasoning1_test.pre_processing_time + "	");
+			
+			System.out.println("query::" + Tuple_reasoning1_test.query_time + "	");
+			
+			System.out.println("reasoning::" + Tuple_reasoning1_test.reasoning_time + "	");
+			
+			System.out.println("population::" + Tuple_reasoning1_test.population_time + "	");
 		}
 		else
 		{
@@ -379,6 +386,14 @@ public class stress_test3 {
 //			System.out.print(origin_citation_size + "	");
 			
 			System.out.print(Tuple_reasoning2_test.covering_set_num * 1.0/row + "	");
+			
+			System.out.print("pre_processing::" + Tuple_reasoning2_test.pre_processing_time + "	");
+			
+			System.out.print("query::" + Tuple_reasoning2_test.query_time + "	");
+			
+			System.out.print("reasoning::" + Tuple_reasoning2_test.reasoning_time + "	");
+			
+			System.out.print("population::" + Tuple_reasoning2_test.population_time + "	");
 			
 //			Tuple_reasoning1.compare(citation_view_map1, citation_view_map2);
 			

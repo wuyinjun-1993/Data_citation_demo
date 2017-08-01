@@ -3055,6 +3055,7 @@ private Object String;
 				String id = listQueries.get(i);
 					try {
 						Query content = query_storage.get_user_query_by_id(Integer.parseInt(id));
+						System.out.println("[generated queries] " + content);
 						dataGenerated.add(new GQuery(id, content.toString()));
 					} catch (Exception e) {
 						e.printStackTrace();

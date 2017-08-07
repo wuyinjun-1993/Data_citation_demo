@@ -198,6 +198,7 @@ public class QBEApp extends Application {
     
     final Clipboard clipboard = Clipboard.getSystemClipboard();
     final ClipboardContent content = new ClipboardContent();
+    final Label lblMessage = new Label();
     
 private Object String;
 
@@ -308,7 +309,6 @@ private Object String;
 		Label lblPassword = new Label("Password");
 		final PasswordField pf = new PasswordField();
 		Button btnLogin = new Button("Login");
-		final Label lblMessage = new Label();
 		final Label dbsMessage = new Label("Admin Login");
 		// Adding Nodes to GridPane layout
 		gridPane.add(dbsMessage, 0, 0);
@@ -332,7 +332,7 @@ private Object String;
 		dropShadow.setRadius(5);
 		dropShadow.setColor(Color.gray(0.3));
 		// Adding text and DropShadow effect to it
-		Text text = new Text("Data Citation System");
+		Text text = new Text("DataCite: A Data Citation System");
 		text.setTextAlignment(TextAlignment.CENTER);
 		text.setFont(Font.font("Courier New", FontWeight.BOLD, 38));
 		text.setEffect(dropShadow);
@@ -349,14 +349,14 @@ private Object String;
 			// TODO: add OAuth Authentication
 			String checkUser = txtUserName.getText().toString();
 			String checkPw = pf.getText().toString();
-//			if (checkUser.equals("admin") && checkPw.equals("admin")) {
+			if (checkUser.equals("admin") && checkPw.equals("admin")) {
 //				lblMessage.setText("Congratulations!");
-//				lblMessage.setTextFill(Color.GREEN);
-//			} else {
-//				lblMessage.setText("Incorrect user or password.");
-//				lblMessage.setTextFill(Color.RED);
-//				return;
-//			}
+				lblMessage.setTextFill(Color.GREEN);
+			} else {
+				lblMessage.setText("Incorrect user or password.");
+				lblMessage.setTextFill(Color.RED);
+				return;
+			}
 			buildViewScene();
 			txtUserName.setText("");
 			pf.setText("");
@@ -383,7 +383,7 @@ private Object String;
         dropShadow.setOffsetY(1);
         dropShadow.setRadius(2);
 		Text textDataLog = new Text("SQL: ");
-		Text textDataLog2 = new Text("DataLog: ");
+		Text textDataLog2 = new Text("Datalog: ");
         textDataLog.setId("text");
         textDataLog2.setId("text");
         textDataLog.setFont(Font.font("Courier New", FontWeight.BOLD, 18));
@@ -405,6 +405,7 @@ private Object String;
 		signOut.setOnAction(e ->{
 			data.clear();
 			dataViewList.clear();
+			lblMessage.setText("");
 			this.stage.setScene(loginScene);
 		});
 		HBox hboxSignout = new HBox();
@@ -452,7 +453,7 @@ private Object String;
 		gridPaneDataViews.setAlignment(Pos.CENTER);
 		gridPaneDataViews.setHgap(5);
 		gridPaneDataViews.setVgap(5);
-		Label lableDataviews = new Label("Data Views");
+		Label lableDataviews = new Label("View Definitions");
 		lableDataviews.setFont(Font.font("Courier New", FontWeight.BLACK, 18));
 		// ListView Data Views
 		ListView<String> listViewDataViews = new ListView<>();
@@ -1823,7 +1824,7 @@ private Object String;
 		idCol.prefWidthProperty().bind(generatedTable.widthProperty().multiply(0.3));
 		idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
 		// query content col
-		TableColumn<GQuery, String> contentCol = new TableColumn<GQuery, String>("DataLog");
+		TableColumn<GQuery, String> contentCol = new TableColumn<GQuery, String>("Datalog");
 		contentCol.prefWidthProperty().bind(generatedTable.widthProperty().multiply(0.7));
 		contentCol.setCellValueFactory(new PropertyValueFactory<>("content"));
 		contentCol.setCellFactory(new Callback<TableColumn<GQuery,String>, TableCell<GQuery,String>>() {
@@ -3060,9 +3061,7 @@ private Object String;
 			for (int i = 0; i < ids.size(); i++) {
 				int id = ids.get(i);
 					try {
-						System.out.println(id);
 						Query content = query_storage.get_user_query_by_id(id);
-						System.out.println(content);
 						dataGenerated.add(new GQuery(Integer.toString(id), content.toString()));
 					} catch (Exception e) {
 						e.printStackTrace();

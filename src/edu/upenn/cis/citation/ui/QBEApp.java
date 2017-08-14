@@ -72,6 +72,7 @@ import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.json.JSONException;
 
 import sun.tools.jar.resources.jar;
+import ucar.ma2.ArrayDouble.D3.IF;
 
 import com.sun.javafx.geom.RectangularShape;
 import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
@@ -2037,51 +2038,51 @@ private Object String;
 					}
 				}
 			};
-			ContextMenu contextMenu = new ContextMenu();
-			MenuItem jsonItem = new MenuItem();
-			jsonItem.textProperty().bind(Bindings.format("Export as JSON"));
-			jsonItem.setOnAction(event -> {
-				String item = cell.getItem();
-				buildFormatScene(item, "json");
-				this.formatStage.setScene(formatScene);
-				this.formatStage.setTitle("Export Formats");
-				this.formatStage.show();
-			});
-			MenuItem xmlItem = new MenuItem();
-			xmlItem.textProperty().bind(Bindings.format("Export as XML"));
-			xmlItem.setOnAction(event -> {
-				String item = cell.getItem();
-				buildFormatScene(item, "xml");
-				this.formatStage.setScene(formatScene);
-				this.formatStage.setTitle("Export Formats");
-				this.formatStage.show();
-			});
-			MenuItem biblatexItem = new MenuItem();
-			biblatexItem.textProperty().bind(Bindings.format("Export as Biblatex"));
-			biblatexItem.setOnAction(event -> {
-				String item = cell.getItem();
-				buildFormatScene(item, "biblatex");
-				this.formatStage.setScene(formatScene);
-				this.formatStage.setTitle("Export Formats");
-				this.formatStage.show();
-			});
-			MenuItem risItem = new MenuItem();
-			risItem.textProperty().bind(Bindings.format("Export as RIS"));
-			risItem.setOnAction(event -> {
-				String item = cell.getItem();
-				buildFormatScene(item, "ris");
-				this.formatStage.setScene(formatScene);
-				this.formatStage.setTitle("Export Formats");
-				this.formatStage.show();
-			});
-			contextMenu.getItems().addAll(jsonItem, xmlItem, biblatexItem, risItem);
-			cell.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
-				if (isNowEmpty) {
-					cell.setContextMenu(null);
-				} else {
-					cell.setContextMenu(contextMenu);
-				}
-			});
+//			ContextMenu contextMenu = new ContextMenu();
+//			MenuItem jsonItem = new MenuItem();
+//			jsonItem.textProperty().bind(Bindings.format("Export as JSON"));
+//			jsonItem.setOnAction(event -> {
+//				String item = cell.getItem();
+//				buildFormatScene(item, "json");
+//				this.formatStage.setScene(formatScene);
+//				this.formatStage.setTitle("Export Formats");
+//				this.formatStage.show();
+//			});
+//			MenuItem xmlItem = new MenuItem();
+//			xmlItem.textProperty().bind(Bindings.format("Export as XML"));
+//			xmlItem.setOnAction(event -> {
+//				String item = cell.getItem();
+//				buildFormatScene(item, "xml");
+//				this.formatStage.setScene(formatScene);
+//				this.formatStage.setTitle("Export Formats");
+//				this.formatStage.show();
+//			});
+//			MenuItem biblatexItem = new MenuItem();
+//			biblatexItem.textProperty().bind(Bindings.format("Export as Biblatex"));
+//			biblatexItem.setOnAction(event -> {
+//				String item = cell.getItem();
+//				buildFormatScene(item, "biblatex");
+//				this.formatStage.setScene(formatScene);
+//				this.formatStage.setTitle("Export Formats");
+//				this.formatStage.show();
+//			});
+//			MenuItem risItem = new MenuItem();
+//			risItem.textProperty().bind(Bindings.format("Export as RIS"));
+//			risItem.setOnAction(event -> {
+//				String item = cell.getItem();
+//				buildFormatScene(item, "ris");
+//				this.formatStage.setScene(formatScene);
+//				this.formatStage.setTitle("Export Formats");
+//				this.formatStage.show();
+//			});
+//			contextMenu.getItems().addAll(jsonItem, xmlItem, biblatexItem, risItem);
+//			cell.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
+//				if (isNowEmpty) {
+//					cell.setContextMenu(null);
+//				} else {
+//					cell.setContextMenu(contextMenu);
+//				}
+//			});
 			cell.textProperty().bind(cell.itemProperty());
 			return cell;
 		});
@@ -2102,6 +2103,80 @@ private Object String;
 			    clipboard.setContent(content);
 			}
 		});
+		
+		MenuButton btnExport = new MenuButton("Export");
+		MenuItem jsonItem = new MenuItem();
+		jsonItem.textProperty().bind(Bindings.format("Export as JSON"));
+		jsonItem.setOnAction(event -> {
+			String item = list.getSelectionModel().getSelectedItem();
+			if(item != null && item.length() != 0) {
+				buildFormatScene(item, "json");
+				this.formatStage.setScene(formatScene);
+				this.formatStage.setTitle("Export Formats");
+				this.formatStage.show();
+			} else {
+				Alert alert = new Alert(Alert.AlertType.INFORMATION);
+	            alert.setTitle("Attention");
+	            alert.setHeaderText(null);
+	            alert.setContentText("Please select a citation");
+	            alert.showAndWait();
+			}
+		});
+		MenuItem xmlItem = new MenuItem();
+		xmlItem.textProperty().bind(Bindings.format("Export as XML"));
+		xmlItem.setOnAction(event -> {
+			String item = list.getSelectionModel().getSelectedItem();
+			if(item != null && item.length() != 0) {
+				buildFormatScene(item, "xml");
+				this.formatStage.setScene(formatScene);
+				this.formatStage.setTitle("Export Formats");
+				this.formatStage.show();
+			} else {
+				Alert alert = new Alert(Alert.AlertType.INFORMATION);
+	            alert.setTitle("Attention");
+	            alert.setHeaderText(null);
+	            alert.setContentText("Please select a citation");
+	            alert.showAndWait();
+			}
+		});
+		MenuItem biblatexItem = new MenuItem();
+		biblatexItem.textProperty().bind(Bindings.format("Export as Biblatex"));
+		biblatexItem.setOnAction(event -> {
+			String item = list.getSelectionModel().getSelectedItem();
+			if(item != null && item.length() != 0) {
+				buildFormatScene(item, "biblatex");
+				this.formatStage.setScene(formatScene);
+				this.formatStage.setTitle("Export Formats");
+				this.formatStage.show();
+			} else {
+				Alert alert = new Alert(Alert.AlertType.INFORMATION);
+	            alert.setTitle("Attention");
+	            alert.setHeaderText(null);
+	            alert.setContentText("Please select a citation");
+	            alert.showAndWait();
+			}
+
+		});
+		MenuItem risItem = new MenuItem();
+		risItem.textProperty().bind(Bindings.format("Export as RIS"));
+		risItem.setOnAction(event -> {
+			String item = list.getSelectionModel().getSelectedItem();
+			if(item != null && item.length() != 0) {
+				buildFormatScene(item, "ris");
+				this.formatStage.setScene(formatScene);
+				this.formatStage.setTitle("Export Formats");
+				this.formatStage.show();
+			} else {
+				Alert alert = new Alert(Alert.AlertType.INFORMATION);
+	            alert.setTitle("Attention");
+	            alert.setHeaderText(null);
+	            alert.setContentText("Please select a citation");
+	            alert.showAndWait();
+			}
+		});
+		btnExport.getItems().addAll(jsonItem, xmlItem, biblatexItem, risItem);
+		
+		
 		GridPane.setHgrow(hBox, Priority.ALWAYS);
 		
 		Button save = new Button("Save Citation");
@@ -2165,7 +2240,7 @@ private Object String;
 			}
 			count++;
 		});
-		hBox.getChildren().addAll(button, save);
+		hBox.getChildren().addAll(btnExport, save);
 		gridCg.add(hBox, 0, 1);
 		
 		return gridCg;

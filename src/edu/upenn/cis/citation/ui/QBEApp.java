@@ -47,6 +47,7 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.effect.BoxBlur;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Reflection;
 import javafx.scene.Group;
@@ -279,6 +280,7 @@ private Object String;
 		gridPane2.add(l2, 0, 2);
 		gridPane2.add(l3, 0, 3);
 		Button citeButton = new Button("Cite a dataset");
+		citeButton.setId("btnLogin");
 		citeButton.setOnAction(event -> {
 			buildUserScene();
 			searchBox.clear();
@@ -305,12 +307,14 @@ private Object String;
 		GridPane.setHgrow(gridPane2, Priority.ALWAYS);
 		GridPane.setVgrow(gridPane2, Priority.ALWAYS);
 		// Implementing Nodes for GridPane
-		Label lblUserName = new Label("Username");
+		Label lblUserName = new Label("Username:");
 		final TextField txtUserName = new TextField();
-		Label lblPassword = new Label("Password");
+		Label lblPassword = new Label("Password:");
 		final PasswordField pf = new PasswordField();
 		Button btnLogin = new Button("Login");
+		btnLogin.setId("btnLogin");
 		final Label dbsMessage = new Label("Admin Login");
+		dbsMessage.setId("labelAdmin");
 		// Adding Nodes to GridPane layout
 		gridPane.add(dbsMessage, 0, 0);
 		gridPane.add(lblUserName, 0, 1);
@@ -335,17 +339,17 @@ private Object String;
 		// Adding text and DropShadow effect to it
 		Text text = new Text("DataCite: A Data Citation System");
 		text.setTextAlignment(TextAlignment.CENTER);
-		text.setFont(Font.font("Courier New", FontWeight.BOLD, 38));
-		text.setEffect(dropShadow);
+//		text.setFont(Font.font("Courier New", FontWeight.BOLD, 38));
+//		text.setEffect(dropShadow);
 		// Adding text to HBox
 		hb.setAlignment(Pos.CENTER);
 		hb.getChildren().add(text);
 		// Add ID's to Nodes
-		gp.setId("bp");
-		gridPane.setId("bproot");
-		gridPane2.setId("bproot");
+		gp.setId("loginPane");
+		gridPane.setId("loginPaneChild");
+		gridPane2.setId("loginPaneChild");
 		btnLogin.setId("btnLogin");
-		text.setId("text");
+		text.setId("title");
 		btnLogin.setOnAction(event -> {
 			// TODO: add OAuth Authentication
 			String checkUser = txtUserName.getText().toString();
@@ -430,6 +434,7 @@ private Object String;
         vboxBottom.setSpacing(5);
         vboxBottom.getChildren().addAll(hbox, hboxSignout);
         vboxBottom.setAlignment(Pos.CENTER_RIGHT);
+        vboxBottom.setPadding(new Insets(0, 70, 0, 0));
 
 		// Adding HBox
 		HBox hb = new HBox();
@@ -439,7 +444,7 @@ private Object String;
         dropShadow_2.setOffsetY(2);
 		dropShadow_2.setColor(Color.gray(0.3));
 		Text text = new Text("Citation Management");
-		text.setId("text");
+		text.setId("viewTitle");
 		text.setFont(Font.font("Courier New", FontWeight.BOLD, 28));
 		text.setEffect(dropShadow_2);
 		hb.getChildren().add(text);
@@ -687,20 +692,22 @@ private Object String;
 		});
 		
 		// Add HBox and GridPane layout to BorderPane Layout
-		gridPaneDataViews.setPrefWidth(800);
-		gridPaneCitationViews.setPrefWidth(800);
-//		gridPaneQueryViews.setPrefWidth(500);
-		listViewDataViews.setPrefWidth(400);
-		listViewCitationView.setPrefWidth(400);
+		gridPaneDataViews.setPrefWidth(500);
+		gridPaneCitationViews.setPrefWidth(500);
+		listViewDataViews.setPrefWidth(300);
+		listViewCitationView.setPrefWidth(300);
 		
 		HBox hboxCenter = new HBox();
+		gridPaneDataViews.setId("viewPaneChild");
+		gridPaneCitationViews.setId("viewPaneChild");
 		hboxCenter.setSpacing(5);
-		hboxCenter.setId("bp");
+		hboxCenter.setAlignment(Pos.CENTER);
 		hboxCenter.getChildren().addAll(gridPaneDataViews, gridPaneCitationViews);
 		bp.setTop(hb);
 		bp.setCenter(hboxCenter);
         hbox.setVisible(false);
 //		bp.setBottom(hbox);
+        bp.setId("viewPane");
         bp.setBottom(vboxBottom);
 		viewScene = new Scene(bp);
 		viewScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());

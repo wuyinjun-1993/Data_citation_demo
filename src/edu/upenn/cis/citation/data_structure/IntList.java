@@ -69,6 +69,11 @@ public class IntList {
 		}
 	}
 	
+	public void init(int lenth)
+	{
+		list = new int[lenth];
+	}
+	
 	public IntList(){
 		size = 0;
 		

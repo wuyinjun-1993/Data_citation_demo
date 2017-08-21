@@ -5,14 +5,19 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Vector;
 
 import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 
 public class citation_view_operation {
 	
-	public static void main(String[] args)
+	public static void main(String[] args) throws ClassNotFoundException, SQLException
 	{
+		String c_names = "family";
 		
+		Vector<String> v_names = get_views(c_names);
+		
+		System.out.println(v_names.toString());
 	}
 	
 	public static void add_citation_view(String name) throws SQLException, ClassNotFoundException
@@ -32,6 +37,33 @@ public class citation_view_operation {
         
         c.close();
         
+	}
+	
+	public static Vector<String> get_views(String c_name) throws SQLException, ClassNotFoundException
+	{
+		Class.forName("org.postgresql.Driver");
+        Connection c = DriverManager
+           .getConnection(populate_db.db_url,
+       	        populate_db.usr_name,populate_db.passwd);
+        
+        PreparedStatement pst = null;
+        
+        Vector<String> view_names = new Vector<String>();
+        
+        String sql = "select view_table.name from view_table, citation2view, citation_table where view_table.view = citation2view.view and citation2view.citation_view_id = citation_table.citation_view_id and citation_table.citation_view_name = '" + c_name + "'";
+        
+        pst = c.prepareStatement(sql);
+                
+        ResultSet rs = pst.executeQuery();
+        
+        while(rs.next())
+        {
+        	view_names.add(rs.getString(1));
+        }
+        
+        c.close();
+        
+        return view_names;
 	}
 	
 	public static void add_connection_view_with_citations(String citation_name, String view_name) throws SQLException, ClassNotFoundException

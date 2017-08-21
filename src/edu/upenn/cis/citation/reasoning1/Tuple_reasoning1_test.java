@@ -40,6 +40,7 @@ import edu.upenn.cis.citation.aggregation.Aggregation1;
 import edu.upenn.cis.citation.aggregation.Aggregation2;
 import edu.upenn.cis.citation.citation_view.*;
 import edu.upenn.cis.citation.data_structure.IntList;
+import edu.upenn.cis.citation.data_structure.Query_lm_authors;
 import edu.upenn.cis.citation.data_structure.StringList;
 import edu.upenn.cis.citation.data_structure.Unique_StringList;
 import edu.upenn.cis.citation.datalog.Parse_datalog;
@@ -73,15 +74,15 @@ public class Tuple_reasoning1_test {
 	
 	static HashMap<Head_strs, Vector<HashSet<String>>> authors = new HashMap<Head_strs, Vector<HashSet<String>>>();
 	
+	static ArrayList<Lambda_term[]> query_lambda_str = new ArrayList<Lambda_term[]>();
+	
 	static StringList view_list = new StringList();
 	
-	static ArrayList<IntList> view_query_mapping = new ArrayList<IntList>();
+	static IntList[] view_query_mapping = null;
 	
 	static IntList query_ids = new IntList();
-	
-	static ArrayList<ArrayList<Lambda_term> > query_lambda_str = new ArrayList<ArrayList<Lambda_term> >();
-	
-	static ArrayList<HashMap<Head_strs, Unique_StringList>> author_mapping = new ArrayList<HashMap<Head_strs, Unique_StringList>>(); 
+		
+	static HashMap<String, Unique_StringList> author_mapping = new HashMap<String, Unique_StringList>(); 
 	
 	static HashMap<int[], ArrayList<citation_view_vector> > c_view_map = new HashMap<int[], ArrayList<citation_view_vector>>();
 	
@@ -1142,11 +1143,11 @@ public class Tuple_reasoning1_test {
 										
 		authors.clear();
 		
-		view_query_mapping.clear();
+		view_query_mapping = null;
+				
+		author_mapping.clear();
 		
 		query_lambda_str.clear();
-		
-		author_mapping.clear();
 		
 		c_view_map.clear();
 		
@@ -1667,7 +1668,11 @@ public class Tuple_reasoning1_test {
 
 	    // compute tuple-cores
 	    
-	    gen_citation1.init_author_mapping(view_list, view_query_mapping, query_ids, query_lambda_str, author_mapping, max_author_num, c, pst);
+	    gen_citation1.get_all_query_ids(query_ids, c, pst);
+	    
+	    view_query_mapping = new IntList[view_list.size];
+	    	    
+	    gen_citation1.init_author_mapping(view_list, view_query_mapping, query_ids, author_mapping, max_author_num, c, pst, query_lambda_str);
 	    
 	    return viewTuples;
 	    
@@ -2109,7 +2114,7 @@ public class Tuple_reasoning1_test {
 
 //					c_views.add(c_unit_combinaton);
 					
-					HashSet<String> citations = gen_citation(c_view_template, c, pst, view_query_mapping, query_lambda_str, author_mapping);
+					HashSet<String> citations = gen_citation(c_view_template, c, pst, view_query_mapping);
 					
 //					c_unit_combinaton.clear();
 					
@@ -2207,7 +2212,7 @@ public class Tuple_reasoning1_test {
 					
 //					c_views.add(update_c_view);
 					
-					HashSet<String> citations = gen_citation(c_view_template, c, pst, view_query_mapping, query_lambda_str, author_mapping);
+					HashSet<String> citations = gen_citation(c_view_template, c, pst, view_query_mapping);
 					
 					
 //					update_c_view.clear();
@@ -2362,7 +2367,7 @@ public class Tuple_reasoning1_test {
 //					
 //					c_unit_com.clear();
 					
-					HashSet<String> citations = gen_citation(c_view_template, c, pst, view_query_mapping, query_lambda_str, author_mapping);
+					HashSet<String> citations = gen_citation(c_view_template, c, pst, view_query_mapping);
 					
 //					HashSet<String> citations = new HashSet<String>();
 					
@@ -2453,7 +2458,7 @@ public class Tuple_reasoning1_test {
 					
 //					c_views.add(update_c_view);
 					
-					HashSet<String> citations = gen_citation(c_view_template, c, pst, view_query_mapping, query_lambda_str, author_mapping);
+					HashSet<String> citations = gen_citation(c_view_template, c, pst, view_query_mapping);
 
 //					HashSet<String> citations = new HashSet<String>();
 //					update_c_view.clear();
@@ -2536,7 +2541,7 @@ public class Tuple_reasoning1_test {
 
 	
 	
-	static HashSet<String> gen_citation(ArrayList<citation_view_vector> c_views, Connection c, PreparedStatement pst, ArrayList<IntList> view_query_mapping, ArrayList<ArrayList<Lambda_term>> query_lambda_str, ArrayList<HashMap<Head_strs, Unique_StringList>> author_mapping) throws ClassNotFoundException, SQLException, JSONException
+	static HashSet<String> gen_citation(ArrayList<citation_view_vector> c_views, Connection c, PreparedStatement pst, IntList [] view_query_mapping) throws ClassNotFoundException, SQLException, JSONException
 	{
 		HashSet<String> citations = new HashSet<String>();
 		
@@ -2545,6 +2550,8 @@ public class Tuple_reasoning1_test {
 //		HashSet<String> c_view_str = new HashSet<String>();
 		
 		JSONObject json_obj = new JSONObject();
+		
+		HashMap<String, HashSet<String>> view_author_mapping = new HashMap<String, HashSet<String>>();
 		
 		for(int p =0; p<c_views.size(); p++)
 		{
@@ -2556,7 +2563,7 @@ public class Tuple_reasoning1_test {
 			
 			author_list = new HashSet<String>();
 						
-			String str = gen_citation1.get_citations3(c_views.get(p), c, pst, view_list, view_query_mapping, query_lambda_str, author_mapping, max_author_num, author_list, json_obj);
+			String str = gen_citation1.get_citations3(c_views.get(p), c, pst, view_list, view_query_mapping, author_mapping, max_author_num, author_list, json_obj, query_ids, query_lambda_str, view_author_mapping);
 			
 //			System.out.println(c_views.get(p));
 //			

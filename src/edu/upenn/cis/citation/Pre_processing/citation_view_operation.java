@@ -13,7 +13,7 @@ public class citation_view_operation {
 	
 	public static void main(String[] args) throws ClassNotFoundException, SQLException
 	{
-		String c_names = "family";
+		String c_names = "single_intro";
 		
 		Vector<String> v_names = get_views(c_names);
 		
@@ -50,7 +50,7 @@ public class citation_view_operation {
         
         Vector<String> view_names = new Vector<String>();
         
-        String sql = "select view_table.name from view_table, citation2view, citation_table where view_table.view = citation2view.view and citation2view.citation_view_id = citation_table.citation_view_id and citation_table.citation_view_name = '" + c_name + "'";
+        String sql = "select view_table.name from view_table, citation2view, citation2query, query2head_variables where view_table.view = citation2view.view and citation2view.citation_view_id = citation2query.citation_view_id and citation2query.query_id = query2head_variables.query_id and query2head_variables.name = '" + c_name + "'";
         
         pst = c.prepareStatement(sql);
                 

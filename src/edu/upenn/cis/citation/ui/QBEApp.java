@@ -969,10 +969,15 @@ private Object String;
 				}
 			} else {
 				ObservableList<ObservableList> tuples = userDataView.getSelectionModel().getSelectedItems();
-				Vector<String> names = new Vector<String>();
+				System.out.println(tuples);
+				Vector<Vector<String>> names = new Vector<Vector<String>>();
 				int l = tuples.size();
 				for(int i = 0; i < l; i++) {
-					String t = "" + tuples.get(i).get(0) + "";
+					Vector<String> t = new Vector<String>();
+					int len = tuples.get(i).size();
+					for(int j = 0; j < len - 1; j++) {
+						t.add("" + tuples.get(i).get(j) + "");
+					}
 					names.add(t);
 				}
 				System.out.println("names" + names);

@@ -540,165 +540,9 @@ public class view_operation {
 			
 			String condition_str = r.getString(1);
 			
-			Conditions condition = null;
+			Conditions condition = parse_conditions(condition_str, populate_db.separator);
 			
-			if(condition_str.contains("'"))
-			{
-				String str2 = condition_str.substring(condition_str.indexOf("'"), condition_str.length());
-				
-				String str1 = condition_str.substring(0, condition_str.indexOf("'"));
-				
-				String [] strs = null;
-				
-				Operation op = null;
-				
-				if(str1.contains(op_less_equal.op))
-				{
-					strs = str1.split(op_less_equal.op);
-					
-					op = new op_less_equal();
-				}
-				else
-				{
-					if(str1.contains(op_greater_equal.op))
-					{
-						strs = str1.split(op_greater_equal.op);
 						
-						op = new op_greater_equal();
-					}
-					else
-					{
-						if(str1.contains(op_not_equal.op))
-						{
-							strs = str1.split(op_not_equal.op);
-							
-							op = new op_not_equal();
-						}
-						else
-						{
-							if(str1.contains(op_less.op))
-							{
-								strs = str1.split(op_less.op);
-								
-								op = new op_less();
-							}
-							else
-							{
-								if(str1.contains(op_greater.op))
-								{
-									strs = str1.split(op_greater.op);
-									
-									op = new op_greater();
-								}
-								else
-								{
-									if(str1.contains(op_equal.op))
-									{
-										strs = str1.split(op_equal.op);
-										
-										op = new op_equal();
-									}
-								}
-							}
-						}
-					}
-					
-				}
-				
-				
-				String relation_name1 = strs[0].substring(0, strs[0].indexOf(populate_db.separator)).trim();
-				
-				String relation_name2 = new String();
-				
-				String arg1 = strs[0].substring(strs[0].indexOf(populate_db.separator) + 1, strs[0].length()).trim();
-
-				String arg2 = new String ();
-				
-				condition = new Conditions(new Argument(arg1, relation_name1), relation_name1, op, new Argument(str2), relation_name2);
-				
-				
-			}
-			else
-			{
-				String []strs = null;
-				
-				Operation op = null;
-				
-				
-				if(condition_str.contains(op_less_equal.op))
-				{
-					strs = condition_str.split(op_less_equal.op);
-					
-					op = new op_less_equal();
-				}
-				else
-				{
-					if(condition_str.contains(op_greater_equal.op))
-					{
-						strs = condition_str.split(op_greater_equal.op);
-						
-						op = new op_greater_equal();
-					}
-					else
-					{
-						if(condition_str.contains(op_not_equal.op))
-						{
-							strs = condition_str.split(op_not_equal.op);
-							
-							op = new op_not_equal();
-						}
-						else
-						{
-							if(condition_str.contains(op_less.op))
-							{
-								strs = condition_str.split(op_less.op);
-								
-								op = new op_less();
-							}
-							else
-							{
-								if(condition_str.contains(op_greater.op))
-								{
-									strs = condition_str.split(op_greater.op);
-									
-									op = new op_greater();
-								}
-								else
-								{
-									if(condition_str.contains(op_equal.op))
-									{
-										strs = condition_str.split(op_equal.op);
-										
-										op = new op_equal();
-									}
-								}
-							}
-						}
-					}
-					
-				}
-				
-				String str1 = strs[0];
-				
-				String str2 = strs[1];
-				
-				String relation_name1 = str1.substring(0, str1.indexOf(populate_db.separator)).trim();
-				
-				String relation_name2 = new String();
-				
-				String arg1 = str1.substring(str1.indexOf(populate_db.separator) + 1, str1.length()).trim();
-
-				String arg2 = str2.substring(str2.indexOf(populate_db.separator) + 1, str2.length()).trim();
-					
-//					subgoal2 = strs2[0] + "_" + strs2[1];
-					
-					relation_name2 = str2.substring(0, str2.indexOf(populate_db.separator)).trim();
-					
-					condition = new Conditions(new Argument(arg1, relation_name1), relation_name1, op, new Argument(arg2, relation_name2), relation_name2);
-
-				
-			}
-			
 			
 			
 			
@@ -723,6 +567,167 @@ public class view_operation {
 		}
 		return conditions;
 		
+	}
+	
+	public static Conditions parse_conditions(String condition_str, String parser)
+	{
+		if(condition_str.contains("'"))
+		{
+			String str2 = condition_str.substring(condition_str.indexOf("'"), condition_str.length());
+			
+			String str1 = condition_str.substring(0, condition_str.indexOf("'"));
+			
+			String [] strs = null;
+			
+			Operation op = null;
+			
+			if(str1.contains(op_less_equal.op))
+			{
+				strs = str1.split(op_less_equal.op);
+				
+				op = new op_less_equal();
+			}
+			else
+			{
+				if(str1.contains(op_greater_equal.op))
+				{
+					strs = str1.split(op_greater_equal.op);
+					
+					op = new op_greater_equal();
+				}
+				else
+				{
+					if(str1.contains(op_not_equal.op))
+					{
+						strs = str1.split(op_not_equal.op);
+						
+						op = new op_not_equal();
+					}
+					else
+					{
+						if(str1.contains(op_less.op))
+						{
+							strs = str1.split(op_less.op);
+							
+							op = new op_less();
+						}
+						else
+						{
+							if(str1.contains(op_greater.op))
+							{
+								strs = str1.split(op_greater.op);
+								
+								op = new op_greater();
+							}
+							else
+							{
+								if(str1.contains(op_equal.op))
+								{
+									strs = str1.split(op_equal.op);
+									
+									op = new op_equal();
+								}
+							}
+						}
+					}
+				}
+				
+			}
+			
+			
+			String relation_name1 = strs[0].substring(0, strs[0].indexOf(parser)).trim();
+			
+			String relation_name2 = new String();
+			
+			String arg1 = strs[0].substring(strs[0].indexOf(parser) + 1, strs[0].length()).trim();
+
+			String arg2 = new String ();
+			
+			return new Conditions(new Argument(arg1, relation_name1), relation_name1, op, new Argument(str2), relation_name2);
+			
+			
+		}
+		else
+		{
+			String []strs = null;
+			
+			Operation op = null;
+			
+			
+			if(condition_str.contains(op_less_equal.op))
+			{
+				strs = condition_str.split(op_less_equal.op);
+				
+				op = new op_less_equal();
+			}
+			else
+			{
+				if(condition_str.contains(op_greater_equal.op))
+				{
+					strs = condition_str.split(op_greater_equal.op);
+					
+					op = new op_greater_equal();
+				}
+				else
+				{
+					if(condition_str.contains(op_not_equal.op))
+					{
+						strs = condition_str.split(op_not_equal.op);
+						
+						op = new op_not_equal();
+					}
+					else
+					{
+						if(condition_str.contains(op_less.op))
+						{
+							strs = condition_str.split(op_less.op);
+							
+							op = new op_less();
+						}
+						else
+						{
+							if(condition_str.contains(op_greater.op))
+							{
+								strs = condition_str.split(op_greater.op);
+								
+								op = new op_greater();
+							}
+							else
+							{
+								if(condition_str.contains(op_equal.op))
+								{
+									strs = condition_str.split(op_equal.op);
+									
+									op = new op_equal();
+								}
+							}
+						}
+					}
+				}
+				
+			}
+			
+			String str1 = strs[0];
+			
+			String str2 = strs[1];
+			
+			String relation_name1 = str1.substring(0, str1.indexOf(parser)).trim();
+			
+			String relation_name2 = new String();
+			
+			String arg1 = str1.substring(str1.indexOf(parser) + 1, str1.length()).trim();
+
+			String arg2 = str2.substring(str2.indexOf(parser) + 1, str2.length()).trim();
+				
+//				subgoal2 = strs2[0] + "_" + strs2[1];
+				
+				relation_name2 = str2.substring(0, str2.indexOf(parser)).trim();
+				
+			return new Conditions(new Argument(arg1, relation_name1), relation_name1, op, new Argument(arg2, relation_name2), relation_name2);
+
+			
+		}
+
 	}
 	
 	static String[] split_relation_attr_name(String head_var_str)

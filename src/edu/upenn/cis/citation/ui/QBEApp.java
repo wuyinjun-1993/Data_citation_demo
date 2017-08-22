@@ -205,8 +205,6 @@ public class QBEApp extends Application {
     
 private Object String;
 
-	Vector<Head_strs> heads = new Vector<Head_strs>();
-
 	HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
 
 
@@ -970,7 +968,7 @@ private Object String;
 			} else {
 				ObservableList<ObservableList> tuples = userDataView.getSelectionModel().getSelectedItems();
 				System.out.println(tuples);
-				Vector<Vector<String>> names = new Vector<Vector<String>>();
+				Vector<Head_strs> names = new Vector<Head_strs>();
 				int l = tuples.size();
 				for(int i = 0; i < l; i++) {
 					Vector<String> t = new Vector<String>();
@@ -978,12 +976,12 @@ private Object String;
 					for(int j = 0; j < len - 1; j++) {
 						t.add("" + tuples.get(i).get(j) + "");
 					}
-					names.add(t);
+					names.add(new Head_strs(t));
 				}
 				System.out.println("names" + names);
 				// generated selected citations
 				try {
-					Vector<String> subset_agg_citations = Tuple_reasoning1.tuple_gen_agg_citations(ids, userGeneratedQuery, heads, citation_view_map);
+					Vector<String> subset_agg_citations = Tuple_reasoning1.tuple_gen_agg_citations(userGeneratedQuery, names, citation_view_map);
 					for (String s : subset_agg_citations) {
 						listCitations.add(s);
 					}
@@ -2948,16 +2946,11 @@ private Object String;
 				
 				Iterator<Head_strs> keySetIterator = citation_strs.keySet().iterator();
 				
-				heads.clear();
-				
 				int rows = 0;
 				while(keySetIterator.hasNext()) {
 					Head_strs keys = keySetIterator.next();
 //					ObservableList row = FXCollections.observableArrayList();
-					Vector<String> head_vals = keys.head_vals;
-					
-					heads.add(keys);
-					
+					Vector<String> head_vals = keys.head_vals;					
 					System.out.println(keys.toString());
 					System.out.println(citation_strs.get(keys));
 					ObservableList<String> lambdaData = FXCollections.observableArrayList(citation_strs.get(keys));

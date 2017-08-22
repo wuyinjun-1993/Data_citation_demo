@@ -1,6 +1,6 @@
 
 
-#viewPane {
+#viewPane, #dbaPane, #userPane, #citationPane {
 	-fx-background-image: url("bg2.png");
 	-fx-background-repeat: no-repeat;
 	-fx-background-size: cover;
@@ -24,8 +24,10 @@
 }
 
 #loginPane {
-    -fx-background-image: url("bg1.jpg");
-    -fx-background-color:  linear-gradient(gray, DimGrey);
+    -fx-background-image: url("bg2.png");
+    -fx-background-repeat: no-repeat;
+	-fx-background-size: cover;
+	-fx-background-opacity: 0.5;
 }
 
 #btnLogin {
@@ -54,14 +56,21 @@
 #title {
    -fx-font-size: 38px;
    -fx-font-family: "Arial Black";
-   -fx-fill: #4E4E4E;
-   -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.7) , 6, 0.0 , 2 , 3 );
+   -fx-fill: #cccccc;
+   -fx-effect: innershadow( three-pass-box , rgba(240,173,106,0.7) , 6, 0.0 , 2 , 3 );
 }
 #viewTitle {
    -fx-font-size: 32px;
    -fx-font-family: "Arial Black";
    -fx-fill: #cccccc;
    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.5) , 3, 0.0 , 0 , 2 );
+}
+
+#whiteLabel {
+   -fx-font-size: 16px;
+   -fx-font-family: "Arial Black";
+   -fx-text-fill: rgba(204,204,204,1.0);
+   -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.3) , 3, 0.0 , 0 , 2 );
 }
 
 #prompt-text {
@@ -75,6 +84,18 @@
     -fx-font-weight: bold;
     -fx-text-fill: #333333;
     -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,1 );
+}
+
+#coloredList .list-cell:even {
+    -fx-background-color: rgba(253,216,179,0.2);
+}
+#coloredList .list-cell:filled:hover {
+    -fx-background-color: linear-gradient(#FCCA91 0%, #FDD6A9 25%, #FDE2C3 75%, #FEF5EB 100%);
+    -fx-text-fill: black; 
+}
+#coloredList .list-cell:filled:selected {
+    -fx-background-color: tomato;
+    -fx-text-fill: black; 
 }
 
 .check-box {
@@ -172,6 +193,15 @@
 	-fx-text-fill: #000066;
 	-fx-underline: true;
 	-fx-border-color: transparent;
+}
+
+#linkLogin {
+	-fx-text-fill: #3366ff;
+	-fx-underline: true;
+	-fx-border-color: transparent;
+}
+#linkLogin:hover {
+	-fx-text-fill: #000066;
 }
 
 #link:hover {

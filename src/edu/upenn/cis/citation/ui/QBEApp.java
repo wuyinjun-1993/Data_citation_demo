@@ -67,6 +67,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import net.sf.jsqlparser.statement.select.FromItem;
 
+import org.apache.poi.hssf.util.HSSFColor.YELLOW;
 import org.apache.poi.poifs.property.Child;
 import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 import org.controlsfx.control.table.TableRowExpanderColumn;
@@ -248,9 +249,10 @@ private Object String;
 		// Adding GridPane
 		GridPane gridPane = new GridPane();
 		GridPane gridPane2 = new GridPane();
-		gridPane2.add(new Label("IUPHAR/BPS"), 0, 0);
+		gridPane2.add(new Label(" IUPHAR/BPS Links: "), 0, 1);
 		Hyperlink l1 = new Hyperlink();
-		l1.setText("Targets");
+		l1.setId("linkLogin");
+		l1.setText("- Targets");
 		l1.setOnAction(Event -> {
 			try {
 				Desktop.getDesktop().browse(new URL("http://www.guidetopharmacology.org/targets.jsp").toURI());
@@ -259,7 +261,8 @@ private Object String;
 			}
 		});
 		Hyperlink l2 = new Hyperlink();
-		l2.setText("Ligands");
+		l2.setId("linkLogin");
+		l2.setText("- Ligands");
 		l2.setOnAction(Event -> {
 			try {
 				Desktop.getDesktop().browse(new URL("http://www.guidetopharmacology.org/GRAC/LigandListForward?database=all").toURI());
@@ -268,7 +271,8 @@ private Object String;
 			}
 		});
 		Hyperlink l3 = new Hyperlink();
-		l3.setText("Advanced Search");
+		l3.setId("linkLogin");
+		l3.setText("- Advanced Search");
 		l3.setOnAction(Event -> {
 			try {
 				Desktop.getDesktop().browse(new URL("http://www.guidetopharmacology.org/GRAC/searchPage.jsp").toURI());
@@ -276,10 +280,10 @@ private Object String;
 				e.printStackTrace();
 			}
 		});
-		gridPane2.add(l1, 0, 1);
-		gridPane2.add(l2, 0, 2);
-		gridPane2.add(l3, 0, 3);
-		Button citeButton = new Button("Cite a dataset");
+		gridPane2.add(l1, 0, 2);
+		gridPane2.add(l2, 0, 3);
+		gridPane2.add(l3, 0, 4);
+		Button citeButton = new Button("Cite an IUPHAR dataset");
 		citeButton.setId("btnLogin");
 		citeButton.setOnAction(event -> {
 			buildUserScene();
@@ -287,11 +291,11 @@ private Object String;
 			this.stage.setScene(userScene);
 			citeStage.hide();
 		});
-		gridPane2.add(citeButton, 0, 4);
-		gridPane.setMaxSize(300, 300);
-		gridPane.setMinSize(300, 300);
-		gridPane2.setMaxSize(300, 300);
-		gridPane2.setMinSize(300, 300);
+		gridPane2.add(citeButton, 0, 0);
+		gridPane.setMaxSize(300, 200);
+		gridPane.setMinSize(300, 200);
+		gridPane2.setMaxSize(300, 200);
+		gridPane2.setMinSize(300, 200);
 		HBox.setMargin(gridPane, new Insets(20, 20, 0, 20));
 		HBox.setMargin(gridPane2, new Insets(20, 20, 0, 20));
 		hbox.setAlignment(Pos.CENTER);
@@ -354,14 +358,13 @@ private Object String;
 			// TODO: add OAuth Authentication
 			String checkUser = txtUserName.getText().toString();
 			String checkPw = pf.getText().toString();
-			if (checkUser.equals("admin") && checkPw.equals("admin")) {
-//				lblMessage.setText("Congratulations!");
-				lblMessage.setTextFill(Color.GREEN);
-			} else {
-				lblMessage.setText("Incorrect user or password.");
-				lblMessage.setTextFill(Color.RED);
-				return;
-			}
+//			if (checkUser.equals("admin") && checkPw.equals("admin")) {
+//				lblMessage.setTextFill(Color.GREEN);
+//			} else {
+//				lblMessage.setText("Incorrect user or password.");
+//				lblMessage.setTextFill(Color.RED);
+//				return;
+//			}
 			buildViewScene();
 			txtUserName.setText("");
 			pf.setText("");
@@ -387,7 +390,7 @@ private Object String;
         dropShadow.setOffsetX(1);
         dropShadow.setOffsetY(1);
         dropShadow.setRadius(2);
-		Text textDataLog = new Text("SQL: ");
+		Text textDataLog = new Text("    SQL: ");
 		Text textDataLog2 = new Text("Datalog: ");
         textDataLog.setId("text");
         textDataLog2.setId("text");
@@ -416,7 +419,7 @@ private Object String;
 		HBox hboxSignout = new HBox();
 		hboxSignout.setSpacing(5);
 		hboxSignout.setAlignment(Pos.CENTER_RIGHT);
-		Button btgeneratedQueries = new Button("Show Generated Queries");
+		Button btgeneratedQueries = new Button("User Generated Queries");
 		btgeneratedQueries.setId("buttonGen");
 		btgeneratedQueries.setFont(Font.font("Courier New", FontWeight.BLACK, 14));
 		hboxSignout.getChildren().addAll(btgeneratedQueries, signOut);
@@ -434,11 +437,11 @@ private Object String;
         vboxBottom.setSpacing(5);
         vboxBottom.getChildren().addAll(hbox, hboxSignout);
         vboxBottom.setAlignment(Pos.CENTER_RIGHT);
-        vboxBottom.setPadding(new Insets(0, 70, 0, 0));
+        vboxBottom.setPadding(new Insets(0, 150, 0, 55));
 
 		// Adding HBox
 		HBox hb = new HBox();
-		hb.setPadding(new Insets(20,20, 20, 30));
+		hb.setPadding(new Insets(20,20, 20, 150));
 		DropShadow dropShadow_2 = new DropShadow();
         dropShadow_2.setOffsetX(2);
         dropShadow_2.setOffsetY(2);
@@ -453,6 +456,7 @@ private Object String;
 		BorderPane bp = new BorderPane();
 		bp.setId("bp");
 		bp.setPadding(new Insets(10, 50, 20, 50));
+		
 		// GridPane data views
 		GridPane gridPaneDataViews = new GridPane();
 		gridPaneDataViews.setPadding(new Insets(20, 20, 20, 20));
@@ -463,15 +467,81 @@ private Object String;
 		lableDataviews.setFont(Font.font("Courier New", FontWeight.BLACK, 18));
 		// ListView Data Views
 		ListView<String> listViewDataViews = new ListView<>();
+		listViewDataViews.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		listViewDataViews.setId("coloredList");
 //		listViewDataViews.setPrefWidth(400);
 		listViewDataViews.setStyle("-fx-font-size:15.0;");
 //		ObservableList<String> listDataViews = FXCollections.observableArrayList(Database.getDataViews());
 		listViewDataViews.setItems(listDataViews);
+		// ListView Citation Views
+		ListView<String> listViewCitationView = new ListView<>();
+		listViewCitationView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		listViewCitationView.setId("coloredList");
+//				listViewCitationView.setPrefWidth(400);
+		listViewCitationView.setStyle("-fx-font-size:15.0;");
+		listViewCitationView.setItems(listCitationViews);
+		
+		//checkbox for view definition
+		HBox hboxCheck = new HBox();
+	    CheckBox check = new CheckBox();
+	    check.setPadding(new Insets(0, 0, 0, 5));
+		check.setOnAction((event) -> {
+			        if(!check.isSelected()) {
+			        	listViewDataViews.getSelectionModel().clearSelection();
+			        }
+		});
+		hboxCheck.getChildren().addAll(lableDataviews, check);
+		hboxCheck.setSpacing(120);
+		
+		// checkbod for citation views
+		HBox hboxCheck1 = new HBox();
+		CheckBox check1 = new CheckBox();
+		check1.setPadding(new Insets(0, 0, 0, 5));
+		check1.setOnAction((event) -> {
+					        if(!check1.isSelected()) {
+					        	listViewCitationView.getSelectionModel().clearSelection();
+					        }
+		});
 
 		listViewDataViews.setOnMouseClicked(event -> {
             String dv = listViewDataViews.getSelectionModel().getSelectedItem();
             if (dv == null) return;
+            check.setSelected(true);
 //            String dataViewDataLog = Database.getDataViewDataLog(dv);
+            // get connection with citations
+            Vector<String> block_names = new Vector<String>();
+    		if (dv !=null && !dv.isEmpty()) {
+					try {
+						Vector<String> q_names = Query_operation.get_connection_citation_with_query(dv, block_names);
+						Vector<String> cites = q_names;
+						ObservableList<java.lang.String> allCites = listViewCitationView.getItems();
+						for(int i = 0; i < allCites.size(); i++) {
+							if(cites.contains(allCites.get(i))) {
+								listViewCitationView.getSelectionModel().select(i);
+								check1.setSelected(true);
+							} else {
+								listViewCitationView.getSelectionModel().clearSelection(i);
+							}
+						}
+//						for(Node n : listViewCitationView.lookupAll(".list-cell")) {
+//	    	            	Cell cell = (Cell) n;
+//	    	            	if(cell.getText() != null) {
+//	    	            		for(String s : cites) {
+//	    	            			if(cell.getText().equals(s)) {
+//	    	            				
+//	    	            				listViewCitationView.se
+////	    	            				cell.setStyle("-fx-background-color: tomato;");
+//	    	            			} else {
+//	    	            				cell.setStyle("-fx-border-color: none;");
+//	    	            			}
+//	    	            		}
+//	    	            	}
+//	    	            }
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+    		}
+    		
             try {
 				Query currentQuery = view_operation.get_view_by_name(dv);
 				System.out.println("[current view]" + dv);
@@ -545,28 +615,32 @@ private Object String;
 		});
 		Button buttonDeleteDataView = new Button("Delete");
 		buttonDeleteDataView.setOnAction(event -> {
-            String dv = listViewDataViews.getSelectionModel().getSelectedItem();
+            ObservableList<java.lang.String> items = listViewDataViews.getSelectionModel().getSelectedItems();
 //            dbaListCitationViews.remove(dv);
 //            Database.deleteDataViewByName(dv);
-            try {
-				citation_view_operation.delete_connection_view_with_citations(dv, dv);
-				citation_view_operation.delete_citation_views(dv);
-				view_operation.delete_view_by_name(dv);
-//				Alert alert = new Alert(Alert.AlertType.INFORMATION);
-//	            alert.setTitle("Succeed");
-//	            alert.setHeaderText(null);
-//	            alert.setContentText("The data view is successfully deleted");
-//	            alert.showAndWait();
-				System.out.println("The data view is successfully deleted");
-				listDataViews.remove(dv);
-			} catch (Exception e) {
-				System.out.println("view delete error");
-				e.printStackTrace();
-			}
+            for(String s : items) {
+            	String dv = s;
+            	try {
+    				citation_view_operation.delete_connection_view_with_citations(dv, dv);
+    				citation_view_operation.delete_citation_views(dv);
+    				view_operation.delete_view_by_name(dv);
+//    				Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//    	            alert.setTitle("Succeed");
+//    	            alert.setHeaderText(null);
+//    	            alert.setContentText("The data view is successfully deleted");
+//    	            alert.showAndWait();
+    				System.out.println("The data view is successfully deleted");
+    				listDataViews.remove(dv);
+    			} catch (Exception e) {
+    				System.out.println("view delete error");
+    				e.printStackTrace();
+    			}
+            }
 		});
 		GridPane.setHgrow(listViewDataViews, Priority.ALWAYS);
 		GridPane.setVgrow(listViewDataViews, Priority.ALWAYS);
-		gridPaneDataViews.add(lableDataviews, 0, 0, 3, 1);
+		
+		gridPaneDataViews.add(hboxCheck, 0, 0, 3, 1);
 		gridPaneDataViews.add(listViewDataViews, 0, 1, 3, 1);
 		HBox hboxButton = new HBox();
 		hboxButton.setSpacing(5);
@@ -585,15 +659,37 @@ private Object String;
 		gridPaneCitationViews.setVgap(5);
 		Label lableCitationViews = new Label("Citation Queries");
 		lableCitationViews.setFont(Font.font("Courier New", FontWeight.BLACK, 18));
-		// ListView Citation Views
-		ListView<String> listViewCitationView = new ListView<>();
-//		listViewCitationView.setPrefWidth(400);
-		listViewCitationView.setStyle("-fx-font-size:15.0;");
-		listViewCitationView.setItems(listCitationViews);
+//		// ListView Citation Views
+//		ListView<String> listViewCitationView = new ListView<>();
+//		listViewCitationView.setId("coloredList");
+////		listViewCitationView.setPrefWidth(400);
+//		listViewCitationView.setStyle("-fx-font-size:15.0;");
+//		listViewCitationView.setItems(listCitationViews);
+		
+	    hboxCheck1.getChildren().addAll(lableCitationViews, check1);
+		hboxCheck1.setSpacing(120);
 		listViewCitationView.setOnMouseClicked(event -> {
 			cv = listViewCitationView.getSelectionModel().getSelectedItem();
 			if (cv == null || cv.isEmpty()) return;
 			else {
+				check1.setSelected(true);
+				try {
+					Vector<String> views = citation_view_operation.get_views(cv);
+					if(views != null) {
+						ObservableList<String> allViews = listViewDataViews.getItems();
+						for(int i = 0; i < allViews.size(); i++) {
+							if(views.contains(allViews.get(i))) {
+								check.setSelected(true);
+								listViewDataViews.getSelectionModel().select(i);
+							} else {
+								listViewDataViews.getSelectionModel().clearSelection(i);
+							}
+						}
+					}
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			
 				hbox.getChildren().clear();
 				hbox.getChildren().addAll(textDataLog, textFieldDataViewDataLog);
 				if (!hbox.isVisible()) hbox.setVisible(true);
@@ -625,26 +721,30 @@ private Object String;
 		});
 		Button buttonDeleteCitationView = new Button("Delete");
 		buttonDeleteCitationView.setOnAction(event -> {
-			cv = listViewCitationView.getSelectionModel().getSelectedItem();
-			if (cv == null || cv.isEmpty()) return;
-			try {
-//				citation_view_operation.delete_citation_views(cv);
-				Query_operation.delete_query_by_name(cv);
-//				Alert alert = new Alert(Alert.AlertType.INFORMATION);
-//	            alert.setTitle("Succeed");
-//	            alert.setHeaderText(null);
-//	            alert.setContentText("The citation query view is successfully deleted");
-//	            alert.showAndWait();
-				System.out.println("The citation query view is successfully deleted");
-	            listCitationViews.remove(cv);
-			} catch (Exception e) {
-				System.out.println("citation delete error!");
-				e.printStackTrace();
+			ObservableList<java.lang.String> items = listViewCitationView.getSelectionModel().getSelectedItems();
+			if (items == null || items.isEmpty()) return;
+			for(String s : items) {
+				cv = s;
+				try {
+//					citation_view_operation.delete_citation_views(cv);
+					Query_operation.delete_query_by_name(cv);
+//					Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//		            alert.setTitle("Succeed");
+//		            alert.setHeaderText(null);
+//		            alert.setContentText("The citation query view is successfully deleted");
+//		            alert.showAndWait();
+					System.out.println("The citation query view is successfully deleted");
+		            listCitationViews.remove(cv);
+				} catch (Exception e) {
+					System.out.println("citation delete error!");
+					e.printStackTrace();
+				}
 			}
 		});
 		GridPane.setHgrow(listViewCitationView, Priority.ALWAYS);
 		GridPane.setVgrow(listViewCitationView, Priority.ALWAYS);
-		gridPaneCitationViews.add(lableCitationViews, 0, 0);
+
+		gridPaneCitationViews.add(hboxCheck1, 0, 0);
 		gridPaneCitationViews.add(listViewCitationView, 0, 1, 2, 1);
 		HBox hboxButton2 = new HBox();
 		hboxButton2.getChildren().addAll(buttonAddCitationView, buttonDeleteCitationView);
@@ -692,15 +792,15 @@ private Object String;
 		});
 		
 		// Add HBox and GridPane layout to BorderPane Layout
-		gridPaneDataViews.setPrefWidth(500);
-		gridPaneCitationViews.setPrefWidth(500);
+		gridPaneDataViews.setPrefWidth(400);
+		gridPaneCitationViews.setPrefWidth(400);
 		listViewDataViews.setPrefWidth(300);
 		listViewCitationView.setPrefWidth(300);
 		
 		HBox hboxCenter = new HBox();
 		gridPaneDataViews.setId("viewPaneChild");
 		gridPaneCitationViews.setId("viewPaneChild");
-		hboxCenter.setSpacing(5);
+		hboxCenter.setSpacing(40);
 		hboxCenter.setAlignment(Pos.CENTER);
 		hboxCenter.getChildren().addAll(gridPaneDataViews, gridPaneCitationViews);
 		bp.setTop(hb);
@@ -718,6 +818,7 @@ private Object String;
 	 */
 	private void buildUserScene() {
 		gridUser = new GridPane();
+		gridUser.setId("userPane");
 		gridUser.setPadding(new Insets(5, 10, 10, 10));
         gridUser.setHgap(10);
         gridUser.setVgap(10);
@@ -864,6 +965,7 @@ private Object String;
 			} else {
 				ids.clear();
 				ids.addAll(indices);
+				System.out.println("ids: " + ids);
 				// generated selected citations
 				try {
 					Vector<String> subset_agg_citations = Tuple_reasoning1.tuple_gen_agg_citations(ids, userGeneratedQuery);
@@ -1047,9 +1149,9 @@ private Object String;
         vboxRight.setPadding(new Insets(8,0,2,0));
 
 		Label labelCv = new Label("Citation Queries");
-		labelCv.setId("prompt-text");
+		labelCv.setId("whiteLabel");
 		labelCv.setMinWidth(165);
-		labelCv.setStyle("-fx-font-size: 16px;");
+//		labelCv.setStyle("-fx-font-size: 16px;");
 		
 //		ListView<String> listViewCv = new ListView<>();
 		HBox hboxQuery = new HBox();
@@ -1073,7 +1175,7 @@ private Object String;
 //				if (isNowEmpty) {
 //					cell.setContextMenu(null);
 //				} else {
-//					cell.setContextMenu(contextMenu);
+//					.setContextMenu(contextMenu);
 //				}
 //			});
 //			return cell;
@@ -1304,9 +1406,9 @@ private Object String;
 		});
 		
 		Label rightCQLabel = new Label("Existing Queries");
-		rightCQLabel.setId("prompt-text");
+		rightCQLabel.setId("whiteLabel");
 		rightCQLabel.setMinWidth(180);
-		rightCQLabel.setStyle("-fx-font-size: 16px;");
+//		rightCQLabel.setStyle("-fx-font-size: 16px;");
 		
 		Button rightBtCQ = new Button("Hide   ");
 		rightBtCQ.setId("buttonGen");
@@ -1572,6 +1674,7 @@ private Object String;
 		hBoxPrevNext.getChildren().addAll(prevButton, nextButton);
 		GridPane.setHgrow(hBoxPrevNext, Priority.ALWAYS);
 		gridDbaSub.add(hBoxPrevNext, 1, 5);
+		gridDba.setId("dbaPane");
 
 		dbaScene = new Scene(gridDba);
 		dbaScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
@@ -1582,6 +1685,7 @@ private Object String;
 	 */
     private void buildCitationScene() {
     	gridCitation = new GridPane();
+    	gridCitation.setId("citationPane");
         gridCitation.setPadding(new Insets(5, 10, 10, 10));
         gridCitation.setHgap(10);
         gridCitation.setVgap(10);
@@ -2113,72 +2217,60 @@ private Object String;
 		
 		MenuButton btnExport = new MenuButton("Export");
 		MenuItem jsonItem = new MenuItem();
-		jsonItem.textProperty().bind(Bindings.format("Export as JSON"));
+		jsonItem.textProperty().bind(Bindings.format("JSON"));
 		jsonItem.setOnAction(event -> {
 			String item = list.getSelectionModel().getSelectedItem();
+			if(item == null) {
+				item = list.getItems().get(0);
+			}
 			if(item != null && item.length() != 0) {
 				buildFormatScene(item, "json");
 				this.formatStage.setScene(formatScene);
 				this.formatStage.setTitle("Export Formats");
 				this.formatStage.show();
-			} else {
-				Alert alert = new Alert(Alert.AlertType.INFORMATION);
-	            alert.setTitle("Attention");
-	            alert.setHeaderText(null);
-	            alert.setContentText("Please select a citation");
-	            alert.showAndWait();
-			}
+			} 
 		});
 		MenuItem xmlItem = new MenuItem();
-		xmlItem.textProperty().bind(Bindings.format("Export as XML"));
+		xmlItem.textProperty().bind(Bindings.format("XML"));
 		xmlItem.setOnAction(event -> {
 			String item = list.getSelectionModel().getSelectedItem();
+			if(item == null) {
+				item = list.getItems().get(0);
+			}
 			if(item != null && item.length() != 0) {
 				buildFormatScene(item, "xml");
 				this.formatStage.setScene(formatScene);
 				this.formatStage.setTitle("Export Formats");
 				this.formatStage.show();
-			} else {
-				Alert alert = new Alert(Alert.AlertType.INFORMATION);
-	            alert.setTitle("Attention");
-	            alert.setHeaderText(null);
-	            alert.setContentText("Please select a citation");
-	            alert.showAndWait();
 			}
 		});
 		MenuItem biblatexItem = new MenuItem();
-		biblatexItem.textProperty().bind(Bindings.format("Export as Biblatex"));
+		biblatexItem.textProperty().bind(Bindings.format("Biblatex"));
 		biblatexItem.setOnAction(event -> {
 			String item = list.getSelectionModel().getSelectedItem();
+			if(item == null) {
+				item = list.getItems().get(0);
+			}
 			if(item != null && item.length() != 0) {
 				buildFormatScene(item, "biblatex");
 				this.formatStage.setScene(formatScene);
 				this.formatStage.setTitle("Export Formats");
 				this.formatStage.show();
-			} else {
-				Alert alert = new Alert(Alert.AlertType.INFORMATION);
-	            alert.setTitle("Attention");
-	            alert.setHeaderText(null);
-	            alert.setContentText("Please select a citation");
-	            alert.showAndWait();
-			}
+			} 
 
 		});
 		MenuItem risItem = new MenuItem();
-		risItem.textProperty().bind(Bindings.format("Export as RIS"));
+		risItem.textProperty().bind(Bindings.format("RIS"));
 		risItem.setOnAction(event -> {
 			String item = list.getSelectionModel().getSelectedItem();
+			if(item == null) {
+				item = list.getItems().get(0);
+			}
 			if(item != null && item.length() != 0) {
 				buildFormatScene(item, "ris");
 				this.formatStage.setScene(formatScene);
 				this.formatStage.setTitle("Export Formats");
 				this.formatStage.show();
-			} else {
-				Alert alert = new Alert(Alert.AlertType.INFORMATION);
-	            alert.setTitle("Attention");
-	            alert.setHeaderText(null);
-	            alert.setContentText("Please select a citation");
-	            alert.showAndWait();
 			}
 		});
 		btnExport.getItems().addAll(jsonItem, xmlItem, biblatexItem, risItem);

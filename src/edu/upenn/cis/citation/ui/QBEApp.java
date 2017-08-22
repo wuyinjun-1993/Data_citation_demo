@@ -968,9 +968,14 @@ private Object String;
 					e1.printStackTrace();
 				}
 			} else {
-				ids.clear();
-				ids.addAll(indices);
-				System.out.println("ids: " + ids);
+				ObservableList<ObservableList> tuples = userDataView.getSelectionModel().getSelectedItems();
+				Vector<String> names = new Vector<String>();
+				int l = tuples.size();
+				for(int i = 0; i < l; i++) {
+					String t = "" + tuples.get(i).get(0) + "";
+					names.add(t);
+				}
+				System.out.println("names" + names);
 				// generated selected citations
 				try {
 					Vector<String> subset_agg_citations = Tuple_reasoning1.tuple_gen_agg_citations(ids, userGeneratedQuery, heads, citation_view_map);

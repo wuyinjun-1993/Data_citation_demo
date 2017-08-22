@@ -204,6 +204,11 @@ public class QBEApp extends Application {
     
 private Object String;
 
+	Vector<Head_strs> heads = new Vector<Head_strs>();
+
+	HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
+
+
 	/**
 	 * GUI Main Method
 	 * 
@@ -866,7 +871,7 @@ private Object String;
 				ids.addAll(indices);
 				// generated selected citations
 				try {
-					Vector<String> subset_agg_citations = Tuple_reasoning1.tuple_gen_agg_citations(ids, userGeneratedQuery);
+					Vector<String> subset_agg_citations = Tuple_reasoning1.tuple_gen_agg_citations(ids, userGeneratedQuery, heads, citation_view_map);
 					for (String s : subset_agg_citations) {
 						listCitations.add(s);
 					}
@@ -2810,8 +2815,10 @@ private Object String;
 				String qname = "qname" + count;
 				count++;
 				userGeneratedQuery = addQueryByName(qname, data);
-				HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
 				HashMap<Head_strs, HashSet<String> > citation_strs = new HashMap<Head_strs, HashSet<String> >();
+				
+				citation_view_map.clear();
+				
 				try {
 					Tuple_reasoning1.tuple_reasoning(userGeneratedQuery, citation_strs, citation_view_map, conn, st);
 				} catch (IOException | InterruptedException | JSONException e) {
@@ -2838,11 +2845,16 @@ private Object String;
 				citationColomn.setCellFactory(cellFactory);
 				
 				Iterator<Head_strs> keySetIterator = citation_strs.keySet().iterator();
+				
+				heads.clear();
+				
 				int rows = 0;
 				while(keySetIterator.hasNext()) {
 					Head_strs keys = keySetIterator.next();
 //					ObservableList row = FXCollections.observableArrayList();
 					Vector<String> head_vals = keys.head_vals;
+					
+					heads.add(keys);
 					
 					System.out.println(keys.toString());
 					System.out.println(citation_strs.get(keys));

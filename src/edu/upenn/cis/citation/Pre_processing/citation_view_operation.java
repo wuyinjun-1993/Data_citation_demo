@@ -243,7 +243,14 @@ public class citation_view_operation {
 		
 	}
 	
-	
+	public static void delete_all_citation_table(Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "delete from citation_table";
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+	}	
 	
 
 }

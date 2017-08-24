@@ -402,6 +402,19 @@ public class view_operation {
 		return ids;
 	}
 	
+	public static void delele_all_views(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	{
+		delete_all_lambda_terms(c, pst);
+        
+        delete_all_subgoals(c, pst);
+        
+        delete_all_conditions(c, pst);
+        
+        delete_all_citation_view(c, pst);
+        
+        delete_all_view_table(c, pst);
+	}
+	
 	public static void delete_view_by_id(int id) throws SQLException, ClassNotFoundException
 	{
 		Class.forName("org.postgresql.Driver");
@@ -496,6 +509,56 @@ public class view_operation {
 	static void delete_view_table(int id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query = "delete from view_table where view = '" + id + "'";
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+	}
+	
+	static void delete_all_citation_view(Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "delete from citation2view";
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+		
+	}
+	
+	
+	
+	static void delete_all_lambda_terms(Connection c, PreparedStatement pst) throws SQLException
+	{
+		
+		String query = "delete from view2lambda_term";
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+		
+	}
+	
+	static void delete_all_conditions(Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "delete from view2conditions";
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+	}
+	
+	static void delete_all_subgoals(Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "delete from view2subgoals";
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+	}
+	
+	static void delete_all_view_table(Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "delete from view_table";
 		
 		pst = c.prepareStatement(query);
 		

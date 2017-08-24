@@ -101,7 +101,7 @@ public class Load_views_and_citation_queries {
 			String [] relation_arg = lambda_strs[i].trim().split("\\" + ".");
 			
 			
-			l_terms.add(new Lambda_term(relation_arg[1].trim(), relation_arg[0].trim()));
+			l_terms.add(new Lambda_term(relation_arg[0].trim() + populate_db.separator + relation_arg[1].trim(), relation_arg[0].trim()));
 		}
 		
 		return l_terms;

@@ -159,6 +159,21 @@ public class Query_operation {
         pst.execute();
 	}
 	
+	public static void delete_all_queries(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	{
+        
+        delete_all_lambda_terms(c, pst);
+        
+        delete_all_subgoals(c, pst);
+        
+        delete_all_conditions(c, pst);
+        
+        delete_all_citation_view(c, pst);
+        
+        delete_all_head_variables(c, pst);
+        
+	}
+	
 	public static void delete_query_by_id(int id) throws SQLException, ClassNotFoundException
 	{
 		Class.forName("org.postgresql.Driver");
@@ -332,6 +347,54 @@ public class Query_operation {
 	static void delete_head_variables(int id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query = "delete from query2head_variables where query_id = '" + id + "'";
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+	}
+	
+	static void delete_all_citation_view(Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "delete from citation2query";
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+		
+	}
+	
+	static void delete_all_lambda_terms(Connection c, PreparedStatement pst) throws SQLException
+	{
+		
+		String query = "delete from query2lambda_term";
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+		
+	}
+	
+	static void delete_all_conditions(Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "delete from query2conditions";
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+	}
+	
+	static void delete_all_subgoals(Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "delete from query2subgoal";
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+	}
+	
+	static void delete_all_head_variables(Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "delete from query2head_variables";
 		
 		pst = c.prepareStatement(query);
 		

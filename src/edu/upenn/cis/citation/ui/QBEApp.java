@@ -91,6 +91,7 @@ import java.net.URL;
 import java.sql.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap.KeySetView;
 
 
 public class QBEApp extends Application {
@@ -2914,18 +2915,20 @@ private Object String;
 				
 				String qname = "qname" + count;
 				count++;
-				userGeneratedQuery = addQueryByName(qname, data);
+				userGeneratedQuery = addQueryByName(qname, data);							
 				
-				ObservableList<ObservableList> items = userDataView.getItems();
+				ObservableList<ObservableList> items = dataView.getItems();
 				Vector<Head_strs> names = new Vector<Head_strs>();
 				int l = items.size();
 				for(int i = 0; i < l; i++) {
 					Vector<String> t = new Vector<String>();
 					int len = items.get(i).size();
-					t.add("" + items.get(i).get(0) + "");
+					for(int j = 0; j < len; j++) {
+						t.add("" + items.get(i).get(j) + "");
+					}
 					names.add(new Head_strs(t));
 				}
-//				System.out.println("[names] " + names);
+				System.out.println("[names] " + names);
 				
 				
 				HashMap<Head_strs, HashSet<String> > citation_strs = new HashMap<Head_strs, HashSet<String> >();
@@ -2958,7 +2961,8 @@ private Object String;
 //				}
 				citationColomn.setCellFactory(cellFactory);
 				
-				Iterator<Head_strs> keySetIterator = citation_strs.keySet().iterator();
+//				Iterator<Head_strs> keySetIterator = citation_strs.keySet().iterator();
+//				System.out.println("[keyset]: " + citation_strs.keySet().toString());
 				
 //				System.out.println("[size]: " + names.size());
 				int nameSize = names.size();
@@ -2971,8 +2975,10 @@ private Object String;
 //					System.out.println("[rows]: " + rows);
 //					System.out.println("keys: " + keys.toString());
 //					System.out.println("strs: " + citation_strs.get(keys));
-					ObservableList<String> lambdaData = FXCollections.observableArrayList(citation_strs.get(keys));
-					((ObservableList) dataViewList.get(rows)).add(lambdaData);
+					if(citation_strs.keySet().contains(keys)) {
+						ObservableList<String> lambdaData = FXCollections.observableArrayList(citation_strs.get(keys));
+						((ObservableList) dataViewList.get(rows)).add(lambdaData);
+					}
 				}
 				
 				

@@ -967,7 +967,6 @@ private Object String;
 				}
 			} else {
 				ObservableList<ObservableList> tuples = userDataView.getSelectionModel().getSelectedItems();
-				System.out.println(tuples);
 				Vector<Head_strs> names = new Vector<Head_strs>();
 				int l = tuples.size();
 				for(int i = 0; i < l; i++) {
@@ -978,10 +977,11 @@ private Object String;
 					}
 					names.add(new Head_strs(t));
 				}
-				System.out.println("names" + names);
 				// generated selected citations
 				try {
 					Vector<String> subset_agg_citations = Tuple_reasoning1.tuple_gen_agg_citations(userGeneratedQuery, names, citation_view_map);
+					System.out.println("subset" + subset_agg_citations);
+					// XXX
 					for (String s : subset_agg_citations) {
 						listCitations.add(s);
 					}
@@ -2846,7 +2846,7 @@ private Object String;
 				if (hBoxLambda != null)  hBoxLambda.getChildren().add(new Label(lambdas.get(p) + ": " + lambdasAll.get(p).get(idx) + "   "));
 				p++;
 			}
-			System.out.println(st.toString());
+			System.out.println("[st]: " + st.toString());
 			st.execute();
 			ResultSet rs = st.getResultSet();
 //			dataViewList.clear();
@@ -2915,12 +2915,26 @@ private Object String;
 				String qname = "qname" + count;
 				count++;
 				userGeneratedQuery = addQueryByName(qname, data);
+				
+				ObservableList<ObservableList> items = userDataView.getItems();
+				Vector<Head_strs> names = new Vector<Head_strs>();
+				int l = items.size();
+				for(int i = 0; i < l; i++) {
+					Vector<String> t = new Vector<String>();
+					int len = items.get(i).size();
+					t.add("" + items.get(i).get(0) + "");
+					names.add(new Head_strs(t));
+				}
+//				System.out.println("[names] " + names);
+				
+				
 				HashMap<Head_strs, HashSet<String> > citation_strs = new HashMap<Head_strs, HashSet<String> >();
 				
 				citation_view_map.clear();
 				
 				try {
 					Tuple_reasoning1.tuple_reasoning(userGeneratedQuery, citation_strs, citation_view_map, conn, st);
+				
 				} catch (IOException | InterruptedException | JSONException e) {
 					e.printStackTrace();
 				}
@@ -2946,17 +2960,21 @@ private Object String;
 				
 				Iterator<Head_strs> keySetIterator = citation_strs.keySet().iterator();
 				
-				int rows = 0;
-				while(keySetIterator.hasNext()) {
-					Head_strs keys = keySetIterator.next();
+//				System.out.println("[size]: " + names.size());
+				int nameSize = names.size();
+				for(int rows = 0; rows < nameSize; rows ++) {
+					Head_strs keys = names.get(rows);
+					
+//					Head_strs keys = keySetIterator.next();
 //					ObservableList row = FXCollections.observableArrayList();
-					Vector<String> head_vals = keys.head_vals;					
-					System.out.println(keys.toString());
-					System.out.println(citation_strs.get(keys));
+//					Vector<String> head_vals = keys.head_vals;	
+//					System.out.println("[rows]: " + rows);
+//					System.out.println("keys: " + keys.toString());
+//					System.out.println("strs: " + citation_strs.get(keys));
 					ObservableList<String> lambdaData = FXCollections.observableArrayList(citation_strs.get(keys));
 					((ObservableList) dataViewList.get(rows)).add(lambdaData);
-					rows++;
 				}
+				
 				
 				citationColomn.setCellValueFactory(
 						new Callback<TableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {

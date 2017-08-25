@@ -69,7 +69,8 @@
 #whiteLabel {
    -fx-font-size: 16px;
    -fx-font-family: "Arial Black";
-   -fx-text-fill: rgba(204,204,204,1.0);
+   /*-fx-text-fill: rgba(204,204,204,1.0);*/
+   -fx-text-fill: white;
    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.3) , 3, 0.0 , 0 , 2 );
 }
 

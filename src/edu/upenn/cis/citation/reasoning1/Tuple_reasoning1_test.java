@@ -108,6 +108,8 @@ public class Tuple_reasoning1_test {
 	
 	static Tuple [] viewtuples = null;
 	
+	static HashMap<Head_strs, ArrayList<Integer>> head_strs_rows_mapping = new HashMap<Head_strs, ArrayList<Integer>>();
+	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException, IOException, InterruptedException, JSONException
 	{
 		
@@ -2114,11 +2116,11 @@ public class Tuple_reasoning1_test {
 
 //					c_views.add(c_unit_combinaton);
 					
-					HashSet<String> citations = gen_citation(c_view_template, c, pst, view_query_mapping);
+//					HashSet<String> citations = gen_citation(c_view_template, c, pst, view_query_mapping);
 					
 //					c_unit_combinaton.clear();
 					
-//					HashSet<String> citations = new HashSet<String>();
+					HashSet<String> citations = new HashSet<String>();
 					
 //					Vector<String> citations = new Vector<String>();
 //					
@@ -2139,6 +2141,23 @@ public class Tuple_reasoning1_test {
 						
 //					first = false;
 					old_value = curr_str;
+					
+					if(head_strs_rows_mapping.get(h_vals) == null)
+					{
+						ArrayList<Integer> int_list = new ArrayList<Integer>();
+						
+						int_list.add(tuple_num);
+						
+						head_strs_rows_mapping.put(h_vals, int_list);
+					}
+					else
+					{
+						ArrayList<Integer> int_list = head_strs_rows_mapping.get(h_vals);
+						
+						int_list.add(tuple_num);
+						
+						head_strs_rows_mapping.put(h_vals, int_list);
+					}
 					
 					if(citation_strs.get(h_vals) == null)
 					{
@@ -2212,11 +2231,11 @@ public class Tuple_reasoning1_test {
 					
 //					c_views.add(update_c_view);
 					
-					HashSet<String> citations = gen_citation(c_view_template, c, pst, view_query_mapping);
+//					HashSet<String> citations = gen_citation(c_view_template, c, pst, view_query_mapping);
 					
 					
 //					update_c_view.clear();
-//					HashSet<String> citations = new HashSet<String>();
+					HashSet<String> citations = new HashSet<String>();
 					
 //					HashSet<String> citations = populate_citation(update_c_view, vals, c, pst, citation_strings, h_vals);
 					
@@ -2232,7 +2251,22 @@ public class Tuple_reasoning1_test {
 //						
 //					}
 					
-					
+					if(head_strs_rows_mapping.get(h_vals) == null)
+					{
+						ArrayList<Integer> int_list = new ArrayList<Integer>();
+						
+						int_list.add(tuple_num);
+						
+						head_strs_rows_mapping.put(h_vals, int_list);
+					}
+					else
+					{
+						ArrayList<Integer> int_list = head_strs_rows_mapping.get(h_vals);
+						
+						int_list.add(tuple_num);
+						
+						head_strs_rows_mapping.put(h_vals, int_list);
+					}
 					
 					if(citation_strs.get(h_vals) == null)
 					{
@@ -2367,9 +2401,9 @@ public class Tuple_reasoning1_test {
 //					
 //					c_unit_com.clear();
 					
-					HashSet<String> citations = gen_citation(c_view_template, c, pst, view_query_mapping);
+//					HashSet<String> citations = gen_citation(c_view_template, c, pst, view_query_mapping);
 					
-//					HashSet<String> citations = new HashSet<String>();
+					HashSet<String> citations = new HashSet<String>();
 					
 //					Vector<String> citations = new Vector<String>();
 //					
@@ -2392,6 +2426,23 @@ public class Tuple_reasoning1_test {
 											
 
 					first = false;
+					
+					if(head_strs_rows_mapping.get(h_vals) == null)
+					{
+						ArrayList<Integer> int_list = new ArrayList<Integer>();
+						
+						int_list.add(tuple_num);
+						
+						head_strs_rows_mapping.put(h_vals, int_list);
+					}
+					else
+					{
+						ArrayList<Integer> int_list = head_strs_rows_mapping.get(h_vals);
+						
+						int_list.add(tuple_num);
+						
+						head_strs_rows_mapping.put(h_vals, int_list);
+					}
 					
 					if(citation_strs.get(h_vals) == null)
 					{
@@ -2458,9 +2509,9 @@ public class Tuple_reasoning1_test {
 					
 //					c_views.add(update_c_view);
 					
-					HashSet<String> citations = gen_citation(c_view_template, c, pst, view_query_mapping);
+//					HashSet<String> citations = gen_citation(c_view_template, c, pst, view_query_mapping);
 
-//					HashSet<String> citations = new HashSet<String>();
+					HashSet<String> citations = new HashSet<String>();
 //					update_c_view.clear();
 					
 //					HashSet<String> citations = populate_citation(update_c_view, vals, c, pst, citation_strings, h_vals);
@@ -2477,7 +2528,22 @@ public class Tuple_reasoning1_test {
 //									
 //					}
 					
-					
+					if(head_strs_rows_mapping.get(h_vals) == null)
+					{
+						ArrayList<Integer> int_list = new ArrayList<Integer>();
+						
+						int_list.add(tuple_num);
+						
+						head_strs_rows_mapping.put(h_vals, int_list);
+					}
+					else
+					{
+						ArrayList<Integer> int_list = head_strs_rows_mapping.get(h_vals);
+						
+						int_list.add(tuple_num);
+						
+						head_strs_rows_mapping.put(h_vals, int_list);
+					}
 					
 					if(citation_strs.get(h_vals) == null)
 					{

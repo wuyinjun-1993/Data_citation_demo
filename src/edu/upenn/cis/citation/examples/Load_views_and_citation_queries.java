@@ -62,6 +62,8 @@ public class Load_views_and_citation_queries {
 	
 	static Query get_view(String line) throws ClassNotFoundException, SQLException
 	{
+		System.out.println(line);
+		
 		String [] strs = line.split("\\" + split1);
 		
 		String view_name = strs[0];
@@ -92,6 +94,12 @@ public class Load_views_and_citation_queries {
 	
 	static Vector<Lambda_term> split_lambda_terms(String lambda_term_str)
 	{
+		
+		if(lambda_term_str.isEmpty())
+		{
+			return new Vector<Lambda_term>();
+		}
+		
 		String [] lambda_strs = lambda_term_str.split(",");
 		
 		Vector<Lambda_term> l_terms = new Vector<Lambda_term>();
@@ -109,6 +117,9 @@ public class Load_views_and_citation_queries {
 	
 	static Vector<Conditions> split_predicates(String predicates_str)
 	{
+		if(predicates_str.isEmpty())
+			return new Vector<Conditions>();
+		
 		String [] predicates = predicates_str.split(",");
 		
 		Vector<Conditions> conditions = new Vector<Conditions>();
@@ -116,7 +127,7 @@ public class Load_views_and_citation_queries {
 		for(int i = 0; i<predicates.length; i++)
 		{
 			String predicate = predicates[i].trim();
-			
+						
 			Conditions condition = view_operation.parse_conditions(predicate, ".");
 			
 			conditions.add(condition);
@@ -174,9 +185,7 @@ public class Load_views_and_citation_queries {
 	}
 	
 	static Vector<Argument> split_head(String head)
-	{
-		System.out.println(head);
-		
+	{		
 		String [] head_arg_strs = head.split(",");
 		
 		Vector<Argument> head_args = new Vector<Argument>();

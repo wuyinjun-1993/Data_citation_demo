@@ -345,7 +345,7 @@ private Object String;
 		dropShadow.setRadius(5);
 		dropShadow.setColor(Color.gray(0.3));
 		// Adding text and DropShadow effect to it
-		Text text = new Text("DataCite: A Data Citation System");
+		Text text = new Text("CiteDB: A Data Citation System");
 		text.setTextAlignment(TextAlignment.CENTER);
 //		text.setFont(Font.font("Courier New", FontWeight.BOLD, 38));
 //		text.setEffect(dropShadow);
@@ -362,13 +362,13 @@ private Object String;
 			// TODO: add OAuth Authentication
 			String checkUser = txtUserName.getText().toString();
 			String checkPw = pf.getText().toString();
-//			if (checkUser.equals("admin") && checkPw.equals("admin")) {
-//				lblMessage.setTextFill(Color.GREEN);
-//			} else {
-//				lblMessage.setText("Incorrect user or password.");
-//				lblMessage.setTextFill(Color.RED);
-//				return;
-//			}
+			if (checkUser.equals("admin") && checkPw.equals("admin")) {
+				lblMessage.setTextFill(Color.GREEN);
+			} else {
+				lblMessage.setText("Incorrect user or password.");
+				lblMessage.setTextFill(Color.RED);
+				return;
+			}
 			buildViewScene();
 			txtUserName.setText("");
 			pf.setText("");
@@ -865,7 +865,7 @@ private Object String;
 		GridPane.setHgrow(userDataView, Priority.ALWAYS);
 		userDataView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		userDataView.setItems(dataViewList);
-		gridUserSub.add(userDataView, 0, 3, 2, 1);
+		gridUserSub.add(userDataView, 0, 4, 2, 1);
 		
 		// Pane
 		TableView<Entry> tableViewUser = new TableView<Entry>();
@@ -874,8 +874,23 @@ private Object String;
 		GridPane.setVgrow(splitPaneQbe, Priority.ALWAYS);
 		splitPaneQbe.getItems().add(tableViewUser);
 		
-		gridUserSub.add(buildTopMenu(null, null, userDataView, true), 1, 0);
+		// DataLog field
+		Label datalogLabel = new Label("SQL: ");
+//      TextField datalogTextArea = new TextField();
+        datalogLabel.setFont(Font.font("Courier New", FontWeight.BOLD, 16));
+        datalogTextArea.setFont(Font.font("Courier New", FontWeight.BLACK, 14));
+        datalogTextArea.setWrapText(true);
+		final HBox hBox = buildTopMenu(datalogTextArea, hBoxLambda, dataView, false);
+		final HBox vboxDatalog = new HBox();
+		vboxDatalog.setSpacing(5);
+		vboxDatalog.setPadding(new Insets(5, 5, 5, 5));
+		vboxDatalog.getChildren().addAll(datalogLabel, datalogTextArea);
+        vboxDatalog.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(datalogTextArea, Priority.ALWAYS);
+		
+		gridUserSub.add(buildTopMenu(datalogTextArea, null, userDataView, true), 1, 0);
 		gridUserSub.add(splitPaneQbe, 0, 1, 2, 1);
+		gridUserSub.add(vboxDatalog, 0, 2, 2, 1);
 
 		// Table View
 		tableViewUser.setEditable(true);
@@ -923,7 +938,7 @@ private Object String;
 		final Label label_1 = new Label("Data Preview");
 		label_1.setId("prompt-text");
 		GridPane.setHgrow(label_1, Priority.ALWAYS);
-		gridUserSub.add(label_1, 0, 2);
+		gridUserSub.add(label_1, 0, 3);
 
 		hBoxPrevNext = new HBox();
 		hBoxPrevNext.setAlignment(Pos.CENTER_RIGHT);
@@ -937,7 +952,7 @@ private Object String;
 		});
 		hBoxPrevNext.getChildren().addAll(prevButton, nextButton);
 		GridPane.setHgrow(hBoxPrevNext, Priority.ALWAYS);
-		gridUserSub.add(hBoxPrevNext, 1, 4);
+		gridUserSub.add(hBoxPrevNext, 1, 5);
 
 		hBoxGenCitation = new HBox();
 		hBoxGenCitation.setAlignment(Pos.CENTER_RIGHT);
@@ -999,7 +1014,7 @@ private Object String;
 		});
 		genButton.setId("buttonGen");
 		hBoxGenCitation.getChildren().add(genButton);
-		gridUserSub.add(hBoxGenCitation, 1, 2);
+		gridUserSub.add(hBoxGenCitation, 1, 3);
 		userScene = new Scene(gridUser);
 		userScene.getStylesheets().add(QBEApp.class.getResource("style.css").toExternalForm());
 	}
@@ -1019,7 +1034,12 @@ private Object String;
 				if (data.isEmpty() ) return;
 				List<Entry> list = new ArrayList<>();
 				list.addAll(data);
-				if (textArea != null) textArea.setText(Util.convertToDatalogOriginal(list) + "\n");
+				
+				if(stage.getScene() == dbaScene) {
+					if (textArea != null) textArea.setText(Util.convertToDatalogOriginal(list) + "\n");
+				}else if(stage.getScene() == userScene) {
+					if (textArea != null) textArea.setText(Util.convertToSQLWithLambda(list, true) + "\n");
+				}
 				lambdasAll.clear();
 				lambdaIndex.clear();
 				lambdaSQL = Util.convertToSQLWithLambda(list, toCite);
@@ -2699,7 +2719,11 @@ private Object String;
 			}
 			List<Entry> entryList = new ArrayList<>();
 			entryList.addAll(data);
-			if (datalogTextArea != null) datalogTextArea.setText(Util.convertToDatalogOriginal(entryList) + "\n");
+			if(stage.getScene() == dbaScene) {
+				if (datalogTextArea != null) datalogTextArea.setText(Util.convertToDatalogOriginal(entryList) + "\n");
+			}else if(stage.getScene() == userScene) {
+				if (datalogTextArea != null) datalogTextArea.setText(Util.convertToSQLWithLambda(entryList, true) + "\n");
+			}
 			comboBoxComparator.setValue(null);
 			comboBoxComparator1.setValue(null);
 			param.toggleExpanded();

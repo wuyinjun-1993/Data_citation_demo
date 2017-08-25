@@ -55,7 +55,7 @@ public class Database_operation {
 		
 		for(int i = 0; i<connections.size(); i++)
 		{
-			Query_operation.add_connection_citation_with_query(connections.get(i)[0], connections.get(i)[1], "author");
+			Query_operation.add_connection_citation_with_query(connections.get(i)[0], connections.get(i)[1], connections.get(i)[2]);
 		}
 	}
 

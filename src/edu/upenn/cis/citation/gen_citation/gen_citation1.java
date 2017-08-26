@@ -722,6 +722,8 @@ public class gen_citation1 {
 	{
 		Vector<Integer> query_ids = new Vector<Integer>();
 		
+		System.out.println(c_view_name);
+		
 		int id = Integer.valueOf(c_view_name.substring(1));
 		
 		String query = "select citation2query.query_id from citation2view, citation2query where citation2view.citation_view_id = citation2query.citation_view_id and citation2view.view = '" + id + "'";

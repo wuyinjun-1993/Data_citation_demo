@@ -23,7 +23,9 @@ public class Database_operation {
        	        populate_db.usr_name,populate_db.passwd);
         
         PreparedStatement pst = null;
-		
+        
+        populate_db.renew_table(c, pst);
+        
 		view_operation.delele_all_views(c, pst);
 		
 		Query_operation.delete_all_queries(c, pst);

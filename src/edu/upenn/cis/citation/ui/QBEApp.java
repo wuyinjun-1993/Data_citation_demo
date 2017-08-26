@@ -2022,7 +2022,7 @@ private Object String;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		} else if (type.equals("biblatex")) {
+		} else if (type.equals("bibtex")) {
 			try {
 				String biblatexString = CitationConverter.convertToBiblatex(formatedCitation, "others");
 				contentString.setText(biblatexString);

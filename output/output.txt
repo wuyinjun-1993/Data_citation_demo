@@ -1,0 +1,2 @@
+JAVAGENT: call premain instrumentation for class SizeOf
+8	1000000	18.271162775s	1.10056632207E-4s	2.043986	1000000	3.0	

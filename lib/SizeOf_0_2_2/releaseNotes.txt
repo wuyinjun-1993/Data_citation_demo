@@ -1,0 +1,18 @@
+0.2.2 (2014-07-08)
+=================
+
+-fixed a bug in turnOffDebug (thanks to Derek Bennett)
+
+0.2.1 (2007-10-13)
+=================
+
+-fixed a bug in recognising already processed object (thanks to Saverio Miroddi)
+
+-added ant file in the source distribution
+
+0.2 (2007-04-09)
+================
+
+-improved usability: the new method deepSizeOf doesn't throw any checked exception
+
+-added support for (known) flyweight objects (many thanks to Dr. Heinz Kabutz - www.javaspecialists.co.za)

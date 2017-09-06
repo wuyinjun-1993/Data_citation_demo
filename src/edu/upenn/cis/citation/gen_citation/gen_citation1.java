@@ -300,12 +300,12 @@ public class gen_citation1 {
 			if(c_vec.c_vec.get(i).has_lambda_term())
 			{
 				
-				if(authors.size() < max_num)
+				if(authors.size() < max_num || max_num <= 0)
 					authors.addAll(get_authors2((citation_view_parametered)c_vec.c_vec.get(i), c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num));
 			}
 			else
 			{
-				if(authors.size() < max_num)
+				if(authors.size() < max_num || max_num <= 0)
 					authors.addAll(get_authors2((citation_view_unparametered)c_vec.c_vec.get(i), c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num));
 			}
 			
@@ -317,9 +317,20 @@ public class gen_citation1 {
 		
 		int num = 0;
 		
+		Object [] author_list = authors.toArray(); 
+		
+		Arrays.sort(author_list);
+		
+		HashSet<String> new_authors = new HashSet<String>();
+		
+		for(int i = 0; i<author_list.length; i++)
+		{
+			new_authors.add((String)author_list[i]);
+		}
+		
 		JSONArray json_author = new JSONArray();
 		
-		for(Iterator iter = authors.iterator(); iter.hasNext();)
+		for(Iterator iter = new_authors.iterator(); iter.hasNext();)
 		{
 			
 //			if(num >= 1)
@@ -384,12 +395,12 @@ public class gen_citation1 {
 			
 			if(c_vec.c_vec.get(i).has_lambda_term())
 			{
-				if(authors.size() < max_num)
+				if(authors.size() < max_num || max_num <= 0)
 					authors.addAll(get_authors3((citation_view_parametered)c_vec.c_vec.get(i), c, pst, view_index, view_query_mapping, author_mapping, max_num, query_ids, query_lambda_str, view_author_mapping));
 			}
 			else
 			{
-				if(authors.size() < max_num)
+				if(authors.size() < max_num || max_num <= 0)
 					authors.addAll(get_authors3((citation_view_unparametered)c_vec.c_vec.get(i), c, pst, view_index, view_query_mapping, author_mapping, max_num, query_ids, query_lambda_str, view_author_mapping));
 			}
 			
@@ -401,9 +412,20 @@ public class gen_citation1 {
 		
 		int num = 0;
 		
+		Object [] author_list = authors.toArray(); 
+		
+		Arrays.sort(author_list);
+		
+		HashSet<String> new_authors = new HashSet<String>();
+		
+		for(int i = 0; i<author_list.length; i++)
+		{
+			new_authors.add((String)author_list[i]);
+		}
+		
 		JSONArray json_author = new JSONArray();
 		
-		for(Iterator iter = authors.iterator(); iter.hasNext();)
+		for(Iterator iter = new_authors.iterator(); iter.hasNext();)
 		{
 			
 //			if(num >= 1)
@@ -1058,7 +1080,7 @@ public class gen_citation1 {
 						else
 						{
 							
-							if((max_num > 0 && author_set.size() <= max_num) || max_num == 0)
+							if((max_num > 0 && author_set.size() <= max_num) || max_num <= 0)
 							{
 								author_set.add(author_name);
 								
@@ -1293,7 +1315,7 @@ public class gen_citation1 {
 	
 	public static void get_all_query_ids(IntList query_ids, Connection c, PreparedStatement pst) throws SQLException
 	{
-		String sql = "select query_id from query2head_variables";
+		String sql = "select query_id from citation2view, citation2query where citation2query.citation_view_id = citation2view.citation_view_id";
 		
 		pst = c.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
 		
@@ -1391,7 +1413,7 @@ public class gen_citation1 {
 					else
 					{
 						
-						if((max_num > 0 && author_set.size <= max_num) || max_num == 0)
+						if((max_num > 0 && author_set.size <= max_num) || max_num <= 0)
 						{
 							author_set.add(author_name);
 									
@@ -1827,7 +1849,7 @@ public class gen_citation1 {
 						}
 						else
 						{
-							if((max_num > 0 && author_set.size() <= max_num) || max_num == 0)
+							if((max_num > 0 && author_set.size() <= max_num) || max_num <= 0)
 							{
 								author_set.add(author_name);
 								

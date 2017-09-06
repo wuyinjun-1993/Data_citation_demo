@@ -2059,7 +2059,7 @@ private Object String;
 				e.printStackTrace();
 			}
     	});
-    	Hyperlink labelBiblatex = new Hyperlink("Biblatex");
+    	Hyperlink labelBiblatex = new Hyperlink("Bibtex");
     	labelBiblatex.setId("link");
     	labelBiblatex.setOnMouseClicked(event -> {
     		try {

@@ -1,12 +1,21 @@
-/* .root {
-	-fx-background-image: url("background.jpg");
-}
- */
-#root {
-	-fx-background-image: url("background.jpg");
+
+
+#viewPane, #dbaPane, #userPane, #citationPane {
+	-fx-background-image: url("bg2.png");
+	-fx-background-repeat: no-repeat;
+	-fx-background-size: cover;
+	-fx-background-opacity: 0.5;
 }
 
-#bproot {
+#viewPaneChild {
+	-fx-background-color:  linear-gradient(lightgray, gray);
+    -fx-border-color: white;
+    -fx-border-radius: 20;
+    -fx-padding: 10 10 10 10;
+    -fx-background-radius: 20;
+}
+
+#loginPaneChild {
     -fx-background-color:  linear-gradient(lightgray, gray);
     -fx-border-color: white;
     -fx-border-radius: 20;
@@ -14,8 +23,23 @@
     -fx-background-radius: 20;
 }
 
-#bp {
-    -fx-background-color:  linear-gradient(gray, DimGrey);
+#loginPane {
+    -fx-background-image: url("bg2.png");
+    -fx-background-repeat: no-repeat;
+	-fx-background-size: cover;
+	-fx-background-opacity: 0.5;
+}
+
+#btnLogin {
+    -fx-text-fill: white;
+    -fx-font-family: "Arial";
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-background-color: linear-gradient(#B83232, #722626);
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+#btnLogin:hover {
+    -fx-background-color: linear-gradient(#722626, #B83232);
 }
 
 .button {
@@ -29,11 +53,50 @@
     -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 3, 0.0 , 0 , 1 );
 }
 
+#title {
+   -fx-font-size: 38px;
+   -fx-font-family: "Arial Black";
+   -fx-fill: #cccccc;
+   -fx-effect: innershadow( three-pass-box , rgba(240,173,106,0.7) , 6, 0.0 , 2 , 3 );
+}
+#viewTitle {
+   -fx-font-size: 32px;
+   -fx-font-family: "Arial Black";
+   -fx-fill: #cccccc;
+   -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.5) , 3, 0.0 , 0 , 2 );
+}
+
+#whiteLabel {
+   -fx-font-size: 16px;
+   -fx-font-family: "Arial Black";
+   /*-fx-text-fill: rgba(204,204,204,1.0);*/
+   -fx-text-fill: white;
+   -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.3) , 3, 0.0 , 0 , 2 );
+}
+
 #prompt-text {
     -fx-font-size: 22px;
     -fx-font-family: "Arial Black";
     -fx-fill: #d4d4d4;
     -fx-effect: innershadow( three-pass-box , rgba(163, 163, 163, 0.7), 6, 0.0 , 0 , 2 );
+}
+#labelAdmin {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,1 );
+}
+
+#coloredList .list-cell:even {
+    -fx-background-color: rgba(253,216,179,0.2);
+}
+#coloredList .list-cell:filled:hover {
+    -fx-background-color: linear-gradient(#FCCA91 0%, #FDD6A9 25%, #FDE2C3 75%, #FEF5EB 100%);
+    -fx-text-fill: black; 
+}
+#coloredList .list-cell:filled:selected {
+    -fx-background-color: tomato;
+    -fx-text-fill: black; 
 }
 
 .check-box {
@@ -125,4 +188,23 @@
 #CQ-combo .arrow {
     -fx-padding: 3;
     /*-fx-shape: "M150 0 L150 0 L0 280 L300 280 M0 370 L300 370 L150 670 L150 670 Z";*/
+}
+
+#link {
+	-fx-text-fill: #000066;
+	-fx-underline: true;
+	-fx-border-color: transparent;
+}
+
+#linkLogin {
+	-fx-text-fill: #3366ff;
+	-fx-underline: true;
+	-fx-border-color: transparent;
+}
+#linkLogin:hover {
+	-fx-text-fill: #000066;
+}
+
+#link:hover {
+	-fx-text-fill: #3366ff;
 }

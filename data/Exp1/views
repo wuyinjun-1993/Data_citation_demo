@@ -1,4 +1,1 @@
 Family_name|family.name|family|||family:family
-Family_type|family.type|family|family.family_id>'60'||family:family
-FamilyIntro_text|introduction.family_id,introduction.text|introduction||introduction.family_id|introduction:introduction
-Family_join_Familyintro|family.family_id, family.name, family.type, introduction.text|family, introduction |family.family_id = introduction.family_id|family.type| family:family,introduction:introduction

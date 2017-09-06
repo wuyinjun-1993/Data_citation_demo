@@ -267,23 +267,31 @@ public class stress_test4 {
 			
 			System.out.print(time + "s	");
 			
-			Set<Head_strs> h_l = citation_strs.keySet();
+			Set<Head_strs> h_l = Tuple_reasoning1_test.head_strs_rows_mapping.keySet();
 			
 			double citation_size1 = 0;
 			
 			int row = 0;
 			
+			start_time = System.nanoTime();
+			
 			for(Iterator iter = h_l.iterator(); iter.hasNext();)
 			{
 				Head_strs h_value = (Head_strs) iter.next();
 				
-				HashSet<String> citations = citation_strs.get(h_value);
+				HashSet<String> citations = Tuple_reasoning1_test.gen_citation(h_value, c, pst);
 				
 				citation_size1 += citations.size();
 				
 				row ++;
 				
 			}
+			
+			end_time = System.nanoTime();
+			
+			time = (end_time - start_time)/(row * 1.0 * 1000000000);
+			
+			System.out.print(time + "s	");
 			
 			if(row !=0)
 			citation_size1 = citation_size1 / row;
@@ -321,6 +329,16 @@ public class stress_test4 {
 			
 			
 			System.out.print(Tuple_reasoning1_test.covering_set_num * 1.0/row + "	");
+			
+			System.out.print("pre_processing::" + Tuple_reasoning1_test.pre_processing_time + "	");
+			
+			System.out.print("query::" + Tuple_reasoning1_test.query_time + "	");
+			
+			System.out.print("reasoning::" + Tuple_reasoning1_test.reasoning_time + "	");
+			
+			System.out.print("population::" + Tuple_reasoning1_test.population_time + "	");
+			
+			System.out.println();
 		}
 		else
 		{
@@ -350,23 +368,31 @@ public class stress_test4 {
 			System.out.print(time + "s	");
 			
 			
-			Set<Head_strs> h_l = citation_strs2.keySet();
+			Set<Head_strs> h_l = Tuple_reasoning2_test.head_strs_rows_mapping.keySet();
 			
 			double citation_size2 = 0.0;
 			
 			int row = 0;
 			
+			start_time = System.nanoTime();
+			
 			for(Iterator iter = h_l.iterator(); iter.hasNext();)
 			{
 				Head_strs h_value = (Head_strs) iter.next();
 				
-				HashSet<String> citations = citation_strs2.get(h_value);
+				HashSet<String> citations = Tuple_reasoning2_test.gen_citation(h_value, c, pst);
 				
 				citation_size2 += citations.size();
 				
 				row ++;
 				
 			}
+			
+			end_time = System.nanoTime();
+			
+			time = (end_time - start_time)/(row * 1.0 * 1000000000);
+			
+			System.out.print(time + "s	");
 			
 			if(row !=0)
 				citation_size2 = citation_size2 / row;
@@ -404,6 +430,16 @@ public class stress_test4 {
 //			System.out.print(origin_citation_size + "	");
 			
 			System.out.print(Tuple_reasoning2_test.covering_set_num * 1.0/row + "	");
+			
+			System.out.print("pre_processing::" + Tuple_reasoning2_test.pre_processing_time + "	");
+			
+			System.out.print("query::" + Tuple_reasoning2_test.query_time + "	");
+			
+			System.out.print("reasoning::" + Tuple_reasoning2_test.reasoning_time + "	");
+			
+			System.out.print("population::" + Tuple_reasoning2_test.population_time + "	");
+			
+			System.out.println();
 			
 //			Tuple_reasoning1.compare(citation_view_map1, citation_view_map2);
 			

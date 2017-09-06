@@ -1,0 +1,1401 @@
+3
+1
+start new view size
+java -Xmx20480m -jar stress_test4.jar 3 5 true true true false
+[id]
+[id]
+[id]
+Q(gpcr|object_id,object|object_id,gpcr1|object_id) :- gpcr,object,gpcr1
+[gpcr|object_id, object|object_id],v1(gpcr|object_id,object|object_id,object|comments,object|only_grac) :- gpcr,object
+[gpcr|object_id],v2(gpcr|object_id) :- gpcr
+[gpcr|object_id, object|object_id],v3(gpcr|object_id,object|object_id,object|annotation_status,object|only_iuphar,object|in_gtip) :- gpcr,object
+[object|object_id],v4(object|object_id,object|name,object|structural_info_comments,object|no_contributor_list,object|in_gtip) :- object
+[object|object_id],v5(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object
+v1(gpcr|object_id,object|object_id,object|comments,object|only_grac) :- gpcr,object
+v2(gpcr|object_id) :- gpcr
+v3(gpcr|object_id,object|object_id,object|annotation_status,object|only_iuphar,object|in_gtip) :- gpcr,object
+v4(object|object_id,object|name,object|structural_info_comments,object|no_contributor_list,object|in_gtip) :- object
+v5(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object
+1	1000000	7.356460288s	6.8830017358E-5s	2.844713	1000000	10.0	pre_processing::0.136747407	query::1.987397961	reasoning::0.040198272	population::1.6637716439996284	
+1	1000000	8.073224619s	7.8218992907E-5s	2.844713	1000000	10.0	pre_processing::0.172717256	query::2.242813922	reasoning::0.039025915	population::1.9038129200003329	
+1	1000000	8.075089362s	7.2569331606E-5s	2.844713	1000000	10.0	pre_processing::0.161112684	query::2.276645677	reasoning::0.039918515	population::1.8422208289998878	
+1	1000000	6.740103528s	7.3145900482E-5s	2.844713	1000000	10.0	pre_processing::0.156253894	query::0.677479488	reasoning::0.05688753	population::1.1073206160000877	
+1	1000000	6.559094935s	7.0954822483E-5s	2.844713	1000000	10.0	pre_processing::0.161375521	query::0.697249185	reasoning::0.056901193	population::3.145808483999859	
+1	1000000	8.649499408s	6.9652433602E-5s	2.844713	1000000	10.0	pre_processing::0.15619219	query::0.688784251	reasoning::0.056432464	population::5.337392531999275	
+2
+
+v1(gpcr|object_id,object|object_id,object|comments,object|only_grac) :- gpcr,object
+v2(gpcr|object_id) :- gpcr
+v3(gpcr|object_id,object|object_id,object|annotation_status,object|only_iuphar,object|in_gtip) :- gpcr,object
+v4(object|object_id,object|name,object|structural_info_comments,object|no_contributor_list,object|in_gtip) :- object
+v51(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id>'391'
+v52(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='391'
+2	1000000	9.338772931s	7.4298273999E-5s	2.844713	1000000	10.0	pre_processing::0.177363	query::3.594673357	reasoning::0.046605597	population::1.563272172000172	
+2	1000000	9.740770327s	7.279209889E-5s	2.844713	1000000	10.0	pre_processing::0.203904039	query::4.056307792	reasoning::0.184366042	population::1.411472433000036	
+2	1000000	9.44433414s	7.1935838122E-5s	2.844713	1000000	10.0	pre_processing::0.191595821	query::3.871293317	reasoning::0.044345455	population::1.4502648010001007	
+2	1000000	10.702455839s	6.7447850175E-5s	2.844713	1000000	10.0	pre_processing::0.194460726	query::2.734439286	reasoning::0.06497067000000001	population::1.1221532079999705	
+2	1000000	10.910298015s	6.778640735E-5s	2.844713	1000000	10.0	pre_processing::0.188096629	query::2.863758372	reasoning::0.061954601	population::4.94572822799989	
+2	1000000	8.590581398s	7.0426509729E-5s	2.844713	1000000	10.0	pre_processing::0.194096785	query::2.777200387	reasoning::0.060514436	population::1.3506643589998781	
+3
+
+v1(gpcr|object_id,object|object_id,object|comments,object|only_grac) :- gpcr,object
+v2(gpcr|object_id) :- gpcr
+v3(gpcr|object_id,object|object_id,object|annotation_status,object|only_iuphar,object|in_gtip) :- gpcr,object
+v4(object|object_id,object|name,object|structural_info_comments,object|no_contributor_list,object|in_gtip) :- object
+v51(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id>'391'
+v521(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='391',object|object_id>'14'
+v522(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='14'
+3	1000000	12.600668758s	6.6155971754E-5s	2.844713	1000000	10.0	pre_processing::0.221242623	query::5.070413168	reasoning::0.052744792	population::1.5183967929998368	
+3	1000000	12.934649825s	6.6126325719E-5s	2.844713	1000000	10.0	pre_processing::0.21860334	query::5.200542615	reasoning::0.053551623	population::1.5586548950000332	
+3	1000000	12.787467544s	6.7045796779E-5s	2.844713	1000000	10.0	pre_processing::0.213992097	query::5.189519878	reasoning::0.053695532000000004	population::3.3717253689996185	
+3	1000000	9.749585644s	7.2568025685E-5s	2.844713	1000000	10.0	pre_processing::0.216762567	query::2.440760666	reasoning::0.083773922	population::1.431373149999738	
+3	1000000	9.621655778s	7.0888955928E-5s	2.844713	1000000	10.0	pre_processing::0.204779214	query::2.456788679	reasoning::0.079544432	population::1.320896122000194	
+3	1000000	9.902133395s	7.0610202726E-5s	2.844713	1000000	10.0	pre_processing::0.220391455	query::2.43166707	reasoning::0.078756357	population::3.272371960999307	
+4
+
+v1(gpcr|object_id,object|object_id,object|comments,object|only_grac) :- gpcr,object
+v3(gpcr|object_id,object|object_id,object|annotation_status,object|only_iuphar,object|in_gtip) :- gpcr,object
+v4(object|object_id,object|name,object|structural_info_comments,object|no_contributor_list,object|in_gtip) :- object
+v51(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id>'391'
+v521(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='391',object|object_id>'14'
+v522(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='14'
+v21(gpcr|object_id) :- gpcr,gpcr|object_id>'129'
+v22(gpcr|object_id) :- gpcr,gpcr|object_id<='129'
+12	1000000	26.053759275s	6.8215348054E-5s	2.844713	1000000	10.0	pre_processing::0.227547414	query::15.679175899	reasoning::0.08194274899999998	population::3.826032636999534	
+12	1000000	25.896669184s	7.0214363071E-5s	2.844713	1000000	10.0	pre_processing::0.226695753	query::15.747265198	reasoning::0.18050202399999998	population::1.1427699799995725	
+12	1000000	26.109950282s	6.7401983731E-5s	2.844713	1000000	10.0	pre_processing::0.234592214	query::15.775632599	reasoning::0.081979061	population::3.8310788809996157	
+12	1000000	13.573603991s	6.7210803544E-5s	2.844713	1000000	10.0	pre_processing::0.23324906	query::4.583152956	reasoning::0.125842008	population::1.7153694189996123	
+12	1000000	13.493217796s	6.7248296188E-5s	2.844713	1000000	10.0	pre_processing::0.227307419	query::4.583330353	reasoning::0.132307698	population::1.5887894699998186	
+12	1000000	13.506368302s	6.7839548543E-5s	2.844713	1000000	10.0	pre_processing::0.230092957	query::4.576816791	reasoning::0.12551364299999998	population::3.2018408929990256	
+5
+
+v1(gpcr|object_id,object|object_id,object|comments,object|only_grac) :- gpcr,object
+v3(gpcr|object_id,object|object_id,object|annotation_status,object|only_iuphar,object|in_gtip) :- gpcr,object
+v4(object|object_id,object|name,object|structural_info_comments,object|no_contributor_list,object|in_gtip) :- object
+v51(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id>'391'
+v521(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='391',object|object_id>'14'
+v522(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='14'
+v21(gpcr|object_id) :- gpcr,gpcr|object_id>'129'
+v221(gpcr|object_id) :- gpcr,gpcr|object_id<='129',gpcr|object_id>'81'
+v222(gpcr|object_id) :- gpcr,gpcr|object_id<='81'
+27	1000000	35.482643359s	6.9817498563E-5s	2.844713	1000000	10.0	pre_processing::0.250123197	query::25.62602259	reasoning::0.127934077	population::1.0470210149998551	
+27	1000000	35.03074595s	7.0307631302E-5s	2.844713	1000000	10.0	pre_processing::0.249454359	query::25.706547723	reasoning::0.125279262	population::1.0762870250004601	
+27	1000000	35.318229188s	7.0412991357E-5s	2.844713	1000000	10.0	pre_processing::0.298747003	query::25.682582197	reasoning::0.12693105899999998	population::1.2226191540002747	
+27	1000000	16.461311432s	6.86002313E-5s	2.844713	1000000	10.0	pre_processing::0.248932313	query::7.609792817	reasoning::0.196175858	population::1.1397215990003196	
+27	1000000	17.576331646s	7.159863209E-5s	2.844713	1000000	10.0	pre_processing::0.238984228	query::7.632069484	reasoning::0.48441245299999997	population::1.3274615080003285	
+27	1000000	16.471178948s	6.9513446602E-5s	2.844713	1000000	10.0	pre_processing::0.268742347	query::7.813031311	reasoning::0.20237788499999998	population::1.5662393199999083	
+6
+
+v1(gpcr|object_id,object|object_id,object|comments,object|only_grac) :- gpcr,object
+v3(gpcr|object_id,object|object_id,object|annotation_status,object|only_iuphar,object|in_gtip) :- gpcr,object
+v4(object|object_id,object|name,object|structural_info_comments,object|no_contributor_list,object|in_gtip) :- object
+v51(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id>'391'
+v521(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='391',object|object_id>'14'
+v522(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='14'
+v21(gpcr|object_id) :- gpcr,gpcr|object_id>'129'
+v221(gpcr|object_id) :- gpcr,gpcr|object_id<='129',gpcr|object_id>'81'
+v2221(gpcr|object_id) :- gpcr,gpcr|object_id<='81',gpcr|object_id>'10'
+v2222(gpcr|object_id) :- gpcr,gpcr|object_id<='10'
+48	1000000	49.525730206s	6.8941296293E-5s	2.844713	1000000	10.0	pre_processing::0.263802267	query::36.278785209	reasoning::0.23068478599999998	population::1.2085318129995972	
+48	1000000	49.238330673s	6.8644492454E-5s	2.844713	1000000	10.0	pre_processing::0.264088834	query::36.398352295	reasoning::0.17694734399999995	population::1.2295674069996674	
+48	1000000	49.287622899s	7.0951148194E-5s	2.844713	1000000	10.0	pre_processing::0.257583387	query::36.22737848	reasoning::0.176134456	population::1.544677632000304	
+48	1000000	18.397655758s	7.2250244114E-5s	2.844713	1000000	10.0	pre_processing::0.256085708	query::8.513862821	reasoning::0.6155699160000001	population::1.4773202949994924	
+48	1000000	18.251163798s	7.2142332991E-5s	2.844713	1000000	10.0	pre_processing::0.266804941	query::8.490126446	reasoning::0.297482957	population::1.3038963299997832	
+48	1000000	18.260057347s	7.22201014E-5s	2.844713	1000000	10.0	pre_processing::0.267549484	query::8.568179625	reasoning::0.302345102	population::1.2419412839997095	
+7
+
+v1(gpcr|object_id,object|object_id,object|comments,object|only_grac) :- gpcr,object
+v3(gpcr|object_id,object|object_id,object|annotation_status,object|only_iuphar,object|in_gtip) :- gpcr,object
+v4(object|object_id,object|name,object|structural_info_comments,object|no_contributor_list,object|in_gtip) :- object
+v51(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id>'391'
+v521(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='391',object|object_id>'14'
+v21(gpcr|object_id) :- gpcr,gpcr|object_id>'129'
+v221(gpcr|object_id) :- gpcr,gpcr|object_id<='129',gpcr|object_id>'81'
+v2221(gpcr|object_id) :- gpcr,gpcr|object_id<='81',gpcr|object_id>'10'
+v2222(gpcr|object_id) :- gpcr,gpcr|object_id<='10'
+v5221(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='14',object|object_id>'2'
+v5222(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='2'
+48	1000000	55.079383567s	6.9309697019E-5s	2.844713	1000000	10.0	pre_processing::0.296641824	query::41.679114429	reasoning::0.18067576700000001	population::5.740964167999839	
+48	1000000	55.524649495s	7.4576350372E-5s	2.844713	1000000	10.0	pre_processing::0.286923153	query::41.831086597	reasoning::0.180382777	population::1.0063563709996723	
+48	1000000	55.529123703s	6.9589900666E-5s	2.844713	1000000	10.0	pre_processing::0.284915722	query::41.715432853	reasoning::0.19644524299999994	population::1.6158024150004704	
+48	1000000	20.998381113s	7.2257261166E-5s	2.844713	1000000	10.0	pre_processing::0.288688048	query::10.005729263	reasoning::0.29208409500000004	population::1.5874671879996298	
+48	1000000	20.681467463s	7.1913158276E-5s	2.844713	1000000	10.0	pre_processing::0.300242951	query::10.055680623	reasoning::0.2984896789999999	population::1.5446891440000685	
+48	1000000	21.01551553s	7.1744991509E-5s	2.844713	1000000	10.0	pre_processing::0.293485191	query::10.083817901	reasoning::0.60056429	population::2.0682858349997195	
+8
+
+v1(gpcr|object_id,object|object_id,object|comments,object|only_grac) :- gpcr,object
+v3(gpcr|object_id,object|object_id,object|annotation_status,object|only_iuphar,object|in_gtip) :- gpcr,object
+v4(object|object_id,object|name,object|structural_info_comments,object|no_contributor_list,object|in_gtip) :- object
+v51(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id>'391'
+v521(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='391',object|object_id>'14'
+v21(gpcr|object_id) :- gpcr,gpcr|object_id>'129'
+v221(gpcr|object_id) :- gpcr,gpcr|object_id<='129',gpcr|object_id>'81'
+v2221(gpcr|object_id) :- gpcr,gpcr|object_id<='81',gpcr|object_id>'10'
+v5221(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='14',object|object_id>'2'
+v5222(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='2'
+v22221(gpcr|object_id) :- gpcr,gpcr|object_id<='10',gpcr|object_id>'7'
+v22222(gpcr|object_id) :- gpcr,gpcr|object_id<='7'
+60	1000000	67.238943241s	6.975169948E-5s	2.844713	1000000	10.0	pre_processing::0.293823819	query::52.977051367	reasoning::0.20705053500000006	population::0.9932408980003705	
+60	1000000	69.326055828s	7.6282831094E-5s	2.844713	1000000	10.0	pre_processing::0.311569555	query::53.843554193	reasoning::0.383287621	population::1.3335810770002225	
+60	1000000	67.26443701s	6.8302219467E-5s	2.844713	1000000	10.0	pre_processing::0.302491288	query::52.886187573	reasoning::0.49668873499999994	population::0.9214890500002546	
+60	1000000	23.388893338s	7.1140962641E-5s	2.844713	1000000	10.0	pre_processing::0.310283011	query::13.042231535	reasoning::0.5376260669999999	population::0.9752267019998059	
+60	1000000	25.40145238s	7.1997682165E-5s	2.844713	1000000	10.0	pre_processing::0.30197111	query::13.983658463	reasoning::0.3975265659999999	population::1.1367886369996905	
+60	1000000	25.096778632s	7.7246322169E-5s	2.844713	1000000	10.0	pre_processing::0.304523003	query::13.892175018	reasoning::0.5319178400000001	population::1.7345054270002973	
+9
+
+v1(gpcr|object_id,object|object_id,object|comments,object|only_grac) :- gpcr,object
+v3(gpcr|object_id,object|object_id,object|annotation_status,object|only_iuphar,object|in_gtip) :- gpcr,object
+v4(object|object_id,object|name,object|structural_info_comments,object|no_contributor_list,object|in_gtip) :- object
+v521(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='391',object|object_id>'14'
+v21(gpcr|object_id) :- gpcr,gpcr|object_id>'129'
+v221(gpcr|object_id) :- gpcr,gpcr|object_id<='129',gpcr|object_id>'81'
+v2221(gpcr|object_id) :- gpcr,gpcr|object_id<='81',gpcr|object_id>'10'
+v5221(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='14',object|object_id>'2'
+v5222(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='2'
+v22221(gpcr|object_id) :- gpcr,gpcr|object_id<='10',gpcr|object_id>'7'
+v22222(gpcr|object_id) :- gpcr,gpcr|object_id<='7'
+v511(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id>'2562'
+v512(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id>'391',object|object_id<='2562'
+80	1000000	75.335316873s	7.1766538347E-5s	2.844713	1000000	10.0	pre_processing::0.313728758	query::60.486877218	reasoning::0.27962946199999994	population::4.483582082999183	
+80	1000000	75.181479829s	7.4462072603E-5s	2.844713	1000000	10.0	pre_processing::0.319585481	query::60.019759007	reasoning::0.45269211699999995	population::1.2601566949997443	
+80	1000000	75.47501824s	7.0949031368E-5s	2.844713	1000000	10.0	pre_processing::0.337500411	query::59.734482323	reasoning::0.39552021300000006	population::1.3417166179999542	
+80	1000000	24.413035494s	7.2482607026E-5s	2.844713	1000000	10.0	pre_processing::0.326212153	query::12.916062041	reasoning::0.46146271899999985	population::0.9342301780000368	
+80	1000000	25.216997878s	7.9543868025E-5s	2.844713	1000000	10.0	pre_processing::0.324272844	query::12.93291859	reasoning::0.8209683240000001	population::1.132078034999828	
+80	1000000	26.660449697s	7.356213081E-5s	2.844713	1000000	10.0	pre_processing::0.320233702	query::13.804712182	reasoning::0.8577652229999996	population::1.3799465109992386	
+10
+
+v1(gpcr|object_id,object|object_id,object|comments,object|only_grac) :- gpcr,object
+v3(gpcr|object_id,object|object_id,object|annotation_status,object|only_iuphar,object|in_gtip) :- gpcr,object
+v4(object|object_id,object|name,object|structural_info_comments,object|no_contributor_list,object|in_gtip) :- object
+v521(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='391',object|object_id>'14'
+v21(gpcr|object_id) :- gpcr,gpcr|object_id>'129'
+v221(gpcr|object_id) :- gpcr,gpcr|object_id<='129',gpcr|object_id>'81'
+v5221(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='14',object|object_id>'2'
+v5222(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='2'
+v22221(gpcr|object_id) :- gpcr,gpcr|object_id<='10',gpcr|object_id>'7'
+v22222(gpcr|object_id) :- gpcr,gpcr|object_id<='7'
+v511(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id>'2562'
+v512(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id>'391',object|object_id<='2562'
+v22211(gpcr|object_id) :- gpcr,gpcr|object_id<='81',gpcr|object_id>'66'
+v22212(gpcr|object_id) :- gpcr,gpcr|object_id>'10',gpcr|object_id<='66'
+100	1000000	89.470057436s	7.1545806985E-5s	2.844713	1000000	10.0	pre_processing::0.344588015	query::72.788843097	reasoning::0.8787244140000003	population::0.9937875299997971	
+100	1000000	88.366775533s	7.3707209898E-5s	2.844713	1000000	10.0	pre_processing::0.360743274	query::70.906990968	reasoning::0.47096499899999994	population::5.116527345998933	
+100	1000000	88.377950323s	7.1134345855E-5s	2.844713	1000000	10.0	pre_processing::0.33647371	query::70.528050694	reasoning::0.3255755179999999	population::5.337919429998993	
+100	1000000	32.290891967s	7.2244075389E-5s	2.844713	1000000	10.0	pre_processing::0.335995004	query::13.697867591	reasoning::0.8820994960000005	population::1.4015182079994026	
+100	1000000	28.592136411s	7.4833333268E-5s	2.844713	1000000	10.0	pre_processing::0.346800918	query::14.45582433	reasoning::0.6673917259999999	population::1.0855243749994476	
+100	1000000	29.201350702s	7.4208966211E-5s	2.844713	1000000	10.0	pre_processing::0.34392093	query::14.626389772	reasoning::0.5934499500000002	population::1.0313766529999897	
+11
+
+v1(gpcr|object_id,object|object_id,object|comments,object|only_grac) :- gpcr,object
+v3(gpcr|object_id,object|object_id,object|annotation_status,object|only_iuphar,object|in_gtip) :- gpcr,object
+v4(object|object_id,object|name,object|structural_info_comments,object|no_contributor_list,object|in_gtip) :- object
+v521(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='391',object|object_id>'14'
+v221(gpcr|object_id) :- gpcr,gpcr|object_id<='129',gpcr|object_id>'81'
+v5221(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='14',object|object_id>'2'
+v5222(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='2'
+v22221(gpcr|object_id) :- gpcr,gpcr|object_id<='10',gpcr|object_id>'7'
+v22222(gpcr|object_id) :- gpcr,gpcr|object_id<='7'
+v511(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id>'2562'
+v512(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id>'391',object|object_id<='2562'
+v22211(gpcr|object_id) :- gpcr,gpcr|object_id<='81',gpcr|object_id>'66'
+v22212(gpcr|object_id) :- gpcr,gpcr|object_id>'10',gpcr|object_id<='66'
+v211(gpcr|object_id) :- gpcr,gpcr|object_id>'320'
+v212(gpcr|object_id) :- gpcr,gpcr|object_id>'129',gpcr|object_id<='320'
+144	1000000	112.037472984s	7.846481295E-5s	2.844713	1000000	10.0	pre_processing::0.343579962	query::92.592781271	reasoning::0.49687066999999996	population::1.1315215529994753	
+144	1000000	112.38928294s	7.4289978389E-5s	2.844713	1000000	10.0	pre_processing::0.350888007	query::92.586340931	reasoning::2.6134849779999993	population::1.4712828850003183	
+144	1000000	111.56397738s	7.7420533615E-5s	2.844713	1000000	10.0	pre_processing::0.359477066	query::92.804550513	reasoning::0.5984656149999996	population::1.2453856959996983	
+144	1000000	36.091470663s	7.2894807348E-5s	2.844713	1000000	10.0	pre_processing::0.349400476	query::16.053452785	reasoning::0.7356299319999997	population::1.4071872909996508	
+144	1000000	36.48271889s	7.7133296586E-5s	2.844713	1000000	10.0	pre_processing::0.353882945	query::15.862251349	reasoning::0.7358822809999999	population::1.4462456310002267	
+144	1000000	35.779313039s	7.33001215E-5s	2.844713	1000000	10.0	pre_processing::0.355877411	query::16.01786474	reasoning::0.7415725940000002	population::1.1265579519999136	
+12
+
+v1(gpcr|object_id,object|object_id,object|comments,object|only_grac) :- gpcr,object
+v3(gpcr|object_id,object|object_id,object|annotation_status,object|only_iuphar,object|in_gtip) :- gpcr,object
+v521(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='391',object|object_id>'14'
+v221(gpcr|object_id) :- gpcr,gpcr|object_id<='129',gpcr|object_id>'81'
+v5221(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='14',object|object_id>'2'
+v5222(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id<='2'
+v22221(gpcr|object_id) :- gpcr,gpcr|object_id<='10',gpcr|object_id>'7'
+v22222(gpcr|object_id) :- gpcr,gpcr|object_id<='7'
+v511(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id>'2562'
+v512(object|object_id,object|comments,object|abbreviation,object|systematic_name,object|in_gtip) :- object,object|object_id>'391',object|object_id<='2562'
+v22211(gpcr|object_id) :- gpcr,gpcr|object_id<='81',gpcr|object_id>'66'
+v22212(gpcr|object_id) :- gpcr,gpcr|object_id>'10',gpcr|object_id<='66'
+v211(gpcr|object_id) :- gpcr,gpcr|object_id>'320'
+v212(gpcr|object_id) :- gpcr,gpcr|object_id>'129',gpcr|object_id<='320'
+v41(object|object_id,object|name,object|structural_info_comments,object|no_contributor_list,object|in_gtip) :- object,object|object_id>'2850'
+v42(object|object_id,object|name,object|structural_info_comments,object|no_contributor_list,object|in_gtip) :- object,object|object_id<='2850'
+180	1000000	113.634591363s	8.1084931151E-5s	2.844713	1000000	10.0	pre_processing::0.394694288	query::93.150672816	reasoning::1.4232055740000003	population::1.1759886369994148	
+180	1000000	115.620834705s	7.9020400433E-5s	2.844713	1000000	10.0	pre_processing::0.385825564	query::94.672272543	reasoning::1.6989061790000008	population::1.251268662999954	
+180	1000000	113.197828959s	7.5908373658E-5s	2.844713	1000000	10.0	pre_processing::0.383790416	query::90.865868236	reasoning::6.360819013	population::1.2734150310001298	
+180	1000000	37.459790948s	^Z
+[1]+  Stopped                 bash stress_testing4.sh
+wuyinjun@ubuntu:~/workspace/Data_citation_demo$ ps -aux | grep bash
+wuyinjun   2601  0.0  0.0  23024  5708 pts/18   Ss   11:11   0:00 bash
+wuyinjun   8374  0.0  0.0  12564  2972 pts/18   T    12:41   0:00 bash stress_testing4.sh
+wuyinjun  13250  0.0  0.0  14224   964 pts/18   S+   14:49   0:00 grep --color=auto bash
+wuyinjun@ubuntu:~/workspace/Data_citation_demo$ kill -9 8374
+wuyinjun@ubuntu:~/workspace/Data_citation_demo$ kill -9 8374
+bash: kill: (8374) - No such process
+[1]+  Killed                  bash stress_testing4.sh
+wuyinjun@ubuntu:~/workspace/Data_citation_demo$ kill -9 8374
+bash: kill: (8374) - No such process
+wuyinjun@ubuntu:~/workspace/Data_citation_demo$ bash stress_testing4.sh 
+3
+1
+start new view size
+java -Xmx20480m -jar stress_test4.jar 3 5 true true true false
+[id]
+[id]
+[id]
+Q(family|family_id,ligand|ligand_id,object|object_id) :- family,ligand,object
+[family|family_id],v1(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family
+[object|object_id, ligand|ligand_id],v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+[object|object_id, family|family_id],v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+[ligand|ligand_id, object|object_id],v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+[ligand|ligand_id],v5(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand
+v1(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v5(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand
+1	1000000	7.574431755s	2.5718988703E-5s	1.391469	1000000	5.0	pre_processing::0.26745131	query::1.926932158	reasoning::0.021302987	population::1.6180513160001233	
+1	1000000	8.706476105s	2.9777298293E-5s	1.391469	1000000	5.0	pre_processing::0.308204536	query::2.260756619	reasoning::0.021761755	population::1.8364356010002714	
+1	1000000	8.338286087s	2.811503136E-5s	1.391469	1000000	5.0	pre_processing::0.290980335	query::2.076024969	reasoning::0.024576524	population::1.4568605889998678	
+1	1000000	6.772605645s	2.7078455384E-5s	1.391469	1000000	5.0	pre_processing::0.28326859	query::0.647430233	reasoning::0.027745617	population::1.3056281569996753	
+1	1000000	6.846133387s	2.881927587E-5s	1.391469	1000000	5.0	pre_processing::0.289023263	query::0.664919042	reasoning::0.024226777	population::2.2374439419993783	
+1	1000000	6.663720606s	2.7418967035E-5s	1.391469	1000000	5.0	pre_processing::0.288865545	query::0.661622484	reasoning::0.025677624	population::2.2768713249995254	
+2
+
+v1(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+2	1000000	10.7565613s	2.6525585572E-5s	1.391469	1000000	5.0	pre_processing::0.424707268	query::3.938609227	reasoning::0.027983988	population::1.3103272590003663	
+2	1000000	10.609950616s	2.6701088105E-5s	1.391469	1000000	5.0	pre_processing::0.421620904	query::3.987645558	reasoning::0.03052947	population::1.5578694490003178	
+2	1000000	11.040053056s	2.6722491137E-5s	1.391469	1000000	5.0	pre_processing::0.434891838	query::3.97771051	reasoning::0.028598112000000002	population::1.3589486910003066	
+2	1000000	8.348958562s	2.7404714457E-5s	1.391469	1000000	5.0	pre_processing::0.435107816	query::1.679739363	reasoning::0.036516222	population::2.3907259370000853	
+2	1000000	8.32148534s	2.6702536628E-5s	1.391469	1000000	5.0	pre_processing::0.433115111	query::1.688210253	reasoning::0.03402226	population::2.6425801969997686	
+2	1000000	8.371105128s	2.6906557947E-5s	1.391469	1000000	5.0	pre_processing::0.437596429	query::1.684717044	reasoning::0.031708055	population::1.373604244000161	
+3
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v11(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751'
+v12(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751'
+4	1000000	16.523929334s	2.4896027415E-5s	1.391469	1000000	5.0	pre_processing::0.445413017	query::6.879353511	reasoning::0.040874482000000004	population::1.0947299840002922	
+4	1000000	14.466661958s	2.7122259374E-5s	1.391469	1000000	5.0	pre_processing::0.462646918	query::7.02239627	reasoning::0.033727788999999994	population::1.5369938899998914	
+4	1000000	14.398818707s	2.7305748522E-5s	1.391469	1000000	5.0	pre_processing::0.444634385	query::6.634527311	reasoning::0.033698817	population::1.676297053000091	
+4	1000000	9.855620137s	2.8709630811E-5s	1.391469	1000000	5.0	pre_processing::0.454086353	query::2.340429125	reasoning::0.049112274	population::2.879179951000905	
+4	1000000	9.691704677s	2.8877732495E-5s	1.391469	1000000	5.0	pre_processing::0.451283232	query::2.370150173	reasoning::0.041602954	population::2.8280498570002957	
+4	1000000	9.749739005s	2.7303355709E-5s	1.391469	1000000	5.0	pre_processing::0.479345475	query::2.32867352	reasoning::0.043138432	population::1.142477910000121	
+4
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v12(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751'
+v111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771'
+v112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='771'
+6	1000000	18.079750459s	2.4918293886E-5s	1.391469	1000000	5.0	pre_processing::0.444770786	query::9.960548261	reasoning::0.04220780699999999	population::3.7123951170000233	
+6	1000000	18.153035425s	2.4803843331E-5s	1.391469	1000000	5.0	pre_processing::0.463489426	query::10.103482679	reasoning::0.042991839999999996	population::1.3136877050004925	
+6	1000000	18.270144433s	2.4988303844E-5s	1.391469	1000000	5.0	pre_processing::0.489263052	query::10.120927752	reasoning::0.042520085	population::1.6656265390002711	
+6	1000000	10.936108616s	2.6970632835E-5s	1.391469	1000000	5.0	pre_processing::0.478534022	query::2.991913361	reasoning::0.043876668	population::1.6137322609993479	
+6	1000000	10.999543769s	2.7084115461E-5s	1.391469	1000000	5.0	pre_processing::0.469771928	query::3.020409282	reasoning::0.050325847	population::1.494026773999442	
+6	1000000	10.883304883s	2.7220662941E-5s	1.391469	1000000	5.0	pre_processing::0.458009091	query::2.981056986	reasoning::0.044129937	population::1.5576008339993554	
+5
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771'
+v112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='771'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185'
+8	1000000	23.454691749s	2.5034144042E-5s	1.391469	1000000	5.0	pre_processing::0.470539321	query::14.145844996	reasoning::0.042855469	population::1.4103833170005087	
+8	1000000	24.004798783s	2.4824645879E-5s	1.391469	1000000	5.0	pre_processing::0.488916944	query::14.196549893	reasoning::0.191694691	population::1.309274009999699	
+8	1000000	23.936803986s	2.4906894154E-5s	1.391469	1000000	5.0	pre_processing::0.494250186	query::14.301249463	reasoning::0.269254183	population::1.1498872140003658	
+8	1000000	12.158939648s	2.7173015937E-5s	1.391469	1000000	5.0	pre_processing::0.470881032	query::3.581896232	reasoning::0.053592179999999996	population::1.555686574999736	
+8	1000000	11.925229806s	2.7311869493E-5s	1.391469	1000000	5.0	pre_processing::0.475231037	query::3.538719498	reasoning::0.05164869200000001	population::1.1757997230006532	
+8	1000000	12.027970704s	2.7598233964E-5s	1.391469	1000000	5.0	pre_processing::0.482709538	query::3.589705823	reasoning::0.053133506999999996	population::3.1879951480001023	
+6
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='771'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185'
+v1111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918'
+v1112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='918'
+10	1000000	29.138329993s	2.507319062E-5s	1.391469	1000000	5.0	pre_processing::0.484641736	query::21.116282697	reasoning::0.049670445	population::1.3022255729999952	
+10	1000000	29.078010933s	2.477271569E-5s	1.391469	1000000	5.0	pre_processing::0.492572029	query::21.173865987	reasoning::0.05364990000000001	population::1.2237029100004067	
+10	1000000	29.40520382s	2.5352744391E-5s	1.391469	1000000	5.0	pre_processing::0.494126342	query::21.159744819	reasoning::0.051511056	population::1.4327581340004154	
+10	1000000	13.268763198s	2.8305499723E-5s	1.391469	1000000	5.0	pre_processing::0.49134813	query::6.431736757	reasoning::0.057780805000000005	population::1.12297130900022	
+10	1000000	13.519999893s	2.7022614639E-5s	1.391469	1000000	5.0	pre_processing::0.509666259	query::6.546830333	reasoning::0.05817261299999999	population::1.2610364809996437	
+10	1000000	13.274728645s	2.6956249813E-5s	1.391469	1000000	5.0	pre_processing::0.479923866	query::6.419705755	reasoning::0.057441147	population::1.4600601020001502	
+7
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='771'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185'
+v1112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='918'
+v11111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924'
+v11112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='924'
+12	1000000	34.55781348s	2.6759440087E-5s	1.391469	1000000	5.0	pre_processing::0.492177828	query::25.56535961	reasoning::0.05685185699999999	population::1.3755319629996656	
+12	1000000	34.589097512s	2.5142749618E-5s	1.391469	1000000	5.0	pre_processing::0.5178991	query::25.382492813	reasoning::0.054017759000000005	population::1.0921812759998386	
+12	1000000	34.531459917s	2.5647852455E-5s	1.391469	1000000	5.0	pre_processing::0.503587481	query::25.404939186	reasoning::0.052088818999999995	population::1.3661767810002297	
+12	1000000	15.080381598s	2.7381094701E-5s	1.391469	1000000	5.0	pre_processing::0.520980903	query::7.328891471	reasoning::0.062001592999999994	population::1.2257324129996143	
+12	1000000	14.85654282s	2.7826267078E-5s	1.391469	1000000	5.0	pre_processing::0.509926963	query::6.910500895	reasoning::0.06113664299999999	population::1.5198876259997791	
+12	1000000	14.572410452s	2.8999273439E-5s	1.391469	1000000	5.0	pre_processing::0.510461911	query::6.91665094	reasoning::0.059969721000000004	population::1.409185666999507	
+8
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='771'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185'
+v11111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924'
+v11112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='924'
+v11121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'794'
+v11122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='794'
+14	1000000	38.023638191s	2.7508083758E-5s	1.391469	1000000	5.0	pre_processing::0.506996807	query::28.442048664	reasoning::0.046657579000000005	population::1.6918250739997343	
+14	1000000	38.493241612s	2.8168774382E-5s	1.391469	1000000	5.0	pre_processing::0.524682382	query::28.46543908	reasoning::0.29796823	population::1.1738374990003568	
+14	1000000	38.226926194s	2.8187418992E-5s	1.391469	1000000	5.0	pre_processing::0.531235571	query::28.527526375	reasoning::0.0562195	population::1.2378136450004604	
+14	1000000	16.560256181s	2.8559560188E-5s	1.391469	1000000	5.0	pre_processing::0.565704206	query::7.287444377	reasoning::0.06680882	population::1.4755403940001721	
+14	1000000	16.903760065s	2.5750048542E-5s	1.391469	1000000	5.0	pre_processing::0.520937386	query::7.346045883	reasoning::0.05763479500000001	population::2.700414296999584	
+14	1000000	16.391220137s	2.8101802906E-5s	1.391469	1000000	5.0	pre_processing::0.524832103	query::7.230039522	reasoning::0.063156226	population::1.8442967879996235	
+9
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='771'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185'
+v11111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924'
+v11121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'794'
+v11122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='794'
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='923'
+16	1000000	44.872891015s	2.8248485732E-5s	1.391469	1000000	5.0	pre_processing::0.547593544	query::33.896418302	reasoning::0.084565141	population::1.1150319069999841	
+16	1000000	44.897938728s	2.8277196192E-5s	1.391469	1000000	5.0	pre_processing::0.543201343	query::33.905491996	reasoning::0.055700457999999994	population::2.019143826999808	
+16	1000000	44.589836032s	2.7925190131E-5s	1.391469	1000000	5.0	pre_processing::0.545130217	query::33.839378968	reasoning::0.05580108	population::1.3798089690003488	
+16	1000000	20.178379896s	2.6101687283E-5s	1.391469	1000000	5.0	pre_processing::0.540946471	query::8.09234681	reasoning::0.069911985	population::4.711080670998199	
+16	1000000	20.204993524s	2.6076452624E-5s	1.391469	1000000	5.0	pre_processing::0.536406077	query::8.085672586	reasoning::0.068931167	population::4.516867455998333	
+16	1000000	19.861142548s	2.6089137455E-5s	1.391469	1000000	5.0	pre_processing::0.537178274	query::8.03756255	reasoning::0.25946816899999997	population::1.8881116669991183	
+10
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='771'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v11111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924'
+v11121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'794'
+v11122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='794'
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='923'
+v1221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'160'
+v1222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160'
+18	1000000	51.176080194s	2.8918169481E-5s	1.391469	1000000	5.0	pre_processing::0.539800992	query::39.443607752	reasoning::0.05665110399999999	population::1.2619834210001888	
+18	1000000	53.353568758s	2.577684721E-5s	1.391469	1000000	5.0	pre_processing::0.545440933	query::39.421293447	reasoning::0.059537603	population::6.407033377999521	
+18	1000000	53.372308518s	2.6052183357E-5s	1.391469	1000000	5.0	pre_processing::0.547986912	query::39.329919715	reasoning::0.05797966000000001	population::1.5950175210002318	
+18	1000000	19.793763917s	2.5860035804E-5s	1.391469	1000000	5.0	pre_processing::0.534067339	query::8.470355031	reasoning::2.841439196	population::1.2503835929992904	
+18	1000000	20.042396759s	2.5809825477E-5s	1.391469	1000000	5.0	pre_processing::0.540473675	query::8.532259073	reasoning::2.7756157420000003	population::1.3157052299998389	
+18	1000000	19.996240975s	2.5592822359E-5s	1.391469	1000000	5.0	pre_processing::0.533520626	query::8.526926296	reasoning::2.810173629	population::0.8742452310002412	
+11
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='771'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v11111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924'
+v11121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'794'
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='923'
+v1221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'160'
+v1222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160'
+v111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'773'
+v111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='773'
+18	1000000	55.573409206s	2.9221774534E-5s	1.391469	1000000	5.0	pre_processing::0.5482042	query::45.470067809	reasoning::0.06216339499999999	population::0.9360017470005136	
+18	1000000	56.527262633s	2.9046933504E-5s	1.391469	1000000	5.0	pre_processing::0.560801077	query::45.947026179	reasoning::0.062407638999999994	population::1.5178126170003023	
+18	1000000	55.717085578s	2.9169719623E-5s	1.391469	1000000	5.0	pre_processing::0.564676535	query::45.564501161	reasoning::0.05877756500000001	population::1.1403526459999314	
+18	1000000	21.389352138s	2.5635396227E-5s	1.391469	1000000	5.0	pre_processing::0.57066257	query::11.534886839	reasoning::0.07218932100000001	population::1.313253839999316	
+18	1000000	21.535663558s	2.5987980665E-5s	1.391469	1000000	5.0	pre_processing::0.540850003	query::11.537855887	reasoning::0.06904866000000001	population::0.8906103299999811	
+18	1000000	20.906783641s	2.6356287942E-5s	1.391469	1000000	5.0	pre_processing::0.562458986	query::11.570916074	reasoning::0.07096276400000001	population::1.1421516969993633	
+12
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='771'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v11111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924'
+v11121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'794'
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='923'
+v1221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'160'
+v1222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160'
+v111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='773'
+v1112211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'774'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+18	1000000	64.435188251s	2.5598903419E-5s	1.391469	1000000	5.0	pre_processing::0.57155809	query::50.873037828	reasoning::0.060720636	population::4.405401661999895	
+18	1000000	65.024037337s	2.5516861096E-5s	1.391469	1000000	5.0	pre_processing::0.576265022	query::51.41902825	reasoning::0.06096026400000001	population::0.9569538590001325	
+18	1000000	64.765052096s	2.5626751083E-5s	1.391469	1000000	5.0	pre_processing::0.573907204	query::51.171836106	reasoning::0.062439507	population::4.550757694999939	
+18	1000000	23.338491455s	2.9027131897E-5s	1.391469	1000000	5.0	pre_processing::0.630640117	query::11.246824484	reasoning::0.071580514	population::1.0525856510003184	
+18	1000000	22.491238175s	2.9216204739E-5s	1.391469	1000000	5.0	pre_processing::0.587986016	query::12.036318731	reasoning::0.06927358600000001	population::1.42322551799926	
+18	1000000	22.492204582s	2.8617040634E-5s	1.391469	1000000	5.0	pre_processing::0.591124651	query::12.062107415	reasoning::0.07425255800000001	population::1.2558866219995408	
+13
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='771'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v11121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'794'
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='923'
+v1221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'160'
+v1222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160'
+v111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='773'
+v1112211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'774'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937'
+v111112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='937'
+18	1000000	70.104926116s	2.6071935728E-5s	1.391469	1000000	5.0	pre_processing::0.602177563	query::55.661597949	reasoning::0.05899212900000001	population::0.9021345039998615	
+18	1000000	69.915726346s	2.5816647557E-5s	1.391469	1000000	5.0	pre_processing::0.578375977	query::55.563728457	reasoning::0.061272144	population::1.1880326860004242	
+18	1000000	70.149799386s	2.5529483241E-5s	1.391469	1000000	5.0	pre_processing::0.578970621	query::55.524352006	reasoning::0.055038065000000004	population::4.871056413998253	
+18	1000000	29.573578789s	2.60334673E-5s	1.391469	1000000	5.0	pre_processing::0.590192405	query::11.824093398	reasoning::0.069187577	population::6.774135948999138	
+18	1000000	29.207868741s	2.6077781168E-5s	1.391469	1000000	5.0	pre_processing::0.583569497	query::11.748889001	reasoning::0.07109966599999998	population::2.3649764859997595	
+18	1000000	29.352822443s	2.6037497834E-5s	1.391469	1000000	5.0	pre_processing::0.619573517	query::11.842528332	reasoning::0.07110973000000001	population::1.5688260539991632	
+14
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v11121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'794'
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='923'
+v1221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'160'
+v1222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160'
+v111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='773'
+v1112211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'774'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937'
+v111112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='937'
+v1121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'759'
+v1122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='759'
+20	1000000	70.805481112s	2.6258110751E-5s	1.391469	1000000	5.0	pre_processing::0.592892178	query::55.300142117	reasoning::0.060770452	population::1.0630034200002316	
+20	1000000	70.840800548s	2.5917867782E-5s	1.391469	1000000	5.0	pre_processing::0.605812981	query::55.204863141	reasoning::0.06396408299999999	population::1.0947884010004187	
+20	1000000	71.109900092s	2.6302720212E-5s	1.391469	1000000	5.0	pre_processing::0.602083044	query::55.642583306	reasoning::0.060506622	population::1.3561935480001532	
+20	1000000	30.63902053s	2.5686570126E-5s	1.391469	1000000	5.0	pre_processing::0.596256307	query::12.580556492	reasoning::0.07421657300000001	population::0.9070225300002349	
+20	1000000	25.243179099s	2.8957601323E-5s	1.391469	1000000	5.0	pre_processing::0.598404137	query::12.77459164	reasoning::0.07578586100000002	population::1.0994209720002919	
+20	1000000	30.673762029s	2.5971786467E-5s	1.391469	1000000	5.0	pre_processing::0.601274963	query::12.746364115	reasoning::0.07214837799999999	population::7.500903267998876	
+15
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v11121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'794'
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='923'
+v1221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'160'
+v1222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160'
+v111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='773'
+v1112211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'774'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937'
+v111112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='937'
+v1121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'759'
+v11221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='759',family|family_id>'755'
+v11222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='755'
+20	1000000	76.448604571s	2.5835171397E-5s	1.391469	1000000	5.0	pre_processing::0.629865746	query::59.99366612	reasoning::0.06139161600000002	population::1.2146821259999636	
+20	1000000	76.539653234s	2.5709373653E-5s	1.391469	1000000	5.0	pre_processing::0.607775567	query::59.982881224	reasoning::0.06362054899999998	population::1.0954615529996976	
+20	1000000	76.178414744s	2.5942386342E-5s	1.391469	1000000	5.0	pre_processing::0.612293115	query::59.97845917	reasoning::0.06057338600000001	population::1.2236172600000632	
+20	1000000	26.589869955s	3.0950942937E-5s	1.391469	1000000	5.0	pre_processing::0.611175809	query::13.328411588	reasoning::0.07132532899999999	population::2.420770307000159	
+20	1000000	30.745679648s	2.5879741078E-5s	1.391469	1000000	5.0	pre_processing::0.605581094	query::12.838653762	reasoning::0.074645388	population::0.9127190099994357	
+20	1000000	29.11088088s	2.5870042965E-5s	1.391469	1000000	5.0	pre_processing::0.60604121	query::12.927322768	reasoning::0.07222031799999999	population::1.5358307310004053	
+16
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='923'
+v1221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'160'
+v1222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160'
+v111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='773'
+v1112211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'774'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937'
+v111112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='937'
+v1121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'759'
+v11221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='759',family|family_id>'755'
+v11222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='755'
+v111211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'892'
+v111212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'794',family|family_id<='892'
+22	1000000	83.778445335s	2.5743072834E-5s	1.391469	1000000	5.0	pre_processing::0.670527953	query::66.464853063	reasoning::0.06579594999999998	population::5.362670534998975	
+22	1000000	83.516054651s	2.5775150766E-5s	1.391469	1000000	5.0	pre_processing::0.624157562	query::66.305267908	reasoning::0.06742266	population::5.211612987999842	
+22	1000000	84.277120324s	2.5783354149E-5s	1.391469	1000000	5.0	pre_processing::0.622738897	query::66.456665571	reasoning::0.06431237599999998	population::1.2668485150002644	
+22	1000000	32.00826747s	2.5709106834E-5s	1.391469	1000000	5.0	pre_processing::0.62239171	query::13.379619687	reasoning::0.075366484	population::1.1437362520006893	
+22	1000000	31.816488099s	2.6096159663E-5s	1.391469	1000000	5.0	pre_processing::0.629561141	query::13.307202359	reasoning::0.07233420000000002	population::1.3492641450005796	
+22	1000000	31.416088742s	2.61168688E-5s	1.391469	1000000	5.0	pre_processing::0.626022493	query::13.43770165	reasoning::0.0796896	population::1.3739359479999431	
+17
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='923'
+v1221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'160'
+v1222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160'
+v1112211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'774'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937'
+v111112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='937'
+v1121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'759'
+v11221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='759',family|family_id>'755'
+v11222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='755'
+v111211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'892'
+v111212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'794',family|family_id<='892'
+v1112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='773',family|family_id>'772'
+v1112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='772'
+22	1000000	91.298590351s	2.5682187905E-5s	1.391469	1000000	5.0	pre_processing::0.652185603	query::72.661075117	reasoning::0.06853973099999999	population::1.2672636480002357	
+22	1000000	91.436034836s	2.5585917571E-5s	1.391469	1000000	5.0	pre_processing::0.644627474	query::72.660582907	reasoning::0.065248064	population::1.1706822979998721	
+22	1000000	91.370514179s	2.5692515012E-5s	1.391469	1000000	5.0	pre_processing::0.641932013	query::72.568136999	reasoning::0.064997185	population::1.3081728329999012	
+22	1000000	32.217520134s	2.5873180373E-5s	1.391469	1000000	5.0	pre_processing::0.641093513	query::13.750969874	reasoning::0.07972234699999999	population::1.3829917229996025	
+22	1000000	31.665153924s	2.6154232896E-5s	1.391469	1000000	5.0	pre_processing::0.626081882	query::13.851066127	reasoning::0.079384434	population::1.2068154330001162	
+22	1000000	31.85822459s	2.6415271391E-5s	1.391469	1000000	5.0	pre_processing::0.614540863	query::13.867562015	reasoning::0.08134823500000002	population::1.1109046110000154	
+18
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='923'
+v1221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'160'
+v1222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160'
+v1112211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'774'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937'
+v1121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'759'
+v11221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='759',family|family_id>'755'
+v11222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='755'
+v111211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'892'
+v111212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'794',family|family_id<='892'
+v1112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='773',family|family_id>'772'
+v1112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='772'
+v1111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='937',family|family_id>'932'
+v1111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='932'
+22	1000000	100.458711955s	2.602763245E-5s	1.391469	1000000	5.0	pre_processing::0.67488462	query::80.24722047	reasoning::0.06236639399999999	population::6.007376572998516	
+22	1000000	100.51286737s	2.6610749817E-5s	1.391469	1000000	5.0	pre_processing::0.669826451	query::80.57766697	reasoning::0.06796960299999999	population::1.1507084590000842	
+22	1000000	101.061618393s	2.5982029897E-5s	1.391469	1000000	5.0	pre_processing::0.661798095	query::81.535320465	reasoning::0.062516275	population::1.5140555780000773	
+22	1000000	36.307930603s	2.6256788619E-5s	1.391469	1000000	5.0	pre_processing::0.706571351	query::15.114545023	reasoning::0.07978001900000002	population::6.679889604000367	
+22	1000000	35.153235762s	2.6081647947E-5s	1.391469	1000000	5.0	pre_processing::0.635933944	query::14.788116799	reasoning::0.07848889999999999	population::1.5873023190004836	
+22	1000000	34.370757331s	2.5749117437E-5s	1.391469	1000000	5.0	pre_processing::0.655958218	query::14.778120835	reasoning::0.07398463200000001	population::1.2836420650002869	
+19
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='923'
+v1221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'160'
+v1222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937'
+v1121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'759'
+v11221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='759',family|family_id>'755'
+v11222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='755'
+v111211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'892'
+v111212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'794',family|family_id<='892'
+v1112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='773',family|family_id>'772'
+v1112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='772'
+v1111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='937',family|family_id>'932'
+v1111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='932'
+v11122111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'793'
+v11122112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'774',family|family_id<='793'
+22	1000000	108.328547604s	2.6541231119E-5s	1.391469	1000000	5.0	pre_processing::0.685792734	query::86.880517196	reasoning::0.06761179699999999	population::1.0447936820001227	
+22	1000000	108.151693402s	2.6772870815E-5s	1.391469	1000000	5.0	pre_processing::0.670754081	query::86.991083857	reasoning::0.06790853499999998	population::1.0392134180000774	
+22	1000000	108.041975275s	2.775535637E-5s	1.391469	1000000	5.0	pre_processing::0.782281708	query::86.947101384	reasoning::0.14012501199999997	population::1.0879939420003244	
+22	1000000	39.031142689s	2.68622713E-5s	1.391469	1000000	5.0	pre_processing::0.721498459	query::16.359834777	reasoning::0.08203446300000002	population::1.4279239000001098	
+22	1000000	37.623174845s	2.6262022411E-5s	1.391469	1000000	5.0	pre_processing::0.693236283	query::16.127804738	reasoning::0.07852327199999999	population::1.1315891010004802	
+22	1000000	34.891554121s	2.6059078503E-5s	1.391469	1000000	5.0	pre_processing::0.694309737	query::20.624561944	reasoning::0.07653661499999999	population::1.0389939949997393	
+20
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='923'
+v1221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'160'
+v1222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937'
+v1121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'759'
+v11221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='759',family|family_id>'755'
+v11222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='755'
+v111211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'892'
+v111212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'794',family|family_id<='892'
+v1112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='773',family|family_id>'772'
+v1112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='772'
+v1111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='937',family|family_id>'932'
+v1111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='932'
+v11122111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'793'
+v111221121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='793',family|family_id>'779'
+v111221122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'774',family|family_id<='779'
+24	1000000	119.34833391s	2.6413066049E-5s	1.391469	1000000	5.0	pre_processing::0.656393461	query::92.786284549	reasoning::0.07306906	population::1.299343764000066	
+24	1000000	114.289499614s	3.0355321351E-5s	1.391469	1000000	5.0	pre_processing::0.672881576	query::91.917412742	reasoning::0.13687616999999994	population::1.194655445999936	
+24	1000000	118.834927226s	2.6454418663E-5s	1.391469	1000000	5.0	pre_processing::0.685061619	query::92.223752873	reasoning::0.09851122899999999	population::0.9934980830000616	
+24	1000000	36.074275018s	2.614646376E-5s	1.391469	1000000	5.0	pre_processing::0.696167136	query::20.328011444	reasoning::0.08004306399999998	population::1.104876555000234	
+24	1000000	36.029136197s	2.6116264883E-5s	1.391469	1000000	5.0	pre_processing::0.695704257	query::20.496054862	reasoning::0.085488359	population::1.083660961000658	
+24	1000000	35.643061169s	2.5736951747E-5s	1.391469	1000000	5.0	pre_processing::0.685585836	query::20.220182553	reasoning::0.07709886299999999	population::1.3082436639994828	
+21
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='923'
+v1221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'160'
+v1222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937'
+v1121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'759'
+v11221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='759',family|family_id>'755'
+v111211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'892'
+v111212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'794',family|family_id<='892'
+v1112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='773',family|family_id>'772'
+v1112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='772'
+v1111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='937',family|family_id>'932'
+v1111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='932'
+v11122111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'793'
+v111221121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='793',family|family_id>'779'
+v111221122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'774',family|family_id<='779'
+v112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='755',family|family_id>'753'
+v112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='753'
+24	1000000	126.873990747s	2.6048659785E-5s	1.391469	1000000	5.0	pre_processing::0.691804092	query::104.06514726	reasoning::0.097407108	population::1.3603058770003005	
+24	1000000	124.881420247s	2.6249264106E-5s	1.391469	1000000	5.0	pre_processing::0.721612228	query::103.70930662	reasoning::0.080008485	population::1.0185124159999808	
+24	1000000	125.945434319s	2.6038626655E-5s	1.391469	1000000	5.0	pre_processing::0.706156778	query::103.388519942	reasoning::0.09429522999999998	population::1.017245598000148	
+24	1000000	37.940179616s	2.590999005E-5s	1.391469	1000000	5.0	pre_processing::0.702872385	query::21.017461773	reasoning::0.078702712	population::1.5731695319992218	
+24	1000000	37.375299702s	2.6223093872E-5s	1.391469	1000000	5.0	pre_processing::0.693225001	query::20.979502988	reasoning::0.077863612	population::1.6360814620003856	
+24	1000000	37.207300475s	2.567764317E-5s	1.391469	1000000	5.0	pre_processing::0.698417605	query::20.899129609	reasoning::0.077914857	population::1.5200482010001881	
+22
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='923'
+v1221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'160'
+v1222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937'
+v1121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'759'
+v11221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='759',family|family_id>'755'
+v111211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'892'
+v1112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='773',family|family_id>'772'
+v1112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='772'
+v1111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='937',family|family_id>'932'
+v1111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='932'
+v11122111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'793'
+v111221121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='793',family|family_id>'779'
+v111221122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'774',family|family_id<='779'
+v112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='755',family|family_id>'753'
+v112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='753'
+v1112121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='892',family|family_id>'856'
+v1112122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'794',family|family_id<='856'
+26	1000000	128.847540565s	3.1178227697E-5s	1.391469	1000000	5.0	pre_processing::0.708418996	query::109.836093109	reasoning::0.069700668	population::2.00049897599984	
+26	1000000	134.095787114s	2.6437336268E-5s	1.391469	1000000	5.0	pre_processing::0.708764919	query::110.943648378	reasoning::0.06884148900000002	population::8.347337905000575	
+26	1000000	132.548089229s	2.761723142E-5s	1.391469	1000000	5.0	pre_processing::0.722290382	query::110.602721292	reasoning::0.09411862700000001	population::1.1189416710000186	
+26	1000000	39.542052307s	3.032738228E-5s	1.391469	1000000	5.0	pre_processing::0.703031765	query::21.645677868	reasoning::0.07920529999999999	population::1.0794313379996723	
+26	1000000	39.331343177s	3.1202940199E-5s	1.391469	1000000	5.0	pre_processing::0.712433302	query::21.662906689	reasoning::0.08307408099999998	population::1.1981958479991257	
+26	1000000	39.104124401s	3.2221524602E-5s	1.391469	1000000	5.0	pre_processing::0.727330111	query::21.663026303	reasoning::0.08078636200000001	population::1.4120979020001052	
+23
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='923'
+v1221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'160'
+v1222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937'
+v1121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'759'
+v11221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='759',family|family_id>'755'
+v111211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'892'
+v1112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='773',family|family_id>'772'
+v1112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='772'
+v1111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='937',family|family_id>'932'
+v1111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='932'
+v11122111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'793'
+v111221121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='793',family|family_id>'779'
+v111221122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'774',family|family_id<='779'
+v112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='755',family|family_id>'753'
+v112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='753'
+v1112122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'794',family|family_id<='856'
+v11121211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='892',family|family_id>'876'
+v11121212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'856',family|family_id<='876'
+28	1000000	139.463308257s	2.6315077113E-5s	1.391469	1000000	5.0	pre_processing::0.733291999	query::117.250284646	reasoning::0.070902791	population::1.196295891000147	
+28	1000000	140.910578666s	2.6405803125E-5s	1.391469	1000000	5.0	pre_processing::0.736970155	query::117.098163682	reasoning::0.098624689	population::1.0088234240001575	
+28	1000000	139.173669469s	2.6528873772E-5s	1.391469	1000000	5.0	pre_processing::0.708728662	query::117.041759338	reasoning::0.06942541299999999	population::1.0981550300001537	
+28	1000000	41.25069239s	3.0148851558E-5s	1.391469	1000000	5.0	pre_processing::0.711564572	query::22.395183006	reasoning::0.087243522	population::1.0945993660000854	
+28	1000000	41.431312022s	3.2390485491E-5s	1.391469	1000000	5.0	pre_processing::0.714417039	query::22.191033315	reasoning::0.08169220999999999	population::0.8993577470005946	
+28	1000000	41.166471452s	3.1641863725E-5s	1.391469	1000000	5.0	pre_processing::0.744136147	query::22.069484658	reasoning::0.08657414100000001	population::0.8718083950004718	
+24
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='923'
+v1221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'160'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937'
+v1121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'759'
+v11221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='759',family|family_id>'755'
+v111211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'892'
+v1112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='773',family|family_id>'772'
+v1112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='772'
+v1111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='937',family|family_id>'932'
+v1111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='932'
+v11122111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'793'
+v111221121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='793',family|family_id>'779'
+v111221122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'774',family|family_id<='779'
+v112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='755',family|family_id>'753'
+v112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='753'
+v1112122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'794',family|family_id<='856'
+v11121211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='892',family|family_id>'876'
+v11121212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'856',family|family_id<='876'
+v12221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160',family|family_id>'12'
+v12222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='12'
+28	1000000	160.903690634s	2.5695282183E-5s	1.391469	1000000	5.0	pre_processing::0.736972554	query::135.17084125	reasoning::0.10166625499999998	population::1.0799154670000146	
+28	1000000	161.907909274s	2.7417389766E-5s	1.391469	1000000	5.0	pre_processing::0.769381124	query::135.19897938	reasoning::0.07419035199999999	population::1.1679645040000102	
+28	1000000	161.330293863s	2.5993794496E-5s	1.391469	1000000	5.0	pre_processing::0.753405604	query::135.097445644	reasoning::0.074254613	population::1.1645426770002505	
+28	1000000	43.62581768s	3.1814705325E-5s	1.391469	1000000	5.0	pre_processing::0.750053676	query::22.611309463	reasoning::0.08543209700000001	population::2.143358701000508	
+28	1000000	43.948777059s	3.2228008664E-5s	1.391469	1000000	5.0	pre_processing::0.746894548	query::22.430429613	reasoning::0.08279846599999997	population::2.153915680999295	
+28	1000000	43.559800593s	3.3794804691E-5s	1.391469	1000000	5.0	pre_processing::0.745967836	query::22.4504208	reasoning::0.08750280499999999	population::1.3923666229991285	
+25
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='923'
+v1221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'160'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937'
+v1121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'759'
+v11221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='759',family|family_id>'755'
+v111211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'892'
+v1112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='773',family|family_id>'772'
+v1112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='772'
+v1111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='937',family|family_id>'932'
+v11122111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'793'
+v111221121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='793',family|family_id>'779'
+v111221122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'774',family|family_id<='779'
+v112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='755',family|family_id>'753'
+v112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='753'
+v1112122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'794',family|family_id<='856'
+v11121211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='892',family|family_id>'876'
+v11121212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'856',family|family_id<='876'
+v12221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160',family|family_id>'12'
+v12222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='12'
+v11111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='932',family|family_id>'930'
+v11111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='930'
+28	1000000	171.868307761s	2.5987660294E-5s	1.391469	1000000	5.0	pre_processing::0.754410175	query::145.150125808	reasoning::0.07445401500000001	population::1.2074354110002203	
+28	1000000	171.337646763s	2.6118951394E-5s	1.391469	1000000	5.0	pre_processing::0.754841254	query::144.921321329	reasoning::0.07208369	population::1.7473291869999417	
+28	1000000	170.321703324s	2.5917513963E-5s	1.391469	1000000	5.0	pre_processing::0.76418998	query::144.013281633	reasoning::0.07804601500000004	population::1.082898996000113	
+28	1000000	49.478887338s	2.6356090498E-5s	1.391469	1000000	5.0	pre_processing::0.743993416	query::23.437537708	reasoning::0.08715245900000002	population::1.5863357589995601	
+28	1000000	49.418466889s	2.7332790578E-5s	1.391469	1000000	5.0	pre_processing::0.784766376	query::23.553714592	reasoning::0.08594880899999999	population::0.910365666999877	
+28	1000000	44.482170518s	3.0273120031E-5s	1.391469	1000000	5.0	pre_processing::0.741530104	query::23.794403042	reasoning::0.083024913	population::1.365887782999001	
+26
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v52(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='923'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937'
+v1121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'759'
+v11221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='759',family|family_id>'755'
+v111211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'892'
+v1112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='773',family|family_id>'772'
+v1112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='772'
+v1111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='937',family|family_id>'932'
+v11122111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'793'
+v111221121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='793',family|family_id>'779'
+v111221122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'774',family|family_id<='779'
+v112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='755',family|family_id>'753'
+v112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='753'
+v1112122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'794',family|family_id<='856'
+v11121211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='892',family|family_id>'876'
+v11121212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'856',family|family_id<='876'
+v12221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160',family|family_id>'12'
+v12222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='12'
+v11111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='932',family|family_id>'930'
+v11111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='930'
+v12211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'165'
+v12212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'160',family|family_id<='165'
+28	1000000	190.497658128s	2.5943343298E-5s	1.391469	1000000	5.0	pre_processing::0.750969935	query::164.516379699	reasoning::0.07426056800000004	population::1.415380926000018	
+28	1000000	191.648802797s	2.6141827185E-5s	1.391469	1000000	5.0	pre_processing::0.771933101	query::164.560385418	reasoning::0.07413655899999998	population::0.998869252999923	
+28	1000000	190.002135097s	2.6088692774E-5s	1.391469	1000000	5.0	pre_processing::0.767102947	query::170.218369531	reasoning::0.101597834	population::1.1804205450000587	
+28	1000000	52.804141763s	2.5979272867E-5s	1.391469	1000000	5.0	pre_processing::0.770169866	query::25.572459311	reasoning::0.09031375599999998	population::0.9099554369995304	
+28	1000000	52.303025733s	2.6034178287E-5s	1.391469	1000000	5.0	pre_processing::0.745270502	query::25.13074522	reasoning::0.088137488	population::0.8864167250001443	
+28	1000000	54.089745292s	2.6036603268E-5s	1.391469	1000000	5.0	pre_processing::0.782036048	query::25.451052721	reasoning::0.8259419259999997	population::0.9174680720000467	
+27
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v111122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='923'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937'
+v1121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'759'
+v11221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='759',family|family_id>'755'
+v111211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'892'
+v1112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='773',family|family_id>'772'
+v1112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='772'
+v1111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='937',family|family_id>'932'
+v11122111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'793'
+v111221121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='793',family|family_id>'779'
+v111221122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'774',family|family_id<='779'
+v112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='755',family|family_id>'753'
+v112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='753'
+v1112122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'794',family|family_id<='856'
+v11121211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='892',family|family_id>'876'
+v11121212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'856',family|family_id<='876'
+v12221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160',family|family_id>'12'
+v12222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='12'
+v11111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='932',family|family_id>'930'
+v11111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='930'
+v12211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'165'
+v12212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'160',family|family_id<='165'
+v521(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964',ligand|ligand_id>'3346'
+v522(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3346'
+42	1000000	194.31877302s	2.6555311531E-5s	1.391469	1000000	5.0	pre_processing::0.942508575	query::167.273587754	reasoning::0.088598393	population::0.9833803580000646	
+42	1000000	194.566830836s	2.6660710701E-5s	1.391469	1000000	5.0	pre_processing::0.968230358	query::173.099302442	reasoning::0.08960728099999997	population::1.374973939999967	
+42	1000000	194.396453256s	2.6637701403E-5s	1.391469	1000000	5.0	pre_processing::0.943588745	query::167.149775485	reasoning::0.147977609	population::1.173381784000053	
+42	1000000	53.367493573s	2.6485396482E-5s	1.391469	1000000	5.0	pre_processing::0.943555826	query::25.923591724	reasoning::0.108415431	population::1.319084906999778	
+42	1000000	53.475107143s	2.6357419835E-5s	1.391469	1000000	5.0	pre_processing::0.977574067	query::25.884602083	reasoning::0.10732061999999996	population::0.8921154820003524	
+42	1000000	52.213173796s	2.6726417947E-5s	1.391469	1000000	5.0	pre_processing::0.919389437	query::25.875688774	reasoning::0.109905121	population::1.5040650200001071	
+28
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'185'
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937'
+v1121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'759'
+v11221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='759',family|family_id>'755'
+v111211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'892'
+v1112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='773',family|family_id>'772'
+v1112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='772'
+v1111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='937',family|family_id>'932'
+v11122111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'793'
+v111221121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='793',family|family_id>'779'
+v111221122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'774',family|family_id<='779'
+v112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='755',family|family_id>'753'
+v112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='753'
+v1112122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'794',family|family_id<='856'
+v11121211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='892',family|family_id>'876'
+v11121212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'856',family|family_id<='876'
+v12221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160',family|family_id>'12'
+v12222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='12'
+v11111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='932',family|family_id>'930'
+v11111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='930'
+v12211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'165'
+v12212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'160',family|family_id<='165'
+v521(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964',ligand|ligand_id>'3346'
+v522(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3346'
+v1111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='923',family|family_id>'920'
+v1111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='920'
+42	1000000	199.029791063s	2.639044078E-5s	1.391469	1000000	5.0	pre_processing::0.960114059	query::177.592176487	reasoning::0.10087685000000005	population::1.1692192019999685	
+42	1000000	205.532194566s	2.647480259E-5s	1.391469	1000000	5.0	pre_processing::0.955099302	query::175.985342311	reasoning::0.08647096600000001	population::1.2735829459998316	
+42	1000000	199.233526908s	2.6457882094E-5s	1.391469	1000000	5.0	pre_processing::0.999610022	query::177.462187753	reasoning::0.09378151700000001	population::1.1920275380000778	
+42	1000000	53.705586162s	2.6507810711E-5s	1.391469	1000000	5.0	pre_processing::0.941202684	query::26.107477608	reasoning::0.4656788469999999	population::0.9512858880002375	
+42	1000000	53.646623284s	2.669078909E-5s	1.391469	1000000	5.0	pre_processing::0.952090291	query::25.722461108	reasoning::0.11237520099999998	population::0.8977187519999694	
+42	1000000	53.651034702s	2.6496364252E-5s	1.391469	1000000	5.0	pre_processing::0.961044514	query::25.94423283	reasoning::0.10889236800000002	population::1.1099725189993777	
+29
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937'
+v1121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'759'
+v11221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='759',family|family_id>'755'
+v111211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'892'
+v1112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='773',family|family_id>'772'
+v1112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='772'
+v1111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='937',family|family_id>'932'
+v11122111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'793'
+v111221121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='793',family|family_id>'779'
+v111221122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'774',family|family_id<='779'
+v112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='755',family|family_id>'753'
+v112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='753'
+v1112122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'794',family|family_id<='856'
+v11121211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='892',family|family_id>'876'
+v11121212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'856',family|family_id<='876'
+v12221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160',family|family_id>'12'
+v12222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='12'
+v11111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='932',family|family_id>'930'
+v11111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='930'
+v12211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'165'
+v12212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'160',family|family_id<='165'
+v521(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964',ligand|ligand_id>'3346'
+v522(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3346'
+v1111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='923',family|family_id>'920'
+v1111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='920'
+v1211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'601'
+v1212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'185',family|family_id<='601'
+45	1000000	223.718276636s	3.2130419651E-5s	1.391469	1000000	5.0	pre_processing::0.994685411	query::201.51960359	reasoning::0.14227945199999992	population::0.9652665520000812	
+45	1000000	224.17063282s	3.2500705735E-5s	1.391469	1000000	5.0	pre_processing::0.986202118	query::201.736535524	reasoning::0.09854589399999998	population::1.1251512530000638	
+45	1000000	223.893655488s	3.2513450369E-5s	1.391469	1000000	5.0	pre_processing::0.99899799	query::201.370624146	reasoning::0.09136491600000003	population::1.140420046999929	
+45	1000000	56.052227241s	2.6829976748E-5s	1.391469	1000000	5.0	pre_processing::0.993974315	query::26.678083018	reasoning::0.11720353400000001	population::8.687285770998129	
+45	1000000	55.383934939s	2.6808779235E-5s	1.391469	1000000	5.0	pre_processing::0.984313887	query::26.697109127	reasoning::0.11887376699999998	population::1.7494562640002216	
+45	1000000	56.042632354s	2.6890961621E-5s	1.391469	1000000	5.0	pre_processing::1.004694714	query::26.71484318	reasoning::0.11221861200000002	population::1.5986548409994081	
+30
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v1121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'759'
+v11221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='759',family|family_id>'755'
+v111211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'892'
+v1112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='773',family|family_id>'772'
+v1112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='772'
+v1111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='937',family|family_id>'932'
+v11122111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'793'
+v111221121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='793',family|family_id>'779'
+v111221122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'774',family|family_id<='779'
+v112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='755',family|family_id>'753'
+v112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='753'
+v1112122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'794',family|family_id<='856'
+v11121211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='892',family|family_id>'876'
+v11121212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'856',family|family_id<='876'
+v12221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160',family|family_id>'12'
+v12222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='12'
+v11111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='932',family|family_id>'930'
+v11111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='930'
+v12211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'165'
+v12212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'160',family|family_id<='165'
+v521(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964',ligand|ligand_id>'3346'
+v522(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3346'
+v1111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='923',family|family_id>'920'
+v1111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='920'
+v1211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'601'
+v1212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'185',family|family_id<='601'
+v1111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'938'
+v1111112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937',family|family_id<='938'
+45	1000000	235.307955856s	3.2812858251E-5s	1.391469	1000000	5.0	pre_processing::0.98776551	query::212.495412711	reasoning::0.10538696199999999	population::1.1599277779998005	
+45	1000000	239.276974805s	2.6772357587E-5s	1.391469	1000000	5.0	pre_processing::0.975467098	query::216.086001125	reasoning::0.09110117300000001	population::1.0658459529999489	
+45	1000000	243.585666047s	2.6401233349E-5s	1.391469	1000000	5.0	pre_processing::0.983549955	query::213.407828555	reasoning::0.09601683699999998	population::1.0915958520000746	
+45	1000000	57.653490422s	2.6894970355E-5s	1.391469	1000000	5.0	pre_processing::0.993432166	query::27.801926446	reasoning::0.32793976700000005	population::1.670334514998964	
+45	1000000	57.351906129s	2.656503368E-5s	1.391469	1000000	5.0	pre_processing::1.014240578	query::27.340658075	reasoning::0.115823818	population::1.26894557799962	
+45	1000000	57.141230493s	2.6820876601E-5s	1.391469	1000000	5.0	pre_processing::0.987335291	query::27.532093993	reasoning::0.11515384199999996	population::1.58627822799997
+31
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v51(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964'
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v1121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'759'
+v11221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='759',family|family_id>'755'
+v111211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'892'
+v1112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='773',family|family_id>'772'
+v1112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='772'
+v1111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='937',family|family_id>'932'
+v11122111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'793'
+v111221121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='793',family|family_id>'779'
+v111221122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'774',family|family_id<='779'
+v112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='755',family|family_id>'753'
+v112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='753'
+v1112122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'794',family|family_id<='856'
+v11121211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='892',family|family_id>'876'
+v11121212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'856',family|family_id<='876'
+v12222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='12'
+v11111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='932',family|family_id>'930'
+v11111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='930'
+v12211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'165'
+v12212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'160',family|family_id<='165'
+v521(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964',ligand|ligand_id>'3346'
+v522(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3346'
+v1111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='923',family|family_id>'920'
+v1111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='920'
+v1211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'601'
+v1212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'185',family|family_id<='601'
+v1111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'938'
+v1111112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937',family|family_id<='938'
+v122211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160',family|family_id>'107'
+v122212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'12',family|family_id<='107'
+48	1000000	255.388622535s	2.6697038434E-5s	1.391469	1000000	5.0	pre_processing::1.040378136	query::227.127005591	reasoning::0.105056661	population::1.077029770999915	
+48	1000000	255.290763942s	2.6777843429E-5s	1.391469	1000000	5.0	pre_processing::0.995789901	query::226.339622838	reasoning::0.116367439	population::1.1946103560000787	
+48	1000000	257.614256334s	2.6858904669E-5s	1.391469	1000000	5.0	pre_processing::0.985403664	query::226.925395708	reasoning::0.12546028	population::1.0389635260000032	
+48	1000000	60.43910973s	2.6924982229E-5s	1.391469	1000000	5.0	pre_processing::1.018640051	query::28.876355498	reasoning::0.24924997100000001	population::0.9254478800003567	
+48	1000000	58.135568818s	2.6598282124E-5s	1.391469	1000000	5.0	pre_processing::1.028156593	query::28.817218214	reasoning::0.11636923500000002	population::0.8746883580000764	
+48	1000000	59.888903642s	2.6710554761E-5s	1.391469	1000000	5.0	pre_processing::1.004229921	query::29.039197325	reasoning::0.12454155600000003	population::0.8640109420005093	
+32
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v1121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'759'
+v11221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='759',family|family_id>'755'
+v111211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'892'
+v1112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='773',family|family_id>'772'
+v1112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='772'
+v1111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='937',family|family_id>'932'
+v11122111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'793'
+v111221121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='793',family|family_id>'779'
+v111221122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'774',family|family_id<='779'
+v112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='755',family|family_id>'753'
+v112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='753'
+v1112122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'794',family|family_id<='856'
+v11121211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='892',family|family_id>'876'
+v11121212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'856',family|family_id<='876'
+v12222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='12'
+v11111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='932',family|family_id>'930'
+v11111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='930'
+v12211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'165'
+v12212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'160',family|family_id<='165'
+v521(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964',ligand|ligand_id>'3346'
+v522(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3346'
+v1111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='923',family|family_id>'920'
+v1111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='920'
+v1211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'601'
+v1212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'185',family|family_id<='601'
+v1111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'938'
+v1111112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937',family|family_id<='938'
+v122211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160',family|family_id>'107'
+v122212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'12',family|family_id<='107'
+v511(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'8173'
+v512(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964',ligand|ligand_id<='8173'
+64	1000000	277.456681061s	2.7016013644E-5s	1.391469	1000000	5.0	pre_processing::1.168235395	query::245.307033581	reasoning::0.127510138	population::0.906338239000044	
+64	1000000	276.582662258s	2.7494264935E-5s	1.391469	1000000	5.0	pre_processing::1.093445134	query::245.660983211	reasoning::0.11422946399999999	population::0.9421805680001365	
+64	1000000	277.47332882s	2.6851595397E-5s	1.391469	1000000	5.0	pre_processing::1.130020681	query::245.477436771	reasoning::9.104963906	population::1.1217159000000896	
+64	1000000	62.539597911s	2.7362407305E-5s	1.391469	1000000	5.0	pre_processing::1.141857611	query::29.199429696	reasoning::0.14349785099999998	population::1.0994632299996243	
+64	1000000	63.497598578s	2.7780816296E-5s	1.391469	1000000	5.0	pre_processing::1.122073327	query::29.635300942	reasoning::0.14528760600000007	population::1.6608670249997195	
+64	1000000	61.632871621s	2.7145966963E-5s	1.391469	1000000	5.0	pre_processing::1.12817666	query::29.249412582	reasoning::0.14743254199999997	population::0.8896133070001833	
+33
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v1121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'759'
+v11221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='759',family|family_id>'755'
+v111211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'892'
+v1112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='773',family|family_id>'772'
+v1112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='772'
+v1111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='937',family|family_id>'932'
+v11122111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'793'
+v111221121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='793',family|family_id>'779'
+v111221122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'774',family|family_id<='779'
+v112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='755',family|family_id>'753'
+v112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='753'
+v1112122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'794',family|family_id<='856'
+v11121211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='892',family|family_id>'876'
+v11121212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'856',family|family_id<='876'
+v12222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='12'
+v11111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='932',family|family_id>'930'
+v11111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='930'
+v12211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'165'
+v12212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'160',family|family_id<='165'
+v521(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964',ligand|ligand_id>'3346'
+v522(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3346'
+v1111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='923',family|family_id>'920'
+v1211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'601'
+v1212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'185',family|family_id<='601'
+v1111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'938'
+v1111112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937',family|family_id<='938'
+v122211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160',family|family_id>'107'
+v122212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'12',family|family_id<='107'
+v511(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'8173'
+v512(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964',ligand|ligand_id<='8173'
+v11112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='920',family|family_id>'919'
+v11112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='919'
+64	1000000	290.603615417s	2.7123196878E-5s	1.391469	1000000	5.0	pre_processing::1.148815282	query::257.64290878	reasoning::0.17330288399999996	population::0.9821936879999027	
+64	1000000	288.536951355s	2.7430357919E-5s	1.391469	1000000	5.0	pre_processing::1.137945823	query::257.604167226	reasoning::0.133445716	population::1.093731549000008	
+64	1000000	296.960143554s	2.8530329994E-5s	1.391469	1000000	5.0	pre_processing::1.135510238	query::263.936088338	reasoning::0.12022572400000002	population::1.1961450290000846	
+64	1000000	65.508082873s	2.8288977822E-5s	1.391469	1000000	5.0	pre_processing::1.135731865	query::29.273987754	reasoning::0.3783639609999999	population::0.9418282369995356	
+64	1000000	64.111887024s	2.738621552E-5s	1.391469	1000000	5.0	pre_processing::1.412252102	query::29.806271669	reasoning::0.142178336	population::0.9218478989998664	
+64	1000000	66.277537835s	2.8925412656E-5s	1.391469	1000000	5.0	pre_processing::1.193043219	query::29.931311167	reasoning::0.16981264299999999	population::1.2859890080002976	
+34
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v1121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'759'
+v11221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='759',family|family_id>'755'
+v111211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'892'
+v1112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='773',family|family_id>'772'
+v1112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='772'
+v1111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='937',family|family_id>'932'
+v11122111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'793'
+v111221121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='793',family|family_id>'779'
+v111221122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'774',family|family_id<='779'
+v112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='755',family|family_id>'753'
+v112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='753'
+v1112122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'794',family|family_id<='856'
+v11121211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='892',family|family_id>'876'
+v11121212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'856',family|family_id<='876'
+v12222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='12'
+v11111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='932',family|family_id>'930'
+v11111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='930'
+v12211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'165'
+v12212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'160',family|family_id<='165'
+v521(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964',ligand|ligand_id>'3346'
+v522(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3346'
+v1111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='923',family|family_id>'920'
+v1211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'601'
+v1212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'185',family|family_id<='601'
+v1111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'938'
+v1111112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937',family|family_id<='938'
+v122211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160',family|family_id>'107'
+v122212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'12',family|family_id<='107'
+v512(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964',ligand|ligand_id<='8173'
+v11112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='920',family|family_id>'919'
+v11112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='919'
+v5111(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'8267'
+v5112(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'8173',ligand|ligand_id<='8267'
+80	1000000	374.464996794s	2.9316832563E-5s	1.391469	1000000	5.0	pre_processing::1.313484514	query::339.40249837	reasoning::0.20697324099999992	population::1.1722930079998697	
+80	1000000	322.473019545s	3.5297438098E-5s	1.391469	1000000	5.0	pre_processing::1.345554661	query::295.855790425	reasoning::0.22706014700000005	population::1.1074129709999512	
+80	1000000	317.329570195s	3.4516056307E-5s	1.391469	1000000	5.0	pre_processing::1.301017519	query::291.538268295	reasoning::0.16776047600000005	population::1.1506878729998817	
+80	1000000	64.761493822s	2.9875281652E-5s	1.391469	1000000	5.0	pre_processing::1.328578351	query::29.497401853	reasoning::0.171328377	population::1.461570506999615	
+80	1000000	66.445988488s	2.8055148022E-5s	1.391469	1000000	5.0	pre_processing::1.407585894	query::31.552058146	reasoning::0.171954168	population::1.6104333750003808	
+80	1000000	65.281939305s	2.8624665243E-5s	1.391469	1000000	5.0	pre_processing::1.309330819	query::29.790330954	reasoning::0.17789633600000002	population::1.4935240029995325	
+35
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v1121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'759'
+v11221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='759',family|family_id>'755'
+v1112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='773',family|family_id>'772'
+v1112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='772'
+v1111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='937',family|family_id>'932'
+v11122111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'793'
+v111221121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='793',family|family_id>'779'
+v111221122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'774',family|family_id<='779'
+v112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='755',family|family_id>'753'
+v112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='753'
+v1112122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'794',family|family_id<='856'
+v11121211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='892',family|family_id>'876'
+v11121212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'856',family|family_id<='876'
+v12222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='12'
+v11111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='932',family|family_id>'930'
+v11111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='930'
+v12211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'165'
+v12212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'160',family|family_id<='165'
+v521(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964',ligand|ligand_id>'3346'
+v522(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3346'
+v1111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='923',family|family_id>'920'
+v1211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'601'
+v1212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'185',family|family_id<='601'
+v1111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'938'
+v1111112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937',family|family_id<='938'
+v122211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160',family|family_id>'107'
+v122212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'12',family|family_id<='107'
+v512(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964',ligand|ligand_id<='8173'
+v11112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='920',family|family_id>'919'
+v11112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='919'
+v5111(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'8267'
+v5112(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'8173',ligand|ligand_id<='8267'
+v1112111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'899'
+v1112112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'892',family|family_id<='899'
+80	1000000	349.315955596s	2.8507418399E-5s	1.391469	1000000	5.0	pre_processing::1.260580515	query::313.217458003	reasoning::0.15811118999999996	population::1.1273927299999051	
+80	1000000	346.388055858s	2.830921302E-5s	1.391469	1000000	5.0	pre_processing::1.296359998	query::310.905804796reasoning::0.15626270000000003	population::1.1815658959998083	
+80	1000000	350.37294487s	2.8839368091E-5s	1.391469	1000000	5.0	pre_processing::1.509007729	query::314.02752636	reasoning::0.14934177699999995	population::1.1093429339999437	
+80	1000000	67.174931937s	2.8488344807E-5s	1.391469	1000000	5.0	pre_processing::1.332209828	query::30.657197712	reasoning::0.17359663299999992	population::0.9855182740004631	
+80	1000000	68.654240839s	2.8416695448E-5s	1.391469	1000000	5.0	pre_processing::1.35480552	query::31.229475229	reasoning::0.16793569299999994	population::1.1886956670003943	
+80	1000000	67.501183807s	2.8671206813E-5s	1.391469	1000000	5.0	pre_processing::1.327395258	query::30.831540073	reasoning::0.18323569899999997	population::1.0786706619996502	
+36
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v11221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='759',family|family_id>'755'
+v1112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='773',family|family_id>'772'
+v1112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='772'
+v1111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='937',family|family_id>'932'
+v11122111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'793'
+v111221121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='793',family|family_id>'779'
+v111221122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'774',family|family_id<='779'
+v112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='755',family|family_id>'753'
+v112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='753'
+v1112122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'794',family|family_id<='856'
+v11121211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='892',family|family_id>'876'
+v11121212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'856',family|family_id<='876'
+v12222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='12'
+v11111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='932',family|family_id>'930'
+v11111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='930'
+v12211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'165'
+v12212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'160',family|family_id<='165'
+v521(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964',ligand|ligand_id>'3346'
+v522(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3346'
+v1111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='923',family|family_id>'920'
+v1211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'601'
+v1212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'185',family|family_id<='601'
+v1111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'938'
+v1111112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937',family|family_id<='938'
+v122211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160',family|family_id>'107'
+v122212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'12',family|family_id<='107'
+v512(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964',ligand|ligand_id<='8173'
+v11112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='920',family|family_id>'919'
+v11112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='919'
+v5111(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'8267'
+v5112(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'8173',ligand|ligand_id<='8267'
+v1112111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'899'
+v1112112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'892',family|family_id<='899'
+v11211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'766'
+v11212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'759',family|family_id<='766'
+85	1000000	362.770282082s	2.8956007669E-5s	1.391469	1000000	5.0	pre_processing::1.270902556	query::326.68572372	reasoning::0.16491481199999997	population::1.1916029469999463	
+85	1000000	358.782866951s	3.6449382907E-5s	1.391469	1000000	5.0	pre_processing::1.351085231	query::331.467738847	reasoning::0.2490949320000001	population::1.0986777339998626	
+85	1000000	367.15296924s	2.7569875237E-5s	1.391469	1000000	5.0	pre_processing::1.429728459	query::329.40966556	reasoning::0.13980861000000008	population::11.899417142998223	
+85	1000000	71.514414629s	2.9514864246E-5s	1.391469	1000000	5.0	pre_processing::1.313868248	query::30.893526734	reasoning::0.46171399999999985	population::1.1404609880002947	
+85	1000000	75.672846154s	3.3477119418E-5s	1.391469	1000000	5.0	pre_processing::1.462192193	query::31.924377502	reasoning::0.232191789	population::1.8182108829998498	
+85	1000000	74.233214316s	2.9716147941E-5s	1.391469	1000000	5.0	pre_processing::1.500672434	query::32.953434233	reasoning::0.1945032050000001	population::1.1684893959999636	
+37
+
+v2(object|object_id,object|systematic_name,object|quaternary_structure_comments,object|in_gtip,ligand|ligand_id) :- object,ligand
+v3(object|object_id,family|family_id,family|name,family|last_modified) :- object,family
+v4(ligand|ligand_id,ligand|absorption_distribution_vector,ligand|metabolism_vector,ligand|radioactive,ligand|popn_pharmacokinetics_vector,ligand|type,ligand|bioactivity_comments,ligand|iupac_name,ligand|clinical_use,ligand|abbreviation_vector,object|object_id,object|gtip_comment,object|no_contributor_list,object|quaternary_structure_comments) :- ligand,object
+v111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='924',family|family_id>'923'
+v1112212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'773',family|family_id<='774'
+v11221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='759',family|family_id>'755'
+v1112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='773',family|family_id>'772'
+v1112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'771',family|family_id<='772'
+v1111121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='937',family|family_id>'932'
+v11122111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='794',family|family_id>'793'
+v111221121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='793',family|family_id>'779'
+v111221122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'774',family|family_id<='779'
+v112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='755',family|family_id>'753'
+v112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'751',family|family_id<='753'
+v1112122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'794',family|family_id<='856'
+v11121211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='892',family|family_id>'876'
+v11121212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'856',family|family_id<='876'
+v12222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='12'
+v11111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='932',family|family_id>'930'
+v11111222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'924',family|family_id<='930'
+v12211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='185',family|family_id>'165'
+v12212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'160',family|family_id<='165'
+v521(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3964',ligand|ligand_id>'3346'
+v522(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id<='3346'
+v1111221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='923',family|family_id>'920'
+v1211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='751',family|family_id>'601'
+v1212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'185',family|family_id<='601'
+v1111111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'938'
+v1111112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'937',family|family_id<='938'
+v122211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='160',family|family_id>'107'
+v512(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'3964',ligand|ligand_id<='8173'
+v11112221(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='920',family|family_id>'919'
+v11112222(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'918',family|family_id<='919'
+v5111(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'8267'
+v5112(ligand|ligand_id,ligand|drugs_url,ligand|immuno_comments,ligand|withdrawn_drug) :- ligand,ligand|ligand_id>'8173',ligand|ligand_id<='8267'
+v1112111(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='918',family|family_id>'899'
+v1112112(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'892',family|family_id<='899'
+v11211(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='771',family|family_id>'766'
+v11212(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'759',family|family_id<='766'
+v1222121(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id<='107',family|family_id>'64'
+v1222122(family|family_id,family|old_family_id,family|annotation_status,family|name_vector) :- family,family|family_id>'12',family|family_id<='64'
+90	1000000	387.040232304s	2.8982339752E-5s	1.391469	1000000	5.0	pre_processing::1.423317251	query::350.412681018	reasoning::0.139297789	population::1.2646964339999378	
+90	1000000	378.576729737s	3.0099941351E-5s	1.391469	1000000	5.0	pre_processing::1.364951411	query::341.783799384	reasoning::0.14753572999999992	population::1.3549533149999624	
+90	1000000	378.839672186s	2.7784253858E-5s	1.391469	1000000	5.0	pre_processing::1.55518716	query::343.0178061	reasoning::0.25430571700000004	population::1.1732862549999037	
+90	1000000	66.65199427s	2.8261180552E-5s	1.391469	1000000	5.0	pre_processing::1.412575944	query::31.899702987	reasoning::0.17714131500000005	population::0.9971673009999862	
+90	1000000	69.461626917s	2.844713743E-5s	1.391469	1000000	5.0	pre_processing::1.32111713	query::31.160319863	reasoning::0.19297815300000004	population::1.2912588699993903	
+90	1000000	70.812145664s	2.8322899944E-5s	1.391469	1000000	5.0	pre_processing::1.327919851	query::33.520682756	reasoning::0.31469837600000006	population::0.9125983630003444

@@ -225,7 +225,7 @@ public class stress_test3 {
 				
 				Tuple_reasoning1_test.tuple_reasoning(query, citation_strs,  citation_view_map1, c, pst);
 				
-				System.gc();
+//				System.gc();
 				
 			}
 			
@@ -241,17 +241,19 @@ public class stress_test3 {
 			
 			System.out.print(time + "s	");
 			
-			Set<Head_strs> h_l = citation_strs.keySet();
+			Set<Head_strs> h_l = Tuple_reasoning1_test.head_strs_rows_mapping.keySet();
 			
 			double citation_size1 = 0;
 			
 			int row = 0;
 			
+			start_time = System.nanoTime();
+			
 			for(Iterator iter = h_l.iterator(); iter.hasNext();)
 			{
 				Head_strs h_value = (Head_strs) iter.next();
 				
-				HashSet<String> citations = citation_strs.get(h_value);
+				HashSet<String> citations = Tuple_reasoning1_test.gen_citation(h_value, c, pst);
 				
 				citation_size1 += citations.size();
 				
@@ -259,8 +261,14 @@ public class stress_test3 {
 				
 			}
 			
+			end_time = System.nanoTime();
+			
 			if(row !=0)
 			citation_size1 = citation_size1 / row;
+			
+			time = (end_time - start_time)/(row * 1.0 * 1000000000);
+			
+			System.out.print(time + "s	");
 			
 			System.out.print(citation_size1 + "	");
 			
@@ -332,17 +340,19 @@ public class stress_test3 {
 			System.out.print(time + "s	");
 			
 			
-			Set<Head_strs> h_l = citation_strs2.keySet();
+			Set<Head_strs> h_l = Tuple_reasoning2_test.head_strs_rows_mapping.keySet();
 			
 			double citation_size2 = 0.0;
 			
 			int row = 0;
 			
+			start_time = System.nanoTime();
+			
 			for(Iterator iter = h_l.iterator(); iter.hasNext();)
 			{
 				Head_strs h_value = (Head_strs) iter.next();
 				
-				HashSet<String> citations = citation_strs2.get(h_value);
+				HashSet<String> citations = Tuple_reasoning2_test.gen_citation(h_value, c, pst);
 				
 				citation_size2 += citations.size();
 				
@@ -350,8 +360,14 @@ public class stress_test3 {
 				
 			}
 			
+			end_time = System.nanoTime();
+			
 			if(row !=0)
 				citation_size2 = citation_size2 / row;
+			
+			time = (end_time - start_time)/(row * 1.0 * 1000000000);
+			
+			System.out.print(time + "s	");
 
 			System.out.print(citation_size2 + "	");
 

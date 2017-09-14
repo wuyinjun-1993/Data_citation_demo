@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,10 +16,10 @@ import org.json.JSONException;
 
 import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Corecover.Subgoal;
+import edu.upenn.cis.citation.Pre_processing.Query_operation;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.Pre_processing.view_operation;
 import edu.upenn.cis.citation.citation_view.Head_strs;
-import edu.upenn.cis.citation.citation_view.Head_strs2;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
@@ -29,10 +28,14 @@ import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_citation_opt2;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_citation_opt;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_opt;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_test;
 import edu.upenn.cis.citation.user_query.query_storage;
+import java.lang.instrument.Instrumentation;
+//import net.sourceforge.sizeof.*;
 
-public class stress_test3 {
+
+public class stress_test6 {
 	
 	static int size_range = 100;
 	
@@ -40,17 +43,15 @@ public class stress_test3 {
 	
 	static int size_upper_bound = 5;
 	
-	static int num_views = 3;
+	static int num_views = 5;
 	
 	static int view_max_size = 40;
+
+	static int query_num = 5;
 	
-	static int upper_bound = 20;
-	
-	static int query_num = 8;
-	
-	static boolean store_covering_set = true;
-	
-	static Vector<String> relations = new Vector<String>();
+	static int repeated_citation_generation_times = 100;
+
+	static HashSet<String> lambda_variable_string = new HashSet<String>();
 	
 	static Vector<String> get_unique_relation_names(Query query)
 	{
@@ -72,98 +73,57 @@ public class stress_test3 {
 		
 	}
 	
-	static Vector<String> get_relation_names(Query query)
-	{
-		Vector<String> relation_names = new Vector<String>();
-				
-		for(int i = 0; i<query.body.size(); i++)
-		{
-			Subgoal subgoal = (Subgoal) query.body.get(i);
-			
-			relation_names.add(query.subgoal_name_mapping.get(subgoal.name));
-			
-		}
-				
-		return relation_names;
-		
-	}
-	
-	public static void get_table_size(Vector<String> relations, Connection c, PreparedStatement pst) throws SQLException
-	{
-		int original_size = 0;
-		
-		int annotated_relation_size = 0;
-		
-		for(int i = 0; i<relations.size(); i++)
-		{
-			original_size += get_single_table_size(relations.get(i), c, pst);
-			
-			annotated_relation_size += get_single_table_size(relations.get(i) + populate_db.suffix, c, pst);
-		}
-		
-		System.out.println("original_relation_size::" + original_size);
-		
-		System.out.println("annotated_relation_size::" + annotated_relation_size);
-	}
-	
-	static int get_single_table_size(String relation, Connection c, PreparedStatement pst) throws SQLException
-	{
-		String query = "SELECT pg_total_relation_size('"+ relation +"')";
-		
-		pst = c.prepareStatement(query);
-		
-		ResultSet rs = pst.executeQuery();
-		
-		if(rs.next())
-		{
-			int size =  rs.getInt(1);
-			
-//			int size_int = Integer.valueOf(size.substring(0, size.indexOf(" ")));
-			
-			return size;
-		}
-		
-		return 0;
-	}
-	
-	
 	public static void main(String [] args) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
 	{
 		
+				
 //		reset();
+		
+//		long a = 6;
+//		
+//		
+//		
+//		 SizeOf.skipStaticField(true); //java.sizeOf will not compute static fields
+//		 SizeOf.skipFinalField(true); //java.sizeOf will not compute final fields
+//		 SizeOf.skipFlyweightObject(true); //java.sizeOf will not compute well-known flyweight objects
+		 //this will print the object size in bytes
 		
 		Connection c = null;
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");
 	    c = DriverManager
 	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
-		
-		
-//	    System.out.println(get_single_table_size("family", c, pst));
-	    
-	    
-	    int k = Integer.valueOf(args[0]);
-	    
-	    boolean new_query = Boolean.valueOf(args[1]);
-		
-		boolean new_rounds = Boolean.valueOf(args[2]);
-		
-		boolean tuple_level = Boolean.valueOf(args[3]);
-		
-		boolean new_start = Boolean.valueOf(args[4]);
-		
-				
+					
 //		Query query = query_storage.get_query_by_id(1);
 		
-//		for(int k = 3; k<=query_num; k++)
+		int k =  Integer.valueOf(args[0]);
+		
+		int view_size = Integer.valueOf(args[1]);
+		
+		boolean new_query = Boolean.valueOf(args[2]);
+		
+		boolean new_rounds = Boolean.valueOf(args[3]);
+		
+		boolean tuple_level = Boolean.valueOf(args[4]);
+		
+		boolean new_start = Boolean.valueOf(args[5]);
+		
+		if(new_query)
+			reset();
+		
+//		for(int k = 3; k<query_num; k++)
 		{
-			if(new_query)
-			{
-				System.out.println("new query");
-				
-				reset(c, pst);
-			}
-						
+//			reset();
+//			
+//			Random r = new Random();
+//			
+//			int size = r.nextInt(query_num);
+//			
+//			while(size <= 0)
+//			{
+//				size = r.nextInt(query_num);
+//			}
+			
 			Query query = null;
 			
 			try{
@@ -176,16 +136,22 @@ public class stress_test3 {
 				System.out.println(query);
 			}
 			
-			relations = get_unique_relation_names(query);
-			
 			Vector<Query> views = null;
+			
+			Vector<String> relation_names = get_unique_relation_names(query);
+			
+//			views = view_generator.generate_store_views_without_lambda_terms(relation_names, view_size, query.body.size());
+			
+//			view_generator.gen_one_addtional_lambda_term(views, lambda_variable_string);
+			
+//			Vector<Query> views = null;
+			
 			
 			if(new_rounds)
 			{
+				views = view_generator.generate_store_views_without_lambda_terms(relation_names, view_size, query.body.size());
 				
-				views = view_generator.gen_default_views(relations);
-				
-//				views = view_generator.generate_store_views_without_predicates(relation_names, view_size, query.body.size());
+//				view_generator.gen_default_views(relation_names);
 				
 				for(Iterator iter = views.iterator(); iter.hasNext();)
 				{
@@ -193,12 +159,17 @@ public class stress_test3 {
 					
 					System.out.println(view);
 				}
-				
-				get_table_size(relations, c, pst);
 			}
 			else
 			{
 				views = view_operation.get_all_views();
+				
+//				for(Iterator iter = views.iterator(); iter.hasNext();)
+//				{
+//					Query view = (Query) iter.next();
+//					
+//					System.out.println(view);
+//				}
 				
 				if(new_start)
 				{
@@ -206,24 +177,43 @@ public class stress_test3 {
 					
 					view_generator.initial();
 					
-					view_generator.gen_one_additional_view(views, relations, query.body.size(), query);
+					if(!view_generator.gen_one_addtional_lambda_term(views, lambda_variable_string))
+						System.exit(1);
 					
 					for(Iterator iter = views.iterator(); iter.hasNext();)
 					{
 						Query view = (Query) iter.next();
 						
-						System.out.println(view);
+						System.out.println(view.lambda_term + "," + view);
 					}
-					
-					get_table_size(relations, c, pst);
 				}
 			}
 			
-			stress_test(query, c, pst, views, tuple_level);
+			
+//			for(Iterator iter = views.iterator(); iter.hasNext();)
+//			{
+//				Query view = (Query) iter.next();
+//				
+//				view_generator.gen_one_local_predicate(view, c, pst, query);
+////				view_generator.gen_one_additional_predicates(views, relation_names, query.body.size(), query);
+//				
+//				view_operation.delete_view_by_name(view.name);
+//				
+//				view_operation.add(view, view.name);
+//				
+//				System.out.println(view);
+//
+//			}
+//			
+//			System.out.println(query);
+			
+			stress_test(query, c, pst, views, relation_names, tuple_level);
 
 		}
 		
-
+		
+		
+		
 		
 		
 		
@@ -232,8 +222,7 @@ public class stress_test3 {
 		
 	}
 	
-	
-	static void stress_test(Query query, Connection c, PreparedStatement pst, Vector<Query> views, boolean tuple_level) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
+	static void stress_test(Query query, Connection c, PreparedStatement pst, Vector<Query> views, Vector<String> relation_names, boolean tuple_level) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
 	{
 		HashMap<Head_strs, HashSet<String> > citation_strs = new HashMap<Head_strs, HashSet<String>>();
 		
@@ -274,7 +263,7 @@ public class stress_test3 {
 				
 				Tuple_reasoning1_test.tuple_reasoning(query, citation_strs,  citation_view_map1, c, pst);
 				
-//				System.gc();
+				System.gc();
 				
 			}
 			
@@ -308,19 +297,19 @@ public class stress_test3 {
 				
 				row ++;
 				
-				if(row >= 10)
+				if(row >= repeated_citation_generation_times)
 					break;
 				
 			}
 			
 			end_time = System.nanoTime();
 			
-			if(row !=0)
-			citation_size1 = citation_size1 / row;
-			
 			time = (end_time - start_time)/(row * 1.0 * 1000000000);
 			
 			System.out.print(time + "s	");
+			
+			if(row !=0)
+			citation_size1 = citation_size1 / (query_generator.query_result_size);
 			
 			System.out.print(citation_size1 + "	");
 			
@@ -365,8 +354,6 @@ public class stress_test3 {
 			System.out.print("population::" + Tuple_reasoning1_test.population_time + "	");
 			
 			System.out.println();
-			
-			
 		}
 		else
 		{
@@ -414,19 +401,19 @@ public class stress_test3 {
 				
 				row ++;
 				
-				if(row >= 10)
+				if(row >= repeated_citation_generation_times)
 					break;
 				
 			}
 			
 			end_time = System.nanoTime();
 			
-			if(row !=0)
-				citation_size2 = citation_size2 / row;
-			
 			time = (end_time - start_time)/(row * 1.0 * 1000000000);
 			
 			System.out.print(time + "s	");
+			
+			if(row !=0)
+				citation_size2 = citation_size2 / query_generator.query_result_size;
 
 			System.out.print(citation_size2 + "	");
 
@@ -497,9 +484,18 @@ public class stress_test3 {
 		}
 	}
 	
-	
-	static void reset(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	static void reset() throws SQLException, ClassNotFoundException
 	{
+		
+		Connection c = null;
+		
+	    PreparedStatement pst = null;
+	      
+		Class.forName("org.postgresql.Driver");
+		
+	    c = DriverManager
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
 		
 		String query = "delete from user_query2conditions";
 		
@@ -524,8 +520,6 @@ public class stress_test3 {
 		pst = c.prepareStatement(query);
 		
 		pst.execute();
-		
-		
 	}
 
 }

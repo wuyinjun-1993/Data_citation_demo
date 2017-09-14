@@ -86,6 +86,8 @@ public class stress_test4_2 {
 //		 SizeOf.skipFlyweightObject(true); //java.sizeOf will not compute well-known flyweight objects
 		 //this will print the object size in bytes
 		
+		query_generator.query_result_size = 10000;
+		
 		Connection c = null;
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");
@@ -262,6 +264,12 @@ public class stress_test4_2 {
 			
 			Set<Head_strs> heads = Tuple_reasoning1_test.head_strs_rows_mapping.keySet();
 			
+			int row = 0;
+			
+			int size1 = 0;
+			
+			int size2 = 0;
+			
 			for(Iterator iter = heads.iterator(); iter.hasNext();)
 			{
 				Head_strs head = (Head_strs) iter.next();
@@ -271,6 +279,10 @@ public class stress_test4_2 {
 				HashSet<String> curr_citation2 = Tuple_reasoning2_test.gen_citation(head, c, pst);
 				
 				HashSet<String> curr_citation1 = Tuple_reasoning1_test.gen_citation(head, c, pst);
+				
+				size1 += curr_citation1.size();
+				
+				size2 += curr_citation2.size();
 				
 //				System.out.println();
 				
@@ -289,8 +301,13 @@ public class stress_test4_2 {
 					
 					Assert.assertEquals(true, false);
 				}
+				
+				row ++;
 			}
 			
+			System.out.println(size1);
+			
+			System.out.println(size2);
 			
 //			System.out.println(SizeOf.humanReadable(SizeOf.deepSizeOf(citation_strs))); 
 			
@@ -306,7 +323,7 @@ public class stress_test4_2 {
 			
 			double citation_size1 = 0;
 			
-			int row = 0;
+			row = 0;
 			
 			for(Iterator iter = h_l.iterator(); iter.hasNext();)
 			{

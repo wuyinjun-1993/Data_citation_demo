@@ -285,6 +285,9 @@ public class stress_test4 {
 				
 				row ++;
 				
+				if(row >= 10)
+					break;
+				
 			}
 			
 			end_time = System.nanoTime();
@@ -385,6 +388,9 @@ public class stress_test4 {
 				citation_size2 += citations.size();
 				
 				row ++;
+				
+				if(row >= 10)
+					break;
 				
 			}
 			

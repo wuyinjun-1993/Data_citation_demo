@@ -36,7 +36,7 @@ public class view_operation {
 //		
 //		delete_view_by_id(5);
 //		
-		delete_view_by_id(18);
+		delete_view_by_name("v6");
 		
 //		String query = "v9(ligand_c_ligand_id,interaction_c_object_id, ligand_c_name):ligand_c(), interaction_c(), interaction_c_ligand_id=ligand_c_ligand_id";
 //		

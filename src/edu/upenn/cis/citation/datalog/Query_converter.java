@@ -1519,7 +1519,7 @@ public class Query_converter {
 			if(i >= 1)
 				str += ",";
 			
-			str += arg.table_name + "." + arg.name.substring(arg.table_name.length() + 1, arg.name.length());
+			str += "md5(CAST (" + arg.table_name + "." + arg.name.substring(arg.name.indexOf(populate_db.separator) + 1, arg.name.length()) + " AS text))";
 			
 		}
 		return str;
@@ -2279,7 +2279,7 @@ public class Query_converter {
 			
 			String name = lambda_terms.get(i).name;
 			
-			str += lambda_terms.get(i).table_name + "." + name.substring(name.indexOf(populate_db.separator) + 1, name.length());
+			str += "md5(CAST (" + lambda_terms.get(i).table_name + "." + name.substring(name.indexOf(populate_db.separator) + 1, name.length()) + " AS text))";
 		}
 		
 		return str;
@@ -2442,7 +2442,14 @@ public class Query_converter {
 			sql += " and " + condition;
 		
 		if(condition_str[1] != null && !condition_str[1].isEmpty())
-			sql += " order by " + condition_str[1]; 
+		{
+			sql += " order by " + condition_str[1] + "," + citation_unit; 
+		}
+		else
+		{
+			sql += " order by " + citation_unit;
+		}
+		
 		
 //		System.out.println("sql:::" + sql);
 		

@@ -311,6 +311,35 @@ public class view_generator {
 	    
 	    store_views(views, c, pst);
 	    
+	    c.close();
+	    
+	    return views;
+	}
+	
+	public static Vector<Query> generate_store_views_without_lambda_terms(Vector<String> subgoal_names, int num_views, int sizeofquery) throws SQLException, ClassNotFoundException
+	{
+		initial();
+		
+		Connection c = null;
+	      PreparedStatement pst = null;
+		Class.forName("org.postgresql.Driver");
+	    c = DriverManager
+	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
+	    
+	    clear_views(c, pst);
+	    
+	    clear_other_tables(c, pst);
+	    
+	    populate_db.renew_table(c, pst);
+	    
+	    get_joinable_relations(c, pst);
+	    
+	    Vector<Query> views = gen_views_without_lambda_terms(subgoal_names, num_views, sizeofquery,  c, pst);
+	    
+	    store_views(views, c, pst);
+	    
+	    c.close();
+	    
 	    return views;
 	}
 	
@@ -836,6 +865,39 @@ public class view_generator {
 		return queries;
 	}
 	
+	static Vector<Query> gen_views_without_lambda_terms(Vector<String> subgoal_names, int num_views, int sizeofquety, Connection c, PreparedStatement pst) throws SQLException
+	{
+		Vector<Integer> sizes = generator_random_numbers(num_views, sizeofquety);
+		
+		Vector<Query> queries = new Vector<Query>();
+		
+		int num = 0;
+		
+		if(!sizes.contains(1))
+			sizes.set(0, 1);
+		
+		while(queries.size() < sizes.size())
+		{
+			
+			int size = sizes.get(num);
+						
+			Query query = generate_view_without_lambda_terms(subgoal_names, num + 1, sizes.get(num), c, pst);
+						
+//			if(!queries.contains(query))
+			{
+				queries.add(query);
+				
+		    	System.out.println(query.lambda_term + "," + query.toString());
+				
+				num ++;
+			}
+			
+			
+		}
+		
+		return queries;
+	}
+	
 	public static void gen_one_additional_predicates(Vector<Query> views, Vector<String> subgoal_names, int sizeofquery, Query query) throws SQLException, ClassNotFoundException
 	{
 //		Vector<Integer> sizes = generator_random_numbers(1, sizeofquery);
@@ -923,6 +985,85 @@ public class view_generator {
 //		view_operation.add(view, view.name);
 				
 		c.close();
+	}
+	
+	public static boolean gen_one_addtional_lambda_term(Vector<Query> views, HashSet<String> lambda_variable_strings) throws ClassNotFoundException, SQLException
+	{
+	
+		int i = 0;
+		
+		for(i = 0; i<views.size(); i++)
+		{
+			if(views.get(i).head.args.size() > views.get(i).lambda_term.size())
+				break;
+		}
+		
+		if(i >= views.size())
+		{
+			System.out.println("no other lambda variables available");
+			
+			return false;
+		}
+		
+		
+		Random r = new Random();
+		
+		int rel_index = 0;
+		
+		while(true)
+		{
+			rel_index = r.nextInt(views.size());
+			
+			int head_size = views.get(rel_index).head.args.size();
+			
+			int lambda_term_size = views.get(rel_index).lambda_term.size();
+			
+			if(head_size > lambda_term_size)
+				break;
+			
+			
+		}
+		
+		while(true)
+		{
+			int lambda_index = r.nextInt(views.get(rel_index).head.args.size());
+			
+			Argument selected_arg = (Argument) views.get(rel_index).head.args.get(lambda_index);
+			
+			Lambda_term l_term = new Lambda_term(selected_arg.toString(), selected_arg.relation_name);
+			
+			views.get(rel_index).lambda_term.add(l_term);
+			
+			String lambda_variable_string = views.get(rel_index).name + populate_db.separator + selected_arg.toString();
+			
+			if(lambda_variable_strings.contains(lambda_variable_string))
+				continue;
+			else
+			{
+				lambda_variable_strings.add(lambda_variable_string);
+				
+				break;
+			}
+			
+		}
+		
+		
+		
+		view_operation.delete_view_by_name(views.get(rel_index).name);
+		
+		citation_view_operation.delete_citation_views(views.get(rel_index).name);
+		
+		String view_name = views.get(rel_index).name;
+		
+		int id = view_operation.add(views.get(rel_index), views.get(rel_index).name);
+		
+		views.get(rel_index).name = view_name;
+		
+		store_single_citation_view(views.get(rel_index), id);
+		
+		return true;
+		
+		
 	}
 	
 	static boolean check_duplicated_conditions(Vector<Query> views, String relation, String attr_name, String constant)
@@ -1723,6 +1864,90 @@ public class view_generator {
 		return new Query(name, new Subgoal(name, heads), body, lambda_terms, predicates, maps);
 	}
 	
+	static Query generate_view_without_lambda_terms(Vector<String> subgoal_names, int id, int size, Connection c, PreparedStatement pst) throws SQLException
+	{
+		Random r = new Random();
+		
+		HashSet<String> relation_names = new HashSet<String>();
+		
+		Vector<Argument> heads = new Vector<Argument>();
+		
+		Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();
+		
+		Vector<Conditions> local_predicates = new Vector<Conditions>();
+		
+		HashMap<String, String> maps = new HashMap<String, String>();
+		
+		Vector<Subgoal> body = new Vector<Subgoal>();
+		
+		for(int i = 0; i<size; i++)
+		{
+			int index = r.nextInt((int) (subgoal_names.size()));
+			
+			String relation = subgoal_names.get(index);
+			
+			if(relation_names.contains(relation))
+			{
+				continue;
+			}
+			else
+			{
+				relation_names.add(relation);
+				
+				maps.put(relation, relation);
+			}
+			
+			HashMap<String, String> attr_types = get_attr_types(relation, c, pst);
+			
+			
+			Set<String> attr_names = attr_types.keySet();
+			
+			Vector<String> attr_list = get_attrs(relation, c, pst);
+			
+//			attr_list.addAll(attr_names);
+			
+			Random rand = new Random();
+			
+			int selection_size = rand.nextInt((int)(attr_list.size() * local_predicates_rate + 1));
+			
+			String [] primary_key_type = get_primary_key(relation, c, pst);
+			
+//			Vector<Conditions> conditions = gen_local_predicates(selection_size, attr_types, attr_list, relation, primary_key_type, c, pst);
+					
+//			local_predicates.addAll(conditions);
+			
+			int head_size = rand.nextInt((int)(attr_list.size() * head_var_rate + 1)) + 1;
+									
+			Vector<Argument> head_vars = gen_all_head_vars(relation, attr_list, head_size, c, pst);
+			
+			
+//			Vector<Lambda_term> l_terms = gen_lambda_terms(head_vars, relation, c, pst);
+			
+			heads.addAll(head_vars);
+						
+//			lambda_terms.add(new Lambda_term(relation + populate_db.separator + primary_key_type[0], relation));
+			
+//			lambda_terms.addAll(l_terms);
+			
+			Vector<Argument> args = new Vector<Argument>();
+			
+			body.add(new Subgoal(relation, args));
+		}
+		
+		String name = "v" + id;
+		
+//		Vector<Conditions> global_predicates = gen_global_conditions(body);
+		
+		Vector<Conditions> predicates = new Vector<Conditions>();
+		
+//		predicates.addAll(global_predicates);
+		
+		predicates.addAll(local_predicates);
+		
+		return new Query(name, new Subgoal(name, heads), body, lambda_terms, predicates, maps);
+	}
+
+	
 	static Query generate_views_with_n_subgoals_without_predicates(Vector<String> subgoal_names, int id, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{		
 		HashSet<String> relation_names = new HashSet<String>();
@@ -1939,6 +2164,21 @@ public class view_generator {
 			Integer index = (Integer) iter.next();
 			
 			Argument l = new Argument(relation_name + populate_db.separator + attr_list.get(index), relation_name);
+			
+			head_vars.add(l);
+			
+		}
+		
+		return head_vars;
+	}
+	
+	static Vector<Argument> gen_all_head_vars(String relation_name, Vector<String> attr_list, int size, Connection c, PreparedStatement pst)
+	{		
+		Vector<Argument> head_vars = new Vector<Argument>();
+
+		for(int i = 0; i<attr_list.size(); i++)
+		{			
+			Argument l = new Argument(relation_name + populate_db.separator + attr_list.get(i), relation_name);
 			
 			head_vars.add(l);
 			

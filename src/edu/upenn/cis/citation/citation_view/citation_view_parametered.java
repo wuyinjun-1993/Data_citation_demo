@@ -293,6 +293,27 @@ public class citation_view_parametered extends citation_view{
 //		gen_table_names(c,pst);
 //		get_queries();
 	}
+	
+	public citation_view_parametered(String name, Query view, Tuple tuple) throws ClassNotFoundException, SQLException 
+	{
+		
+		this.name = name;
+		
+		this.lambda_terms = tuple.lambda_terms;
+		
+		this.view = view;
+		
+		this.view_tuple = tuple;
+		
+		Vector<Conditions> conditions = tuple.conditions;
+				
+		set_table_names(tuple);
+		
+//		gen_index();
+			    
+//		gen_table_names(c,pst);
+//		get_queries();
+	}
 	 
 	void set_table_names(Tuple tuple)
 	{

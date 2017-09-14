@@ -50,13 +50,17 @@ public class populate_db {
 	
 
 
-	public static String usr_name = "postgres";
+	public static String usr_name = "wuyinjun";
 	
 	public static String passwd = "12345678";
 	
 	public static String suffix = "_c";
 	
-	public static String star_op = " union ";	
+	public static String star_op = "union";
+	
+	public static String plus_op = "union";
+	
+	public static String agg_op = "intersection";
 	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException
 	{

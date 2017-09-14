@@ -92,6 +92,8 @@ public class stress_test3_2 {
 		
 //		reset();
 		
+		query_generator.query_result_size = 10000;
+		
 		Connection c = null;
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");
@@ -195,10 +197,7 @@ public class stress_test3_2 {
 		
 //		while(views.size() < view_max_size)
 		if(tuple_level)
-		{
-		
-			System.gc();
-						
+		{						
 			double end_time = 0;
 
 			
@@ -338,7 +337,9 @@ public class stress_test3_2 {
 				
 				citation_view2.clear();
 				
-				citation_view2 = Tuple_reasoning2_test.tuple_reasoning(query, citation_strs2, citation_view_map2, c, pst);
+				Tuple_reasoning1_test.tuple_reasoning(query, citation_strs,  citation_view_map1, c, pst);
+				
+				Tuple_reasoning2_test.tuple_reasoning(query, citation_strs2,  citation_view_map2, c, pst);
 				
 				System.gc();
 			}
@@ -353,28 +354,53 @@ public class stress_test3_2 {
 			System.out.print(time + "s	");
 			
 			
-			Set<Head_strs> h_l = citation_strs2.keySet();
-			
-			double citation_size2 = 0.0;
+			Set<Head_strs> heads = Tuple_reasoning1_test.head_strs_rows_mapping.keySet();
 			
 			int row = 0;
 			
-			for(Iterator iter = h_l.iterator(); iter.hasNext();)
+			int size1 = 0;
+			
+			int size2 = 0;
+			
+			for(Iterator iter = heads.iterator(); iter.hasNext();)
 			{
-				Head_strs h_value = (Head_strs) iter.next();
+				Head_strs head = (Head_strs) iter.next();
 				
-				HashSet<String> citations = citation_strs2.get(h_value);
+				System.out.println(head);
 				
-				citation_size2 += citations.size();
+				HashSet<String> curr_citation2 = Tuple_reasoning2_test.gen_citation(head, c, pst);
+				
+				HashSet<String> curr_citation1 = Tuple_reasoning1_test.gen_citation(head, c, pst);
+				
+				size1 += curr_citation1.size();
+				
+				size2 += curr_citation2.size();
+				
+//				System.out.println();
+				
+//				if(curr_citation1.toString().equals("[]") && curr_citation2.toString().equals("[{\"db_name\":\"IUPHAR/BPS Guide to PHARMACOLOGY\",\"author\":[]}]"))
+//					continue;
+				
+				if(!curr_citation1.containsAll(curr_citation2) || !curr_citation2.containsAll(curr_citation1))
+				{
+					System.out.println(curr_citation1);
+					
+					System.out.println(curr_citation2);
+					
+					curr_citation2 = Tuple_reasoning2_test.gen_citation(head, c, pst);
+					
+					curr_citation1 = Tuple_reasoning1_test.gen_citation(head, c, pst);
+					
+					Assert.assertEquals(true, false);
+				}
 				
 				row ++;
-				
 			}
 			
-			if(row !=0)
-				citation_size2 = citation_size2 / row;
-
-			System.out.print(citation_size2 + "	");
+//			if(row !=0)
+//				citation_size2 = citation_size2 / row;
+//
+//			System.out.print(citation_size2 + "	");
 
 			System.out.print(row + "	");
 			

@@ -94,6 +94,10 @@ public class citation_view_unparametered extends citation_view{
 //		lambda = false;
 	}
 	
+	public citation_view_unparametered() {
+		// TODO Auto-generated constructor stub
+	}
+
 	void gen_table_names(Connection c, PreparedStatement pst ) throws ClassNotFoundException, SQLException
 	{
 		
@@ -314,7 +318,19 @@ public class citation_view_unparametered extends citation_view{
 	@Override
 	public citation_view clone() {
 		// TODO Auto-generated method stub
-		return this;
+		citation_view_unparametered c_v = new citation_view_unparametered();
+		
+//		c_v.index = this.index;
+				
+		c_v.name = this.name;
+				
+		c_v.table_names = this.table_names;
+		
+		c_v.table_name_str = this.table_name_str;
+				
+		c_v.view_tuple = this.view_tuple;
+		
+		return c_v;
 	}
 
 	@Override

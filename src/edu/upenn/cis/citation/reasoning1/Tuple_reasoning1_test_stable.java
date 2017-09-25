@@ -1884,20 +1884,7 @@ public class Tuple_reasoning1_test_stable {
 				Head_strs h_vals = new Head_strs(vals);
 				
 				vals.clear();
-				
-////				System.out.println(h_vals);
-				if(h_vals.toString().equals("934 570 184"))
-				{
-					int y = 0;
-					y++;
-				}
-////				
-//				if(h_vals.toString().equals("6 5 5 16"))
-//				{
-//					int y = 0;
-//					y++;
-//				}
-								
+							
 				int pos1 = query.body.size() + query.head.args.size() + lambda_term_num;
 				
 				for(int i = pos1; i< pos1 + valid_conditions.size(); i++)

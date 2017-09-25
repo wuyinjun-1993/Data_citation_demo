@@ -37,6 +37,8 @@ public class query_generator {
 	
 	
 	public static String [] citatable_tables = {"ligand", "gpcr","object", "family", "introduction"};
+	
+	static HashMap<String, Vector<String>> parameterizable_attri = new HashMap<String, Vector<String>>();
 
 	static HashMap<string_array, Vector<string_array> > joinable_attribute_lists = new HashMap<string_array, Vector<string_array>>();
 	
@@ -82,15 +84,67 @@ public class query_generator {
 	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
 
 	    
-	    get_joinable_relations(c, pst);
+//	    get_joinable_relations(c, pst);
+//	    
+//	    int size = 10;
+//	    	    
+//	    Query query = gen_query(size, c, pst);
+//	    
+//	    System.out.println(query);
 	    
-	    int size = 10;
+	    init_parameterizable_attributes(c, pst);
+	    
+	    c.close();
 	    	    
-	    Query query = gen_query(size, c, pst);
 	    
-	    System.out.println(query);
-	    	    
-	    
+	}
+	
+	static void init_parameterizable_attributes(Connection c, PreparedStatement pst) throws SQLException
+	{
+		
+		int col_num = 0;
+		
+		for(int i = 0; i<citatable_tables.length; i++)
+		{
+			String attr_query = "SELECT column_name FROM information_schema.columns WHERE table_name = '" + citatable_tables[i] + "'";
+			
+			pst = c.prepareStatement(attr_query);
+			
+			ResultSet rs = pst.executeQuery();
+			
+			Vector<String> cols = new Vector<String>();
+			
+			while(rs.next())
+			{
+				String attr_name = rs.getString(1);
+				
+				String length_query = "select max(char_length(cast (" + attr_name + " as text))) from " + citatable_tables[i];
+				
+//				System.out.println(length_query);
+				
+				pst = c.prepareStatement(length_query);
+				
+				ResultSet r = pst.executeQuery();
+				
+				if(r.next())
+				{
+					int length = r.getInt(1);
+					
+					if(length < 60)
+					{
+						col_num ++;
+						
+						cols.add(attr_name);
+					}
+					
+//					System.out.println(citatable_tables[i] + " " + attr_name + " " + length);
+				}
+			}
+			
+			parameterizable_attri.put(citatable_tables[i], cols);
+		}
+		
+//		System.out.println(parameterizable_attri);
 	}
 	
 	public static Vector<Query> gen_queries(int size, int query_num) throws SQLException, ClassNotFoundException

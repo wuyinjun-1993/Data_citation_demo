@@ -24,12 +24,12 @@ import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.gen_citation.gen_citation1;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test_stable;
 
 public class Aggregation2 {
 	
 	public static void do_aggregate(Vector<citation_view_vector> curr_res, Vector<citation_view_vector> c_views, int seq, Vector<HashSet<String> > author_list, HashMap<String, Vector<Integer> > view_query_mapping, HashMap<Integer, Vector<Lambda_term>> query_lambda_str, HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping, int max_num, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
-	{
-		
+	{		
 		if(seq == 0)
 		{
 			
@@ -54,11 +54,15 @@ public class Aggregation2 {
 					{
 						authors = gen_citation1.get_authors2((citation_view_parametered)c_v, c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num);
 						
+//						System.out.println(authors);
+						
 						all_authors.addAll(authors);
 					}
 					else
 					{
 						authors = gen_citation1.get_authors2((citation_view_unparametered)c_v, c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num);
+						
+//						System.out.println(authors);
 						
 						all_authors.addAll(authors);
 					}
@@ -117,6 +121,8 @@ public class Aggregation2 {
 					if(c_v.has_lambda_term())
 					{
 						authors = gen_citation1.get_authors2((citation_view_parametered)c_v, c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num);
+						
+//						System.out.println(authors);
 						
 						author_list.get(i).addAll(authors);
 					}
@@ -207,6 +213,9 @@ public class Aggregation2 {
 			
 			HashSet<String> authors = author_lists.get(i);
 			
+			if(authors.isEmpty())
+				continue;
+			
 			JSONArray jarray = new JSONArray();
 
 			int num = 0;
@@ -287,12 +296,16 @@ public class Aggregation2 {
 				{
 					rs.absolute(i + 1);
 					
-					Tuple_reasoning1.update_valid_citation_combination(c_view, rs, start_pos);
+					c_view = Tuple_reasoning1_test_stable.update_valid_citation_combination(c_view, rs, start_pos);
 					
 					do_aggregate(curr_res, c_view, i, author_lists, view_query_mapping, query_lambda_str, author_mapping, max_num, c, pst);
+					
+//					System.out.println(c_view);
 				}
 			}
 		}
+		
+		System.out.println(curr_res);
 		
 		Vector<String> json_string = new Vector<String>();
 		
@@ -300,9 +313,14 @@ public class Aggregation2 {
 		
 		for(int i = 0; i<author_lists.size(); i++)
 		{
+			
+//			System.out.println(curr_res.get(i));
+//			
+//			System.out.println(author_lists.get(i));
+			
 			JSONObject json = new JSONObject();
 			
-			HashSet<String> authors = author_lists.get(i);
+			HashSet<String> authors = gen_citation1.reorder_hashset(author_lists.get(i));
 			
 			JSONArray jarray = new JSONArray();
 
@@ -322,6 +340,8 @@ public class Aggregation2 {
 			
 			json.put("author", jarray);
 			
+			json.put("db_name", gen_citation1.db_name);
+			
 			if(!unique_string.contains(json.toString()))
 			{
 				json_string.add(json.toString());
@@ -329,9 +349,9 @@ public class Aggregation2 {
 				unique_string.add(json.toString());
 			}
 			
-			json.put("db_name", gen_citation1.db_name);
 			
-			json.put("Accessed on", gen_citation1.getCurrentDate());
+			
+//			json.put("Accessed on", gen_citation1.getCurrentDate());
 		}
 		
 		

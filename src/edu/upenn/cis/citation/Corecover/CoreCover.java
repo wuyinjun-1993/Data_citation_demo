@@ -109,14 +109,21 @@ public class CoreCover {
  /**
   * given a canonical db and a set of views, computes the view tuples
   */
+  
   public static HashSet computeViewTuples(Database canDb, Vector views) {
 	HashSet viewTuples = new HashSet();
+	
+//	System.out.println("tuples::" + canDb.tuples);
+	
     for (int i = 0; i < views.size(); i ++) {
       Query view = (Query) views.elementAt(i);
 
 //      System.out.println(view);
       
       Relation rel = canDb.execQuery(view);
+      
+//      System.out.println("relation:::" + rel);
+      
       
 //      if(!rel.getTuples().isEmpty())
 //      {
@@ -133,6 +140,8 @@ public class CoreCover {
       for (Iterator iter = rel.getTuples().iterator(); iter.hasNext();) {
     	      	  
     	  Tuple tuple = (Tuple) iter.next();
+    	  
+//          System.out.println("valid_tuple::" + tuple);
     	  
     	  set_tuple_lambda_term(tuple, view);
 
@@ -169,11 +178,18 @@ public class CoreCover {
 	  
 	  for(int i = 0; i<view.conditions.size(); i++)
 	  {
+		  boolean get_mapping1 = true;
+		  
+		  boolean get_mapping2 = true;
+		  
 		  String curr_arg1 = tuple.phi_str.apply(view.conditions.get(i).subgoal1 + populate_db.separator + view.conditions.get(i).arg1.name);
 		  
-		  String subgoal1 = curr_arg1.substring(0, curr_arg1.indexOf(populate_db.separator));
+		  if(curr_arg1 == null)
+			  get_mapping1 = false;
 		  
-		  curr_arg1 = curr_arg1.substring(curr_arg1.indexOf(populate_db.separator) + 1, curr_arg1.length());
+		  String subgoal1 = (get_mapping1 == true) ? curr_arg1.substring(0, curr_arg1.indexOf(populate_db.separator)) : view.conditions.get(i).subgoal1;
+		  
+		  curr_arg1 = (get_mapping1 == true) ? curr_arg1.substring(curr_arg1.indexOf(populate_db.separator) + 1, curr_arg1.length()):view.conditions.get(i).arg1.name;
 		  
 		  String curr_arg2 = new String();
 		  
@@ -191,12 +207,19 @@ public class CoreCover {
 		  {
 			  curr_arg2 = tuple.phi_str.apply(view.conditions.get(i).subgoal2 + populate_db.separator + view.conditions.get(i).arg2.name);
 			  			  
-			  subgoal2 = curr_arg2.substring(0, curr_arg2.indexOf(populate_db.separator));
+			  if(curr_arg2 == null)
+				  get_mapping2 = false;
 			  
-			  curr_arg2 = curr_arg2.substring(curr_arg2.indexOf(populate_db.separator) + 1, curr_arg2.length());
+			  subgoal2 = (get_mapping2 == true) ? curr_arg2.substring(0, curr_arg2.indexOf(populate_db.separator)):view.conditions.get(i).subgoal2;
+			  
+			  curr_arg2 = (get_mapping2 == true) ? curr_arg2.substring(curr_arg2.indexOf(populate_db.separator) + 1, curr_arg2.length()) : view.conditions.get(i).arg2.name;
 			  
 			  condition = new Conditions(new Argument(curr_arg1, subgoal1), subgoal1, view.conditions.get(i).op, new Argument(curr_arg2, subgoal2), subgoal2);
 		  }
+		  
+		  condition.get_mapping1 = get_mapping1;
+		  
+		  condition.get_mapping2 = get_mapping2;
 		  
 		  conditions.add(condition);
 		  
@@ -740,6 +763,109 @@ public class CoreCover {
 	if (tupleSubset.size() != size) 
 	  UserLib.myerror("CoreCover.coverQuerySubgoals(), error!");
 	
+//	if(size == 4)
+//	{
+//		HashSet<String> t1 = new HashSet<String>();
+//		
+//		t1.add("gpcr3");
+//		
+//		t1.add("object");
+//		
+//		HashSet<String> t2 = new HashSet<String>();
+//		
+//		t2.add("gpcr");
+//		
+//		HashSet<String> t3 = new HashSet<String>();
+//		
+//		t3.add("gpcr3");
+//		
+//		t3.add("object2");
+//		
+//		HashSet<String> t4 = new HashSet<String>();
+//		
+//		t4.add("gpcr3");
+//		
+//		boolean match = true;
+//		
+//		for(Iterator it = tupleSubset.iterator(); it.hasNext();)
+//		{
+//			Tuple tuple = (Tuple) it.next();
+//			
+//			if(tuple.name.equals("v10"))
+//			{
+//				HashSet<String> t_strs = tuple.get_relations();
+//				
+//				if(t_strs.equals(t1))
+//				{
+//					match = true;
+//				}
+//				else
+//				{
+//					match = false;
+//					break;
+//				}
+//								
+//				
+//			}
+//			else
+//			{
+//				if(tuple.name.equals("v1"))
+//				{
+//					HashSet<String> t_strs = tuple.get_relations();
+//					
+//					if(t_strs.equals(t2) || t_strs.equals(t4))
+//					{
+//						match = true;
+//					}
+//					else
+//					{
+//						match = false;
+//						break;
+//					}
+//									
+//					
+//				}
+//				else
+//				{
+//					if(tuple.name.equals("v8"))
+//					{
+//						HashSet<String> t_strs = tuple.get_relations();
+//						
+//						if(t_strs.equals(t3))
+//						{
+//							match = true;
+//						}
+//						else
+//						{
+//							match = false;
+//							break;
+//						}
+//										
+//						
+//					}
+//					else
+//					{
+//						match = false;
+//						break;
+//					}
+//				}
+//			}
+//		}
+//		
+//		if(match)
+//		{
+//			String index_str = new String();
+//	    	
+//	    	for(Iterator it = tupleSubset.iterator(); it.hasNext();)
+//	    	{
+//	    		Tuple tuple = (Tuple) it.next();
+//	    		
+//	    		index_str += tuple.name + populate_db.separator + tuple.get_relations();
+//	    	}
+//	    	
+//	    	System.out.println(index_str);
+//		}
+//	}
 	
 	
 

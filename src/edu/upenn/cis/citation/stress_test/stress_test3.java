@@ -26,9 +26,11 @@ import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_citation_opt;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_citation_opt2;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_citation_opt;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_test;
 import edu.upenn.cis.citation.user_query.query_storage;
 
@@ -152,7 +154,7 @@ public class stress_test3 {
 		
 		boolean new_start = Boolean.valueOf(args[4]);
 		
-				
+//		query_generator.query_result_size = 10000;
 //		Query query = query_storage.get_query_by_id(1);
 		
 //		for(int k = 3; k<=query_num; k++)
@@ -266,13 +268,9 @@ public class stress_test3 {
 			for(int k = 0; k<times; k++)
 			{
 				
-				citation_view_map1.clear();
-				
-				citation_strs.clear();
-				
 //				citation_view1.clear();
 				
-				Tuple_reasoning1_test.tuple_reasoning(query, citation_strs,  citation_view_map1, c, pst);
+				Tuple_reasoning1_full_test.tuple_reasoning(query, c, pst);
 				
 //				System.gc();
 				
@@ -290,7 +288,7 @@ public class stress_test3 {
 			
 			System.out.print(time + "s	");
 			
-			Set<Head_strs> h_l = Tuple_reasoning1_test.head_strs_rows_mapping.keySet();
+			Set<Head_strs> h_l = Tuple_reasoning1_full_test.head_strs_rows_mapping.keySet();
 			
 			double citation_size1 = 0;
 			
@@ -302,7 +300,7 @@ public class stress_test3 {
 			{
 				Head_strs h_value = (Head_strs) iter.next();
 				
-				HashSet<String> citations = Tuple_reasoning1_test.gen_citation(h_value, c, pst);
+				HashSet<String> citations = Tuple_reasoning1_full_test.gen_citation(h_value, c, pst);
 				
 				citation_size1 += citations.size();
 				
@@ -354,15 +352,26 @@ public class stress_test3 {
 //			
 			
 			
-			System.out.print(Tuple_reasoning1_test.covering_set_num * 1.0/row + "	");
+			System.out.print(Tuple_reasoning1_full_test.covering_set_num * 1.0/Tuple_reasoning1_full_test.tuple_num + "	");
 			
-			System.out.print("pre_processing::" + Tuple_reasoning1_test.pre_processing_time + "	");
+			System.out.print("pre_processing::" + Tuple_reasoning1_full_test.pre_processing_time + "	");
 			
-			System.out.print("query::" + Tuple_reasoning1_test.query_time + "	");
+			System.out.print("query::" + Tuple_reasoning1_full_test.query_time + "	");
 			
-			System.out.print("reasoning::" + Tuple_reasoning1_test.reasoning_time + "	");
+			System.out.print("reasoning::" + Tuple_reasoning1_full_test.reasoning_time + "	");
 			
-			System.out.print("population::" + Tuple_reasoning1_test.population_time + "	");
+			System.out.print("population::" + Tuple_reasoning1_full_test.population_time + "	");
+			
+			
+//			start_time = System.nanoTime();
+//			
+//			HashSet<String> agg_citations = Tuple_reasoning1_test.tuple_gen_agg_citations(query);
+//			
+//			end_time = System.nanoTime();
+			
+			time = (end_time - start_time) * 1.0/1000000000;
+			
+			System.out.print("Aggregation::" + time);
 			
 			System.out.println();
 			
@@ -374,14 +383,8 @@ public class stress_test3 {
 			double start_time = System.nanoTime();
 			
 			for(int k = 0; k<times; k++)
-			{
-				citation_view_map2.clear();
-				
-				citation_strs2.clear();
-				
-				citation_view2.clear();
-				
-				citation_view2 = Tuple_reasoning2_test.tuple_reasoning(query, citation_strs2, citation_view_map2, c, pst);
+			{				
+				Tuple_reasoning2_full_test.tuple_reasoning(query, c, pst);
 				
 				System.gc();
 			}
@@ -396,7 +399,7 @@ public class stress_test3 {
 			System.out.print(time + "s	");
 			
 			
-			Set<Head_strs> h_l = Tuple_reasoning2_test.head_strs_rows_mapping.keySet();
+			Set<Head_strs> h_l = Tuple_reasoning2_full_test.head_strs_rows_mapping.keySet();
 			
 			double citation_size2 = 0.0;
 			
@@ -408,7 +411,7 @@ public class stress_test3 {
 			{
 				Head_strs h_value = (Head_strs) iter.next();
 				
-				HashSet<String> citations = Tuple_reasoning2_test.gen_citation(h_value, c, pst);
+				HashSet<String> citations = Tuple_reasoning2_full_test.gen_citation(h_value, c, pst);
 				
 				citation_size2 += citations.size();
 				
@@ -460,15 +463,25 @@ public class stress_test3 {
 //						
 //			System.out.print(origin_citation_size + "	");
 			
-			System.out.print(Tuple_reasoning2_test.covering_set_num * 1.0/row + "	");
+			System.out.print(Tuple_reasoning2_full_test.covering_set_num * 1.0/Tuple_reasoning2_full_test.tuple_num + "	");
 			
-			System.out.print("pre_processing::" + Tuple_reasoning2_test.pre_processing_time + "	");
+			System.out.print("pre_processing::" + Tuple_reasoning2_full_test.pre_processing_time + "	");
 			
-			System.out.print("query::" + Tuple_reasoning2_test.query_time + "	");
+			System.out.print("query::" + Tuple_reasoning2_full_test.query_time + "	");
 			
-			System.out.print("reasoning::" + Tuple_reasoning2_test.reasoning_time + "	");
+			System.out.print("reasoning::" + Tuple_reasoning2_full_test.reasoning_time + "	");
 			
-			System.out.print("population::" + Tuple_reasoning2_test.population_time + "	");
+			System.out.print("population::" + Tuple_reasoning2_full_test.population_time + "	");
+			
+//			start_time = System.nanoTime();
+//			
+//			HashSet<String> agg_citations = Tuple_reasoning2_test.tuple_gen_agg_citations(query);
+//			
+//			end_time = System.nanoTime();
+			
+			time = (end_time - start_time) * 1.0/1000000000;
+			
+			System.out.print("Aggregation::" + time);
 			
 			System.out.println();
 			

@@ -72,6 +72,8 @@ class Relation {
   public void setQuery(Query query) {
     for (Iterator iter = tuples.iterator(); iter.hasNext();) {
       Tuple tuple = (Tuple) iter.next();
+//      System.out.println(tuple.mapSubgoals);
+      
       tuple.setQuery(query);
     }    
   }

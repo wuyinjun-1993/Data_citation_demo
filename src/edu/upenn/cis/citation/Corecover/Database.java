@@ -9,7 +9,7 @@ import java.util.*;
 
 public class Database {
   
-  HashSet tuples = null;
+  public HashSet tuples = null;
 
   HashMap<String, String> subgoal_name_mappings = null;
   
@@ -28,8 +28,19 @@ public class Database {
     for (int i = 0; i < query.getSubgoalNum(); i ++ ) {
       Subgoal subgoal = query.getSubgoal(i);
       
+//      System.out.println("subgoal:::" + subgoal);
+      
       // processes the subgoal on the db
       Relation subgoalRel = processSubgoal(subgoal, query);
+      
+      if(subgoalRel.tuples.size() == 0)
+    	  continue;
+      
+//      System.out.println("tuples:::" + subgoalRel.tuples);
+      
+//      System.out.println("subgoal_relation:::" + subgoalRel);
+//      
+//      System.out.println("subgoal_relation_schema:::" + subgoalRel.getSchema());
 
       // process the join
       sr = join(sr, subgoalRel, query.getName(), i);
@@ -39,6 +50,7 @@ public class Database {
       
     }
 
+//    System.out.println(sr.getTuples());
     // set the query of the result, and compute the head of each tuple
     sr.setQuery(query);  
     return sr;
@@ -143,6 +155,8 @@ public class Database {
 	      resSchema.add(arg);
 	    }
 
+	    
+	    
 	    // finds tuples that can be unified with this subgoal
 	    HashSet resTuples = new HashSet();
 	    for (Iterator iter = tuples.iterator(); iter.hasNext();) {
@@ -288,6 +302,11 @@ public class Database {
 	    HashSet resTuples = new HashSet();
 	    HashSet tuples1  = rel1.getTuples();
 	    HashSet tuples2  = rel2.getTuples();
+	    
+//	    resTuples.addAll(tuples1);
+//	    
+//	    resTuples.addAll(tuples2);
+	    
 	    for (Iterator iter1 = tuples1.iterator(); iter1.hasNext();) {
 	      Tuple tuple1 = (Tuple) iter1.next();
 

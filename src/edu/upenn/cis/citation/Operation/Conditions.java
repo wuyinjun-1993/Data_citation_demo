@@ -23,6 +23,10 @@ public class Conditions {
 	
 	public String expression;
 	
+	public boolean get_mapping1 = true;
+	
+	public boolean get_mapping2 = true;
+	
 	public int id1 = -1;
 	
 	public int id2 = -1;

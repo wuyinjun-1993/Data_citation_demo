@@ -1519,7 +1519,7 @@ public class Query_converter {
 			if(i >= 1)
 				str += ",";
 			
-			str += "md5(CAST (" + arg.table_name + "." + arg.name.substring(arg.name.indexOf(populate_db.separator) + 1, arg.name.length()) + " AS text))";
+			str += "(" + arg.table_name + "." + arg.name.substring(arg.name.indexOf(populate_db.separator) + 1, arg.name.length()) + ")";
 			
 		}
 		return str;
@@ -2190,23 +2190,85 @@ public class Query_converter {
 				str[1] += ",";
 			}
 			
-			if(condition.subgoal2 == null || condition.subgoal2.isEmpty())
+			if(condition.get_mapping1 == true && condition.get_mapping2 == true)
 			{
-				String arg2_str = condition.arg2.name;
-				
-				if(arg2_str.length() > 2)
+				if(condition.subgoal2 == null || condition.subgoal2.isEmpty())
 				{
-					arg2_str = "'" + arg2_str.substring(1, condition.arg2.name.length() - 1).replaceAll("'", "''") + "'";
+					String arg2_str = condition.arg2.name;
+					
+					if(arg2_str.length() > 2)
+					{
+						arg2_str = "'" + arg2_str.substring(1, condition.arg2.name.length() - 1).replaceAll("'", "''") + "'";
+					}
+					
+					
+					
+					str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + condition.op + arg2_str + ") as condition" + condition_num;
 				}
+				else
+					str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + condition.op + condition.subgoal2 + "." + condition.arg2 + ") as condition" + condition_num;
 				
-				
-				
-				str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + condition.op + arg2_str + ") as condition" + condition_num;
+				str[1] += "condition" + condition_num + " desc";
 			}
 			else
-				str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + condition.op + condition.subgoal2 + "." + condition.arg2 + ") as condition" + condition_num;
+			{
+				if(condition.get_mapping1 == true && condition.get_mapping2 == false)
+				{
+//					if(condition.subgoal2 == null || condition.subgoal2.isEmpty())
+//					{
+//						String arg2_str = condition.arg2.name;
+//						
+//						if(arg2_str.length() > 2)
+//						{
+//							arg2_str = "'" + arg2_str.substring(1, condition.arg2.name.length() - 1).replaceAll("'", "''") + "'";
+//						}
+//						
+//						
+//						
+//						str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + condition.op + arg2_str + ") as condition" + condition_num;
+//					}
+//					else
+					if(!condition.arg1.isConst())
+					{
+						str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + " in ( select " + condition.arg2 + " from " + condition.subgoal2 + ")) as condition" + condition_num;
+						
+						str[1] += "condition" + condition_num + " desc";
+					}
+						
+				}
+				else
+				{
+					if(condition.get_mapping2 == true && condition.get_mapping1 == false)
+					{
+//						if(condition.subgoal2 == null || condition.subgoal2.isEmpty())
+//						{
+//							String arg2_str = condition.arg2.name;
+//							
+//							if(arg2_str.length() > 2)
+//							{
+//								arg2_str = "'" + arg2_str.substring(1, condition.arg2.name.length() - 1).replaceAll("'", "''") + "'";
+//							}
+//							
+//							
+//							
+//							str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + condition.op + arg2_str + ") as condition" + condition_num;
+//						}
+//						else
+						
+						if(!condition.arg2.isConst())
+						{
+							str[0] += "(" + condition.subgoal2 + "." + condition.arg2 + " in ( select " + condition.arg1 + " from " + condition.subgoal1 + ")) as condition" + condition_num;
+							
+							str[1] += "condition" + condition_num + " desc";
+						}
+//							str[0] += "(" + condition.subgoal2 + "." + condition.arg2 + " in ( select " + condition.arg2 + " from " + condition.subgoal2 + ")) as condition" + condition_num;
+//						
+//						str[1] += "condition" + condition_num + " desc";
+					}
+				}
+			}
 			
-			str[1] += "condition" + condition_num + " desc";
+			
 			
 			condition_num ++;
 
@@ -2279,7 +2341,7 @@ public class Query_converter {
 			
 			String name = lambda_terms.get(i).name;
 			
-			str += "md5(CAST (" + lambda_terms.get(i).table_name + "." + name.substring(name.indexOf(populate_db.separator) + 1, name.length()) + " AS text))";
+			str += "(" + lambda_terms.get(i).table_name + "." + name.substring(name.indexOf(populate_db.separator) + 1, name.length()) + ")";
 		}
 		
 		return str;

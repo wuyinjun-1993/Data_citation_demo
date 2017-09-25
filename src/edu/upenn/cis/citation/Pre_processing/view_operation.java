@@ -306,7 +306,7 @@ public class view_operation {
 		return id;
 	}
 	
-	public static void delete_view_by_name(String name) throws SQLException, ClassNotFoundException
+	public static int delete_view_by_name(String name) throws SQLException, ClassNotFoundException
 	{
 		Class.forName("org.postgresql.Driver");
         Connection c = DriverManager
@@ -336,6 +336,8 @@ public class view_operation {
         c.close();
         
         populate_db.delete("v" + id, subgoals, subgoal_name_mapping, has_lambda);
+        
+        return id;
 
 	}
 	

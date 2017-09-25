@@ -43,6 +43,7 @@ import edu.upenn.cis.citation.data_structure.Unique_StringList;
 import edu.upenn.cis.citation.datalog.Parse_datalog;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
+import edu.upenn.cis.citation.sort_citation_view_vec.sort_insert;
 
 public class gen_citation1 {
 	
@@ -421,11 +422,23 @@ public class gen_citation1 {
 		return json_obj.toString();
 	}
 	
-	static HashSet<String> reorder_hashset(HashSet<String> str_list)
+	public static HashSet<String> reorder_hashset(HashSet<String> str_list)
 	{
-		List sortedList = new ArrayList(str_list);
+		List<String> sortedList = new ArrayList(str_list);
 		
 		Collections.sort(sortedList);
+		
+//		Object[] list = (Object[]) str_list.toArray();
+//		
+//		Arrays.sort(list);
+//		
+//		HashSet<String> new_list = new HashSet<String>();
+//		
+//		for(int i = 0; i<list.length; i++)
+//		{
+//			new_list.add((String)list[i]);
+//		}
+		
 		
 		return new HashSet<String>(sortedList);
 	}
@@ -496,7 +509,7 @@ public class gen_citation1 {
 		
 	}
 	
-	static JSONObject get_json_citation(HashMap<String, HashSet<String>> json_citation)
+	public static JSONObject get_json_citation(HashMap<String, HashSet<String>> json_citation)
 	{
 		JSONObject json_obj = new JSONObject();
 		
@@ -507,6 +520,9 @@ public class gen_citation1 {
 			String key = (String) iter.next();
 			
 			HashSet<String> content = json_citation.get(key);
+			
+//			if(key.equals("author") && content.isEmpty())
+//				return null;
 			
 			content = reorder_hashset(content);
 			
@@ -530,7 +546,43 @@ public class gen_citation1 {
 		return json_obj;
 	}
 	
-	public static HashSet<String> get_citations3(citation_view_vector c_vec, Connection c, PreparedStatement pst, StringList view_list, ArrayList<HashMap<String, Integer>> view_query_mapping, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> citation_max_num, HashSet<String> authors, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping, String star_op) throws ClassNotFoundException, SQLException, JSONException
+	public static HashMap<String, HashSet<String>> join_covering_sets(citation_view_vector c_vec, Connection c, PreparedStatement pst, StringList view_list, ArrayList<HashMap<String, Integer>> view_query_mapping, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> citation_max_num, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping) throws ClassNotFoundException, SQLException
+	{
+		HashMap<String, HashSet<String>> json_citation = new HashMap<String, HashSet<String>>();
+		
+		HashMap<String, Integer> json_citation_size = new HashMap<String, Integer>();
+		
+		for(int i = 0; i<c_vec.c_vec.size(); i++)
+		{
+			
+			int view_index = view_list.find(c_vec.c_vec.get(i).get_name());
+			
+			
+			if(c_vec.c_vec.get(i).has_lambda_term())
+			{
+				HashMap<String, HashSet<String>> j_citation = get_authors3((citation_view_parametered)c_vec.c_vec.get(i), c, pst, view_index, view_query_mapping, author_mapping, citation_max_num, query_ids, query_lambda_str, view_author_mapping);
+				
+				json_citation = join_citation(json_citation, j_citation, json_citation_size, citation_max_num);
+				
+			}
+			else
+			{
+				
+				HashMap<String, HashSet<String>> j_citation = get_authors3((citation_view_unparametered)c_vec.c_vec.get(i), c, pst, view_index, view_query_mapping, author_mapping, citation_max_num, query_ids, query_lambda_str, view_author_mapping);
+				
+				json_citation = join_citation(json_citation, j_citation, json_citation_size, citation_max_num);
+			}
+			
+			
+			
+		}
+		
+//		System.out.println(c_vec + ":::::::::" + json_citation);
+		
+		return json_citation;
+	}
+	
+	public static HashSet<String> get_citations3(citation_view_vector c_vec, Connection c, PreparedStatement pst, StringList view_list, ArrayList<HashMap<String, Integer>> view_query_mapping, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> citation_max_num, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping, String star_op) throws ClassNotFoundException, SQLException, JSONException
 	{
 //		String author_str = new String();
 		
@@ -543,41 +595,22 @@ public class gen_citation1 {
 		if(star_op.equals(join))
 		{
 			
-			HashMap<String, HashSet<String>> json_citation = new HashMap<String, HashSet<String>>();
-			
-			HashMap<String, Integer> json_citation_size = new HashMap<String, Integer>();
-			
-			for(int i = 0; i<c_vec.c_vec.size(); i++)
-			{
-				
-				int view_index = view_list.find(c_vec.c_vec.get(i).get_name());
-				
-				
-				if(c_vec.c_vec.get(i).has_lambda_term())
-				{
-					HashMap<String, HashSet<String>> j_citation = get_authors3((citation_view_parametered)c_vec.c_vec.get(i), c, pst, view_index, view_query_mapping, author_mapping, citation_max_num, query_ids, query_lambda_str, view_author_mapping);
-					
-					json_citation = join_citation(json_citation, j_citation, json_citation_size, citation_max_num);
-					
-				}
-				else
-				{
-					
-					HashMap<String, HashSet<String>> j_citation = get_authors3((citation_view_unparametered)c_vec.c_vec.get(i), c, pst, view_index, view_query_mapping, author_mapping, citation_max_num, query_ids, query_lambda_str, view_author_mapping);
-					
-					json_citation = join_citation(json_citation, j_citation, json_citation_size, citation_max_num);
-				}
-				
-				
-				
-			}
 			
 			
+			HashMap<String, HashSet<String>> json_citation = join_covering_sets(c_vec, c, pst, view_list, view_query_mapping, author_mapping, citation_max_num, query_ids, query_lambda_str, view_author_mapping);
 			
 //			System.out.println(json_citation);
 			
 			JSONObject json_obj = get_json_citation(json_citation);
 			
+			if(json_obj == null)
+				return citation_strings;
+			
+//			JSONArray j_arr = (JSONArray) json_obj.get("author");
+//			
+//			if(j_arr.length() == 0)
+//				return citation_strings;
+						
 			citation_strings.add(json_obj.toString());
 						
 //			int num = 0;
@@ -1349,14 +1382,6 @@ public class gen_citation1 {
 		{
 			return view_author_mapping.get(c_view.toString());
 		}
-		
-		
-		if(c_view.toString().equals("v1(41)"))
-		{
-			int y= 0;
-			y++;
-		}
-		
 		
 		
 		

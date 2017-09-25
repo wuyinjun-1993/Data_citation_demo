@@ -12,10 +12,10 @@ import edu.upenn.cis.citation.Operation.Conditions;
 public class Tuple {
   public String name = null;
   Vector args = null;  // a list of arguments
-  Mapping phi = null;  // mapping from query args to the database deriving
+  public Mapping phi = null;  // mapping from query args to the database deriving
 		       // the tuple
   
-  Mapping phi_str = null;
+  public Mapping phi_str = null;
   public Subgoal subgoal = null; // the subgoal that produces this tuple in canDb.
   public HashMap mapSubgoals = null;
   
@@ -137,11 +137,32 @@ public class Tuple {
     this.name = query.getName();
 
     // compute the new head under the phi
-    Subgoal head = query.getHead();
-    if (head.size() != args.size())
-      UserLib.myerror("Tuple.setQuery(), wrong args!");
-    Subgoal newHead = phi.apply(head);
-    args = newHead.getArgs();  // set the new args
+    
+//    Set<Subgoal> subgoal_s = mapSubgoals.keySet();
+//    
+//    for(int i = 0; i<args.size(); i++)
+//    {
+//    	Argument curr_arg = (Argument) args.get(i);
+//    	
+//    	args.set(i, phi.apply(curr_arg));
+//    }
+    
+//    args.clear();
+//    
+//    for(Iterator iter = subgoal_s.iterator(); iter.hasNext();)
+//    {
+//    	Subgoal key_subgoal = (Subgoal) iter.next();
+//    	
+//    	Subgoal map_subgoal = (Subgoal) mapSubgoals.get(key_subgoal);
+//    	
+//    	args.addAll(map_subgoal.getArgs());
+//    }
+    
+//    Subgoal head = query.getHead();
+////    if (head.size() != args.size())
+////      UserLib.myerror("Tuple.setQuery(), wrong args!");
+//    Subgoal newHead = phi.apply(args);
+//    args = newHead.getArgs();  // set the new args
   }
 
   public void setCore(HashSet core) {
@@ -245,13 +266,27 @@ public class Tuple {
    * HashSet collection, called when HashSet.equals() is called.
    */
   public int hashCode() {
-    int hashCode = this.getName().hashCode();
-    for (int i = 0; i < args.size(); i ++) {
-      Argument arg  = (Argument) args.elementAt(i);
-      hashCode += arg.hashCode();
-    }
+	  
+	  
+	  if(this.mapSubgoals_str == null)
+	  {
+		  String hash_string = this.getName() + args.toString();
+		  
+//	    int hashCode = this.getName().hashCode();
+//	    for (int i = 0; i < args.size(); i ++) {
+//	      Argument arg  = (Argument) args.elementAt(i);
+//	      hashCode += arg.hashCode();
+//	    }
+	    
+	    return hash_string.hashCode();
+	  }
+	  
+	  String hash_string = this.getName() + this.mapSubgoals_str.toString();
+	  
+	  
+
     
-    return hashCode;
+    return hash_string.hashCode();
   }
 
   public String toString() {

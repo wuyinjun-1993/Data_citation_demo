@@ -126,12 +126,17 @@ public class stress_test6 {
 			
 			Query query = null;
 			
+			query_generator.init_parameterizable_attributes(c, pst);
+			
 			try{
 				query = query_storage.get_query_by_id(1);
 			}
 			catch(Exception e)
 			{
 				query = query_generator.gen_query(k, c, pst);
+				
+				
+				
 				query_storage.store_query(query, new Vector<Integer>());
 				System.out.println(query);
 			}
@@ -255,13 +260,7 @@ public class stress_test6 {
 			for(int k = 0; k<times; k++)
 			{
 				
-				citation_view_map1.clear();
-				
-				citation_strs.clear();
-				
-//				citation_view1.clear();
-				
-				Tuple_reasoning1_test.tuple_reasoning(query, citation_strs,  citation_view_map1, c, pst);
+				Tuple_reasoning1_test.tuple_reasoning(query, c, pst);
 				
 				System.gc();
 				
@@ -362,13 +361,7 @@ public class stress_test6 {
 			
 			for(int k = 0; k<times; k++)
 			{
-				citation_view_map2.clear();
-				
-				citation_strs2.clear();
-				
-				citation_view2.clear();
-				
-				citation_view2 = Tuple_reasoning2_test.tuple_reasoning(query, citation_strs2, citation_view_map2, c, pst);
+				citation_view2 = Tuple_reasoning2_test.tuple_reasoning(query, c, pst);
 				
 				System.gc();
 			}

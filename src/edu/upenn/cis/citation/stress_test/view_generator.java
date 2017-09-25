@@ -336,7 +336,7 @@ public class view_generator {
 	    
 	    Vector<Query> views = gen_views_without_lambda_terms(subgoal_names, num_views, sizeofquery,  c, pst);
 	    
-	    store_views(views, c, pst);
+	    store_views_lambda(views, c, pst);
 	    
 	    c.close();
 	    
@@ -471,6 +471,28 @@ public class view_generator {
 		c.close();
 	}
 	
+	public static void store_single_citation_view_lambda(Query view, int id) throws ClassNotFoundException, SQLException
+	{
+		
+		Connection c = null;
+	      PreparedStatement pst = null;
+		Class.forName("org.postgresql.Driver");
+	    c = DriverManager
+	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
+		
+//		view_operation.add(view, view.name);
+		
+		citation_view_operation.add_citation_view("c" + id);
+		
+		citation_view_operation.add_connection_view_with_citations("c" + id, view.name);
+		
+		store_citation_queries_lambda(view, id, c, pst);
+		
+		Query_operation.add_connection_citation_with_query("c" + id, "q" + id , "author");
+		
+		c.close();
+	}
+	
 	public static void clear_other_tables(Connection c, PreparedStatement pst) throws SQLException
 	{
 		String [] tables = {"citation2query", "citation2view", "citation_table", "query2subgoal", "query2lambda_term", "query2conditions", "query2head_variables"};
@@ -532,6 +554,34 @@ public class view_generator {
 		
 	}
 	
+	public static void store_views_lambda(Vector<Query> views, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	{
+		
+		int num = 1;
+		
+		for(Iterator iter = views.iterator(); iter.hasNext();)
+		{
+			
+			Query view = (Query) iter.next();
+			
+			String name = view.name;
+			
+			view_operation.add(view, view.name);
+			
+			citation_view_operation.add_citation_view("c" + num);
+			
+			citation_view_operation.add_connection_view_with_citations("c" + num, name);
+			
+			store_citation_queries_lambda(view, num, c, pst);
+			
+			Query_operation.add_connection_citation_with_query("c" + num, "q" + num , "author");
+			
+			num ++;
+
+		}
+		
+	}
+	
 	static void store_citation_queries(Query view, int num, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
 		Vector<String> citable_table_names = new Vector<String>();
@@ -553,11 +603,6 @@ public class view_generator {
 			if(citable_table_names.contains(subgoal.name))
 				break;
 		}
-		
-		
-		
-		
-		
 		
 		String [] primary_key_type = get_primary_key(subgoal.name, c, pst);
 		
@@ -594,6 +639,68 @@ public class view_generator {
 				l_args.add(l);
 				
 				break;
+			}
+		}
+				
+		Query q = new Query("q" + num, head, body, l_args, conditions, subgoal_mapping);
+		
+		Query_operation.add(q, q.name);
+		
+	}
+	
+	static void store_citation_queries_lambda(Query view, int num, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	{
+		Vector<String> citable_table_names = new Vector<String>();
+		
+		citable_table_names.addAll(Arrays.asList(citatable_tables));
+		
+		Subgoal subgoal = null;
+		
+		while(true)
+		{
+			Random r = new Random();
+			
+			int index = r.nextInt(view.body.size());
+			
+			
+			
+			subgoal = (Subgoal)view.body.get(index);
+			
+			if(citable_table_names.contains(subgoal.name))
+				break;
+		}
+				
+		
+		Vector<Conditions> conditions = query_conditions.get(subgoal.name);
+		
+		Vector<Argument> head_vars = query_head_names.get(subgoal.name);
+		
+		Vector<String> subgoals = query_table_names.get(subgoal.name);
+		
+		Subgoal head = new Subgoal("q" + num, head_vars);
+		
+		Vector<Subgoal> body = new Vector<Subgoal>();
+		
+		HashMap<String, String> subgoal_mapping = new HashMap<String, String>();
+		
+		for(int i = 0; i < subgoals.size(); i++)
+		{
+			Vector<Argument> args = new Vector<Argument>();
+			
+			body.add(new Subgoal(subgoals.get(i), args));
+			
+			subgoal_mapping.put(subgoals.get(i), subgoals.get(i));
+		}
+		
+		Vector<Lambda_term> l_args = new Vector<Lambda_term>();
+		
+		for(int i = 0; i<view.lambda_term.size(); i++)
+		{
+			Lambda_term l = view.lambda_term.get(i);
+			
+			if(l.table_name.equals(subgoal.name))
+			{
+				l_args.add(l);
 			}
 		}
 				
@@ -873,15 +980,12 @@ public class view_generator {
 		
 		int num = 0;
 		
-		if(!sizes.contains(1))
-			sizes.set(0, 1);
-		
 		while(queries.size() < sizes.size())
 		{
 			
-			int size = sizes.get(num);
+			int size = 1;
 						
-			Query query = generate_view_without_lambda_terms(subgoal_names, num + 1, sizes.get(num), c, pst);
+			Query query = generate_view_without_lambda_terms(subgoal_names, num + 1, size, c, pst);
 						
 //			if(!queries.contains(query))
 			{
@@ -950,9 +1054,11 @@ public class view_generator {
 			{
 				views.remove(view);
 				
-				view_operation.delete_view_by_name(view.name);
+				int old_id = view_operation.delete_view_by_name(view.name);
 				
-				citation_view_operation.delete_citation_views(view.name);
+				citation_view_operation.delete_citation_views_by_id(old_id);
+				
+				Query_operation.delete_query_by_id(old_id);
 				
 				break;
 			}
@@ -987,14 +1093,31 @@ public class view_generator {
 		c.close();
 	}
 	
+	static int get_candidate_parameters(Query view)
+	{
+		int para_size = 0;
+		
+		for(int j = 0; j < view.body.size(); j++)
+		{
+			Subgoal subgoal = (Subgoal) view.body.get(j);
+			
+			para_size += query_generator.parameterizable_attri.get(subgoal.name).size();
+		}
+		
+		return para_size;
+	}
+	
 	public static boolean gen_one_addtional_lambda_term(Vector<Query> views, HashSet<String> lambda_variable_strings) throws ClassNotFoundException, SQLException
 	{
-	
+			
 		int i = 0;
 		
 		for(i = 0; i<views.size(); i++)
 		{
-			if(views.get(i).head.args.size() > views.get(i).lambda_term.size())
+			
+			int para_size = get_candidate_parameters(views.get(i));
+			
+			if(para_size > views.get(i).lambda_term.size())
 				break;
 		}
 		
@@ -1014,7 +1137,7 @@ public class view_generator {
 		{
 			rel_index = r.nextInt(views.size());
 			
-			int head_size = views.get(rel_index).head.args.size();
+			int head_size = get_candidate_parameters(views.get(rel_index));//views.get(rel_index).head.args.size();
 			
 			int lambda_term_size = views.get(rel_index).lambda_term.size();
 			
@@ -1026,15 +1149,36 @@ public class view_generator {
 		
 		while(true)
 		{
-			int lambda_index = r.nextInt(views.get(rel_index).head.args.size());
+			int lambda_index = r.nextInt(get_candidate_parameters(views.get(rel_index)));
 			
-			Argument selected_arg = (Argument) views.get(rel_index).head.args.get(lambda_index);
+			int number = 0;
 			
-			Lambda_term l_term = new Lambda_term(selected_arg.toString(), selected_arg.relation_name);
+			String subgoal_arg_string = null;
+			
+			Lambda_term l_term = null;
+			
+			for(int k = 0; k<views.get(rel_index).body.size(); k++)
+			{
+				Subgoal subgoal = (Subgoal)views.get(rel_index).body.get(k);
+				
+				number += query_generator.parameterizable_attri.get(subgoal.name).size();
+				
+				if(number > lambda_index)
+				{
+//					query_generator.parameterizable_attri.get(subgoal.name).get(lambda_index - (number - query_generator.parameterizable_attri.get(subgoal.name).size()));
+					
+//					selected_arg = (Argument)subgoal.args.get(lambda_index - (number - subgoal.args.size()));
+					subgoal_arg_string = subgoal.name + populate_db.separator + query_generator.parameterizable_attri.get(subgoal.name).get(lambda_index - (number - query_generator.parameterizable_attri.get(subgoal.name).size()));
+					
+					l_term = new Lambda_term(subgoal_arg_string, subgoal.name);
+					
+					break;
+				}
+			}
 			
 			views.get(rel_index).lambda_term.add(l_term);
 			
-			String lambda_variable_string = views.get(rel_index).name + populate_db.separator + selected_arg.toString();
+			String lambda_variable_string = views.get(rel_index).name + populate_db.separator + subgoal_arg_string;
 			
 			if(lambda_variable_strings.contains(lambda_variable_string))
 				continue;
@@ -1046,12 +1190,12 @@ public class view_generator {
 			}
 			
 		}
+				
+		int old_id = view_operation.delete_view_by_name(views.get(rel_index).name);
 		
+		citation_view_operation.delete_citation_views_by_id(old_id);
 		
-		
-		view_operation.delete_view_by_name(views.get(rel_index).name);
-		
-		citation_view_operation.delete_citation_views(views.get(rel_index).name);
+		Query_operation.delete_query_by_id(old_id);
 		
 		String view_name = views.get(rel_index).name;
 		
@@ -1059,7 +1203,7 @@ public class view_generator {
 		
 		views.get(rel_index).name = view_name;
 		
-		store_single_citation_view(views.get(rel_index), id);
+		store_single_citation_view_lambda(views.get(rel_index), id);
 		
 		return true;
 		

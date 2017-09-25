@@ -128,6 +128,27 @@ public class citation_view_operation {
 		
 		c.close();
 	}
+	
+	public static void delete_citation_views_by_id(int citation_view_id) throws ClassNotFoundException, SQLException
+	{
+		
+		Class.forName("org.postgresql.Driver");
+        Connection c = DriverManager
+           .getConnection(populate_db.db_url,
+       	        populate_db.usr_name,populate_db.passwd);
+        
+        PreparedStatement pst = null;
+		
+//		int citation_view_id = get_citation_id(citation_name, c, pst);
+		
+		delete_citation2query(citation_view_id, c, pst);
+		
+		delete_citation2view(citation_view_id, c, pst);
+		
+		delete_citation_table(citation_view_id, c, pst);
+		
+		c.close();
+	}
 
 	public static void update_citation_view(String old_name, String new_name) throws SQLException, ClassNotFoundException
 	{

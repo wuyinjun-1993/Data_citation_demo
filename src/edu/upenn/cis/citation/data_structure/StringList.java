@@ -79,7 +79,7 @@ public class StringList {
 		size = 0;
 	}
 	
-	public void add(String insert)
+	public int add(String insert)
 	{
 		if(list == null || list.length == 0)
 		{
@@ -90,7 +90,7 @@ public class StringList {
 			
 			size = 1;
 			
-			return;
+			return 0;
 		
 		}
 		
@@ -100,7 +100,7 @@ public class StringList {
 			
 			size ++;
 			
-			return;
+			return 0;
 		}
 		
 		String first = list[0];
@@ -118,7 +118,7 @@ public class StringList {
 			size ++;
 //			index_vec.insertElementAt(insert, 0);
 			
-			return;
+			return 0;
 		}
 		
 		String last = list[size - 1];
@@ -132,7 +132,7 @@ public class StringList {
 			
 			size ++;
 			
-			return;
+			return size - 1;
 		}
 		
 		
@@ -166,6 +166,8 @@ public class StringList {
 		
 		size ++;
 		
+		
+		return pos;
 //		index_vec.insertElementAt(insert, pos);
 		
 	}

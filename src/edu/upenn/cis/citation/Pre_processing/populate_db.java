@@ -56,11 +56,13 @@ public class populate_db {
 	
 	public static String suffix = "_c";
 	
-	public static String star_op = "union";
+	public static String star_op = "join";
 	
 	public static String plus_op = "union";
 	
 	public static String agg_op = "intersection";
+	
+	public static String [] available_block = {"author"};
 	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException
 	{
@@ -340,6 +342,13 @@ public class populate_db {
 		for(int i = 0; i<relation_names.size(); i++)
 		{
 			String query = new String();
+			
+//			if(relation_names.get(i).equals("family"))
+//			{
+//				int y = 0;
+//				
+//				y++;
+//			}
 
 			if(relation_names.get(i).endsWith(suffix + suffix))
 			{

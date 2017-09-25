@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -18,6 +19,7 @@ import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Corecover.Subgoal;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.Pre_processing.view_operation;
+import edu.upenn.cis.citation.aggregation.Aggregation3;
 import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.Head_strs2;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
@@ -25,10 +27,12 @@ import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_citation_opt;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_citation_opt2;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test_stable;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_citation_opt;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_test;
 import edu.upenn.cis.citation.user_query.query_storage;
 import junit.framework.Assert;
@@ -164,12 +168,14 @@ public class stress_test3_2 {
 					
 					view_generator.gen_one_additional_view(views, relations, query.body.size(), query);
 					
-					for(Iterator iter = views.iterator(); iter.hasNext();)
-					{
-						Query view = (Query) iter.next();
-						
-						System.out.println(view);
-					}
+					
+				}
+				
+				for(Iterator iter = views.iterator(); iter.hasNext();)
+				{
+					Query view = (Query) iter.next();
+					
+					System.out.println(view);
 				}
 			}
 			
@@ -207,13 +213,9 @@ public class stress_test3_2 {
 			for(int k = 0; k<times; k++)
 			{
 				
-				citation_view_map1.clear();
-				
-				citation_strs.clear();
-				
 //				citation_view1.clear();
 				
-				Tuple_reasoning1_test.tuple_reasoning(query, citation_strs,  citation_view_map1, c, pst);
+				Tuple_reasoning1_test.tuple_reasoning(query, c, pst);
 				
 				Tuple_reasoning1_test_stable.tuple_reasoning(query, citation_strs2, citation_view_map1, c, pst);
 				
@@ -228,7 +230,7 @@ public class stress_test3_2 {
 			{
 				Head_strs head = (Head_strs) iter.next();
 				
-				System.out.println(head);
+//				System.out.println(head);
 				
 				HashSet<String> curr_citation2 = citation_strs2.get(head);
 				
@@ -323,6 +325,27 @@ public class stress_test3_2 {
 			System.out.println("reasoning::" + Tuple_reasoning1_test.reasoning_time + "	");
 			
 			System.out.println("population::" + Tuple_reasoning1_test.population_time + "	");
+			
+			HashSet<String> agg_citation1 = Tuple_reasoning1_test.tuple_gen_agg_citations(query);
+			
+			Vector<String> agg_citation2 = Tuple_reasoning1_test_stable.tuple_gen_agg_citations(query);
+			
+			System.out.println(agg_citation1);
+			
+			System.out.println(agg_citation2);
+			
+			for(int i = 0; i<agg_citation2.size(); i++)
+			{
+				if(agg_citation1.contains(agg_citation2.get(i)))
+				{
+					continue;
+				}
+				else
+				{
+					Assert.assertEquals(true, false);
+				}
+			}
+			
 		}
 		else
 		{
@@ -331,17 +354,12 @@ public class stress_test3_2 {
 			
 			for(int k = 0; k<times; k++)
 			{
-				citation_view_map2.clear();
 				
-				citation_strs2.clear();
+				Tuple_reasoning1_full_test.tuple_reasoning(query, c, pst);
 				
-				citation_view2.clear();
+				Tuple_reasoning2_full_test.tuple_reasoning(query, c, pst);
 				
-				Tuple_reasoning1_test.tuple_reasoning(query, citation_strs,  citation_view_map1, c, pst);
-				
-				Tuple_reasoning2_test.tuple_reasoning(query, citation_strs2,  citation_view_map2, c, pst);
-				
-				System.gc();
+//				System.gc();
 			}
 			
 			double end_time = System.nanoTime();
@@ -354,7 +372,7 @@ public class stress_test3_2 {
 			System.out.print(time + "s	");
 			
 			
-			Set<Head_strs> heads = Tuple_reasoning1_test.head_strs_rows_mapping.keySet();
+			Set<Head_strs> heads = Tuple_reasoning2_full_test.head_strs_rows_mapping.keySet();
 			
 			int row = 0;
 			
@@ -362,15 +380,29 @@ public class stress_test3_2 {
 			
 			int size2 = 0;
 			
+			HashMap<Head_strs, HashSet<String>> head_values1 = new HashMap<Head_strs, HashSet<String>>();
+			
+			HashMap<Head_strs, HashSet<String>> head_values2 = new HashMap<Head_strs, HashSet<String>>();
+			
 			for(Iterator iter = heads.iterator(); iter.hasNext();)
 			{
 				Head_strs head = (Head_strs) iter.next();
 				
 				System.out.println(head);
 				
-				HashSet<String> curr_citation2 = Tuple_reasoning2_test.gen_citation(head, c, pst);
+				HashSet<String> covering_set_str1 = new HashSet<String>();
 				
-				HashSet<String> curr_citation1 = Tuple_reasoning1_test.gen_citation(head, c, pst);
+				HashSet<String> covering_set_str2 = new HashSet<String>();
+				
+				
+				
+				HashSet<String> curr_citation2 = Tuple_reasoning2_full_test.gen_citation(head, head_values2, covering_set_str2, c, pst);
+				
+				HashSet<String> curr_citation1 = Tuple_reasoning1_full_test.gen_citation(head, head_values1, covering_set_str1, c, pst);
+				
+				System.out.println(covering_set_str1);
+				
+				System.out.println(covering_set_str2);
 				
 				size1 += curr_citation1.size();
 				
@@ -381,21 +413,63 @@ public class stress_test3_2 {
 //				if(curr_citation1.toString().equals("[]") && curr_citation2.toString().equals("[{\"db_name\":\"IUPHAR/BPS Guide to PHARMACOLOGY\",\"author\":[]}]"))
 //					continue;
 				
-				if(!curr_citation1.containsAll(curr_citation2) || !curr_citation2.containsAll(curr_citation1))
+				if(!covering_set_str1.equals(covering_set_str2)|| !curr_citation1.containsAll(curr_citation2) || !curr_citation2.containsAll(curr_citation1))
 				{
 					System.out.println(curr_citation1);
 					
 					System.out.println(curr_citation2);
 					
-					curr_citation2 = Tuple_reasoning2_test.gen_citation(head, c, pst);
+					System.out.println(covering_set_str1);
 					
-					curr_citation1 = Tuple_reasoning1_test.gen_citation(head, c, pst);
+					System.out.println(covering_set_str2);
+					
+					curr_citation2 = Tuple_reasoning2_full_test.gen_citation(head, head_values2, c, pst);
+					
+					curr_citation1 = Tuple_reasoning1_full_test.gen_citation(head, head_values1, c, pst);
 					
 					Assert.assertEquals(true, false);
 				}
 				
+				if(row > 10)
+					break;
+				
 				row ++;
 			}
+			
+			Set<int[]> keys = Tuple_reasoning2_full_test.c_view_map.keySet();
+			
+			for(Iterator iter = keys.iterator(); iter.hasNext();)
+			{
+				int [] key = (int []) iter.next();
+				
+				ArrayList<citation_view_vector> covering_sets1 = Tuple_reasoning2_full_test.c_view_map.get(key);
+				
+				ArrayList<citation_view_vector> covering_sets2 = Tuple_reasoning1_full_test.c_view_map.get(key);
+				
+				
+				
+			}
+			
+//			Set<Head_strs> keys = head_values1.keySet();
+//			
+//			for(Iterator iter = keys.iterator(); iter.hasNext();)
+//			{
+//				
+//				Head_strs key = (Head_strs) iter.next();
+//				
+//				HashSet<String> values1 = head_values1.get(key);
+//				
+//				HashSet<String> values2 = head_values2.get(key);
+//				
+//				System.out.println(values1 + ":::" + values2);
+//				
+//				if(!values1.containsAll(values2))
+//					Assert.assertEquals(true, false);
+//				
+//				if(!values2.containsAll(values1))
+//					Assert.assertEquals(true, false);
+//				
+//			}
 			
 //			if(row !=0)
 //				citation_size2 = citation_size2 / row;
@@ -432,15 +506,66 @@ public class stress_test3_2 {
 //						
 //			System.out.print(origin_citation_size + "	");
 			
-			System.out.print(Tuple_reasoning2_test.covering_set_num * 1.0/row + "	");
+			System.out.print(Tuple_reasoning2_full_test.covering_set_num * 1.0/row + "	");
 			
-			System.out.print("pre_processing::" + Tuple_reasoning2_test.pre_processing_time + "	");
+			System.out.print("pre_processing::" + Tuple_reasoning2_full_test.pre_processing_time + "	");
 			
-			System.out.print("query::" + Tuple_reasoning2_test.query_time + "	");
+			System.out.print("query::" + Tuple_reasoning2_full_test.query_time + "	");
 			
-			System.out.print("reasoning::" + Tuple_reasoning2_test.reasoning_time + "	");
+			System.out.print("reasoning::" + Tuple_reasoning2_full_test.reasoning_time + "	");
 			
-			System.out.print("population::" + Tuple_reasoning2_test.population_time + "	");
+			System.out.print("population::" + Tuple_reasoning2_full_test.population_time + "	");
+			
+			System.out.println();
+			
+//			HashMap<String, String> views_citation_mapping1 = new HashMap<String, String>();
+//			
+//			HashMap<String, String> views_citation_mapping2 = new HashMap<String, String>();
+//			
+//			HashSet<String> agg_citation1 = Tuple_reasoning1_test.tuple_gen_agg_citations(query);
+//			
+//			Aggregation3.view_author_mapping.clear();
+//			
+//			HashSet<String> agg_citation2 = Tuple_reasoning2_test.tuple_gen_agg_citations(query);
+//			
+//			
+//			Set<String> key_strs = views_citation_mapping1.keySet();
+//			
+//			for(Iterator iter = key_strs.iterator(); iter.hasNext();)
+//			{
+//				String key_str = (String)iter.next();
+//				
+//				String value1 = views_citation_mapping1.get(key_str);
+//				
+//				String value2 = views_citation_mapping2.get(key_str);
+//				
+//				if(!value1.equals(value2))
+//				{
+//					System.out.println("error::");
+//					
+//					System.out.println(key_str);
+//					
+//					System.out.println(value1);
+//					
+//					System.out.println(value2);
+//					
+//					Assert.assertEquals(true, false);
+//				}
+//			}
+//			
+//			for(Iterator iter = agg_citation2.iterator(); iter.hasNext();)
+//			{
+//				String value = (String) iter.next();
+//				
+//				if(!agg_citation1.contains(value))
+//				{
+//					System.out.println(agg_citation1);
+//					
+//					System.out.println(agg_citation2);
+//					
+//					Assert.assertEquals(true, false);
+//				}
+//			}
 			
 //			Tuple_reasoning1.compare(citation_view_map1, citation_view_map2);
 			

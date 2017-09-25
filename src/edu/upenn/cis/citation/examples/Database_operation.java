@@ -41,6 +41,8 @@ public class Database_operation {
 		
 		for(int i = 0; i<views.size(); i++)
 		{
+			System.out.println(views.get(i));
+			
 			String name = views.get(i).name;
 			
 			view_operation.add(views.get(i), views.get(i).name);
@@ -52,6 +54,8 @@ public class Database_operation {
 		
 		for(int i = 0; i<queries.size(); i++)
 		{
+			System.out.println(queries.get(i));
+			
 			Query_operation.add(queries.get(i), queries.get(i).name);
 		}
 		

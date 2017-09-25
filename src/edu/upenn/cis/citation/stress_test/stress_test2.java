@@ -140,11 +140,7 @@ public class stress_test2 {
 				for(int k = 0; k<times; k++)
 				{
 					
-					citation_view_map1.clear();
-					
-					citation_strs.clear();
-					
-					Tuple_reasoning1_test.tuple_reasoning(q, citation_strs,  citation_view_map1, c, pst);
+					Tuple_reasoning1_test.tuple_reasoning(q, c, pst);
 					
 				}
 				
@@ -226,7 +222,7 @@ public class stress_test2 {
 					
 					citation_strs2.clear();
 					
-					Tuple_reasoning2_test.tuple_reasoning(q, citation_strs2, citation_view_map2, c, pst);
+					Tuple_reasoning2_test.tuple_reasoning(q, c, pst);
 				}
 				
 				end_time = System.nanoTime();

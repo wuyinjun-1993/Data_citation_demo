@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import edu.upenn.cis.citation.Corecover.Argument;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.sort_citation_view_vec.binary_compare;
 import edu.upenn.cis.citation.sort_citation_view_vec.sort_insert;
@@ -21,6 +22,8 @@ public class citation_view_vector {
 	
 	public Vector<String> index_vec;
 	
+	public HashSet<Argument> head_variables = new HashSet<Argument>();
+	
 	public HashSet<String> table_names;
 		
 	public String index_str;
@@ -28,6 +31,8 @@ public class citation_view_vector {
 	public String view_name_str;
 	
 	public String table_name_str;
+//	
+//	public String head_var_string = new String();
 	
 	public citation_view_vector()
 	{
@@ -76,13 +81,15 @@ public class citation_view_vector {
 		for(int i = 0; i<vec.size(); i++)
 		{
 			
-			if(!table_names.containsAll(vec.get(i).get_table_names()))
+			if(!table_names.containsAll(vec.get(i).get_table_names()) || !head_variables.contains(vec.get(i).get_view_tuple().getArgs()))
 			{
 				table_names.addAll(vec.get(i).get_table_names());
 				
 //				insert_sort(index_vec, vec.get(i).toString());
 				
 				insert_sort(c_vec, vec.get(i));
+				
+				head_variables.addAll(vec.get(i).get_view_tuple().getArgs());
 				
 			}
 
@@ -116,7 +123,7 @@ public class citation_view_vector {
 		
 		String table_name_str = new String();
 		
-		if(!table_names_new.containsAll(c.get_table_names()))
+		if(!table_names_new.containsAll(c.get_table_names()) || !head_variables.containsAll(c.get_view_tuple().getArgs()))
 		{
 			table_names_new.addAll(c.get_table_names());
 			
@@ -151,6 +158,12 @@ public class citation_view_vector {
 		}
 		
 		citation_view_vector c_v = new citation_view_vector(vec_new, index_new, table_names_new);
+		
+//		c_v.head_variables = new HashSet<Argument>();
+		
+		c_v.head_variables = this.head_variables;
+		
+		c_v.head_variables.addAll(c.get_view_tuple().getArgs());
 		
 		c_v.index_str = index_str_new;
 		
@@ -220,11 +233,11 @@ public class citation_view_vector {
 		
 		}
 		
-		String s1 = insert_str.toString() + insert_str.get_table_name_string();
+		String s1 = insert_str.get_name() + insert_str.get_table_name_string();
 		
 		citation_view first_str = index_vec.firstElement();
 		
-		String s2 = first_str.toString() + first_str.get_table_name_string();
+		String s2 = first_str.get_name() + first_str.get_table_name_string();
 		
 		if(s1.compareTo(s2) < 0)
 		{
@@ -235,7 +248,7 @@ public class citation_view_vector {
 		
 		citation_view last_str = index_vec.lastElement();
 		
-		s2 = last_str.toString() + last_str.get_table_name_string();
+		s2 = last_str.get_name() + last_str.get_table_name_string();
 		
 		if(s1.compareTo(s2) > 0)
 		{
@@ -250,9 +263,9 @@ public class citation_view_vector {
 			@Override			
 			public int compare(citation_view a, citation_view b)
 			{
-				String s1 = b.toString() + b.get_table_name_string();
+				String s1 = b.get_name() + b.get_table_name_string();
 				
-				String s2 = a.toString() + a.get_table_name_string();
+				String s2 = a.get_name() + a.get_table_name_string();
 
 				if(s2.compareTo(s1) > 0)
 					return 1;
@@ -348,11 +361,15 @@ public class citation_view_vector {
 		
 		table_names = new HashSet<String>();
 		
-		table_names.add(c.toString());
+		table_names.addAll(c.get_table_names());
 		
 		index_vec.add(c.get_index());
 		
 		table_name_str = c.get_table_name_string();
+		
+		index_str = c.toString();
+		
+		head_variables.addAll(c.get_view_tuple().getArgs());
 		
 	}
 	
@@ -370,26 +387,45 @@ public class citation_view_vector {
 //			return merge_vector(new citation_view_vector(c), vec);
 	}
 	
-	static citation_view_vector merge_vector(citation_view_vector vec1, citation_view_vector vec2)
+	public static citation_view_vector merge(citation_view_vector vec, citation_view_vector c)
 	{
-		
-		Vector<citation_view> vec_new = (Vector<citation_view>) vec1.c_vec.clone();
-		
-		
-		vec_new.addAll((vec2.c_vec));
-		
-		Vector<String> index_new = (Vector<String>) vec1.index_vec.clone();
-		
-		index_new.addAll(vec2.index_vec);
-		
-		HashSet<String> tuple_cores_new = (HashSet<String>) vec1.table_names.clone();
-		
-		tuple_cores_new.addAll(vec2.table_names);
-		
-		return new citation_view_vector(vec_new, index_new, tuple_cores_new);
-		
-		
+		return vec.merge(c);
 	}
+	
+	public citation_view_vector merge(citation_view_vector c)
+	{
+		citation_view_vector updated_covering_set = this.clone();
+		
+		citation_view_vector insert_covering_set = c.clone();
+		
+		for(int i = 0; i<insert_covering_set.c_vec.size(); i++)
+		{
+			updated_covering_set = updated_covering_set.merge(insert_covering_set.c_vec.get(i));
+		}
+		
+		return updated_covering_set;
+	}
+	
+//	static citation_view_vector merge_vector(citation_view_vector vec1, citation_view_vector vec2)
+//	{
+//		
+//		Vector<citation_view> vec_new = (Vector<citation_view>) vec1.c_vec.clone();
+//		
+//		
+//		vec_new.addAll((vec2.c_vec));
+//		
+//		Vector<String> index_new = (Vector<String>) vec1.index_vec.clone();
+//		
+//		index_new.addAll(vec2.index_vec);
+//		
+//		HashSet<String> tuple_cores_new = (HashSet<String>) vec1.table_names.clone();
+//		
+//		tuple_cores_new.addAll(vec2.table_names);
+//		
+//		return new citation_view_vector(vec_new, index_new, tuple_cores_new);
+//		
+//		
+//	}
 	
 	@Override
 	public String toString()
@@ -429,6 +465,8 @@ public class citation_view_vector {
 		c_v.view_name_str = view_name_str;
 		
 		c_v.table_name_str = table_name_str;
+		
+		c_v.head_variables = (HashSet<Argument>) head_variables.clone();
 		
 		return c_v;
 		

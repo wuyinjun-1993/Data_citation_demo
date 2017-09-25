@@ -610,6 +610,8 @@ public class citation_view_parametered extends citation_view{
 		
 		c_v.table_names = this.table_names;
 		
+		c_v.table_name_str = this.table_name_str;
+		
 		c_v.view = this.view;
 		
 		c_v.view_tuple = this.view_tuple;

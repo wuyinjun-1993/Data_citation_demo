@@ -647,31 +647,35 @@ public class Query_operation {
 	
 	static void insert_query_lambda_term(int seq, Query q, Connection c, PreparedStatement pst) throws SQLException
 	{		
-		String lambda_term_str = new String();
-		
-		String lambda_term_table_name = new String();
+//		String lambda_term_str = new String();
+//		
+//		String lambda_term_table_name = new String();
 		
 		for(int i = 0; i<q.lambda_term.size(); i++)
 		{
-			if(i >= 1)
-			{
-				lambda_term_str += populate_db.separator;
-				
-				lambda_term_table_name += populate_db.separator;
-			}
 			
-			lambda_term_str += q.lambda_term.get(i).toString();
-			
-			lambda_term_table_name += q.lambda_term.get(i).table_name;
-		}
-		
-		if(!q.lambda_term.isEmpty())
-		{
-			String query = "insert into query2lambda_term values ('" + seq + "','" + lambda_term_str + "','" + lambda_term_table_name + "')";
+			String query = "insert into query2lambda_term values ('" + seq + "','" + q.lambda_term.get(i).toString() + "','" + q.lambda_term.get(i).table_name + "')";
 			
 			pst = c.prepareStatement(query);
 			
 			pst.execute();
+			
+//			
+//			if(i >= 1)
+//			{
+//				lambda_term_str += populate_db.separator;
+//				
+//				lambda_term_table_name += populate_db.separator;
+//			}
+//			
+//			lambda_term_str += q.lambda_term.get(i).toString();
+//			
+//			lambda_term_table_name += q.lambda_term.get(i).table_name;
+		}
+		
+		if(!q.lambda_term.isEmpty())
+		{
+			
 		}
 		
 

@@ -1673,19 +1673,28 @@ private Object String;
     			}
             } else {
             	// add new view
+            	Connection conn;
+    			
             	try {
-					view_operation.add(generatedQuery, dv);
-					citation_view_operation.add_citation_view(dv);
-					citation_view_operation.add_connection_view_with_citations(dv, dv);
+            		
+            		Class.forName("org.postgresql.Driver");
+        			conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+        			PreparedStatement st = conn.prepareStatement(lambdaSQL);
+					view_operation.add(generatedQuery, dv, conn, st);
+					citation_view_operation.add_citation_view(dv, conn, st);
+					citation_view_operation.add_connection_view_with_citations(dv, dv, conn, st);
 					listDataViews.add(dv);
 					Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("Succeed");
                     alert.setHeaderText(null);
                     alert.setContentText("The new view queries are successfully saved as " + dv);
                     alert.showAndWait();
+                	conn.close();
+
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
+            	
             	
             }
         });
@@ -1894,9 +1903,15 @@ private Object String;
             Query currentQuery = addQueryByName(cv, dataNew);
             if (stage.getScene() == viewScene) {
             	// at this stage, dv = ""
+            	Connection conn = null;
+
             	try {
+            		Class.forName("org.postgresql.Driver");
+        			conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+        			PreparedStatement st = conn.prepareStatement(lambdaSQL);
+            		
     				if (!listCitationViews.contains(cv)) {
-    					Query_operation.add(currentQuery, cv);
+    					Query_operation.add(currentQuery, cv, conn, st);
     					listCitationViews.add(cv);
     					Alert alert = new Alert(Alert.AlertType.INFORMATION);
     	                alert.setTitle("Succeed");
@@ -1908,9 +1923,17 @@ private Object String;
     				e1.printStackTrace();
     			}
             } else if (stage.getScene() == dbaScene) {
+            	
+            	Connection conn = null;
+
+            	
             	try {
+            		Class.forName("org.postgresql.Driver");
+        			conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+        			PreparedStatement st = conn.prepareStatement(lambdaSQL);
+            		
     				if (!dbaListCitationViews.contains(cv)) {
-    					Query_operation.add(currentQuery, cv);
+    					Query_operation.add(currentQuery, cv, conn, st);
         				dbaListCitationViews.add(cv);
         				dataQuery.add(new CQuery(cv, "Undef"));
         				listCitationViews.add(cv);
@@ -1920,9 +1943,13 @@ private Object String;
                         alert.setContentText("The citation queries " + cv + " are successfully add to " + dv);
                         alert.showAndWait();
     				}
+    				
+                	conn.close();
+
     			} catch (Exception e1) {
     				e1.printStackTrace();
     			}
+            	
             }
             citeStage.hide();
         });

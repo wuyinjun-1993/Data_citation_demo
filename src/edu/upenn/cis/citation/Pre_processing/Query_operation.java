@@ -1,11 +1,18 @@
 package edu.upenn.cis.citation.Pre_processing;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.Vector;
 
 import edu.upenn.cis.citation.Corecover.Argument;
@@ -38,12 +45,142 @@ public class Query_operation {
 		
 		Query query = get_query_by_name("q2");
 		
-		String query_str = Query_converter.datalog2sql(query);
+		String query_str = covert2data_str(query);
 		
-		System.out.println(query);
+		System.out.println(query_str);
 		
 //		delete_query_by_id(10);
 		
+	}
+	
+	public static String covert2data_str(Query q)
+	{
+		String str = q.name + populate_db.separator;
+		
+		for(int i = 0; i<q.head.args.size(); i++)
+		{
+			
+			if(i >= 1)
+				str += ",";
+			
+			String head_arg_str = q.head.args.get(i).toString().replaceFirst("\\" + populate_db.separator, ".");
+			
+			str += head_arg_str;
+		}
+		
+		str += populate_db.separator;
+		
+		for(int i = 0; i<q.body.size(); i++)
+		{
+			if(i >= 1)
+				str += ",";
+			Subgoal subgoal = (Subgoal) q.body.get(i);
+			
+			str += subgoal.name;
+		}
+		
+		str += populate_db.separator;
+		
+		for(int i = 0; i<q.conditions.size(); i++)
+		{
+			
+			if(i >= 1)
+				str += ",";
+			
+			if(q.conditions.get(i).arg2.isConst())
+				str += q.conditions.get(i).subgoal1 + "." + q.conditions.get(i).arg1.name + q.conditions.get(i).op + q.conditions.get(i).arg2.name;
+			else
+				str += q.conditions.get(i).subgoal1 + "." + q.conditions.get(i).arg1.name + q.conditions.get(i).op + q.conditions.get(i).subgoal2 + "." + q.conditions.get(i).arg2.name;
+		}
+		
+		str += populate_db.separator;
+		
+		for(int i = 0; i<q.lambda_term.size(); i++)
+		{
+			
+			Lambda_term l_term = q.lambda_term.get(i);
+			
+			String l_term_str = l_term.name.replaceFirst("\\" + populate_db.separator, ".");
+			
+			if(i >= 1)
+				str += l_term_str;
+		}
+		
+		str += populate_db.separator;
+		
+		Set<String> relation_mapping_key = q.subgoal_name_mapping.keySet();
+		
+		int num = 0;
+		
+		for(Iterator iter = relation_mapping_key.iterator(); iter.hasNext();)
+		{
+			
+			if(num >= 1)
+				str += ",";
+			
+			String curr_name = (String) iter.next();
+			
+			String mapped_name = q.subgoal_name_mapping.get(curr_name);
+			
+			str += curr_name + ":" + mapped_name; 
+			
+			num++;
+		}
+		
+		return str;
+	}
+	
+	public static void write2file(String file_name, Vector<String> views) throws IOException
+	{
+		File fout = new File(file_name);
+		FileOutputStream fos = new FileOutputStream(fout);
+	 
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+	 
+		for (int i = 0; i < views.size(); i++) {
+			bw.write(views.get(i));
+			bw.newLine();
+		}
+	 
+		bw.close();
+	}
+	
+	public static Vector<Query> get_all_citation_queries(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	{
+        
+        Vector<Query> queries = new Vector<Query>();
+        
+        Vector<Integer> ids = get_all_query_ids(c, pst);
+        
+        for(int i = 0; i<ids.size(); i++)
+        {
+        	Query q = get_query_by_id(ids.get(i), c, pst, false);
+        	
+        	q.name = "c" + q.name;
+        	
+        	queries.add(q);
+        }
+        
+        
+        return queries;
+	}
+	
+	static Vector<Integer> get_all_query_ids(Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "select query_id from query2head_variables";
+		
+		pst = c.prepareStatement(query);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		Vector<Integer> ids = new Vector<Integer>();
+		
+		while(rs.next())
+		{
+			ids.add(rs.getInt(1));
+		}
+		
+		return ids;
 	}
 	
 	public static void add_connection_citation_with_query(String cname, Vector<String[]> qname_block) throws SQLException, ClassNotFoundException
@@ -70,14 +207,8 @@ public class Query_operation {
         
 	}
 	
-	public static void add_connection_citation_with_query(String cname, String qname, String block) throws SQLException, ClassNotFoundException
+	public static void add_connection_citation_with_query(String cname, String qname, String block, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-        
-        PreparedStatement pst = null;
         
         int cid = citation_view_operation.get_citation_id(cname, c, pst);
         
@@ -89,9 +220,7 @@ public class Query_operation {
 //        }
         
         
-        
-        c.close();
-        
+                
 	}
 	
 	public static void delete_connection_citation_with_query(String cname) throws SQLException, ClassNotFoundException
@@ -174,15 +303,8 @@ public class Query_operation {
         
 	}
 	
-	public static void delete_query_by_id(int id) throws SQLException, ClassNotFoundException
+	public static void delete_query_by_id(int id, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-        
-        PreparedStatement pst = null;
-        
 //        String id = get_view_id(name, c, pst);
         
 //        String id = name;
@@ -201,7 +323,6 @@ public class Query_operation {
         
         delete_head_variables(id, c, pst);
         
-        c.close();
         
 //        populate_db.delete(id, subgoals, subgoal_name_mapping, has_lambda);
 
@@ -403,7 +524,12 @@ public class Query_operation {
 	
 	
 	
-	public static Query get_query_by_id(int id, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	public static Query get_query_by_id(int id, Connection c, PreparedStatement pst) throws SQLException
+	{
+		return get_query_by_id(id, c, pst, true);
+	}
+	
+	public static Query get_query_by_id(int id, Connection c, PreparedStatement pst, boolean reasoning) throws SQLException
 	{
 //		Class.forName("org.postgresql.Driver");
 //        Connection c = DriverManager
@@ -416,7 +542,7 @@ public class Query_operation {
         
 //        String id = get_id_head_vars(name, head_var, c, pst);
 
-        head_var = get_head_vars(id, c, pst);
+        String qname = get_head_vars(id, head_var, c, pst);
         
         HashMap<String, String> subgoal_name_mapping = new HashMap<String, String> ();
         
@@ -426,9 +552,12 @@ public class Query_operation {
         
         Vector<Lambda_term> lambda_terms = get_query_lambda_terms(id, c, pst);
         
-        Subgoal head = new Subgoal("q" + id, head_var);
+        if(reasoning)
+        	qname = "q" + id;
         
-        Query view = new Query("q" + id, head, subgoals,lambda_terms, conditions, subgoal_name_mapping);
+        Subgoal head = new Subgoal(qname, head_var);
+        
+        Query view = new Query(qname, head, subgoals,lambda_terms, conditions, subgoal_name_mapping);
         
         
 //        c.close();
@@ -451,7 +580,7 @@ public class Query_operation {
         
 //        String id = get_id_head_vars(name, head_var, c, pst);
 
-        head_var = get_head_vars(id, c, pst);
+        String q_name = get_head_vars(id, head_var, c, pst);
         
         HashMap<String, String> subgoal_name_mapping = new HashMap<String, String> ();
         
@@ -461,9 +590,9 @@ public class Query_operation {
         
         Vector<Lambda_term> lambda_terms = get_query_lambda_terms(id, c, pst);
         
-        Subgoal head = new Subgoal("q" + id, head_var);
+        Subgoal head = new Subgoal(q_name, head_var);
         
-        Query view = new Query("q" + id, head, subgoals,lambda_terms, conditions, subgoal_name_mapping);
+        Query view = new Query(q_name, head, subgoals,lambda_terms, conditions, subgoal_name_mapping);
         
         
         c.close();
@@ -545,9 +674,9 @@ public class Query_operation {
 		return Gen_query.gen_query("q10", subgoal_name_mapping, head_vars, condition_str, lambda_term_str);
 	}
 	
-	public static void add(Query v, String name) throws ClassNotFoundException, SQLException
+	public static void add(Query v, String name, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
-		insert_query(v, name);
+		insert_query(v, name, c, pst);
 		
 //		Vector<String> subgoal_names = new Vector<String>();
 //		
@@ -562,14 +691,14 @@ public class Query_operation {
 
 	}
 	
-	static void insert_query(Query query, String name) throws SQLException, ClassNotFoundException
+	static void insert_query(Query query, String name, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-        
-        PreparedStatement pst = null;
+//		Class.forName("org.postgresql.Driver");
+//        Connection c = DriverManager
+//           .getConnection(populate_db.db_url,
+//       	        populate_db.usr_name,populate_db.passwd);
+//        
+//        PreparedStatement pst = null;
         
 //        update_table(view, c, pst);
         
@@ -584,9 +713,7 @@ public class Query_operation {
         insert_query_lambda_term(seq, query, c, pst);
         
         insert_query_subgoals(seq, query, c, pst);
-                
-        c.close();
-        
+                        
 	}
 	
 	static int get_query_num(Connection c, PreparedStatement pst) throws SQLException
@@ -728,9 +855,9 @@ public class Query_operation {
 			
 	}
 	
-	static Vector<Argument> get_head_vars(int id, Connection c, PreparedStatement pst) throws SQLException
+	static String get_head_vars(int id, Vector<Argument> head_var, Connection c, PreparedStatement pst) throws SQLException
 	{
-		String query = "select head_variables from query2head_variables where query_id = '" + id + "'";
+		String query = "select head_variables, name from query2head_variables where query_id = '" + id + "'";
 		
 		pst = c.prepareStatement(query);
 		
@@ -738,15 +865,17 @@ public class Query_operation {
 		
 		String head_var_str = new String();
 		
+		String qname = new String();
+		
 		if(rs.next())
 		{			
 			head_var_str = rs.getString(1).trim();
+			
+			qname = rs.getString(2).trim();
 		}
 		
 		String [] head_var_strs = head_var_str.split(",");
-		
-		Vector<Argument> head_var = new Vector<Argument>();
-		
+				
 		for(int i = 0; i<head_var_strs.length; i++)
 		{
 			
@@ -757,7 +886,7 @@ public class Query_operation {
 			head_var.add(arg);
 		}
 		
-		return head_var;
+		return qname;
 	}
 	
 	static String[] split_relation_attr_name(String head_var_str)
@@ -885,7 +1014,7 @@ public class Query_operation {
 		
 	}
 	
-	static Vector<Subgoal> get_query_subgoals(int name, HashMap<String, String> subgoal_name_mapping, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	static Vector<Subgoal> get_query_subgoals(int name, HashMap<String, String> subgoal_name_mapping, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String q_subgoals = "select subgoal_names, subgoal_origin_names from query2subgoal where query_id = '" + name + "'";
 		

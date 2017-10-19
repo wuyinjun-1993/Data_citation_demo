@@ -103,7 +103,7 @@ public class Tuple_reasoning2_min_test {
 	
 	public static long second2nano = 1000000000;
 	
-	static IntList query_ids = new IntList();
+	public static IntList query_ids = new IntList();
 	
 	static StringList view_list = new StringList();
 	
@@ -126,6 +126,8 @@ public class Tuple_reasoning2_min_test {
 	static HashSet<String> all_relation_names = new HashSet<String>();
 	
 	static ArrayList<HashSet<String>> single_subgoal_relations = new ArrayList<HashSet<String>>();
+	
+	public static HashMap<Integer, Query> citation_queries = new HashMap<Integer, Query>();
 	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException, IOException, InterruptedException, JSONException
 	{
@@ -726,7 +728,7 @@ public class Tuple_reasoning2_min_test {
 			query_lambda_str.add(null);
 		}
 	    	    
-	    gen_citation1.init_author_mapping(view_list, view_query_mapping, query_ids, author_mapping, max_author_num, c, pst, query_lambda_str);
+	    gen_citation1.init_author_mapping(view_list, view_query_mapping, query_ids, author_mapping, max_author_num, c, pst, query_lambda_str, citation_queries);
 
 	    
 	    
@@ -735,6 +737,12 @@ public class Tuple_reasoning2_min_test {
 	    
 	}
 	
+	public static HashMap<String, Integer> get_citation_queries(String view_name)
+	{
+		int view_id = view_list.find(view_name);
+		
+		return view_query_mapping.get(view_id);
+	}
 	
 	static String get_condition_str(Tuple tuple, Conditions condition)
 	{
@@ -841,6 +849,8 @@ public class Tuple_reasoning2_min_test {
 		aggregation_time = 0.0;
 		
 		max_author_num.put("author", -1);
+		
+		citation_queries.clear();
 														
 	}
 	
@@ -1003,7 +1013,7 @@ public class Tuple_reasoning2_min_test {
 		
 		remove_conflict_duplicate_view_mapping(query);
 			
-		String sql = Query_converter.datalog2sql_citation2_test(query, valid_conditions, valid_lambda_terms);
+		String sql = Query_converter.datalog2sql_citation2(query, valid_conditions, valid_lambda_terms);
 
 		end = System.nanoTime();
 		

@@ -36,8 +36,24 @@ public class view_operation {
 //		
 //		delete_view_by_id(5);
 //		
-		delete_view_by_name("v6");
+		Class.forName("org.postgresql.Driver");
+        Connection c1 = DriverManager
+           .getConnection(populate_db.db_url2,
+       	        populate_db.usr_name,populate_db.passwd);
+        
+        PreparedStatement pst = null;
 		
+		delete_view_by_name("v21", false, c1, pst);
+		
+		c1.close();
+		
+        Connection c2 = DriverManager
+           .getConnection(populate_db.db_url2,
+       	        populate_db.usr_name,populate_db.passwd);
+        		
+		delete_view_by_name("v21", false, c2, pst);
+		
+		c2.close();
 //		String query = "v9(ligand_c_ligand_id,interaction_c_object_id, ligand_c_name):ligand_c(), interaction_c(), interaction_c_ligand_id=ligand_c_ligand_id";
 //		
 //		query = Tuple_reasoning2.get_full_query(query);
@@ -67,7 +83,21 @@ public class view_operation {
 		
 	}
 	
+	public static void add_lambda_term(int view_id, Lambda_term l_term, Connection c, PreparedStatement pst) throws SQLException
+	{
+		String query = "insert into view2lambda_term values ('" + view_id + "','" + l_term.toString() + "','" + l_term.table_name + "')";
+		
+		pst = c.prepareStatement(query);
+		
+		pst.execute();
+	}
+	
 	public static void save_view_by_name(String old_name, String new_name, Query view) throws SQLException, ClassNotFoundException
+	{
+		save_view_by_name(old_name, new_name, view, true);
+	}
+	
+	public static void save_view_by_name(String old_name, String new_name, Query view, boolean tuple_level) throws SQLException, ClassNotFoundException
 	{
 		Class.forName("org.postgresql.Driver");
         Connection c = DriverManager
@@ -91,8 +121,8 @@ public class view_operation {
         delete_conditions(id, c, pst);
         
 //        delete_citation_view(id, c, pst);
-        
-        populate_db.delete("v" + id, subgoals, subgoal_name_mapping, has_lambda);
+        if(tuple_level)
+        	populate_db.delete("v" + id, subgoals, subgoal_name_mapping, has_lambda, c, pst);
         
         update_view_table(id, new_name, view, c, pst);
         
@@ -184,9 +214,9 @@ public class view_operation {
 		populate_db.initial();
 	}
 	
-	public static int add(Query v, String name) throws ClassNotFoundException, SQLException
+	public static int add(Query v, String name, Connection c, PreparedStatement pst, boolean tuple_level) throws ClassNotFoundException, SQLException
 	{
-		int id = insert_view(v, name);
+		int id = insert_view(v, name, c, pst);
 		
 		v.name = "v" + id;
 		
@@ -201,10 +231,16 @@ public class view_operation {
 		
 //		create_view.create_views(id, subgoal_names, v.conditions, null, null);
 		
-		populate_db.update(v);
+		if(tuple_level)
+			populate_db.update(v, c, pst);
 		
 		return id;
 
+	}
+	
+	public static int add(Query v, String name, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	{
+		return add(v, name, c, pst, true);
 	}
 	
 	public static Query get_view_by_name(String name) throws SQLException, ClassNotFoundException
@@ -238,34 +274,45 @@ public class view_operation {
         return view;
 	}
 	
-	public static Query get_view_by_id(int id) throws SQLException, ClassNotFoundException
+	public static int get_view_id_by_name(String name, Connection c, PreparedStatement pst) throws SQLException
 	{
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-        
-        PreparedStatement pst = null;
-        
-        Vector<Argument> head_var = get_head_vars(id, c, pst);
-        
-        Vector<Conditions> conditions = get_view_conditions(id, c, pst);
-        
-        HashMap<String, String> subgoal_name_mapping = new HashMap<String, String>();
-        
-        Vector<Subgoal> subgoals = get_view_subgoals_full(id, subgoal_name_mapping, c, pst);
-        
-        Vector<Lambda_term> lambda_terms = get_view_lambda_terms(id, c, pst);
-        
-        Subgoal head = new Subgoal("v" + id, head_var);
-        
-        Query view = new Query("v" + id, head, subgoals,lambda_terms, conditions, subgoal_name_mapping);
-        
-        
-        c.close();
-                
-        return view;
+		String query = "select view from view_table where name = '" + name + "'";
+		
+		pst = c.prepareStatement(query);
+		
+		ResultSet rs = pst.executeQuery();
+		
+		int id = 0;
+		
+		if(rs.next())
+		{
+			id = rs.getInt(1);
+		}
+		
+		return id;
 	}
+	
+//	public static Query get_view_by_id(int id, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+//	{
+//        
+//        Vector<Argument> head_var = get_head_vars(id, c, pst);
+//        
+//        Vector<Conditions> conditions = get_view_conditions(id, c, pst);
+//        
+//        HashMap<String, String> subgoal_name_mapping = new HashMap<String, String>();
+//        
+//        Vector<Subgoal> subgoals = get_view_subgoals_full(id, subgoal_name_mapping, c, pst);
+//        
+//        Vector<Lambda_term> lambda_terms = get_view_lambda_terms(id, c, pst);
+//        
+//        Subgoal head = new Subgoal("v" + id, head_var);
+//        
+//        Query view = new Query("v" + id, head, subgoals,lambda_terms, conditions, subgoal_name_mapping);
+//        
+//        
+//                
+//        return view;
+//	}
 	
 	public static Query get_view_by_id(int id, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
@@ -306,14 +353,13 @@ public class view_operation {
 		return id;
 	}
 	
-	public static int delete_view_by_name(String name) throws SQLException, ClassNotFoundException
+	public static int delete_view_by_name(String name, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-        
-        PreparedStatement pst = null;
+		return delete_view_by_name(name, c, pst, true);
+	}
+	
+	public static int delete_view_by_name(String name, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, ClassNotFoundException
+	{
         
         int id = get_view_id(name, c, pst);
         
@@ -333,22 +379,47 @@ public class view_operation {
         
         delete_view_table(id, c, pst);
         
-        c.close();
         
-        populate_db.delete("v" + id, subgoals, subgoal_name_mapping, has_lambda);
+        if(tuple_level)
+        	populate_db.delete("v" + id, subgoals, subgoal_name_mapping, has_lambda, c, pst);
+        
         
         return id;
 
 	}
 	
-	public static Vector<Query> get_all_views() throws SQLException, ClassNotFoundException
+	public static int delete_view_by_name(String name, boolean tuple_level, Connection c, PreparedStatement pst) throws SQLException
 	{
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
         
-        PreparedStatement pst = null;
+        int id = get_view_id(name, c, pst);
+        
+//        String id = name;
+        
+        boolean has_lambda = delete_lambda_terms(id, c, pst);
+        
+        HashMap<String, String> subgoal_name_mapping = new HashMap<String, String>();
+        
+        Vector<Subgoal> subgoals = get_view_subgoals(id, subgoal_name_mapping, c, pst);
+                
+        delete_subgoals(id, c, pst);
+        
+        delete_conditions(id, c, pst);
+        
+        delete_citation_view(id, c, pst);
+        
+        delete_view_table(id, c, pst);
+        
+        
+        if(tuple_level)
+        	populate_db.delete("v" + id, subgoals, subgoal_name_mapping, has_lambda, c, pst);
+        
+        
+        return id;
+
+	}
+	
+	public static Vector<Query> get_all_views(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	{
         
         Vector<Query> views = new Vector<Query>();
         
@@ -356,15 +427,13 @@ public class view_operation {
         
         for(int i = 0; i<ids.size(); i++)
         {
-        	Query view = get_view_by_id(ids.get(i));
+        	Query view = get_view_by_id(ids.get(i), c, pst);
         	
         	update_name(view, ids.get(i), c, pst);
         	
         	views.add(view);
         }
-        
-        c.close();
-        
+                
         return views;
 	}
 	
@@ -417,14 +486,8 @@ public class view_operation {
         delete_all_view_table(c, pst);
 	}
 	
-	public static void delete_view_by_id(int id) throws SQLException, ClassNotFoundException
+	public static void delete_view_by_id(int id, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, ClassNotFoundException
 	{
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-        
-        PreparedStatement pst = null;
         
 //        String id = get_view_id(name, c, pst);
         
@@ -441,10 +504,9 @@ public class view_operation {
         delete_citation_view(id, c, pst);
         
         delete_view_table(id, c, pst);
-        
-        c.close();
-        
-        populate_db.delete("v" + id, subgoals, subgoal_name_mapping, has_lambda);
+                
+        if(tuple_level)
+        	populate_db.delete("v" + id, subgoals, subgoal_name_mapping, has_lambda, c, pst);
 
 	}
 	
@@ -939,7 +1001,7 @@ public class view_operation {
 	
 	public static Vector<Argument> get_full_schema(String subgoal_name, String subgoal_origin_name, Connection c, PreparedStatement pst) throws SQLException
 	{
-		String query = "SELECT column_name FROM information_schema.columns WHERE table_name = '" + subgoal_origin_name +"' ";
+		String query = "SELECT column_name FROM information_schema.columns WHERE table_name = '" + subgoal_origin_name +"' order by column_name ";
 		
 		pst = c.prepareStatement(query);
 		
@@ -949,7 +1011,13 @@ public class view_operation {
 		
 		while(rs.next())
 		{
-			args.add(new Argument(subgoal_name + populate_db.separator + rs.getString(1), subgoal_name));
+			String attr_name = rs.getString(1);
+			
+			if(!attr_name.equals("citation_view"))
+			{
+				args.add(new Argument(subgoal_name + populate_db.separator + rs.getString(1), subgoal_name));
+
+			}
 		}
 		
 		return args;
@@ -981,14 +1049,8 @@ public class view_operation {
 		
 	}
 	
-	static int insert_view(Query view, String name) throws SQLException, ClassNotFoundException
+	static int insert_view(Query view, String name, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-        
-        PreparedStatement pst = null;
         
 //        update_table(view, c, pst);
         
@@ -1005,8 +1067,6 @@ public class view_operation {
         insert_view_lambda_term(seq, view, c, pst);
         
         insert_view_subgoals(seq, view, c, pst);
-                
-        c.close();
         
 //        String id = "v" + seq;
         
@@ -1015,7 +1075,7 @@ public class view_operation {
 	}
 	
 	
-	static int get_view_num(Connection c, PreparedStatement pst) throws SQLException
+	public static int get_view_num(Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query = "select max(view) from view_table";
 		

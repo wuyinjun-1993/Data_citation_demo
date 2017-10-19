@@ -19,22 +19,26 @@ import org.json.JSONException;
 
 import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Corecover.Subgoal;
+import edu.upenn.cis.citation.Pre_processing.Query_operation;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.Pre_processing.view_operation;
+import edu.upenn.cis.citation.aggregation.Aggregation3;
+import edu.upenn.cis.citation.aggregation.Aggregation5;
 import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.Head_strs2;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_citation_opt;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_citation_opt2;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_citation_opt;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test2;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_test;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_min_test;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning2_min_test;
 import edu.upenn.cis.citation.user_query.query_storage;
+import junit.framework.Assert;
 
 public class stress_test8 {
 	
@@ -57,6 +61,8 @@ public class stress_test8 {
 	static Vector<String> relations = new Vector<String>();
 	
 	static double []ratio = {0.1, 0.2, 0.5, 0.6, 0.8, 1.0};
+		
+	static String path = "reasoning_results/";
 	
 	static Vector<String> get_unique_relation_names(Query query)
 	{
@@ -136,8 +142,7 @@ public class stress_test8 {
 	public static void main(String [] args) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
 	{
 		
-//		reset();
-		
+//		reset();		
 		Connection c = null;
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");
@@ -189,7 +194,7 @@ public class stress_test8 {
 			if(new_rounds)
 			{
 				
-				views = view_generator.gen_default_views(relations);
+				views = view_generator.gen_default_views(relations, c, pst);
 				
 //				views = view_generator.generate_store_views_without_predicates(relation_names, view_size, query.body.size());
 				
@@ -212,7 +217,7 @@ public class stress_test8 {
 					
 					view_generator.initial();
 					
-					view_generator.gen_one_additional_view(views, relations, query.body.size(), query);
+					view_generator.gen_one_additional_view(views, relations, query.body.size(), query, c, pst);
 					
 					for(Iterator iter = views.iterator(); iter.hasNext();)
 					{
@@ -225,17 +230,44 @@ public class stress_test8 {
 				}
 			}
 			
+			
+			
 			stress_test(query, c, pst, views, tuple_level);
+			
+			Vector<Query> all_citation_queries = Query_operation.get_all_citation_queries();
+			
+			Vector<Query> user_query = new Vector<Query>();
+			
+			user_query.add(query);
+			
+			output_queries(user_query, path + "user_queries");
+			
+			output_queries(views, path + "views");
+			
+			output_queries(all_citation_queries, path + "citation_query");
 
 		}
 		
 
-		
-		
+
 		
 		c.close();
 		
 		
+	}
+	
+	static void output_queries(Vector<Query> queries, String file_name) throws IOException
+	{
+		Vector<String> query_strs = new Vector<String>();
+		
+		for(int i = 0; i<queries.size(); i++)
+		{
+			String query_str = Query_operation.covert2data_str(queries.get(i));
+			
+			query_strs.add(query_str);
+		}
+		
+		Query_operation.write2file(file_name, query_strs);
 	}
 	
 	
@@ -266,16 +298,14 @@ public class stress_test8 {
 			double end_time = 0;
 
 			
-			double start_time = System.nanoTime();
+			double start_time = 0;
+			
+			start_time = System.nanoTime();
 			
 			
-			for(int k = 0; k<times; k++)
+//			for(int k = 0; k<times; k++)
 			{
-				
-				Tuple_reasoning1_test.tuple_reasoning(query, c, pst);
-				
-//				System.gc();
-				
+				Tuple_reasoning1_full_test.tuple_reasoning(query, c, pst);				
 			}
 			
 			
@@ -284,13 +314,17 @@ public class stress_test8 {
 			
 			end_time = System.nanoTime();
 			
-			double time = (end_time - start_time);
+			double time = (end_time - start_time)*1.0;
 			
-			time = time /(times * 1.0 *1000000000);
+			time = time /(times * 1000000000);
+			
+			System.out.print(Tuple_reasoning1_full_test.group_num + "	");
+			
+			System.out.print(Tuple_reasoning1_full_test.tuple_num + "	");
 			
 			System.out.print(time + "s	");
 			
-			Set<Head_strs> h_l = Tuple_reasoning1_test.head_strs_rows_mapping.keySet();
+			Set<Head_strs> h_l = Tuple_reasoning1_full_test.head_strs_rows_mapping.keySet();
 			
 			double citation_size1 = 0;
 			
@@ -302,7 +336,7 @@ public class stress_test8 {
 			{
 				Head_strs h_value = (Head_strs) iter.next();
 				
-				HashSet<String> citations = Tuple_reasoning1_test.gen_citation(h_value, c, pst);
+				HashSet<String> citations = Tuple_reasoning1_full_test.gen_citation(h_value, c, pst);
 				
 				citation_size1 += citations.size();
 				
@@ -356,28 +390,103 @@ public class stress_test8 {
 //			
 			
 			
-			System.out.print(Tuple_reasoning1_test.covering_set_num * 1.0/row + "	");
+			System.out.print(Tuple_reasoning1_full_test.covering_set_num * 1.0/Tuple_reasoning1_full_test.tuple_num + "	");
 			
-			System.out.print("pre_processing::" + Tuple_reasoning1_test.pre_processing_time + "	");
+			System.out.print("pre_processing::" + Tuple_reasoning1_full_test.pre_processing_time + "	");
 			
-			System.out.print("query::" + Tuple_reasoning1_test.query_time + "	");
+			System.out.print("query::" + Tuple_reasoning1_full_test.query_time + "	");
 			
-			System.out.print("reasoning::" + Tuple_reasoning1_test.reasoning_time + "	");
+			System.out.print("reasoning::" + Tuple_reasoning1_full_test.reasoning_time + "	");
 			
-			System.out.print("population::" + Tuple_reasoning1_test.population_time + "	");
+			System.out.print("population::" + Tuple_reasoning1_full_test.population_time + "	");
 			
+			HashSet<String> agg_citations = null;
 			
 			start_time = System.nanoTime();
-			
-			HashSet<String> agg_citations = Tuple_reasoning1_test.tuple_gen_agg_citations(query);
-			
+						
+			agg_citations = Tuple_reasoning1_full_test.tuple_gen_agg_citations(query);
+						
 			end_time = System.nanoTime();
 			
 			time = (end_time - start_time) * 1.0/1000000000;
 			
-			System.out.print("Aggregation::" + time + "	");
+			System.out.print("Aggregation_time::" + time + "	");
 			
-			diff_agg_time(tuple_level, query);
+			System.out.print("Aggregation_size::" + agg_citations.size() + "	");
+			
+//			start_time = System.nanoTime();
+//			
+//			Tuple_reasoning1_full_test.tuple_reasoning(query, c, pst);
+//			
+//			agg_citations = Tuple_reasoning1_full_test.tuple_gen_agg_citations(query);
+//						
+//			end_time = System.nanoTime();
+//			
+//			time = (end_time - start_time) * 1.0/1000000000;
+//			
+//			System.out.print("total_reasoning_time::" + time + "	");
+			
+			Vector<String> agg_results = new Vector<String>();
+			
+			for(int k = 0; k<Aggregation5.curr_res.size(); k++)
+			{
+				agg_results.add(Aggregation5.curr_res.get(k).toString());
+			}
+			
+//			String aggregate_result = Aggregation5.curr_res.toString();
+			
+//			System.out.println(aggregate_result);
+						
+			Query_operation.write2file(path + "covering_sets", agg_results);
+			
+//			HashSet<String> agg_citations2 = Tuple_reasoning1_full_test.tuple_gen_agg_citations2(query);
+//			
+//			System.out.println("citation1::" + agg_citations);
+//			
+//			System.out.println("citation2::" + agg_citations2);
+//			
+//			if(!agg_citations.equals(agg_citations2))
+//			{
+//				
+//				for(int p = 0; p < Aggregation3.author_lists.size(); p ++)
+//				{
+//					HashMap<String, HashSet<String>> citation1 = Aggregation3.author_lists.get(p);
+//					
+//					HashMap<String, HashSet<String>> citation2 = Aggregation5.full_citations.get(p);
+//					
+//					HashSet<String> author1 = citation1.get("author");
+//					
+//					HashSet<String> author2 = citation2.get("author");
+//					
+//					if(!author1.equals(author2))
+//					{
+//						
+//						HashSet<String> curr_authors = new HashSet<String>();
+//						
+//						curr_authors.addAll(author1);
+//						
+//						curr_authors.removeAll(author2);
+//						
+//						System.out.println(Aggregation3.curr_res.get(p));
+//						
+//						System.out.println(Aggregation5.curr_res.get(p));
+//						
+//						System.out.println(p);
+//						
+//						System.out.println(author1.size());
+//						
+//						System.out.println(author2.size());
+//						
+//						int y = 0;
+//						
+//						y++;
+//					}
+//				}
+//				
+//				Assert.assertEquals(true, false);
+//			}
+						
+//			diff_agg_time(tuple_level, query);
 			
 			System.out.println();
 			
@@ -388,26 +497,34 @@ public class stress_test8 {
 		else
 		{
 			
-			double start_time = System.nanoTime();
+			double start_time = 0;
 			
-			for(int k = 0; k<times; k++)
+			double end_time = 0;
+			
+			start_time = System.nanoTime();
+			
+//			for(int k = 0; k<times; k++)
 			{
-				Tuple_reasoning2_test.tuple_reasoning(query, c, pst);
+				Tuple_reasoning2_full_test2.tuple_reasoning(query, c, pst);
 				
-				System.gc();
+//				System.gc();
 			}
 			
-			double end_time = System.nanoTime();
+			end_time = System.nanoTime();
 			
-			double time = (end_time - start_time);
+			double time = (end_time - start_time) * 1.0;
 			
 			
-			time = time /(times * 1.0 *1000000000);
+			time = time /(1000000000);
+			
+			System.out.print(Tuple_reasoning2_full_test2.group_num + "	");
+			
+			System.out.print(Tuple_reasoning2_full_test2.tuple_num + "	");
 			
 			System.out.print(time + "s	");
 			
 			
-			Set<Head_strs> h_l = Tuple_reasoning2_test.head_strs_rows_mapping.keySet();
+			Set<Head_strs> h_l = Tuple_reasoning2_full_test2.head_strs_rows_mapping.keySet();
 			
 			double citation_size2 = 0.0;
 			
@@ -419,7 +536,7 @@ public class stress_test8 {
 			{
 				Head_strs h_value = (Head_strs) iter.next();
 				
-				HashSet<String> citations = Tuple_reasoning2_test.gen_citation(h_value, c, pst);
+				HashSet<String> citations = Tuple_reasoning2_full_test2.gen_citation(h_value, c, pst);
 				
 				citation_size2 += citations.size();
 				
@@ -436,6 +553,8 @@ public class stress_test8 {
 				citation_size2 = citation_size2 / row;
 			
 			time = (end_time - start_time)/(row * 1.0 * 1000000000);
+			
+			
 			
 			System.out.print(time + "s	");
 
@@ -471,29 +590,55 @@ public class stress_test8 {
 //						
 //			System.out.print(origin_citation_size + "	");
 			
-			System.out.print(Tuple_reasoning2_test.covering_set_num * 1.0/row + "	");
+			System.out.print(Tuple_reasoning2_full_test2.covering_set_num * 1.0/Tuple_reasoning2_full_test2.tuple_num + "	");
 			
-			System.out.print("pre_processing::" + Tuple_reasoning2_test.pre_processing_time + "	");
+			System.out.print("pre_processing::" + Tuple_reasoning2_full_test2.pre_processing_time + "	");
 			
-			System.out.print("query::" + Tuple_reasoning2_test.query_time + "	");
+			System.out.print("query::" + Tuple_reasoning2_full_test2.query_time + "	");
 			
-			System.out.print("reasoning::" + Tuple_reasoning2_test.reasoning_time + "	");
+			System.out.print("reasoning::" + Tuple_reasoning2_full_test2.reasoning_time + "	");
 			
-			System.out.print("population::" + Tuple_reasoning2_test.population_time + "	");
+			System.out.print("population::" + Tuple_reasoning2_full_test2.population_time + "	");
+			
+			HashSet<String> agg_citations = null;
 			
 			start_time = System.nanoTime();
-			
-			HashSet<String> agg_citations = Tuple_reasoning2_test.tuple_gen_agg_citations(query);
+						
+			agg_citations = Tuple_reasoning2_full_test2.tuple_gen_agg_citations(query);
 			
 			end_time = System.nanoTime();
 			
 			time = (end_time - start_time) * 1.0/1000000000;
 			
-			System.out.print("Aggregation::" + time + "	");
+			System.out.print("Aggregation_time::" + time + "	");
 			
-			diff_agg_time(tuple_level, query);
+			System.out.print("Aggregation_size::" + agg_citations.size() + "	");
+			
+//			start_time = System.nanoTime();
+//			
+//			Tuple_reasoning2_full_test2.tuple_reasoning(query, c, pst);
+//			
+//			agg_citations = Tuple_reasoning2_full_test2.tuple_gen_agg_citations(query);
+//			
+//			end_time = System.nanoTime();
+//			
+//			time = (end_time - start_time) * 1.0/1000000000;
+//			
+//			System.out.print("total_reasoning_time::" + time + "	");
+						
+//			diff_agg_time(tuple_level, query);
 			
 			System.out.println();
+			
+//			String aggregate_result = Aggregation5.curr_res.toString();
+//			
+//			Vector<String> agg_results = new Vector<String>();
+//			
+//			agg_results.add(aggregate_result);
+//			
+//			Query_operation.write2file(path + "covering_sets", agg_results);
+			
+			
 			
 //			Tuple_reasoning1.compare(citation_view_map1, citation_view_map2);
 			

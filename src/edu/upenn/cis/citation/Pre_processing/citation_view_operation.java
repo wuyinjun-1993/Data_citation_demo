@@ -20,23 +20,15 @@ public class citation_view_operation {
 		System.out.println(v_names.toString());
 	}
 	
-	public static void add_citation_view(String name) throws SQLException, ClassNotFoundException
+	public static void add_citation_view(String name, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-        
-        PreparedStatement pst = null;
         
         int id = get_citation_view_num(c, pst) + 1;
         
 //        String citation_id = "c" + id;
         
         insert_citation_table(id, name, c, pst);
-        
-        c.close();
-        
+                
 	}
 	
 	public static Vector<String> get_views(String c_name) throws SQLException, ClassNotFoundException
@@ -66,14 +58,8 @@ public class citation_view_operation {
         return view_names;
 	}
 	
-	public static void add_connection_view_with_citations(String citation_name, String view_name) throws SQLException, ClassNotFoundException
+	public static void add_connection_view_with_citations(String citation_name, String view_name, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-        
-        PreparedStatement pst = null;
 		
 		int view_id = view_operation.get_view_id(view_name, c, pst);
 		
@@ -81,7 +67,6 @@ public class citation_view_operation {
 		
 		insert_citation2view(view_id, citation_id, c, pst);
 		
-		c.close();
 	}
 	
 
@@ -129,15 +114,8 @@ public class citation_view_operation {
 		c.close();
 	}
 	
-	public static void delete_citation_views_by_id(int citation_view_id) throws ClassNotFoundException, SQLException
+	public static void delete_citation_views_by_id(int citation_view_id, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
-		
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-        
-        PreparedStatement pst = null;
 		
 //		int citation_view_id = get_citation_id(citation_name, c, pst);
 		
@@ -147,7 +125,6 @@ public class citation_view_operation {
 		
 		delete_citation_table(citation_view_id, c, pst);
 		
-		c.close();
 	}
 
 	public static void update_citation_view(String old_name, String new_name) throws SQLException, ClassNotFoundException

@@ -46,4 +46,19 @@ public class Lambda_term {
 	{
 		return new Lambda_term(this.name, this.table_name);
 	}
+	
+	@Override
+	public int hashCode()
+	{
+		return name.hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		Lambda_term l = (Lambda_term) obj;
+		
+		return (l.name.equals(this.name));
+		
+	}
 }

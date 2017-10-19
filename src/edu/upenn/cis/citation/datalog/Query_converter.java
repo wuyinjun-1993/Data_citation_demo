@@ -1526,17 +1526,8 @@ public class Query_converter {
 	}
 //	
 	
-	public static String datalog2sql_citation_query(Query query) throws SQLException, ClassNotFoundException
-	{		
-		Connection c = null;
-		
-	    PreparedStatement pst = null;
-	      
-		Class.forName("org.postgresql.Driver");
-		
-	    c = DriverManager
-	        .getConnection(populate_db.db_url,
-	    	        populate_db.usr_name,populate_db.passwd);
+	public static String datalog2sql_citation_query(Query query) throws SQLException
+	{
 		
 		String sql = new String();
 		
@@ -1580,23 +1571,12 @@ public class Query_converter {
 //			sql += " order by " + condition_str[1]; 
 		
 //		System.out.println("sql:::" + sql);
-		
-		c.close();
-		
+				
 		return sql;
 	}
 	
-	public static String datalog2sql_citation_query(Query query, int max_num) throws SQLException, ClassNotFoundException
-	{		
-		Connection c = null;
-		
-	    PreparedStatement pst = null;
-	      
-		Class.forName("org.postgresql.Driver");
-		
-	    c = DriverManager
-	        .getConnection(populate_db.db_url,
-	    	        populate_db.usr_name,populate_db.passwd);
+	public static String datalog2sql_citation_query(Query query, int max_num) throws SQLException
+	{
 		
 		String sql = new String();
 		
@@ -1642,9 +1622,7 @@ public class Query_converter {
 		
 		if(max_num > 0)
 			sql += " limit " + max_num;
-		
-		c.close();
-		
+				
 		return sql;
 	}
 	
@@ -1822,6 +1800,24 @@ public class Query_converter {
 			Subgoal subgoal = (Subgoal)q.body.get(i);
 			
 			str += subgoal.name + populate_db.suffix + ".citation_view";
+			
+		}
+		
+		return str;
+	}
+	
+	static String get_sel_citation_unit2(Query q)
+	{
+		String str = new String ();
+		
+		for(int i = 0; i<q.body.size(); i++)
+		{
+			if(i >= 1)
+				str += ",";
+			
+			Subgoal subgoal = (Subgoal)q.body.get(i);
+			
+			str += subgoal.name + ".citation_view";
 			
 		}
 		
@@ -2209,6 +2205,10 @@ public class Query_converter {
 					str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + condition.op + condition.subgoal2 + "." + condition.arg2 + ") as condition" + condition_num;
 				
 				str[1] += "condition" + condition_num + " desc";
+				
+				condition_num ++;
+
+				i++;
 			}
 			else
 			{
@@ -2233,8 +2233,15 @@ public class Query_converter {
 						str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + " in ( select " + condition.arg2 + " from " + condition.subgoal2 + ")) as condition" + condition_num;
 						
 						str[1] += "condition" + condition_num + " desc";
-					}
 						
+						condition_num ++;
+
+						i++;
+							
+						
+					}
+					
+					
 				}
 				else
 				{
@@ -2260,6 +2267,10 @@ public class Query_converter {
 							str[0] += "(" + condition.subgoal2 + "." + condition.arg2 + " in ( select " + condition.arg1 + " from " + condition.subgoal1 + ")) as condition" + condition_num;
 							
 							str[1] += "condition" + condition_num + " desc";
+							
+							condition_num ++;
+
+							i++;
 						}
 //							str[0] += "(" + condition.subgoal2 + "." + condition.arg2 + " in ( select " + condition.arg2 + " from " + condition.subgoal2 + ")) as condition" + condition_num;
 //						
@@ -2270,9 +2281,7 @@ public class Query_converter {
 			
 			
 			
-			condition_num ++;
 
-			i++;
 		}
 		
 		return str;
@@ -2347,39 +2356,90 @@ public class Query_converter {
 		return str;
 	}
 	
-	public static String datalog2sql_citation(Query query, Vector<Lambda_term> lambda_terms, HashSet<Conditions> valid_conditions) throws SQLException, ClassNotFoundException
+	static String get_unique_lambda_str(Query v, HashSet<Lambda_term> lambda_terms)
+	{
+		String str = new String();
+		
+		int i = 0;
+		
+		for(Iterator iter = lambda_terms.iterator(); iter.hasNext();)
+		{
+			if(i >= 1)
+				str += ",";
+			
+			Lambda_term l_term = (Lambda_term) iter.next();
+			
+			String name = l_term.name;
+			
+			str += "(" + l_term.table_name + "." + name.substring(name.indexOf(populate_db.separator) + 1, name.length()) + ")";
+		}
+		
+		return str;
+	}
+	
+//	public static String datalog2sql_citation(Query query, Vector<Lambda_term> lambda_terms, HashSet<Conditions> valid_conditions, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+//	{
+//				
+////		String sel_item = new String();
+//		
+//		String sql = new String();
+//
+//		String sel_item = get_sel_item(query);
+//		
+//		String citation_unit = get_sel_citation_unit(query);
+//		
+//		String sel_lambda_terms = get_lambda_str(query, lambda_terms);
+//		
+//		String [] condition_str = get_condition_boolean_value(query, valid_conditions);
+//		
+//		
+//		String citation_table = get_relations_with_citation_table(query);
+//		
+//		String condition = get_condition(query);
+//		
+//		String citation_condition = get_citation_condition(query, c, pst);
+//		
+//		sql = "select " + sel_item + "," + citation_unit;
+//		
+//		if(sel_lambda_terms != null && !sel_lambda_terms.isEmpty())
+//			sql += "," + sel_lambda_terms;
+//		
+//		if(condition_str[0] != null && !condition_str[0].isEmpty())
+//			sql += "," + condition_str[0];
+//		
+//		sql += " from " + citation_table + " where " +  citation_condition;
+//		
+//		if(condition != null && !condition.isEmpty())
+//			sql += " and " + condition;
+//		
+//		if(condition_str[1] != null && !condition_str[1].isEmpty())
+//			sql += " order by " + condition_str[1]; 
+//		
+////		System.out.println("sql:::" + sql);
+//				
+//		return sql;
+//	}
+//	
+	
+	public static String datalog2sql_citation(Query query, Vector<Lambda_term> lambda_terms, HashSet<Conditions> valid_conditions, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
 				
-//		String sel_item = new String();
-				
-		Connection c = null;
-		
-	    PreparedStatement pst = null;
-	      
-		Class.forName("org.postgresql.Driver");
-		
-	    c = DriverManager
-	        .getConnection(populate_db.db_url,
-	    	        populate_db.usr_name,populate_db.passwd);
-	    
-	    
-		
 		String sql = new String();
 
 		String sel_item = get_sel_item(query);
 		
-		String citation_unit = get_sel_citation_unit(query);
+		String citation_unit = get_sel_citation_unit2(query);
 		
 		String sel_lambda_terms = get_lambda_str(query, lambda_terms);
 		
 		String [] condition_str = get_condition_boolean_value(query, valid_conditions);
 		
 		
-		String citation_table = get_relations_with_citation_table(query);
+		String citation_table = get_relations_without_citation_table(query);
 		
 		String condition = get_condition(query);
 		
-		String citation_condition = get_citation_condition(query, c, pst);
+//		String citation_condition = get_citation_condition(query, c, pst);
 		
 		sql = "select " + sel_item + "," + citation_unit;
 		
@@ -2389,18 +2449,94 @@ public class Query_converter {
 		if(condition_str[0] != null && !condition_str[0].isEmpty())
 			sql += "," + condition_str[0];
 		
-		sql += " from " + citation_table + " where " +  citation_condition;
+		sql += " from " + citation_table;// + " where " +  citation_condition;
 		
 		if(condition != null && !condition.isEmpty())
-			sql += " and " + condition;
+			sql += " where " + condition;
 		
 		if(condition_str[1] != null && !condition_str[1].isEmpty())
-			sql += " order by " + condition_str[1]; 
+		{
+			sql += " order by " + condition_str[1] + "," + citation_unit; 
+		}
+		else
+		{
+			sql += " order by " + citation_unit;
+		}
+		
 		
 //		System.out.println("sql:::" + sql);
+				
+		return sql;
+	}
+	
+	public static String datalog2sql_schema(Query query, Vector<Lambda_term> lambda_terms, Connection c, PreparedStatement pst)
+	{
+				
+		String sql = new String();
+
+		String sel_item = get_sel_item(query);
+				
+		String sel_lambda_terms = get_lambda_str(query, lambda_terms);
 		
-		c.close();
+		String citation_table = get_relations_without_citation_table(query);
 		
+		String condition = get_condition(query);
+		
+//		String citation_condition = get_citation_condition(query, c, pst);
+		
+		sql = "select " + sel_item;
+		
+		if(sel_lambda_terms != null && !sel_lambda_terms.isEmpty())
+			sql += "," + sel_lambda_terms;
+		
+		sql += " from " + citation_table;// + " where " +  citation_condition;
+		
+		if(condition != null && !condition.isEmpty())
+			sql += " where " + condition;		
+//		System.out.println("sql:::" + sql);
+				
+		return sql;
+	}
+	
+	public static String datalog2sql_schema_test(Query query, Vector<Lambda_term> lambda_terms, Connection c, PreparedStatement pst)
+	{
+				
+		String sql = new String();
+
+		String sel_item = get_sel_item(query);
+				
+		String sel_lambda_terms = get_lambda_str(query, lambda_terms);
+		
+		String citation_table = get_relations_without_citation_table(query);
+		
+		String condition = get_condition(query);
+		
+		if(query.lambda_term.size() > 0)
+		{
+			if(condition.isEmpty())
+			{
+				condition = query.lambda_term.get(0).name;
+			}
+			else
+			{
+				condition += " and " + query.lambda_term.get(0).name;
+			}
+			
+		}
+		
+//		String citation_condition = get_citation_condition(query, c, pst);
+		
+		sql = "select " + sel_item;
+		
+		if(sel_lambda_terms != null && !sel_lambda_terms.isEmpty())
+			sql += "," + sel_lambda_terms;
+		
+		sql += " from " + citation_table;// + " where " +  citation_condition;
+		
+		if(condition != null && !condition.isEmpty())
+			sql += " where " + condition;		
+//		System.out.println("sql:::" + sql);
+				
 		return sql;
 	}
 	
@@ -2458,37 +2594,95 @@ public class Query_converter {
 	
 	public static String datalog2sql_citation_test(Query query, Vector<Lambda_term> lambda_terms, HashSet<Conditions> valid_conditions) throws SQLException, ClassNotFoundException
 	{
+		
+		return datalog2sql_citation_test2(query, lambda_terms, valid_conditions);
+				
+////		String sel_item = new String();
+//				
+//		Connection c = null;
+//		
+//	    PreparedStatement pst = null;
+//	      
+//		Class.forName("org.postgresql.Driver");
+//		
+//	    c = DriverManager
+//	        .getConnection(populate_db.db_url,
+//	    	        populate_db.usr_name,populate_db.passwd);
+//	    
+//	    
+//		
+//		String sql = new String();
+//
+//		String sel_item = get_sel_item(query);
+//		
+//		String citation_unit = get_sel_citation_unit(query);
+//		
+//		String sel_lambda_terms = get_lambda_str(query, lambda_terms);
+//		
+//		String [] condition_str = get_condition_boolean_value(query, valid_conditions);
+//		
+//		
+//		String citation_table = get_relations_with_citation_table(query);
+//		
+//		String condition = query.lambda_term.get(0).name;
+//		
+//		String citation_condition = get_citation_condition(query, c, pst);
+//		
+//		sql = "select " + sel_item + "," + citation_unit;
+//		
+//		if(sel_lambda_terms != null && !sel_lambda_terms.isEmpty())
+//			sql += "," + sel_lambda_terms;
+//		
+//		if(condition_str[0] != null && !condition_str[0].isEmpty())
+//			sql += "," + condition_str[0];
+//		
+//		sql += " from " + citation_table + " where " +  citation_condition;
+//		
+//		if(condition != null && !condition.isEmpty())
+//			sql += " and " + condition;
+//		
+//		if(condition_str[1] != null && !condition_str[1].isEmpty())
+//		{
+//			sql += " order by " + condition_str[1] + "," + citation_unit; 
+//		}
+//		else
+//		{
+//			sql += " order by " + citation_unit;
+//		}
+//		
+//		
+////		System.out.println("sql:::" + sql);
+//		
+//		c.close();
+//		
+//		return sql;
+	}
+	
+	public static String datalog2sql_citation_test2(Query query, Vector<Lambda_term> lambda_terms, HashSet<Conditions> valid_conditions)
+	{
 				
 //		String sel_item = new String();
-				
-		Connection c = null;
-		
-	    PreparedStatement pst = null;
-	      
-		Class.forName("org.postgresql.Driver");
-		
-	    c = DriverManager
-	        .getConnection(populate_db.db_url,
-	    	        populate_db.usr_name,populate_db.passwd);
-	    
 	    
 		
 		String sql = new String();
 
 		String sel_item = get_sel_item(query);
 		
-		String citation_unit = get_sel_citation_unit(query);
+		String citation_unit = get_sel_citation_unit2(query);
 		
 		String sel_lambda_terms = get_lambda_str(query, lambda_terms);
 		
 		String [] condition_str = get_condition_boolean_value(query, valid_conditions);
 		
 		
-		String citation_table = get_relations_with_citation_table(query);
+		String citation_table = get_relations_without_citation_table(query);
 		
-		String condition = query.lambda_term.get(0).name;
+		String condition = new String ();
 		
-		String citation_condition = get_citation_condition(query, c, pst);
+		if(query.lambda_term.size() > 0)
+			condition = query.lambda_term.get(0).name;
+		
+//		String citation_condition = get_citation_condition(query, c, pst);
 		
 		sql = "select " + sel_item + "," + citation_unit;
 		
@@ -2498,10 +2692,10 @@ public class Query_converter {
 		if(condition_str[0] != null && !condition_str[0].isEmpty())
 			sql += "," + condition_str[0];
 		
-		sql += " from " + citation_table + " where " +  citation_condition;
+		sql += " from " + citation_table;// + " where " +  citation_condition;
 		
 		if(condition != null && !condition.isEmpty())
-			sql += " and " + condition;
+			sql += " where " + condition;
 		
 		if(condition_str[1] != null && !condition_str[1].isEmpty())
 		{
@@ -2514,11 +2708,10 @@ public class Query_converter {
 		
 		
 //		System.out.println("sql:::" + sql);
-		
-		c.close();
-		
+				
 		return sql;
 	}
+	
 	
 	public static String datalog2sql_group(Query q, String sel_item, String conditions, String group_conditions)
 	{
@@ -2588,22 +2781,8 @@ public class Query_converter {
 		return heads;
 	}
 	
-	public static String datalog2sql(Query query) throws SQLException, ClassNotFoundException
+	public static String datalog2sql(Query query)
 	{
-				
-//		String sel_item = new String();
-				
-		Connection c = null;
-		
-	    PreparedStatement pst = null;
-	      
-		Class.forName("org.postgresql.Driver");
-		
-	    c = DriverManager
-	        .getConnection(populate_db.db_url,
-	    	        populate_db.usr_name,populate_db.passwd);
-	    
-	    
 		
 		String sql = new String();
 
@@ -2620,10 +2799,28 @@ public class Query_converter {
 		if(condition != null && !condition.isEmpty())
 			sql += " where " + condition;
 		
+		return sql;
+	}
+	
+	public static String datalog2sql_test(Query query)
+	{
 		
-//		System.out.println("sql:::" + sql);
+		String sql = new String();
+
+		String sel_item = get_sel_item(query);
+			
+		String citation_table = get_relations_without_citation_table(query);
 		
-		c.close();
+		String condition = get_condition(query);
+		
+		String condition2 = query.lambda_term.get(0).name;
+				
+		sql = "select " + sel_item;
+		
+		sql += " from " + citation_table + " where " + condition2;
+		
+		if(condition != null && !condition.isEmpty())
+			sql += " and " + condition;
 		
 		return sql;
 	}

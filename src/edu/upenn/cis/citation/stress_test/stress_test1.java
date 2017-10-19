@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,8 +19,6 @@ import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_citation_opt;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_citation_opt;
 import edu.upenn.cis.citation.user_query.query_storage;
 
 public class stress_test1 {
@@ -50,10 +49,114 @@ public class stress_test1 {
 		
 	}
 	
+	static void test() throws SQLException, ClassNotFoundException
+	{
+		
+		int times = 100;
+		
+		String query_base = "SELECT contributor.first_names, contributor.surname FROM contributor JOIN contributor2family ON contributor.contributor_id = contributor2family.contributor_id JOIN family ON family.family_id = contributor2family.family_id WHERE";
+		
+		String query = "select family_id, type from family";
+		
+		Vector<Integer> ids = new Vector<Integer>();
+		
+		Connection c = null;
+	      PreparedStatement pst = null;
+		Class.forName("org.postgresql.Driver");
+	    c = DriverManager
+	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
+	    
+	    pst = c.prepareStatement(query);
+	    
+	    ResultSet rs = pst.executeQuery();
+	    	    
+	    String query1 = query_base;
+	    
+	    String query2 = query_base + " (family.family_id, family.type) in (select * from unnest(";
+	    
+	    int num = 0;
+	    
+	    String id_str = new String();
+	    
+	    String type_str = new String();
+	    
+	    while(rs.next())
+	    {
+	    	if(num >= 1)
+	    	{
+	    		query1 += " or ";
+	    			    		
+	    		id_str += ",";
+	    		
+	    		type_str += ",";
+	    	}
+	    	
+	    	id_str += rs.getInt(1);
+	    	
+	    	type_str += "'" + rs.getString(2) + "'";
+	    	
+	    	query1 += " family.family_id = " + rs.getInt(1) + " and family.type = '" + rs.getString(2) + "'";
+	    		    	
+	    	num++;
+	    }
+	    
+//	    query1 += "}')";
+	    
+	    query2 += "ARRAY[" + id_str + "], ARRAY[" + type_str + "]))";
+	    
+	    System.out.println(query1);
+	    
+	    System.out.println(query2);
+	    
+	    long start = 0;
+	    
+	    long end = 0;
+	    
+	    double time1 = 0;
+	    
+	    double time2 = 0;
+	    
+	    start = System.nanoTime();
+	    
+	    for(int i = 0; i<times; i++)
+	    {
+	        pst = c.prepareStatement(query1);
+		    
+		    ResultSet rs1 = pst.executeQuery();
+
+	    }
+	    	    
+	    end = System.nanoTime();
+	    
+	    time1 = (end -start) * 1.0/1000000000;
+	    
+	    start = System.nanoTime();
+	    
+	    for(int i = 0; i<times; i++)
+	    {
+	        pst = c.prepareStatement(query2);
+		    
+		    ResultSet rs2 = pst.executeQuery();
+
+	    }
+	    	    
+	    end = System.nanoTime();
+	    
+	    time2 = (end -start)* 1.0/1000000000;
+	    
+	    
+	    System.out.println("time1::" + time1);
+	    
+	    System.out.println("time2::" + time2);
+	    
+	}
+	
 	public static void main(String [] args) throws ClassNotFoundException, SQLException, IOException, InterruptedException
 	{
 		
 //		reset();
+		
+		test();
 		
 		Connection c = null;
 	      PreparedStatement pst = null;
@@ -125,7 +228,7 @@ public class stress_test1 {
 					
 					citation_strs.clear();
 					
-					citation_view1 = Tuple_reasoning1_citation_opt.tuple_reasoning(q, citation_strs,  citation_view_map1, c, pst);
+//					citation_view1 = Tuple_reasoning1_citation_opt.tuple_reasoning(q, citation_strs,  citation_view_map1, c, pst);
 					
 				}
 				
@@ -170,7 +273,7 @@ public class stress_test1 {
 					
 					citation_strs2.clear();
 					
-					Tuple_reasoning2_citation_opt.tuple_reasoning(q, citation_strs2, citation_view_map2, c, pst);
+//					Tuple_reasoning2_citation_opt.tuple_reasoning(q, citation_strs2, citation_view_map2, c, pst);
 				}
 				
 				end_time = System.nanoTime();

@@ -1587,7 +1587,7 @@ public class gen_citation1 {
 		}
 	}
 	
-	public static void init_author_mapping(StringList view_list, ArrayList<HashMap<String, Integer>> view_query_mapping, IntList query_ids, HashMap<String, Unique_StringList> author_mappings, HashMap<String, Integer> max_num, Connection c, PreparedStatement pst, ArrayList<Lambda_term[]> query_lambda_str) throws ClassNotFoundException, SQLException
+	public static void init_author_mapping(StringList view_list, ArrayList<HashMap<String, Integer>> view_query_mapping, IntList query_ids, HashMap<String, Unique_StringList> author_mappings, HashMap<String, Integer> max_num, Connection c, PreparedStatement pst, ArrayList<Lambda_term[]> query_lambda_str) throws SQLException
 	{
 		
 //		boolean [] query_id_set = new boolean[query_ids.size]; 
@@ -1616,6 +1616,302 @@ public class gen_citation1 {
 				HashMap<Head_strs, Unique_StringList> curr_author_mapping = new HashMap<Head_strs, Unique_StringList>(); 
 				
 				Query q = Query_operation.get_query_by_id(query_ids.list[id], c, pst);
+				
+				Lambda_term [] l_terms = new Lambda_term [q.lambda_term.size()];
+				
+				for(int k = 0; k<q.lambda_term.size(); k++)
+				{
+					l_terms[k] = q.lambda_term.get(k);
+				}
+				
+//				.addAll(q.lambda_term);				
+				query_lambda_str.add(id, l_terms);
+				
+				String sql = Query_converter.datalog2sql_citation_query(q);
+				
+				pst = c.prepareStatement(sql);
+				
+				ResultSet rs = pst.executeQuery();
+				
+				ResultSetMetaData meta = rs.getMetaData();
+				
+				int col_num = meta.getColumnCount();
+								
+				while(rs.next())
+				{
+					String author_name = new String();
+					
+					for(int k = 0; k < col_num - q.lambda_term.size(); k++)
+					{
+						if(k >= 1)
+							author_name += " ";
+						author_name += rs.getString(k + 1);
+						
+					}
+					
+//					if(block_name.equals("author"))
+//						author_name = rs.getString(1) + " " + rs.getString(2);
+//					else
+//						author_name = rs
+					
+					Vector<String> head_strs = new Vector<String>();
+					
+					for(int k = col_num - q.lambda_term.size(); k<col_num; k++)
+					{
+						head_strs.add(rs.getString(k + 1));
+					}
+					
+					Head_strs h_str = new Head_strs(head_strs);
+										
+					head_strs.clear();
+					
+					Unique_StringList author_set = curr_author_mapping.get(h_str); 
+					
+					if(author_set == null)
+					{
+						author_set = new Unique_StringList();
+						
+						author_set.add(author_name);
+						
+						curr_author_mapping.put(h_str, author_set);
+					}
+					else
+					{
+						
+						if((block_max_size > 0 && author_set.size <= block_max_size) || block_max_size <= 0)
+						{
+							author_set.add(author_name);
+									
+							curr_author_mapping.put(h_str, author_set);
+						}
+					}					
+				}
+				
+				Set<Head_strs> head_strs = curr_author_mapping.keySet();
+				
+				for(Iterator it = head_strs.iterator(); it.hasNext();)
+				{
+					Head_strs h_str = (Head_strs) it.next();
+					
+					String key = view_list.list[i] + populate_db.separator + block_name + populate_db.separator + h_str.toString() + populate_db.separator + id;
+										
+					author_mappings.put(key, curr_author_mapping.get(h_str));
+				}
+				
+				
+//				author_mapping.add(curr_author_mapping);
+			}
+			
+//			for(int j = 0; j<curr_query_ids.size; j++)
+//			{
+//
+//			
+//			}
+		}
+		
+//		System.out.println(query_lambda_str);
+		
+		
+//		
+//		for(int j = 0; j<query_ids.size; j++)
+//		{
+//			HashMap<Head_strs, Unique_StringList> curr_author_mapping = new HashMap<Head_strs, Unique_StringList>(); 
+//			
+//			Query q = Query_operation.get_query_by_id(query_ids.list[j], c, pst);
+//			
+//			Lambda_term [] l_terms = new Lambda_term [q.lambda_term.size()];
+//			
+//			for(int k = 0; k<q.lambda_term.size(); k++)
+//			{
+//				l_terms[k] = q.lambda_term.get(k);
+//			}
+//			
+////			.addAll(q.lambda_term);
+//			
+//			query_lambda_str.add(l_terms);
+//			
+//			String sql = Query_converter.datalog2sql_citation_query(q);
+//			
+//			pst = c.prepareStatement(sql);
+//			
+//			ResultSet rs = pst.executeQuery();
+//			
+//			ResultSetMetaData meta = rs.getMetaData();
+//			
+//			int col_num = meta.getColumnCount();
+//			
+//			HashSet<Head_strs> h_lists = new HashSet<Head_strs>();
+//			
+//			while(rs.next())
+//			{
+//				String author_name = rs.getString(1) + " " + rs.getString(2);
+//				
+//				Vector<String> head_strs = new Vector<String>();
+//				
+//				for(int i = 0; i<col_num -2; i++)
+//				{
+//					head_strs.add(rs.getString(i + 3));
+//				}
+//				
+//				Head_strs h_str = new Head_strs(head_strs);
+//				
+//				h_lists.add(h_str);
+//				
+//				head_strs.clear();
+//				
+//				Unique_StringList author_set = curr_author_mapping.get(h_str); 
+//				
+//				if(author_set == null)
+//				{
+//					author_set = new Unique_StringList();
+//					
+//					author_set.add(author_name);
+//					
+//					curr_author_mapping.put(h_str, author_set);
+//				}
+//				else
+//				{
+//					
+//					if((max_num > 0 && author_set.size <= max_num) || max_num == 0)
+//					{
+//						author_set.add(author_name);
+//								
+//						curr_author_mapping.put(h_str, author_set);
+//					}
+//				}
+//				
+//				
+//				
+//				
+//			}
+//			
+////			author_mapping.add(curr_author_mapping);
+//			
+//			author_mappings[j] = new Query_lm_authors();
+//			
+//			author_mappings[j].init(h_lists.size());
+//			
+//			ArrayList<Head_strs> h_arr = new ArrayList<Head_strs>();
+//			
+//			h_arr.addAll(h_lists);
+//			
+//			author_mappings[j].addAll(curr_author_mapping, h_arr);
+//		}
+		
+		
+		
+//		for(int k = 0; k<curr_query_ids.size(); k++)
+//		{
+//			HashMap<Head_strs, HashSet<String>> curr_author_mapping = author_mapping.get(curr_query_ids.get(k));
+//			
+//			if(curr_author_mapping == null)
+//			{
+//				
+//				curr_author_mapping = new HashMap<Head_strs, HashSet<String>>();
+//				
+//				Query q = Query_operation.get_query_by_id(curr_query_ids.get(k), c, pst);
+//				
+//				ArrayList<Lambda_term> l_terms = new ArrayList<Lambda_term>();
+//				
+//				l_terms.addAll(q.lambda_term);
+//				
+//				query_lambda_str.put(curr_query_ids.get(k), l_terms);
+//				
+////				HashMap<Head_strs, HashSet<String>> curr_query_author_mapping = new HashMap<Head_strs, HashSet<String>>();
+//				
+////				System.out.println(q);
+//				
+//				String sql = Query_converter.datalog2sql_citation_query(q);
+//				
+//				pst = c.prepareStatement(sql);
+//				
+//				ResultSet rs = pst.executeQuery();
+//				
+//				ResultSetMetaData meta = rs.getMetaData();
+//				
+//				int col_num = meta.getColumnCount();
+//				
+//				while(rs.next())
+//				{
+//					String author_name = rs.getString(1) + " " + rs.getString(2);
+//					
+//					Vector<String> head_strs = new Vector<String>();
+//					
+//					for(int i = 0; i<col_num -2; i++)
+//					{
+//						head_strs.add(rs.getString(i + 3));
+//					}
+//					
+//					Head_strs h_str = new Head_strs(head_strs);
+//					
+//					head_strs.clear();
+//					
+//					HashSet<String> author_set = curr_author_mapping.get(h_str); 
+//					
+//					if(author_set == null)
+//					{
+//						author_set = new HashSet<String>();
+//						
+//						author_set.add(author_name);
+//						
+//						curr_author_mapping.put(h_str, author_set);
+//					}
+//					else
+//					{
+//						
+//						if((max_num > 0 && author_set.size() <= max_num) || max_num == 0)
+//						{
+//							author_set.add(author_name);
+//							
+//							curr_author_mapping.put(h_str, author_set);
+//						}
+//					}
+//					
+//					
+//					
+//					
+//				}
+//				
+//							
+//				
+//			}
+//			
+//			author_mapping.put(curr_query_ids.get(k), curr_author_mapping);	
+//			
+//		}
+	}
+	
+	public static void init_author_mapping(StringList view_list, ArrayList<HashMap<String, Integer>> view_query_mapping, IntList query_ids, HashMap<String, Unique_StringList> author_mappings, HashMap<String, Integer> max_num, Connection c, PreparedStatement pst, ArrayList<Lambda_term[]> query_lambda_str, HashMap<Integer, Query> citation_queries) throws SQLException
+	{
+		
+//		boolean [] query_id_set = new boolean[query_ids.size]; 
+		
+//		get_all_query_ids(query_ids, c, pst);
+				
+		for(int i = 0; i < view_list.size; i++)
+		{
+			HashMap<String, Integer> curr_query_ids = get_query_id3(view_list.list[i], query_ids, c, pst);
+			
+//			System.out.println(curr_query_ids);
+			
+			view_query_mapping.add(i, curr_query_ids);
+			
+			Set<String> block_names = curr_query_ids.keySet();
+			
+			for(Iterator iter = block_names.iterator(); iter.hasNext();)
+			{
+				
+				String block_name = (String) iter.next();
+				
+				int block_max_size = max_num.get(block_name);
+				
+				Integer id = curr_query_ids.get(block_name);
+				
+				HashMap<Head_strs, Unique_StringList> curr_author_mapping = new HashMap<Head_strs, Unique_StringList>(); 
+				
+				Query q = Query_operation.get_query_by_id(query_ids.list[id], c, pst);
+				
+				citation_queries.put(query_ids.list[id], q);
 				
 				Lambda_term [] l_terms = new Lambda_term [q.lambda_term.size()];
 				

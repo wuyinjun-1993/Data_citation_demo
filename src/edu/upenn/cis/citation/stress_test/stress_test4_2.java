@@ -22,12 +22,9 @@ import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_citation_opt;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_citation_opt2;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test_stable;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_citation_opt;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_opt;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_test;
 import edu.upenn.cis.citation.user_query.query_storage;
@@ -143,7 +140,7 @@ public class stress_test4_2 {
 			
 			if(new_rounds)
 			{
-				views = view_generator.generate_store_views_without_predicates(relation_names, view_size, query.body.size());
+				views = view_generator.generate_store_views_without_predicates(relation_names, view_size, query.body.size(), c, pst);
 				
 //				view_generator.gen_default_views(relation_names);
 				
@@ -171,7 +168,7 @@ public class stress_test4_2 {
 					
 					view_generator.initial();
 					
-					view_generator.gen_one_additional_predicates(views, relation_names, query.body.size(), query);
+					view_generator.gen_one_additional_predicates(views, relation_names, query.body.size(), query, c, pst);
 					
 					for(Iterator iter = views.iterator(); iter.hasNext();)
 					{

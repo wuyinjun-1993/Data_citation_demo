@@ -12,13 +12,13 @@ package edu.upenn.cis.citation.Corecover;
 import java.util.*;
 
 public class Mapping {
-  public Map    map = null;  // recording the map
+  public HashMap    map = null;  // recording the map
 
   Mapping() {
     map = new HashMap();
   }
 
-  Mapping(Map map) {
+  Mapping(HashMap map) {
     this.map = map;
   }
 
@@ -203,7 +203,7 @@ public class Mapping {
    */
   public Mapping rename(Map renameMap) {
     // changes the mapping
-    Map    newMap = new HashMap();
+	  HashMap    newMap = new HashMap();
     Set entrySet  = map.entrySet();
     for (Iterator iter = entrySet.iterator(); iter.hasNext();) {
       Map.Entry mapEntry = (Map.Entry) iter.next();

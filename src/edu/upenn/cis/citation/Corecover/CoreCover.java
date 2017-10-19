@@ -143,7 +143,10 @@ public class CoreCover {
     	  
 //          System.out.println("valid_tuple::" + tuple);
     	  
-    	  set_tuple_lambda_term(tuple, view);
+    	  if(!set_tuple_lambda_term(tuple, view))
+    	  {
+    		  continue;
+    	  }
 
     	  set_tuple_conditions(tuple, view);
     	  
@@ -154,13 +157,16 @@ public class CoreCover {
     return viewTuples;
   }
   
-  static void set_tuple_lambda_term(Tuple tuple, Query view)
+  static boolean set_tuple_lambda_term(Tuple tuple, Query view)
   {
 	  Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();
 	  
 	  for(int i = 0; i<view.lambda_term.size(); i++)
 	  {
 		  String curr_lambda_name = tuple.phi_str.apply(view.lambda_term.get(i).name);
+		  
+		  if(curr_lambda_name == null)
+			  return false;
 		  
 		  String curr_table_name = curr_lambda_name.substring(0, curr_lambda_name.indexOf(populate_db.separator));
 		  
@@ -170,6 +176,8 @@ public class CoreCover {
 	  }
 	  
 	  tuple.lambda_terms = lambda_terms;
+	  
+	  return true;
   }
   
   static void set_tuple_conditions(Tuple tuple, Query view)
@@ -201,6 +209,9 @@ public class CoreCover {
 		  {
 			  curr_arg2 = view.conditions.get(i).arg2.name;
 			  
+			  if(get_mapping1)
+				  get_mapping2 = true;
+			  
 			  condition = new Conditions(new Argument(curr_arg1, subgoal1), subgoal1, view.conditions.get(i).op, new Argument(curr_arg2), subgoal2);
 		  }
 		  else
@@ -220,6 +231,11 @@ public class CoreCover {
 		  condition.get_mapping1 = get_mapping1;
 		  
 		  condition.get_mapping2 = get_mapping2;
+		  
+		  if(!get_mapping1 && !get_mapping2)
+			  continue;
+		  if(!get_mapping1 && get_mapping2 && view.conditions.get(i).arg2.isConst())
+			  continue;
 		  
 		  conditions.add(condition);
 		  
@@ -571,6 +587,22 @@ public class CoreCover {
     return result;
   }
 
+  static HashSet<Argument> get_Covered_head_args(HashSet viewTuples, Query query)
+  {
+	  HashSet<Argument> coreUnion = new HashSet<Argument>();
+	    for (Iterator iter2 = viewTuples.iterator(); iter2.hasNext();) {
+	      Tuple viewTuple = (Tuple) iter2.next();
+//	      HashSet core = viewTuple.getCore();
+//	      coreUnion.addAll(core);
+	      coreUnion.addAll(viewTuple.getArgs());
+	      
+	    }
+	    
+	    coreUnion.retainAll(query.head.args);
+
+	    return coreUnion;
+  }
+  
   public static HashSet coverQuerySubgoals(HashSet viewTuples, Query query) {
     HashSet rewritings = new HashSet();
         
@@ -582,13 +614,17 @@ public class CoreCover {
     numMR   = 0;
     numGMR  = 0;
 
-    int upperBound = query.body.size();
+    
 //    if (upperBound >= query.getSubgoalNum()) // according to LMSS95
 //      upperBound = query.getSubgoalNum();
 
     // if the union of the tuple-cores doesn't cover all query subgoals,
     // just return no rewriting
     HashSet covered_relations = get_CoverSubgoals(viewTuples, query);
+    
+    HashSet<Argument> covered_head_args = get_Covered_head_args(viewTuples, query);
+    
+    int upperBound = (covered_head_args.size() > covered_relations.size()) ? covered_head_args.size() : covered_relations.size();
 
     
 //    if (!unionCoverSubgoals(viewTuples, query))
@@ -611,7 +647,7 @@ public class CoreCover {
 
     	
 //    	if(curr_rewritings.size() == 0)
-    		gen_rewriting(tupleSubsets, size, covered_relations, query, rewritings);
+    		gen_rewriting(tupleSubsets, size, covered_relations, covered_head_args, query, rewritings);
 //    	else
 //    	{
     		
@@ -762,114 +798,53 @@ public class CoreCover {
 	HashSet tupleSubset = (HashSet) iter.next();
 	if (tupleSubset.size() != size) 
 	  UserLib.myerror("CoreCover.coverQuerySubgoals(), error!");
-	
-//	if(size == 4)
-//	{
-//		HashSet<String> t1 = new HashSet<String>();
-//		
-//		t1.add("gpcr3");
-//		
-//		t1.add("object");
-//		
-//		HashSet<String> t2 = new HashSet<String>();
-//		
-//		t2.add("gpcr");
-//		
-//		HashSet<String> t3 = new HashSet<String>();
-//		
-//		t3.add("gpcr3");
-//		
-//		t3.add("object2");
-//		
-//		HashSet<String> t4 = new HashSet<String>();
-//		
-//		t4.add("gpcr3");
-//		
-//		boolean match = true;
-//		
-//		for(Iterator it = tupleSubset.iterator(); it.hasNext();)
-//		{
-//			Tuple tuple = (Tuple) it.next();
-//			
-//			if(tuple.name.equals("v10"))
-//			{
-//				HashSet<String> t_strs = tuple.get_relations();
-//				
-//				if(t_strs.equals(t1))
-//				{
-//					match = true;
-//				}
-//				else
-//				{
-//					match = false;
-//					break;
-//				}
-//								
-//				
-//			}
-//			else
-//			{
-//				if(tuple.name.equals("v1"))
-//				{
-//					HashSet<String> t_strs = tuple.get_relations();
-//					
-//					if(t_strs.equals(t2) || t_strs.equals(t4))
-//					{
-//						match = true;
-//					}
-//					else
-//					{
-//						match = false;
-//						break;
-//					}
-//									
-//					
-//				}
-//				else
-//				{
-//					if(tuple.name.equals("v8"))
-//					{
-//						HashSet<String> t_strs = tuple.get_relations();
-//						
-//						if(t_strs.equals(t3))
-//						{
-//							match = true;
-//						}
-//						else
-//						{
-//							match = false;
-//							break;
-//						}
-//										
-//						
-//					}
-//					else
-//					{
-//						match = false;
-//						break;
-//					}
-//				}
-//			}
-//		}
-//		
-//		if(match)
-//		{
-//			String index_str = new String();
-//	    	
-//	    	for(Iterator it = tupleSubset.iterator(); it.hasNext();)
-//	    	{
-//	    		Tuple tuple = (Tuple) it.next();
-//	    		
-//	    		index_str += tuple.name + populate_db.separator + tuple.get_relations();
-//	    	}
-//	    	
-//	    	System.out.println(index_str);
-//		}
-//	}
-	
-	
 
 	if (unionCoverSubgoals(tupleSubset, covered_relations))  
+	{// found one
+	  
+//	  if(cost < min_cost)
+//	  {
+//		  min_rewriting = new Rewriting(tupleSubset, query);
+//		  min_cost = cost;
+//	  }
+	  
+//	  if(!curr_rewritings.contains(tupleSubset))
+	  {
+		  rewritings.add(new Rewriting(tupleSubset, query));
+		  
+//		  curr_rewritings.add(tupleSubset);
+//		
+//		  sizeGMR = size;
+//		  numGMR ++;
+//		  numMR ++;
+	  }
+	  /*System.out.println("\n tupleSubset " + tupleSubset +
+			     " query = " + query + "\n");*/
+	  
+	  // time when the 1st GMR is generated
+//	  if (!found) {
+//	    endTime = System.currentTimeMillis();
+//	    timeFirstGMR = endTime - startTime;
+//	  }
+//
+//	  found = true;
+	}
+      }
+  }
+  
+  static void gen_rewriting(HashSet tupleSubsets, int size, HashSet covered_relations, HashSet<Argument> covered_head_args, Query query, HashSet rewritings)
+  {
+      //System.out.println("# of tupleSubsets = " + tupleSubsets.size());
+
+      
+      for (Iterator iter = tupleSubsets.iterator(); iter.hasNext();) 
+      {
+	// for this "i"^th around, we consider only subsets with size i 
+	HashSet tupleSubset = (HashSet) iter.next();
+	if (tupleSubset.size() != size) 
+	  UserLib.myerror("CoreCover.coverQuerySubgoals(), error!");
+
+	if (unionCoverSubgoals(tupleSubset, covered_head_args, covered_relations))  
 	{// found one
 	  
 //	  if(cost < min_cost)
@@ -979,6 +954,32 @@ public class CoreCover {
 	    }
 
 	    return coreUnion.containsAll(query);
+	  }
+  
+  static boolean unionCoverSubgoals(HashSet tupleSubset, HashSet<Argument> head_args, HashSet query) {
+	    HashSet coreUnion = new HashSet();
+	    
+	    HashSet<Argument> covered_head_args = new HashSet<Argument>();
+	    
+	    for (Iterator iter2 = tupleSubset.iterator(); iter2.hasNext();) {
+	      Tuple viewTuple = (Tuple) iter2.next();
+	      HashSet core = viewTuple.get_relations();
+	      coreUnion.addAll(core);
+	      
+	      HashSet<Argument> curr_covered_head_args = new HashSet<Argument>();
+	      
+	      curr_covered_head_args.addAll(viewTuple.getArgs());
+	      
+	      curr_covered_head_args.retainAll(head_args);
+	      
+	      covered_head_args.addAll(curr_covered_head_args);
+	    }
+
+	    boolean b1 = coreUnion.containsAll(query);
+	    
+	    boolean b2 = covered_head_args.containsAll(head_args);
+	    
+	    return b1 && b2;
 	  }
   
   static HashSet get_CoverSubgoals(HashSet tupleSubset, Query query) {

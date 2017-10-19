@@ -24,11 +24,8 @@ import edu.upenn.cis.citation.citation_view.Head_strs2;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_citation_opt;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_citation_opt2;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_citation_opt;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_test;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_min_test;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning2_min_test;
@@ -187,7 +184,7 @@ public class stress_test7 {
 			if(new_rounds)
 			{
 				
-				views = view_generator.gen_default_views(relations);
+				views = view_generator.gen_default_views(relations, c, pst);
 				
 //				views = view_generator.generate_store_views_without_predicates(relation_names, view_size, query.body.size());
 				
@@ -210,7 +207,7 @@ public class stress_test7 {
 					
 					view_generator.initial();
 					
-					view_generator.gen_one_additional_view(views, relations, query.body.size(), query);
+					view_generator.gen_one_additional_view(views, relations, query.body.size(), query, c, pst);
 					
 					for(Iterator iter = views.iterator(); iter.hasNext();)
 					{
@@ -250,8 +247,6 @@ public class stress_test7 {
 
 		HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map2 = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
 		
-		Vector<Vector<citation_view_vector>> citation_view1 = new Vector<Vector<citation_view_vector>>();
-
 		Vector<Vector<citation_view_vector>> citation_view2 = new Vector<Vector<citation_view_vector>>();
 
 		
@@ -276,7 +271,7 @@ public class stress_test7 {
 				
 //				citation_view1.clear();
 				
-				Tuple_reasoning1_min_test.tuple_reasoning(query, citation_strs,  citation_view_map1, c, pst);
+				Tuple_reasoning1_min_test.tuple_reasoning(query, c, pst);
 				
 //				System.gc();
 				

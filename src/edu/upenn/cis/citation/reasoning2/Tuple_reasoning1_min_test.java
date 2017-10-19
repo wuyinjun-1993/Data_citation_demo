@@ -50,6 +50,7 @@ import edu.upenn.cis.citation.data_structure.Unique_StringList;
 import edu.upenn.cis.citation.datalog.Parse_datalog;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.examples.Init_examples;
+import edu.upenn.cis.citation.examples.Load_views_and_citation_queries;
 import edu.upenn.cis.citation.gen_citation.gen_citation1;
 import edu.upenn.cis.citation.output.output2excel;
 import edu.upenn.cis.citation.set_cover_algo.cost_function;
@@ -86,7 +87,7 @@ public class Tuple_reasoning1_min_test {
 	
 	static ArrayList<HashMap<String, Integer>> view_query_mapping = null;
 	
-	static IntList query_ids = new IntList();
+	public static IntList query_ids = new IntList();
 		
 	static HashMap<String, Unique_StringList> author_mapping = new HashMap<String, Unique_StringList>(); 
 	
@@ -130,11 +131,39 @@ public class Tuple_reasoning1_min_test {
 	
 	static int[] entire_interval = new int[2];
 	
+	public static HashMap<Integer, Query> citation_queries = new HashMap<Integer, Query>();
+
+	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException, IOException, InterruptedException, JSONException
 	{
 	
 		
+		Connection c = null;
 		
+	    PreparedStatement pst = null;
+	      
+		Class.forName("org.postgresql.Driver");
+		
+	    c = DriverManager
+	        .getConnection(populate_db.db_url,
+	    	        populate_db.usr_name,populate_db.passwd);
+		
+		Vector<Query> queries = Load_views_and_citation_queries.get_views("data/test/query", c, pst);
+		
+		System.out.println(queries.get(0));
+		
+		tuple_reasoning(queries.get(0), c, pst);
+		
+		Set<int[]> keys = c_view_map.keySet();
+		
+		for(Iterator iter = keys.iterator(); iter.hasNext();)
+		{
+			int [] key = (int []) iter.next();
+			
+			citation_view_vector c_views = c_view_map.get(key);
+			
+			System.out.println(key[0] + "," + key[1] + ":::" + c_views);
+		}
 		
 //		
 //		ArrayList<Integer> b = new ArrayList<Integer>();
@@ -1137,28 +1166,15 @@ public class Tuple_reasoning1_min_test {
 		return citations;
 	}
 	
-	public static HashSet<String> tuple_gen_agg_citations(Query query) throws ClassNotFoundException, SQLException, JSONException
+	public static HashSet<String> tuple_gen_agg_citations(Query query, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException, JSONException
 	{
 		start = System.nanoTime();
 		
 		int start_pos = Resultset_prefix_col_num;
-		
-		Connection c = null;
-		
-	    PreparedStatement pst = null;
-	      
-		Class.forName("org.postgresql.Driver");
-		
-	    c = DriverManager
-	        .getConnection(populate_db.db_url,
-	    	        populate_db.usr_name,populate_db.passwd);
-		
 	    
 	    //rs, c_view_map, start_pos, view_query_mapping, query_lambda_str, author_mapping, max_author_num, query_ids, view_list, c, pst
 		HashSet<String> citations = Aggregation4.do_agg_intersection_min(rs, covering_sets_query, entire_interval, start_pos, view_query_mapping, query_lambda_str, author_mapping, max_author_num, query_ids, view_list, c, pst, true);
-		
-		c.close();
-		
+				
 		end = System.nanoTime();
 		
 		aggregation_time = (end - start) * 1.0/second2nano;
@@ -1218,7 +1234,7 @@ public class Tuple_reasoning1_min_test {
 //	}
 	
 	
-	public static void tuple_reasoning(Query query, HashMap<Head_strs, HashSet<String> > citation_strs, Vector<Head_strs> head_vals, String f_name, HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map1, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
+	public static void tuple_reasoning(Query query, String f_name, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
 	{
 //		query = get_full_query(query);
 //		
@@ -1226,7 +1242,7 @@ public class Tuple_reasoning1_min_test {
 		
 		file_name = f_name;
 				
-		tuple_reasoning(query, citation_strs, citation_view_map1, c, pst);
+		tuple_reasoning(query, c, pst);
 		
 		
 		
@@ -1287,6 +1303,9 @@ public class Tuple_reasoning1_min_test {
 		covering_sets_query = null;
 		
 		entire_interval[0] = 0;
+		
+		citation_queries.clear();
+
 	}
 	
 	public static String get_full_query(String query) throws ClassNotFoundException, SQLException
@@ -1551,40 +1570,6 @@ public class Tuple_reasoning1_min_test {
 //		}
 //	}
 //	
-	public static Vector<Query> get_views_schema()
-	{
-	      Connection c = null;
-	      ResultSet rs = null;
-	      PreparedStatement pst = null;
-	      Vector<Query> views = new Vector<Query>();
-	      
-	      try {
-	         Class.forName("org.postgresql.Driver");
-	         c = DriverManager
-	            .getConnection(populate_db.db_url,
-	        	        populate_db.usr_name,populate_db.passwd);
-	         
-//	         pst = c.prepareStatement("SELECT *  FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = 'v2'");
-	         pst = c.prepareStatement("SELECT *  FROM view_table");
-	         rs = pst.executeQuery();
-	         
-	            while (rs.next()) {
-	            	
-	            	int view_id = rs.getInt(1);
-	            	
-	            	views.add(view_operation.get_view_by_id(view_id));
-	            	
-	            }
-	  	      c.close();
-
-	      } catch (Exception e) {
-	         e.printStackTrace();
-	         System.err.println(e.getClass().getName()+": "+e.getMessage());
-	         System.exit(0);
-	      }
-	      
-	      return views;
-	}
 	
 	static String get_args_web_view(String subgoal, Connection c, PreparedStatement pst) throws SQLException
 	{
@@ -1813,14 +1798,21 @@ public class Tuple_reasoning1_min_test {
 			query_lambda_str.add(null);
 		}
 	    	    
-	    gen_citation1.init_author_mapping(view_list, view_query_mapping, query_ids, author_mapping, max_author_num, c, pst, query_lambda_str);
+	    gen_citation1.init_author_mapping(view_list, view_query_mapping, query_ids, author_mapping, max_author_num, c, pst, query_lambda_str, citation_queries);
 	    
 	    return viewTuples;
 	    
 	    
 	}
+	
+	public static HashMap<String, Integer> get_citation_queries(String view_name)
+	{
+		int view_id = view_list.find(view_name);
 		
-	public static void tuple_reasoning(Query q, HashMap<Head_strs, HashSet<String> > citation_strs, HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map1, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
+		return view_query_mapping.get(view_id);
+	}
+		
+	public static void tuple_reasoning(Query q, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
 	{
 		
 //		Query q = Parse_datalog.parse_query(query, valid_subgoal_id);
@@ -1833,7 +1825,7 @@ public class Tuple_reasoning1_min_test {
 		
 		HashSet<Tuple> viewTuples = pre_processing(q ,c,pst);
 		
-		get_citation_views(q, citation_strs, citation_view_map1, viewTuples, c, pst);
+		get_citation_views(q, viewTuples, c, pst);
 				
 		
 		
@@ -1885,9 +1877,9 @@ public class Tuple_reasoning1_min_test {
 		}
 	}
 	
-	public static void get_citation_views(Query query, HashMap<Head_strs, HashSet<String> > citation_strs, HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map1, HashSet<Tuple> viewTuples, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException, IOException, InterruptedException, JSONException
+	public static void get_citation_views(Query query, HashSet<Tuple> viewTuples, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException, IOException, InterruptedException, JSONException
 	{
-		query_execution(query, c, pst, citation_strs, citation_view_map1, viewTuples);
+		query_execution(query, c, pst, viewTuples);
 				
 	}
 	
@@ -2020,7 +2012,7 @@ public class Tuple_reasoning1_min_test {
 		}
 	}
 	
-	public static void query_execution(Query query, Connection c, PreparedStatement pst, HashMap<Head_strs, HashSet<String> > citation_strs, HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map1, HashSet<Tuple> viewTuples) throws SQLException, ClassNotFoundException, IOException, InterruptedException, JSONException
+	public static void query_execution(Query query, Connection c, PreparedStatement pst, HashSet<Tuple> viewTuples) throws SQLException, ClassNotFoundException, IOException, InterruptedException, JSONException
 	{
 				
 //		Vector<Vector<citation_view_vector>> c_views = new Vector<Vector<citation_view_vector>>();
@@ -2037,7 +2029,7 @@ public class Tuple_reasoning1_min_test {
 		
 		pre_processing_time = (end - start) * 1.0/second2nano;
 		
-		reasoning(query, c, pst, sql, citation_view_map1, citation_strs, viewTuples);
+		reasoning(query, c, pst, sql, viewTuples);
 		
 //		return c_views;
 	}
@@ -2076,7 +2068,7 @@ public class Tuple_reasoning1_min_test {
 //		}
 //	}
 //	
-	public static void reasoning(Query query, Connection c, PreparedStatement pst, String sql, HashMap<Head_strs, Vector<Vector<citation_view_vector> > > citation_view_map1, HashMap<Head_strs, HashSet<String> > citation_strs, HashSet<Tuple> viewTuples) throws SQLException, ClassNotFoundException, IOException, InterruptedException, JSONException
+	public static void reasoning(Query query, Connection c, PreparedStatement pst, String sql, HashSet<Tuple> viewTuples) throws SQLException, ClassNotFoundException, IOException, InterruptedException, JSONException
 	{
 		start = System.nanoTime();
 		

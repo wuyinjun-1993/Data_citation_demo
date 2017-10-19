@@ -1,5 +1,9 @@
 package edu.upenn.cis.citation.stress_test;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -58,7 +62,7 @@ public class query_generator {
 	
 	static double lambda2head_rate = 0.3;
 	
-	static double head_var_rate = 0.3;
+	static double head_var_rate = 1;
 	
 	static double global_predicate_rate = 1;
 	
@@ -99,7 +103,7 @@ public class query_generator {
 	    
 	}
 	
-	static void init_parameterizable_attributes(Connection c, PreparedStatement pst) throws SQLException
+	public static void init_parameterizable_attributes(Connection c, PreparedStatement pst) throws SQLException
 	{
 		
 		int col_num = 0;
@@ -130,7 +134,7 @@ public class query_generator {
 				{
 					int length = r.getInt(1);
 					
-					if(length < 60)
+					if(length < 100)
 					{
 						col_num ++;
 						
@@ -396,22 +400,24 @@ public class query_generator {
 			
 			if(relation_names.contains(relation))
 			{
-				Random rand = new Random();
-				
-				int suffix = rand.nextInt(size + 1);
-				
-				relation_name = relation + suffix;
-				
-				while(relation_names.contains(relation_name))
-				{
-					suffix = rand.nextInt(size + 1);
-					
-					relation_name = relation + suffix;
-				}
-				
-				relation_names.add(relation_name);
-				
-				maps.put(relation_name, relation);
+				i--;
+				continue;
+//				Random rand = new Random();
+//				
+//				int suffix = rand.nextInt(size + 1);
+//				
+//				relation_name = relation + suffix;
+//				
+//				while(relation_names.contains(relation_name))
+//				{
+//					suffix = rand.nextInt(size + 1);
+//					
+//					relation_name = relation + suffix;
+//				}
+//				
+//				relation_names.add(relation_name);
+//				
+//				maps.put(relation_name, relation);
 				
 			}
 			else
@@ -426,9 +432,9 @@ public class query_generator {
 			
 			Set<String> attr_names = attr_types.keySet();
 			
-			Vector<String> attr_list = new Vector<String> ();
+			Vector<String> attr_list = parameterizable_attri.get(relation);
 			
-			attr_list.addAll(attr_names);
+//			attr_list.addAll(attr_names);
 			
 			Random rand = new Random();
 			
@@ -438,13 +444,13 @@ public class query_generator {
 											
 			int head_size = rand.nextInt((int)(attr_list.size() * head_var_rate + 1)) + 1;
 									
-//			Vector<Argument> head_vars = gen_head_vars(relation, relation_name, attr_list, head_size, c, pst);
+			Vector<Argument> head_vars = gen_head_vars(relation, relation_name, attr_list, attr_list.size(), c, pst);
 			
-			Argument head_arg = new Argument(relation_name + populate_db.separator + primary_key_type[0], relation_name);
+//			Argument head_arg = new Argument(relation_name + populate_db.separator + primary_key_type[0], relation_name);
 			
-			Vector<Argument> head_vars = new Vector<Argument>();
+//			Vector<Argument> head_vars = new Vector<Argument>();
 			
-			head_vars.add(head_arg);
+//			head_vars.add(head_arg);
 			
 			heads.addAll(head_vars);
 			
@@ -467,6 +473,29 @@ public class query_generator {
 		return new Query(name, new Subgoal(name, heads), body, lambda_terms, predicates, maps);
 	}
 	
+	
+	public static Query generate_query_with_new_instance_size(Query query, int size, Connection c, PreparedStatement pst) throws SQLException
+	{
+		HashMap<String, String> maps = query.subgoal_name_mapping;
+		
+		HashSet<String> relation_names = new HashSet<String>();
+		
+		for(int i = 0; i<query.body.size(); i++)
+		{
+			Subgoal subgoal = (Subgoal) query.body.get(i);
+			
+			relation_names.add(subgoal.name);
+		}
+		
+		String new_lambda_string = gen_local_predicates_with_fixed_size(maps, relation_names, size, c, pst);
+		
+		query.lambda_term.clear();
+		
+		query.lambda_term.add(new Lambda_term(new_lambda_string));
+		
+		return query;
+		
+	}
 	
 	static String [] get_primary_key(String table_name, Connection c, PreparedStatement pst) throws SQLException
 	{
@@ -634,12 +663,17 @@ public class query_generator {
 		{
 			int index = r.nextInt(attr_list.size());
 			
-			
-			id_set.add(index);
-			
-			
-				
-			
+			if(parameterizable_attri.get(relation).contains(attr_list.get(index)))
+			{
+				id_set.add(index);
+			}
+//			else
+//			{
+//				i--;
+//				
+//				continue;
+//			}
+//			
 		}
 		
 		for(Iterator iter = id_set.iterator(); iter.hasNext();)
@@ -698,6 +732,8 @@ public class query_generator {
 		
 		relations.addAll(relation_names);
 		
+		HashMap<String, HashSet<Integer>> max_min_value_mapping = new HashMap<String, HashSet<Integer>>();
+		
 		for(int i = 0; i<relations.size(); i++)
 		{
 			
@@ -746,9 +782,19 @@ public class query_generator {
 				
 				int num = 0;
 				
+				HashSet<Integer> integer_list = max_min_value_mapping.get(relation_mapping.get(relations.get(i)));
+				
+				if(integer_list == null)
+				{
+					integer_list = new HashSet<Integer>();
+				}
+				
+				
 				for(Iterator iter = id_list.iterator(); iter.hasNext();)
 				{
 					Integer id = (Integer) iter.next();
+					
+					integer_list.add(id);
 					
 					if(num >= 1)
 					{
@@ -764,14 +810,203 @@ public class query_generator {
 				selection_string += ")";
 				
 				selection_strings += selection_string;
+				
+				max_min_value_mapping.put(relation_mapping.get(relations.get(i)), integer_list);
 			}
 		}
+		
+		output_selected_value2files(max_min_value_mapping);
 		
 //		System.out.println(real_size);
 //		
 //		System.out.println("selection_string:::" + selection_strings);
 		
 		return selection_strings;
+	}
+	
+	static String gen_local_predicates_with_fixed_size(HashMap<String, String> relation_mapping, HashSet<String> relation_names, int size, Connection c, PreparedStatement pst) throws SQLException
+	{
+		
+		long total_range = 1;
+		
+		Vector<String> relations = new Vector<String>();
+		
+		relations.addAll(relation_names);
+		
+		HashMap<String, HashSet<Integer>> max_min_value_mapping = new HashMap<String, HashSet<Integer>>();
+		
+		for(int i = 0; i<relations.size(); i++)
+		{
+			
+//			System.out.println(relation_mapping.get(relations.get(i)));
+			
+//			System.out.println(relation_primary_key_ranges.get(relation_mapping.get(relations.get(i))).size());
+			
+			total_range = total_range * relation_primary_key_ranges.get(relation_mapping.get(relations.get(i))).size();
+		}
+		
+		int selected_size = (int)(Math.pow(query_result_size, 1.0/relations.size()) + 0.5);
+		
+		String selection_strings = new String();
+		
+		int real_size = 1;
+		
+//		if(ratio < 1)
+		{
+			
+			for(int i = 0; i<relations.size(); i++)
+			{
+				
+				if(i >= 1)
+					selection_strings += " and ";
+				
+				String selection_string = "(";
+				
+				int max_size = relation_primary_key_ranges.get(relation_mapping.get(relations.get(i))).size();
+				
+//				int selected_size = (int)(max_size * ratio + 0.5);
+				
+				real_size *= selected_size;
+				
+//				System.out.println(selected_size);
+				
+				HashSet<Integer> id_list = new HashSet<Integer>();
+				
+				while(id_list.size() < selected_size)
+				{
+					Random r = new Random();
+					
+					int id = r.nextInt(max_size);
+					
+					id_list.add(relation_primary_key_ranges.get(relation_mapping.get(relations.get(i))).get(id));
+				}
+				
+				int num = 0;
+				
+				HashSet<Integer> integer_list = max_min_value_mapping.get(relation_mapping.get(relations.get(i)));
+				
+				if(integer_list == null)
+				{
+					integer_list = new HashSet<Integer>();
+				}
+				
+				
+				for(Iterator iter = id_list.iterator(); iter.hasNext();)
+				{
+					Integer id = (Integer) iter.next();
+					
+					integer_list.add(id);
+					
+					if(num >= 1)
+					{
+						selection_string += " or ";
+					}
+					
+					selection_string += relations.get(i) + "." + relation_primary_key_mapping.get(relation_mapping.get(relations.get(i))) + "=" + id;
+					
+					num++;
+					
+				}
+				
+				selection_string += ")";
+				
+				selection_strings += selection_string;
+				
+				max_min_value_mapping.put(relation_mapping.get(relations.get(i)), integer_list);
+			}
+		}
+		
+		output_selected_value2files(max_min_value_mapping);
+		
+//		System.out.println(real_size);
+//		
+//		System.out.println("selection_string:::" + selection_strings);
+		
+		return selection_strings;
+	}
+	
+	static void output_selected_value2files(HashMap<String, HashSet<Integer>> selected_value_mapping)
+	{
+		Set<String> keys = selected_value_mapping.keySet();
+		
+		Vector<String> output_strings = new Vector<String>();
+		
+		Vector<String> index4gap = new Vector<String>();
+		
+		for(Iterator iter = keys.iterator(); iter.hasNext();)
+		{
+			
+			String key = (String) iter.next();
+			
+			HashSet<Integer> int_list = selected_value_mapping.get(key);
+			
+			int [] int_arr = new int[int_list.size()];
+			
+			int num = 0;
+			
+			for(Iterator it = int_list.iterator(); it.hasNext();)
+			{
+				int integer = (int) it.next();
+				
+				int_arr[num ++] = integer;
+			}
+						
+			Arrays.sort(int_arr);
+			
+			String string = key + "::";
+			
+			String index_str = key + "::1";
+			
+			for(int i = 0; i<int_arr.length; i++)
+			{
+				
+				if(i >= 1)
+					string += ",";
+				
+				string += int_arr[i];
+			}
+			
+			output_strings.add(string);
+			
+			index4gap.add(index_str);
+		}
+		
+		write("query_selected_values.txt", output_strings);
+		
+		write("query_selected_values_index_gap.txt", index4gap);
+	}
+	
+	static void write(String file_name, Vector<String> line)
+	{
+		 BufferedWriter bw = null;
+	      try {
+	         //Specify the file name and path here
+		 File file = new File(file_name);
+
+		 /* This logic will make sure that the file 
+		  * gets created if it is not present at the
+		  * specified location*/
+		  if (!file.exists()) {
+		     file.createNewFile();
+		  }
+
+		  FileWriter fw = new FileWriter(file);
+		  bw = new BufferedWriter(fw);
+		  
+		  for(int i = 0; i<line.size(); i++)
+		  {
+			  bw.append(line.get(i));
+			  bw.newLine();
+		  }
+		  		  
+	      bw.close();
+
+
+		  
+	      } catch (IOException ioe) {
+		   ioe.printStackTrace();
+		}
+	      
 	}
 	
 	static Vector<Conditions> gen_local_predicates(int selection_size, HashMap<String, String> attr_types, Vector<String> attr_list, String relation, String relation_name, String [] primary_key_type, Connection c, PreparedStatement pst) throws SQLException
@@ -948,6 +1183,9 @@ public class query_generator {
 		while(rs.next())
 		{
 			String attr_name = rs.getString(1);
+			
+			if(attr_name.equals("citation_view"))
+				continue;
 			
 			String type = rs.getString(2);
 			

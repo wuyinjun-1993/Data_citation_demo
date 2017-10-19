@@ -28,15 +28,24 @@ public class Load_views_and_citation_queries {
 	
 	public static void main(String [] args) throws ClassNotFoundException, SQLException
 	{
-		Vector<Query> queries = get_views("data/Exp1/views");
+		Class.forName("org.postgresql.Driver");
+        Connection c = DriverManager
+           .getConnection(populate_db.db_url,
+       	        populate_db.usr_name,populate_db.passwd);
+        
+        PreparedStatement pst = null;
+		
+		Vector<Query> queries = get_views("data/Exp1/views", c, pst);
 		
 		for(int i = 0; i < queries.size(); i++)
 		{
 			System.out.println(queries.get(i));
 		}
+		
+		c.close();
 	}
 	
-	public static Vector<Query> get_views(String file) throws ClassNotFoundException, SQLException
+	public static Vector<Query> get_views(String file, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
 		Vector<Query> queries = new Vector<Query>();
 		
@@ -46,7 +55,7 @@ public class Load_views_and_citation_queries {
 		    while ((line = br.readLine()) != null) {
 		       // process the line.
 		    	
-		    	queries.add(get_view(line));
+		    	queries.add(get_view(line, c, pst));
 		    }
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -60,9 +69,9 @@ public class Load_views_and_citation_queries {
 		return queries;
 	}
 	
-	static Query get_view(String line) throws ClassNotFoundException, SQLException
+	static Query get_view(String line, Connection c, PreparedStatement pst) throws SQLException
 	{
-		System.out.println(line);
+//		System.out.println(line);
 		
 		String [] strs = line.split("\\" + split1);
 		
@@ -82,7 +91,7 @@ public class Load_views_and_citation_queries {
 		
 		HashMap<String, String> relation_mapping = get_relation_mapping(relation_mapping_str);
 		
-		Vector<Subgoal> relational_subgoals = split_bodies(body, relation_mapping); 
+		Vector<Subgoal> relational_subgoals = split_bodies(body, relation_mapping, c ,pst); 
 		
 		Vector<Conditions> predicate_subgoal = split_predicates(predicates);
 		
@@ -155,16 +164,9 @@ public class Load_views_and_citation_queries {
 	
 	
 	
-	static Vector<Subgoal> split_bodies(String body_str, HashMap<String, String> relation_mapping) throws SQLException, ClassNotFoundException
+	static Vector<Subgoal> split_bodies(String body_str, HashMap<String, String> relation_mapping, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String [] relations = body_str.split(",");
-		
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-		
-        PreparedStatement pst = null;
 		
         Vector<Subgoal> subgoals = new Vector<Subgoal>();
         
@@ -178,9 +180,7 @@ public class Load_views_and_citation_queries {
 			
 			subgoals.add(subgoal);
 		}
-		
-		c.close();
-		
+				
 		return subgoals;
 	}
 	

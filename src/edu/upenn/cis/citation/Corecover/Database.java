@@ -25,6 +25,8 @@ public class Database {
 
     Relation sr = new Relation("sr");
     
+    int num = 0;
+    
     for (int i = 0; i < query.getSubgoalNum(); i ++ ) {
       Subgoal subgoal = query.getSubgoal(i);
       
@@ -43,10 +45,12 @@ public class Database {
 //      System.out.println("subgoal_relation_schema:::" + subgoalRel.getSchema());
 
       // process the join
-      sr = join(sr, subgoalRel, query.getName(), i);
+      sr = join(sr, subgoalRel, query.getName(), num);
 
       Vector usefulArgs = query.getUsefulArgs(i);
       sr = sr.project(usefulArgs);
+      
+      num ++;
       
     }
 

@@ -26,33 +26,33 @@ public class Gen_query {
 	
 	public static void main(String [] args) throws ClassNotFoundException, SQLException
 	{
-		Query view = view_operation.get_view_by_id(4);
-		
-		HashMap<String, String> relation_mapping = new HashMap<String, String>(); 
-		
-		Vector<String[]> head_vars = new Vector<String[]>(); 
-		
-		Vector<String []> condition_str = new Vector<String []>();
-		
-		Vector<String[]> lambda_term_str = new Vector<String []> ();
-		
-		get_query_info(view, relation_mapping, head_vars, condition_str, lambda_term_str);
-		
-		Query view_2 = gen_query("v4'", relation_mapping, head_vars, condition_str, lambda_term_str);
-		
-		System.out.println(view);
-		
-		for(int i = 0; i<view.lambda_term.size(); i++)
-		{
-			System.out.println(view.lambda_term.get(i));
-		}
-		
-		System.out.println(view_2);
-		
-		for(int i = 0; i<view_2.lambda_term.size(); i++)
-		{
-			System.out.println(view_2.lambda_term.get(i));
-		}
+//		Query view = view_operation.get_view_by_id(4);
+//		
+//		HashMap<String, String> relation_mapping = new HashMap<String, String>(); 
+//		
+//		Vector<String[]> head_vars = new Vector<String[]>(); 
+//		
+//		Vector<String []> condition_str = new Vector<String []>();
+//		
+//		Vector<String[]> lambda_term_str = new Vector<String []> ();
+//		
+//		get_query_info(view, relation_mapping, head_vars, condition_str, lambda_term_str);
+//		
+//		Query view_2 = gen_query("v4'", relation_mapping, head_vars, condition_str, lambda_term_str);
+//		
+//		System.out.println(view);
+//		
+//		for(int i = 0; i<view.lambda_term.size(); i++)
+//		{
+//			System.out.println(view.lambda_term.get(i));
+//		}
+//		
+//		System.out.println(view_2);
+//		
+//		for(int i = 0; i<view_2.lambda_term.size(); i++)
+//		{
+//			System.out.println(view_2.lambda_term.get(i));
+//		}
 		
 	}
 	

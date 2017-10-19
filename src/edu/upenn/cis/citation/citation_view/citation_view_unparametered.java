@@ -30,7 +30,7 @@ public class citation_view_unparametered extends citation_view{
 	
 	public Tuple view_tuple = null;
 	
-	public citation_view_unparametered(String name, Tuple tuple) throws ClassNotFoundException, SQLException
+	public citation_view_unparametered(String name, Tuple tuple)
 	{
 		this.name = name;
 		
@@ -345,7 +345,7 @@ public class citation_view_unparametered extends citation_view{
 		
 		citation_view c = (citation_view) o;
 		
-		if(c.toString().equals(this.toString()))
+		if(c.hashCode() == this.hashCode())
 			return true;
 		
 		return false;
@@ -375,4 +375,11 @@ public class citation_view_unparametered extends citation_view{
 		return view_tuple;
 	}
 
+	@Override
+	public int hashCode()
+	{
+		String string = this.get_name() + populate_db.separator + this.get_table_name_string();
+		
+		return string.hashCode();
+	}
 }

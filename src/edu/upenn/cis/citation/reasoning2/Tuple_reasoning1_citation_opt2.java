@@ -793,40 +793,6 @@ public class Tuple_reasoning1_citation_opt2 {
 //		}
 //	}
 //	
-	public static Vector<Query> get_views_schema()
-	{
-	      Connection c = null;
-	      ResultSet rs = null;
-	      PreparedStatement pst = null;
-	      Vector<Query> views = new Vector<Query>();
-	      
-	      try {
-	         Class.forName("org.postgresql.Driver");
-	         c = DriverManager
-	            .getConnection(populate_db.db_url,
-	        	        populate_db.usr_name,populate_db.passwd);
-	         
-//	         pst = c.prepareStatement("SELECT *  FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = 'v2'");
-	         pst = c.prepareStatement("SELECT *  FROM view_table");
-	         rs = pst.executeQuery();
-	         
-	            while (rs.next()) {
-	            	
-	            	int view_id = rs.getInt(1);
-	            	
-	            	views.add(view_operation.get_view_by_id(view_id));
-	            	
-	            }
-	  	      c.close();
-
-	      } catch (Exception e) {
-	         e.printStackTrace();
-	         System.err.println(e.getClass().getName()+": "+e.getMessage());
-	         System.exit(0);
-	      }
-	      
-	      return views;
-	}
 
 	
 	public static void check_equality(Query view, Connection c, PreparedStatement pst) throws SQLException
@@ -1397,7 +1363,7 @@ public class Tuple_reasoning1_citation_opt2 {
 		
 		remove_conflict_duplicate_view_mapping(query);
 					
-		String sql = Query_converter.datalog2sql_citation(query, valid_lambda_terms, valid_conditions);
+		String sql = Query_converter.datalog2sql_citation(query, valid_lambda_terms, valid_conditions, c, pst);
 		
 		reasoning(c_views, query, c, pst, sql, citation_view_map1, citation_strs);
 		

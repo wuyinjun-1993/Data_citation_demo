@@ -981,31 +981,6 @@ public class Tuple_reasoning2_test {
 	    		index_str += tuple.name + populate_db.separator + tuple.get_relations();
 	    	}
 	    	
-	    	if(index_str.equals("v10|[gpcr3, object]v1|[gpcr3]v1|[gpcr]v8|[object2, gpcr3]"))
-	    	{
-	    		int y = 0;
-	    		y++;
-	    		
-	    		for(int k = 0; k<c_view_template.size(); k++)
-	    		{
-	    			citation_view_vector c_vec = c_view_template.get(k);
-	    			
-	    			if(c_vec.c_vec.toString().equals("[v1(null), v10(null,null), v8(null,null)]") && c_vec.table_name_str.equals("[gpcr][gpcr3, object][gpcr3, object2]"))
-	    			{
-	    				System.out.println(k);
-	    				
-	    				int z = 0;
-	    				z++;
-	    			}
-	    		}
-	    	}
-	    	
-	    	if(index_str.equals("v10|[gpcr3, object]v1|[gpcr]v8|[object2, gpcr3]"))
-	    	{
-	    		int y = 0;
-	    		y++;
-	    	}
-			
 			Vector<citation_view> citation_views = new Vector<citation_view>();
 			
 			for(Iterator it = v_tuples.iterator();it.hasNext();)
@@ -1058,18 +1033,6 @@ public class Tuple_reasoning2_test {
 
 		
 		Tuple_reasoning1_test.remove_duplicate_view_combinations_final(c_view_template);
-		
-		for(int k = 0; k<c_view_template.size(); k++)
-		{
-			String c_view_index = new String();
-			
-			for(int p = 0; p<c_view_template.get(k).c_vec.size(); p++)
-			{
-				c_view_index += c_view_template.get(k).c_vec.get(p).get_name() + populate_db.separator + c_view_template.get(k).c_vec.get(p).get_table_name_string();
-			}
-			
-			System.out.println("index::" + c_view_index);
-		}
 	}
 	
 	public static Vector<citation_view_vector> remove_duplicate(Vector<citation_view_vector> c_combinations)
@@ -1140,23 +1103,7 @@ public class Tuple_reasoning2_test {
 //			String str = (String) iter.next();
 			
 			citation_view_vector c_vec = c_combinations.get(i);
-			
-			if(c_vec.c_vec.toString().equals("[v1(null), v10(null,null), v8(null,null)]") && c_vec.table_name_str.equals("[gpcr][gpcr3, object][gpcr3, object2]"))
-			{
-				System.out.println(i);
-				
-				int z = 0;
-				z++;
-			}
-			
-			if(i == 209)
-			{
-				int y = 0;
-				y++;
-			}
-			
-			boolean contains = false;
-			
+						
 			citation_view_vector c_combination = c_combinations.get(i);
 			
 //			for(int j = 0; j<c_combinations.size(); j++)
@@ -1171,12 +1118,6 @@ public class Tuple_reasoning2_test {
 //					if((c_combination.index_vec.containsAll(curr_combination.index_vec) && c_combination.index_vec.size() > curr_combination.index_vec.size()))
 					if(Tuple_reasoning1.view_vector_contains(c_combination, curr_combination)&& Tuple_reasoning1.table_names_contains(c_combination, curr_combination) && c_combination.index_vec.size() > curr_combination.index_vec.size())
 					{
-						
-						if(c_combination.toString().equals("v1(null)*v10(null,null)*v8(null,null)"))
-						{
-							int y = 0;
-							y++;
-						}
 						
 //						if(c_combination.table_names.equals(curr_combination.table_names))
 						{

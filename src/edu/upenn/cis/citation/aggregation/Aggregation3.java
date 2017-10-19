@@ -30,14 +30,19 @@ import edu.upenn.cis.citation.data_structure.StringList;
 import edu.upenn.cis.citation.data_structure.Unique_StringList;
 import edu.upenn.cis.citation.gen_citation.gen_citation1;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_test;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_min_test;
 
 public class Aggregation3 {
 	
+	public static ArrayList<HashMap<String, HashSet<String>>> author_lists = new ArrayList<HashMap<String, HashSet<String>>>();
 	
 	public static HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping = new HashMap<String, HashMap<String, HashSet<String>>>();
+	
+	public static ArrayList<citation_view_vector> curr_res = new ArrayList<citation_view_vector>();
 	
 	public static void do_aggregate(ArrayList<citation_view_vector> curr_res, ArrayList<citation_view_vector> c_views, int seq, ArrayList<HashMap<String, HashSet<String>> > author_list, ArrayList<HashMap<String, Integer>> view_query_mapping, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, StringList view_list, HashMap<String, Boolean> full_flag, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
@@ -69,6 +74,8 @@ public class Aggregation3 {
 			
 			String id1 = curr_res.get(i).view_name_str;
 			
+			String t_id1 = curr_res.get(i).table_name_str;
+			
 			int j = 0;
 			
 			citation_view_vector c_vector = null;
@@ -77,9 +84,11 @@ public class Aggregation3 {
 			{
 				String id2 = c_views.get(j).view_name_str;
 				
+				String t_id2 = c_views.get(j).table_name_str;
+				
 				c_vector = c_views.get(j);
 				
-				if(id1.equals(id2))
+				if(id1.equals(id2) && t_id1.equals(t_id2))
 				{
 					break;
 				}
@@ -464,9 +473,9 @@ public class Aggregation3 {
 					
 					
 					if(tuple_level)
-						Tuple_reasoning1_test.update_valid_citation_combination(c_view, rs, start_pos);
+						Tuple_reasoning1_full_test.update_valid_citation_combination(c_view, rs, start_pos);
 					else
-						Tuple_reasoning2_test.update_valid_citation_combination(c_view, rs, start_pos);
+						Tuple_reasoning2_full_test.update_valid_citation_combination(c_view, rs, start_pos);
 						
 					do_aggregate(curr_res, c_view, i, author_lists, view_query_mapping, author_mapping, max_num, query_ids, query_lambda_str, view_list, full_flag, c, pst);
 					
@@ -550,10 +559,8 @@ public class Aggregation3 {
 				
 		rs.beforeFirst();
 		
-		ArrayList<HashMap<String, HashSet<String>>> author_lists = new ArrayList<HashMap<String, HashSet<String>>>();
-		
-		ArrayList<citation_view_vector> curr_res = new ArrayList<citation_view_vector>();
-				
+//		ArrayList<HashMap<String, HashSet<String>>> author_lists = new ArrayList<HashMap<String, HashSet<String>>>();
+						
 		for(Iterator iter = intervals.iterator(); iter.hasNext();)
 		{
 			int [] interval = (int[]) iter.next();
@@ -569,11 +576,39 @@ public class Aggregation3 {
 					rs.absolute(i + 1);
 					
 					if(tuple_level)
-						Tuple_reasoning1_test.update_valid_citation_combination(c_view, rs, start_pos);
+						Tuple_reasoning1_full_test.update_valid_citation_combination(c_view, rs, start_pos);
 					else
-						Tuple_reasoning2_test.update_valid_citation_combination(c_view, rs, start_pos);
+						Tuple_reasoning2_full_test.update_valid_citation_combination(c_view, rs, start_pos);
 					
 					do_aggregate(curr_res, c_view, i, author_lists, view_query_mapping, author_mapping, max_num, query_ids, query_lambda_str, view_list, full_flag, c, pst);
+					
+					for(int k = 0; k<curr_res.size(); k++)
+					{
+						citation_view_vector c_vector = curr_res.get(k);
+						
+						if(c_vector.table_name_str.equals("[introduction, object][object0, introduction]"))
+						{
+							if(c_vector.c_vec.get(0).get_name().equals("v4") && c_vector.c_vec.get(1).get_name().equals("v5"))
+							{
+								
+								if(author_lists.get(k).get("author").contains("Kouji Matsushima"))
+								{
+									int y = 0;
+									y++;
+								}
+								
+								citation_view_parametered curr_view = (citation_view_parametered) c_vector.c_vec.get(0);
+								
+								String value = curr_view.map.get("object|object_id");
+								
+								int value_id = Integer.valueOf(value);
+								
+								if(value_id >= 58 && value_id <= 75)							
+									System.out.println(c_vector);
+							}
+						}
+						
+					}
 					
 //					System.out.println(curr_res);
 				}

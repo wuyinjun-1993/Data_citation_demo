@@ -11,7 +11,7 @@ import edu.upenn.cis.citation.Operation.Conditions;
 
 public class Tuple {
   public String name = null;
-  Vector args = null;  // a list of arguments
+  public Vector args = null;  // a list of arguments
   public Mapping phi = null;  // mapping from query args to the database deriving
 		       // the tuple
   
@@ -172,7 +172,6 @@ public class Tuple {
   public HashSet getCore() {
     return core;
   }
-  
   public HashSet get_relations()
   {
 	  
@@ -265,12 +264,13 @@ public class Tuple {
    * Overrides the hash function Object.hasCode().  As an item in a
    * HashSet collection, called when HashSet.equals() is called.
    */
+  @Override
   public int hashCode() {
 	  
 	  
 	  if(this.mapSubgoals_str == null)
 	  {
-		  String hash_string = this.getName() + args.toString();
+		  String hash_string = this.getName();
 		  
 //	    int hashCode = this.getName().hashCode();
 //	    for (int i = 0; i < args.size(); i ++) {
@@ -288,6 +288,14 @@ public class Tuple {
     
     return hash_string.hashCode();
   }
+  
+  @Override
+  public boolean equals(Object obj)
+  {
+	  Tuple tuple = (Tuple) obj;
+	  
+	  return tuple.hashCode() == this.hashCode();
+  }
 
   public String toString() {
     StringBuffer result = new StringBuffer();
@@ -298,5 +306,23 @@ public class Tuple {
     /*if (phi != null)
       result.append("; " + phi.toString());*/
     return (result.toString());
+  }
+  
+  @Override
+  public Object clone()
+  {
+	  
+	  String name = this.name;
+	  
+	  Vector<Argument> args = (Vector<Argument>) this.args.clone();
+	    Mapping phi  = (Mapping) this.phi.clone();
+	    Mapping phi_str = new Mapping();
+	    
+	    phi_str.map.putAll(this.phi_str.map);
+	    
+	    HashMap mapSubgoals = (HashMap) this.mapSubgoals.clone();
+	    HashMap mapSubgoals_str = (HashMap) this.mapSubgoals_str.clone();
+	  
+	  return new Tuple(name, args, phi, phi_str, mapSubgoals);
   }
 }

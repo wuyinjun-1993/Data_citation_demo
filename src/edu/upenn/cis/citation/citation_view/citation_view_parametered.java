@@ -294,7 +294,7 @@ public class citation_view_parametered extends citation_view{
 //		get_queries();
 	}
 	
-	public citation_view_parametered(String name, Query view, Tuple tuple) throws ClassNotFoundException, SQLException 
+	public citation_view_parametered(String name, Query view, Tuple tuple)
 	{
 		
 		this.name = name;
@@ -625,7 +625,7 @@ public class citation_view_parametered extends citation_view{
 		
 		citation_view c = (citation_view) o;
 		
-		if(c.toString().equals(this.toString()))
+		if(c.hashCode() == this.hashCode())
 			return true;
 		
 		return false;
@@ -653,6 +653,14 @@ public class citation_view_parametered extends citation_view{
 	public Tuple get_view_tuple() {
 		// TODO Auto-generated method stub
 		return view_tuple;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		String string = this.get_name() + populate_db.separator + this.get_table_name_string();
+		
+		return string.hashCode();
 	}
 	
 

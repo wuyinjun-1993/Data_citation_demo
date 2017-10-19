@@ -1648,40 +1648,6 @@ public class Tuple_reasoning1_test {
 //		}
 //	}
 //	
-	public static Vector<Query> get_views_schema()
-	{
-	      Connection c = null;
-	      ResultSet rs = null;
-	      PreparedStatement pst = null;
-	      Vector<Query> views = new Vector<Query>();
-	      
-	      try {
-	         Class.forName("org.postgresql.Driver");
-	         c = DriverManager
-	            .getConnection(populate_db.db_url,
-	        	        populate_db.usr_name,populate_db.passwd);
-	         
-//	         pst = c.prepareStatement("SELECT *  FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = 'v2'");
-	         pst = c.prepareStatement("SELECT *  FROM view_table");
-	         rs = pst.executeQuery();
-	         
-	            while (rs.next()) {
-	            	
-	            	int view_id = rs.getInt(1);
-	            	
-	            	views.add(view_operation.get_view_by_id(view_id));
-	            	
-	            }
-	  	      c.close();
-
-	      } catch (Exception e) {
-	         e.printStackTrace();
-	         System.err.println(e.getClass().getName()+": "+e.getMessage());
-	         System.exit(0);
-	      }
-	      
-	      return views;
-	}
 	
 	static String get_args_web_view(String subgoal, Connection c, PreparedStatement pst) throws SQLException
 	{

@@ -97,7 +97,7 @@ public class citation_view_vector {
 		
 		for(int i = 0; i< c_vec.size(); i++)
 		{
-			index_str += c_vec.get(i).toString();
+			index_str += "(" + c_vec.get(i).get_name() + ")";
 			
 			index_vec.add(c_vec.get(i).toString());
 			
@@ -146,7 +146,7 @@ public class citation_view_vector {
 		
 		for(int i = 0; i< vec_new.size(); i++)
 		{
-			index_str_new += vec_new.get(i).toString();
+			index_str_new += "(" + vec_new.get(i).get_name() + ")";
 			
 			index_new.add(vec_new.get(i).toString());
 			
@@ -367,7 +367,11 @@ public class citation_view_vector {
 		
 		table_name_str = c.get_table_name_string();
 		
-		index_str = c.toString();
+		index_str = "(" + c.get_name() + ")";
+		
+		view_name_str = new String();
+		
+		view_name_str = c.get_name();
 		
 		head_variables.addAll(c.get_view_tuple().getArgs());
 		
@@ -389,7 +393,150 @@ public class citation_view_vector {
 	
 	public static citation_view_vector merge(citation_view_vector vec, citation_view_vector c)
 	{
-		return vec.merge(c);
+		citation_view_vector c1 = vec.clone();
+		
+		citation_view_vector c2 = c.clone();
+		
+		Vector<citation_view> new_citation_vec = new Vector<citation_view>();
+		
+		HashSet<String> tables = new HashSet<String>();
+		
+		tables.addAll(vec.table_names);
+		
+		tables.addAll(c.table_names);
+		
+		HashSet<Argument> args = new HashSet<Argument>();
+		
+		args.addAll(vec.head_variables);
+		
+		args.addAll(c.head_variables);
+		
+		int i = 0;
+		
+		int j = 0;
+		
+		String index_str = new String();
+		
+		Vector<String> index_vec = new Vector<String>();
+		
+		String view_name_str = new String();
+		
+		String table_name_str = new String();
+		
+		while(i < c1.c_vec.size() && j < c2.c_vec.size())
+		{
+			citation_view v1 = c1.c_vec.get(i);
+			
+			citation_view v2 = c2.c_vec.get(j);
+			
+			String k1 = v1.get_name() + v1.get_table_name_string();
+			
+			String k2 = v2.get_name() + v2.get_table_name_string();
+			
+			if(k1.compareTo(k2) < 0)
+			{
+				new_citation_vec.add(v1);
+				
+				index_str += "(" + v1.get_name() + ")";
+				
+				index_vec.add(v1.toString());
+				
+				view_name_str += v1.toString().replaceFirst("\\(.*\\)", "");
+				
+				table_name_str += v1.get_table_name_string();
+				
+				i++;
+			}
+			else
+			{
+				if(k1.compareTo(k2) > 0)
+				{
+					new_citation_vec.add(v2);
+					
+					index_str += "(" + v2.get_name() + ")";
+					
+					index_vec.add(v2.toString());
+					
+					view_name_str += v2.toString().replaceFirst("\\(.*\\)", "");
+					
+					table_name_str += v2.get_table_name_string();
+					
+					j++;
+				}
+				else
+				{
+					new_citation_vec.add(v1);
+					
+					index_str += "(" + v1.get_name() + ")";
+					
+					index_vec.add(v1.toString());
+					
+					view_name_str += v1.toString().replaceFirst("\\(.*\\)", "");
+					
+					table_name_str += v1.get_table_name_string();
+					
+					i++;
+					
+					j++;
+				}
+			}
+		}
+		
+		if(i < c1.c_vec.size())
+		{
+			while(i < c1.c_vec.size())
+			{
+				citation_view v1 = c1.c_vec.get(i);
+				
+				new_citation_vec.add(v1);
+				
+				index_str += "(" + v1.get_name() + ")";
+				
+				index_vec.add(v1.toString());
+				
+				view_name_str += v1.toString().replaceFirst("\\(.*\\)", "");
+				
+				table_name_str += v1.get_table_name_string();
+				
+				i++;
+			}
+		}
+		else
+		{
+			if(j < c2.c_vec.size())
+			{
+				while(j < c2.c_vec.size())
+				{
+					citation_view v2 = c2.c_vec.get(j);
+					
+					new_citation_vec.add(v2);
+					
+					index_str += "(" + v2.get_name() + ")";
+					
+					index_vec.add(v2.toString());
+					
+					view_name_str += v2.toString().replaceFirst("\\(.*\\)", "");
+					
+					table_name_str += v2.get_table_name_string();
+					
+					j++;
+				}
+			}
+		}
+		
+		citation_view_vector merged_citation_view_vectors = new citation_view_vector(new_citation_vec, index_vec, tables);
+		
+		merged_citation_view_vectors.head_variables = args;
+		
+		merged_citation_view_vectors.index_str = index_str;
+		
+		merged_citation_view_vectors.index_vec = index_vec;
+		
+		merged_citation_view_vectors.table_name_str = table_name_str;
+		
+		merged_citation_view_vectors.view_name_str = view_name_str;
+		
+		return merged_citation_view_vectors;
 	}
 	
 	public citation_view_vector merge(citation_view_vector c)
@@ -398,12 +545,7 @@ public class citation_view_vector {
 		
 		citation_view_vector insert_covering_set = c.clone();
 		
-		for(int i = 0; i<insert_covering_set.c_vec.size(); i++)
-		{
-			updated_covering_set = updated_covering_set.merge(insert_covering_set.c_vec.get(i));
-		}
-		
-		return updated_covering_set;
+		return merge(updated_covering_set, insert_covering_set);
 	}
 	
 //	static citation_view_vector merge_vector(citation_view_vector vec1, citation_view_vector vec2)
@@ -522,13 +664,28 @@ public class citation_view_vector {
 //				return false;
 //		}
 		
-		return c_vec.index_str.equals(this.index_str);
+		return c_vec.hashCode() == this.hashCode();
 	}
 	
 	@Override
 	public int hashCode()
 	{
-		return this.index_str.hashCode();
+		return this.get_unique_string_id().hashCode();
+	}
+	
+	public String get_unique_string_id()
+	{
+		String string = new String();
+		
+		for(int i = 0; i<c_vec.size(); i++)
+		{
+			if(i >= 1)
+				string += populate_db.separator;
+			
+			string += c_vec.get(i).get_name() + c_vec.get(i).get_table_name_string(); 
+		}
+		
+		return string;
 	}
 
 }

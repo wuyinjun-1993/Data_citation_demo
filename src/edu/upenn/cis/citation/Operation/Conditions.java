@@ -2,9 +2,14 @@ package edu.upenn.cis.citation.Operation;
 import java.util.HashMap;
 import java.util.Vector;
 
+import org.apache.commons.lang3.StringUtils;
+
 import edu.upenn.cis.citation.Corecover.Argument;
+import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Corecover.Subgoal;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
+import edu.upenn.cis.citation.citation_view.Head_strs;
+import edu.upenn.cis.citation.reasoning1.schema_reasoning;
 
 public class Conditions {
 	
@@ -314,6 +319,160 @@ public class Conditions {
 	public int hashCode()
 	{
 		return this.arg1.hashCode() * 10000 + this.subgoal1.hashCode()*1000 + this.op.hashCode()*100 + this.arg2.hashCode()*10 + this.subgoal2.hashCode();
+	}
+	
+	
+	public static boolean check_predicate_match(Conditions condition1, Conditions condition2)
+	{
+		if(condition1.arg2.isConst())
+		{
+			if(condition2.arg2.isConst() && condition1.subgoal1.equals(condition2.subgoal1) && condition1.arg1.equals(condition2.arg1))
+			{
+				return true;
+			}
+		}
+		else
+		{
+			if(!condition2.arg2.isConst() && condition1.subgoal1.equals(condition2.subgoal1) && condition1.subgoal2.equals(condition2.subgoal2) && condition1.arg1.equals(condition2.arg1) && condition1.arg2.equals(condition2.arg2))
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	static boolean check_smaller_greater_values(Operation op1, Operation op2)
+	{
+		if(op1.toString().equals(">") || op1.toString().equals(">="))
+		{
+			if(op2.toString().equals(">") || op2.toString().equals(">=") || op2.toString().equals("="))
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	static boolean check_greater_smaller_values(Operation op1, Operation op2)
+	{
+		if(op1.toString().equals("<") || op1.toString().equals("<="))
+		{
+			if(op2.toString().equals("<") || op2.toString().equals("<=") || op2.toString().equals("="))
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	//condition1: view condition;;condition2:query condition
+	public static boolean check_predicates_satisfy(Conditions condition1, Conditions condition2, Query query, HashMap<Head_strs, String> attr_type_mapping)
+	{
+		if(condition1.arg2.isConst())
+		{
+			String string1 = condition1.arg2.name;
+			
+			String string2 = condition2.arg2.name;
+			
+			String relation = condition1.subgoal1;
+			
+			Operation op1 = condition1.op;
+			
+			Operation op2 = condition2.op;
+			
+			String arg_name = condition1.arg1.name.substring(condition1.arg1.name.indexOf(populate_db.separator) + 1, condition1.arg1.name.length());
+			
+			String mapped_relation = query.subgoal_name_mapping.get(relation);
+			
+			Vector<String> vec_str = new Vector<String>();
+			
+			vec_str.add(mapped_relation);
+			
+			vec_str.add(arg_name);
+			
+			Head_strs head = new Head_strs(vec_str);
+			
+			String type = attr_type_mapping.get(head);
+			
+			if(schema_reasoning.numberic_type.contains(type))
+			{
+				double value1 = Double.valueOf(string1);
+				
+				double value2 = Double.valueOf(string1);
+				
+				if(value1 < value2)
+				{
+					return check_smaller_greater_values(op1, op2);
+				}
+				else
+				{
+					if(value1 > value2)
+					{
+						return check_greater_smaller_values(op1, op2);
+					}
+					else
+					{
+						if(op1.equals(op2))
+							return true;
+						else
+							return false;
+					}
+				}
+			}
+			else
+			{
+				if(string1.compareTo(string2) < 0)
+				{
+					
+					return check_smaller_greater_values(op1, op2);
+					
+				}
+				else
+				{
+					if(string1.compareTo(string2) > 0)
+					{
+						return check_greater_smaller_values(op1, op2);
+					}
+					else
+					{
+						if(op1.equals(op2))
+							return true;
+						else
+							return false;
+					}
+				}
+			}
+		}
+		else
+		{
+			Operation op1 = condition1.op;
+			
+			Operation op2 = condition2.op;
+			
+			if(op1.equals(op2))
+				return true;
+			else
+			{
+				if(op1.toString().equals(">="))
+				{
+					if(op2.toString().equals(">") || op2.toString().equals("="))
+						return true;
+				}
+				else
+				{
+					if(op1.toString().equals("<="))
+					{
+						if(op2.toString().equals("<") || op2.toString().equals("="))
+							return true;
+					}
+				}
+			}
+			
+			return false;
+		}
 	}
 	
 }

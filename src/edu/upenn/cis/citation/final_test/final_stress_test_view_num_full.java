@@ -213,6 +213,8 @@ public class final_stress_test_view_num_full {
 				System.out.println("new query");
 				
 				reset(c1, pst);
+				
+				reset(c2, pst);
 			}
 						
 			Query query = null;
@@ -221,12 +223,13 @@ public class final_stress_test_view_num_full {
 
 			
 			try{
-				query = query_storage.get_query_by_id(1);
+				query = query_storage.get_query_by_id(1, c2, pst);
 			}
 			catch(Exception e)
 			{
-				query = query_generator.gen_query(k, c1, pst);
-				query_storage.store_query(query, new Vector<Integer>());
+				query = query_generator.gen_query(k, c2, pst);
+
+				query_storage.store_query(query, new Vector<Integer>(), c2, pst);
 				System.out.println(query);
 			}
 			

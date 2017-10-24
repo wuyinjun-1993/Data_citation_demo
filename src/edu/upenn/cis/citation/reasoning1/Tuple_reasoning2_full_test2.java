@@ -990,6 +990,14 @@ public class Tuple_reasoning2_full_test2 {
 		
 		max_author_num.put("author", -1);
 		
+		max_author_num.put("info", -1);
+		
+		max_author_num.put("Investigator", -1);
+		
+		max_author_num.put("Program", -1);
+		
+		max_author_num.put("Funding", -1);
+		
 		tuple_num = 0;
 						
 		citation_queries.clear();
@@ -1843,7 +1851,7 @@ public class Tuple_reasoning2_full_test2 {
 						Resultset_prefix_col_num = query.head.args.size();
 						
 						reasoning_single_tuple(curr_views, query, rs, c_view_template, curr_head_vars);
-						
+												
 						covering_set_num += c_view_template.size();
 				
 						old_value = curr_str;

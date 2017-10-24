@@ -47,6 +47,11 @@ public class populate_db {
 	public static String db_url2 = "jdbc:postgresql://localhost:5432/test2";
 	
 	public static String db_url3 = "jdbc:postgresql://localhost:5432/test3";
+	
+	public static String dblp_url1 = "jdbc:postgresql://localhost:5432/dblp";
+	
+	public static String dblp_url2 = "jdbc:postgresql://localhost:5432/dblp";
+
 
 	
 //	public static String db_url = "jdbc:postgresql://localhost:5432/example";

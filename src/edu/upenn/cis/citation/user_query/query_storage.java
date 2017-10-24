@@ -33,7 +33,7 @@ public class query_storage {
 		
 		int_list.add(1);
 		
-		store_query(q, int_list);
+//		store_query(q, int_list);
 	}
 	
 	static Query gen_query() throws SQLException, ClassNotFoundException
@@ -156,14 +156,8 @@ public class query_storage {
 		
 	}
 	
-	public static Query get_query_by_id(int id) throws SQLException, ClassNotFoundException
+	public static Query get_query_by_id(int id, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-        
-        PreparedStatement pst = null;
         
         Vector<Argument> head_var = new Vector<Argument>();
         
@@ -186,10 +180,7 @@ public class query_storage {
         Subgoal head = new Subgoal("q" + id, head_var);
         
         Query view = new Query("q" + id, head, subgoals,lambda_terms, conditions, subgoal_name_mapping);
-        
-        
-        c.close();
-                
+                        
         return view;
 	}
 	
@@ -484,14 +475,8 @@ public class query_storage {
 	}
 	
 	
-	public static int store_query(Query query, Vector<Integer> id_list) throws SQLException, ClassNotFoundException
+	public static int store_query(Query query, Vector<Integer> id_list, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
-		
-		Connection c = null;
-	      PreparedStatement pst = null;
-		Class.forName("org.postgresql.Driver");
-	    c = DriverManager
-	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
 	    
 	    query_graph q_graph = new query_graph(query);
 	    
@@ -512,9 +497,7 @@ public class query_storage {
 			store_query_predicates(query, query_num, c, pst);
 			
 	    }
-	    
-	    c.close();
-	    
+	    	    
 	    return id;
 		
 		
@@ -595,6 +578,15 @@ public class query_storage {
 	static void store_query_predicates(Query query, int id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String sql = "insert into user_query_conditions values ('" + id + "','" + query.lambda_term.get(0) + "')";
+		
+		pst = c.prepareStatement(sql);
+		
+		pst.execute();
+	}
+	
+	public static void update_query_predicates(Query query, int id, Connection c, PreparedStatement pst) throws SQLException
+	{
+		String sql = "update user_query_conditions set string = '" + query.lambda_term.get(0) + "' where query_id = " + id;
 		
 		pst = c.prepareStatement(sql);
 		

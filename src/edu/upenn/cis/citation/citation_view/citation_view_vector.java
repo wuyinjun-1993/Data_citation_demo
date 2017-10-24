@@ -99,7 +99,7 @@ public class citation_view_vector {
 		{
 			index_str += "(" + c_vec.get(i).get_name() + ")";
 			
-			index_vec.add(c_vec.get(i).toString());
+			index_vec.add(c_vec.get(i).get_name());
 			
 			view_name_str += c_vec.get(i).toString().replaceFirst("\\(.*\\)", "");
 			
@@ -439,7 +439,7 @@ public class citation_view_vector {
 				
 				index_str += "(" + v1.get_name() + ")";
 				
-				index_vec.add(v1.toString());
+				index_vec.add(v1.get_name());
 				
 				view_name_str += v1.toString().replaceFirst("\\(.*\\)", "");
 				
@@ -455,7 +455,7 @@ public class citation_view_vector {
 					
 					index_str += "(" + v2.get_name() + ")";
 					
-					index_vec.add(v2.toString());
+					index_vec.add(v2.get_name());
 					
 					view_name_str += v2.toString().replaceFirst("\\(.*\\)", "");
 					
@@ -469,7 +469,7 @@ public class citation_view_vector {
 					
 					index_str += "(" + v1.get_name() + ")";
 					
-					index_vec.add(v1.toString());
+					index_vec.add(v1.get_name());
 					
 					view_name_str += v1.toString().replaceFirst("\\(.*\\)", "");
 					
@@ -492,7 +492,7 @@ public class citation_view_vector {
 				
 				index_str += "(" + v1.get_name() + ")";
 				
-				index_vec.add(v1.toString());
+				index_vec.add(v1.get_name());
 				
 				view_name_str += v1.toString().replaceFirst("\\(.*\\)", "");
 				
@@ -513,7 +513,7 @@ public class citation_view_vector {
 					
 					index_str += "(" + v2.get_name() + ")";
 					
-					index_vec.add(v2.toString());
+					index_vec.add(v2.get_name());
 					
 					view_name_str += v2.toString().replaceFirst("\\(.*\\)", "");
 					

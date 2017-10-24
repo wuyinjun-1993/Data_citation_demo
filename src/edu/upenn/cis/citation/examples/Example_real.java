@@ -20,7 +20,7 @@ public class Example_real {
 		
 		Class.forName("org.postgresql.Driver");
         Connection c = DriverManager
-           .getConnection(populate_db.db_url,
+           .getConnection(populate_db.dblp_url1,
        	        populate_db.usr_name,populate_db.passwd);
         
         PreparedStatement pst = null;

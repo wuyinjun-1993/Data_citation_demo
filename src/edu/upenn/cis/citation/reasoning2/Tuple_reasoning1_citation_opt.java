@@ -113,7 +113,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 		
 		
 		
-		Query q = query_storage.get_query_by_id(1);
+		Query q = query_storage.get_query_by_id(1, c, pst);
 		
 
 		
@@ -1350,7 +1350,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			
-			query_storage.store_query(query, new Vector<Integer>());
+//			query_storage.store_query(query, new Vector<Integer>());
 			
 			e.printStackTrace();
 		}

@@ -117,7 +117,7 @@ public class Tuple_reasoning1_citation_opt2 {
 		
 		
 		
-		Query q = query_storage.get_query_by_id(1);
+		Query q = query_storage.get_query_by_id(1, c, pst);
 		
 
 		
@@ -1417,7 +1417,7 @@ public class Tuple_reasoning1_citation_opt2 {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			
-			query_storage.store_query(query, new Vector<Integer>());
+//			query_storage.store_query(query, new Vector<Integer>());
 			
 			e.printStackTrace();
 		}

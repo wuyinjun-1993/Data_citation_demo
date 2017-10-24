@@ -1128,6 +1128,14 @@ public class schema_reasoning {
 		aggregation_time = 0.0;
 		
 		max_author_num.put("author", -1);
+		
+		max_author_num.put("info", -1);
+		
+		max_author_num.put("Investigator", -1);
+		
+		max_author_num.put("Program", -1);
+		
+		max_author_num.put("Funding", -1);
 								
 		citation_queries.clear();
 		

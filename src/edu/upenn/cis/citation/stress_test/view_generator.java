@@ -80,7 +80,7 @@ public class view_generator {
 	
 	static int const_range = 20;
 	
-	static double with_predicate = 0.5;
+	static double with_predicate = 0.3;
 	
 	public static void initial()
 	{
@@ -1267,7 +1267,7 @@ public class view_generator {
 		return queries;
 	}
 	
-	static void inputquery_conditions(HashMap<String, int[]> selected_ids, HashMap<String, Integer> indexes)
+	public static void inputquery_conditions(HashMap<String, int[]> selected_ids, HashMap<String, Integer> indexes)
 	{
 		
 		String file1 = "query_selected_values.txt";
@@ -2655,9 +2655,13 @@ public class view_generator {
 			int index = r.nextInt(attr_list.size());
 			
 //			if(query_generator.parameterizable_attri.get(relation).contains(attr_list.get(index)))
-//			if(!id_set.contains(index))
+			if(!id_set.contains(index))
 			{
-				id_set.add(index);
+				id_set.add(i);
+			}
+			else
+			{
+				i--;
 			}
 //			
 		}
@@ -2930,7 +2934,7 @@ public class view_generator {
 		
 		double d = Math.random();
 		
-		if(d >= with_predicate)
+		if(d < with_predicate)
 		{
 			gen_one_local_predicate(view, c, pst, query);
 		}
@@ -2994,6 +2998,7 @@ public class view_generator {
 									
 			Vector<Argument> head_vars = gen_all_head_vars(relation, attr_list, c, pst);//(relation, relation, attr_list, head_size, c, pst);//(relation, attr_list, c, pst);
 			
+//			Vector<Argument> head_vars = gen_head_vars(relation, relation, attr_list, head_size, c, pst);//(relation, attr_list, head_size, c, pst);//(relation, relation, attr_list, head_size, c, pst);//(relation, attr_list, c, pst);
 			
 //			Vector<Lambda_term> l_terms = gen_lambda_terms(head_vars, relation, c, pst);
 			
@@ -3547,7 +3552,7 @@ public class view_generator {
 	public static boolean gen_one_local_predicate(Query view, Connection c, PreparedStatement pst, Query query) throws SQLException
 	{		
 		
-		Random r = new Random();
+		Random r = new Random(10000);
 
 		int index = r.nextInt(view.body.size());
 		

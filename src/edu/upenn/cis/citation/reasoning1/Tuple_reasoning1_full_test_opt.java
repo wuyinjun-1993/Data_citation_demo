@@ -140,6 +140,8 @@ public class Tuple_reasoning1_full_test_opt {
 	
 	public static int unique_tuple_num = 0;
 	
+	static HashMap<String, Integer> q_subgoal_id = new HashMap<String, Integer>();
+	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException, IOException, InterruptedException, JSONException
 	{
 		HashSet<String> sets = new HashSet<String>();
@@ -1183,6 +1185,14 @@ public class Tuple_reasoning1_full_test_opt {
 		
 		max_author_num.put("author", -1);
 		
+		max_author_num.put("info", -1);
+		
+		max_author_num.put("Investigator", -1);
+		
+		max_author_num.put("Program", -1);
+		
+		max_author_num.put("Funding", -1);
+		
 		view_tuple_mapping.clear();
 		
 		tuple_num = 0;
@@ -1190,6 +1200,8 @@ public class Tuple_reasoning1_full_test_opt {
 		citation_queries.clear();
 		
 		group_num = 0;
+		
+		q_subgoal_id.clear();
 	}
 	
 	public static String get_full_query(String query) throws ClassNotFoundException, SQLException
@@ -1645,6 +1657,16 @@ public class Tuple_reasoning1_full_test_opt {
 		}
 	}
 	
+	static void build_subgoal_id_mapping(Query q)
+	{
+		for(int i = 0; i<q.body.size(); i++)
+		{
+			Subgoal subgoal = (Subgoal) q.body.get(i);
+			
+			q_subgoal_id.put(subgoal.name, i);
+		}
+	}
+	
 	public static HashSet<Tuple> pre_processing(Vector<Query> views, Query q, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
 	
@@ -1657,6 +1679,7 @@ public class Tuple_reasoning1_full_test_opt {
 			view_mapping.put(views.get(k).name, views.get(k));
 		}
 
+		build_subgoal_id_mapping(q);
 		
 //	    q = q.minimize();
 
@@ -2166,7 +2189,7 @@ public class Tuple_reasoning1_full_test_opt {
 					}
 				}
 				
-				ArrayList<String[]> c_units = new ArrayList<String[]>();
+				ArrayList<HashSet<String>> c_units = new ArrayList<HashSet<String>>();
 				for(int i = query.head.args.size(); i<query.body.size() + query.head.args.size();i++)
 				{
 					String citation_vec = rs.getString(i + 1);
@@ -2179,7 +2202,10 @@ public class Tuple_reasoning1_full_test_opt {
 					}
 					
 					String[] c_unit= citation_vec.split("\\"+ populate_db.separator);
-					c_units.add(c_unit);
+					
+					HashSet<String> c_unit_set = new HashSet<String>(Arrays.asList(c_unit));
+					
+					c_units.add(c_unit_set);
 				}
 
 				
@@ -2257,6 +2283,8 @@ public class Tuple_reasoning1_full_test_opt {
 //					output_vec(c_unit_vec);				
 					
 					get_valid_citation_combination(c_view_template, c_unit_vec,query, all_head_vars);
+					
+//					System.out.println(c_view_template);
 					
 					covering_set_num += c_view_template.size();
 					
@@ -3568,7 +3596,7 @@ public class Tuple_reasoning1_full_test_opt {
 		return correct;
 	}
 	
-	public static ArrayList<ArrayList<Tuple>> get_citation_units_condition(ArrayList<String[]> c_units, int start_pos, Query q, ArrayList<HashSet<Argument>> all_head_vars, HashMap<String, ArrayList<Tuple>> curr_tuple_mapping) throws ClassNotFoundException, SQLException
+	public static ArrayList<ArrayList<Tuple>> get_citation_units_condition(ArrayList<HashSet<String>> c_units, int start_pos, Query q, ArrayList<HashSet<Argument>> all_head_vars, HashMap<String, ArrayList<Tuple>> curr_tuple_mapping) throws ClassNotFoundException, SQLException
 	{
 		ArrayList<ArrayList<Tuple>> c_views = new ArrayList<ArrayList<Tuple>>();
 		
@@ -3584,14 +3612,16 @@ public class Tuple_reasoning1_full_test_opt {
 			
 			HashSet<Argument> curr_head_vars = new HashSet<Argument>();
 			
-			String [] c_unit_str = c_units.get(i);
+			HashSet<String> c_unit_str = c_units.get(i);
 			
 			ArrayList<Tuple> curr_valid_tuples = new ArrayList<Tuple>();
 			
-			for(int j = 0; j<c_unit_str.length; j++)
+			for(Iterator it = c_unit_str.iterator(); it.hasNext();)
 			{
+				
+				String annotation_name = (String) it.next();
 								
-				String c_view_name = c_unit_str[j].split("\\(")[0];
+				String c_view_name = annotation_name.split("\\(")[0];
 		
 //				ArrayList<Tuple> available_tuples = curr_tuple_mapping.get(c_view_name);
 					
@@ -3611,11 +3641,48 @@ public class Tuple_reasoning1_full_test_opt {
 						
 						valid_tuples.retainAll(available_tuples);
 						
-						curr_valid_tuples.addAll(valid_tuples);
+						
 						
 						for(int k = 0; k<valid_tuples.size(); k++)
 						{
-							Vector<Argument> head_args = valid_tuples.get(k).getArgs();
+							
+							Tuple curr_tuple = valid_tuples.get(k);
+							
+							HashSet<Subgoal> subgoals = curr_tuple.getTargetSubgoals();
+							
+							int counter = 0;
+							
+							if(subgoals.size() > 1)
+							{
+								for(Iterator curr_iter = subgoals.iterator(); curr_iter.hasNext();)
+								{
+									Subgoal curr_subgoal = (Subgoal) curr_iter.next();
+									
+									int subgoal_id = q_subgoal_id.get(curr_subgoal.name);
+									
+									HashSet<String> curr_c_unit_str = c_units.get(subgoal_id);
+									
+									if(!curr_c_unit_str.contains(annotation_name))
+									{
+										break;
+									}
+									
+									counter ++;
+								}
+								
+								if(counter < subgoals.size())
+								{
+									valid_tuples.remove(k);
+									
+									k --;
+									
+									continue;
+								}
+							}
+							
+							
+							
+							Vector<Argument> head_args = curr_tuple.getArgs();
 							
 							curr_head_vars.addAll(head_args);
 							
@@ -3624,6 +3691,8 @@ public class Tuple_reasoning1_full_test_opt {
 //								curr_head_vars.add(head_args.get(i).toString());
 //							}
 						}
+						
+						curr_valid_tuples.addAll(valid_tuples);
 //						for(int k = 0; k<valid_tuples.size(); k++)
 //						{
 //							Tuple valid_tuple = valid_tuples.get(k);

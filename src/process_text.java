@@ -15,9 +15,9 @@ public class process_text {
 	
 	public static void main(String[] strs)
 	{
-//		process(path + "final_stress_test_lambda_num_min.txt", path + "tuple_level_stress_test_lambda_num_min.xlsx", path + "semi_schema_level_stress_test_lambda_num_min.xlsx", path + "schema_level_stress_test_lambda_num_min.xlsx");
+		process_text_full_case(path + "final_stress_test_lambda_num_full.txt", path + "tuple_level_stress_test_lambda_num_full_agg_intersection.csv", path + "tuple_level_stress_test_lambda_num_full_agg_union.csv", path + "semi_schema_level_stress_test_lambda_num_full_agg_intersection.csv", path + "semi_schema_level_stress_test_lambda_num_full_agg_union.csv", path + "schema_level_stress_test_lambda_num_full.csv");
 		
-		process_text_full_case(path + "final_real_test_full.txt", path + "exp_final_real_test_full_tuple_agg_intersection.csv", path + "exp_final_real_test_full_tuple_agg_union.csv", path + "exp_final_real_test_full_semi_schema_agg_intersection.csv", path + "exp_final_real_test_full_semi_schema_agg_union.csv", path + "exp_final_real_test_full_schema.csv");
+//		process_text_min_case(path + "final_real_test_min2.txt", path + "exp_final_real_test_min2_tuple.csv", path + "exp_final_real_test_min2_semi_schema.csv", path + "exp_final_real_test_min2_schema.csv");
 	}
 
 	
@@ -254,7 +254,7 @@ public class process_text {
 	    
 	    Vector<Vector<Double>> schema = new Vector<Vector<Double>>();
 		
-	    int m = 10;
+	    int m = 3;
 	    
 		try (BufferedReader br = new BufferedReader(new FileReader(file_name))) {
 		    String line;		    
@@ -269,12 +269,15 @@ public class process_text {
 		    	{
 		    		Vector<Double> curr_values = new Vector<Double>();
 		    		
+//		    		System.out.println(num + "::" + line);
 		    		
 		    		for(int i = 0; i<str.length; i++)
 		    		{
 		    			if(str[i].contains("::"))
 		    			{
 		    				String num_val = str[i].split("::")[1];
+		    				
+		    				System.out.print(str[i].split("::")[0] + "	");
 		    				
 		    				if(isNumeric(num_val))
 		    				{
@@ -284,6 +287,8 @@ public class process_text {
 		    				}
 		    			}
 		    		}
+		    		
+		    		System.out.println();
 		    		
 		    		if(num % (5*m) <m)
 		    		{
@@ -350,6 +355,119 @@ public class process_text {
 	    write(f4, covert2vec_str(semi_schema_agg_union_average));
 	    
 	    write(f5, covert2vec_str(schema_average));
+	}
+	
+	static void process_text_min_case(String file_name, String f1, String f2, String f3)
+	{
+		Vector<Vector<Double>> tuple_level = new Vector<Vector<Double>>();
+	    	    
+	    Vector<Vector<Double>> semi_schema = new Vector<Vector<Double>>();
+	    	    
+	    Vector<Vector<Double>> schema = new Vector<Vector<Double>>();
+		
+	    int m = 10;
+	    
+		try (BufferedReader br = new BufferedReader(new FileReader(file_name))) {
+		    String line;		    
+		    
+		    int num = 0;
+		    
+		    while ((line = br.readLine()) != null) {
+		       // process the line.
+		    	String[] str = line.split("	");
+		    	
+		    	if(StringUtils.isNumeric(str[0]) && line.length() > 10)
+		    	{
+		    		Vector<Double> curr_values = new Vector<Double>();
+		    		
+//		    		System.out.println(num + "::" + line);
+		    		
+		    		for(int i = 0; i<str.length; i++)
+		    		{
+		    			if(str[i].contains("::"))
+		    			{
+		    				String num_val = str[i].split("::")[1];
+		    				
+		    				System.out.print(str[i].split("::")[0] + "	");
+		    				
+		    				if(isNumeric(num_val))
+		    				{
+		    					double value = Double.valueOf(num_val);
+		    					
+		    					curr_values.add(value);
+		    				}
+		    			}
+		    		}
+		    		
+		    		System.out.println();
+		    		
+		    		if(num % (2*m) <m)
+		    		{
+		    			tuple_level.add(curr_values);
+		    		}
+		    		else
+		    		{
+		    			
+		    			semi_schema.add(curr_values);
+	    					    			
+		    		}
+		    		
+			    	num ++;
+
+		    	}
+		    	
+		    	if(str[0].startsWith("execution time::"))
+		    	{
+		    		Vector<Double> curr_values = new Vector<Double>();
+		    		
+//		    		System.out.println(num + "::" + line);
+		    		
+		    		for(int i = 0; i<str.length; i++)
+		    		{
+		    			if(str[i].contains("::"))
+		    			{
+		    				String num_val = str[i].split("::")[1];
+		    				
+		    				System.out.print(str[i].split("::")[0] + "	");
+		    				
+		    				if(isNumeric(num_val))
+		    				{
+		    					double value = Double.valueOf(num_val);
+		    					
+		    					curr_values.add(value);
+		    				}
+		    			}
+		    		}
+		    		
+		    		schema.add(curr_values);
+		    		
+		    		System.out.println();
+		    	}
+		    	
+		    }
+		    
+		    
+		    
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		Vector<Vector<Double>> tuple_level_average = cal_average(tuple_level, m);		    
+	    	    
+	    Vector<Vector<Double>> semi_schema_average = cal_average(semi_schema, m);
+	    	    
+	    Vector<Vector<Double>> schema_average = cal_average(schema, m);
+	    
+	    write(f1, covert2vec_str(tuple_level_average));
+	    	    
+	    write(f2, covert2vec_str(semi_schema_average));
+	    
+	    write(f3, covert2vec_str(schema_average));
+
 	}
 	
 	public static boolean isNumeric(String str)  

@@ -192,18 +192,20 @@ public class final_stress_test_lambda_num_full {
 				System.out.println("new query");
 				
 				reset(c1, pst);
+				
+				reset(c2, pst);
 			}
 						
 			Query query = null;
 			
 			
 			try{
-				query = query_storage.get_query_by_id(1);
+				query = query_storage.get_query_by_id(1, c2, pst);
 			}
 			catch(Exception e)
 			{
-				query = query_generator.gen_query(k, c1, pst);
-				query_storage.store_query(query, new Vector<Integer>());
+				query = query_generator.gen_query(k, c2, pst);
+				query_storage.store_query(query, new Vector<Integer>(), c2, pst);
 				System.out.println(query);
 			}
 			
@@ -393,11 +395,15 @@ public class final_stress_test_lambda_num_full {
 			
 			double start_time = 0;
 			
+			double time1 = 0;
+			
 			HashSet<String> agg_citations = null;
 						
 			start_time = System.nanoTime();
 			
 			Tuple_reasoning1_full_test_opt.tuple_reasoning(query, c, pst);
+			
+			time1 = System.nanoTime();
 			
 			ArrayList<HashSet<citation_view>> views_per_group = Tuple_reasoning1_full_test_opt.cal_covering_sets_schema_level(query, c, pst);
 			
@@ -413,9 +419,11 @@ public class final_stress_test_lambda_num_full {
 			
 			double time = (end_time - start_time)*1.0;
 			
-			double agg_time = (end_time - middle_time) * 1.0/1000000000;
+			double agg_time = (middle_time - time1) * 1.0/1000000000;
 			
 			double reasoning_time = (middle_time - start_time) * 1.0/1000000000;
+			
+			double citation_gen_time = (end_time - middle_time) * 1.0/1000000000;
 			
 			time = time /(times * 1000000000);
 						
@@ -431,15 +439,15 @@ public class final_stress_test_lambda_num_full {
 			
 			System.out.print("aggregation_time::" + agg_time + "	");
 			
+			System.out.print("citation_gen_time::" + citation_gen_time + "	");
+			
 //			System.out.print("covering_sets::" + Aggregation5.curr_res + "	");
 			
 			System.out.print("covering_set_size::" + Aggregation5.curr_res.size() + "	");
 			
 			int distinct_view_size = Aggregation5.cal_distinct_views();
 			
-			System.out.print("distinct_view_size::" + Tuple_reasoning1_full_test_opt.unique_tuple_num + "	");
-			
-			System.out.print("distinct_instantiated_view_size::" + distinct_view_size + "	");
+			System.out.print("distinct_view_size::" + distinct_view_size + "	");
 			
 //			Set<Head_strs> h_l = Tuple_reasoning1_full_min_test.head_strs_rows_mapping.keySet();
 //			
@@ -517,13 +525,8 @@ public class final_stress_test_lambda_num_full {
 			
 			System.out.print("population::" + Tuple_reasoning1_full_test_opt.population_time + "	");
 			
-//			if(cal_covering_set)
-//			{
-//				HashSet<String> distinct_covering_sets = Tuple_reasoning1_full_test_opt.cal_unique_covering_sets();
-//				
-//				System.out.print("distinct_covering_set_size::" + distinct_covering_sets.size() + "	");
-//			}
-//			
+			
+			
 //			time = (end_time - start_time) * 1.0/1000000000;
 //			
 //			System.out.print("Aggregation_time::" + time + "	");
@@ -638,11 +641,15 @@ public class final_stress_test_lambda_num_full {
 				
 				double start_time = 0;
 				
+				double time1 = 0.0;
+				
 				HashSet<String> agg_citations = null;
 							
 				start_time = System.nanoTime();
 				
 				Tuple_reasoning2_full_test2.tuple_reasoning(query, c, pst);
+				
+				time1 = System.nanoTime();
 				
 				ArrayList<HashSet<citation_view>> views_per_group = Tuple_reasoning2_full_test2.cal_covering_sets_schema_level(query, c, pst);
 				
@@ -658,9 +665,11 @@ public class final_stress_test_lambda_num_full {
 				
 				double time = (end_time - start_time)*1.0;
 				
-				double agg_time = (end_time - middle_time) * 1.0/1000000000;
+				double agg_time = (middle_time - time1) * 1.0/1000000000;
 				
 				double reasoning_time = (middle_time - start_time) * 1.0/1000000000;
+				
+				double citation_gen_time = (end_time - middle_time) * 1.0/1000000000;
 				
 				time = time /(times * 1000000000);
 							
@@ -675,6 +684,8 @@ public class final_stress_test_lambda_num_full {
 				System.out.print("reasoning_time::" + reasoning_time + "	");
 				
 				System.out.print("aggregation_time::" + agg_time + "	");
+				
+				System.out.print("citation_gen_time::" + citation_gen_time + "	");
 
 //				System.out.print("covering_sets::" + Aggregation5.curr_res + "	");
 				
@@ -682,9 +693,7 @@ public class final_stress_test_lambda_num_full {
 				
 				int distinct_view_size = Aggregation5.cal_distinct_views();
 				
-				System.out.print("distinct_view_size::" + Tuple_reasoning2_full_test2.unique_tuple_num + "	");
-				
-				System.out.print("distinct_instantiated_view_size::" + distinct_view_size + "	");
+				System.out.print("distinct_view_size::" + distinct_view_size + "	");
 				
 //				Set<Head_strs> h_l = Tuple_reasoning1_full_min_test.head_strs_rows_mapping.keySet();
 //				
@@ -761,13 +770,6 @@ public class final_stress_test_lambda_num_full {
 				System.out.print("reasoning::" + Tuple_reasoning2_full_test2.reasoning_time + "	");
 				
 				System.out.print("population::" + Tuple_reasoning2_full_test2.population_time + "	");
-				
-//				if(cal_covering_set)
-//				{
-//					HashSet<String> distinct_covering_sets = Tuple_reasoning2_full_test2.cal_unique_covering_sets();
-//					
-//					System.out.print("distinct_covering_set_size::" + distinct_covering_sets.size() + "	");
-//				}
 				
 				System.out.println();
 				
@@ -928,14 +930,6 @@ public class final_stress_test_lambda_num_full {
 				System.out.print("pre_processing::" + schema_reasoning.pre_processing_time + "	");
 				
 				System.out.print("query::" + query_time + "	");
-				
-//				if(cal_covering_set)
-//				{
-//					HashSet<String> distinct_covering_sets = schema_reasoning.cal_unique_covering_sets();
-//					
-//					System.out.print("distinct_covering_set_size::" + distinct_covering_sets.size() + "	");
-//					
-//				}
 												
 				System.out.println();
 				

@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -24,13 +25,17 @@ import edu.upenn.cis.citation.Pre_processing.view_operation;
 import edu.upenn.cis.citation.aggregation.Aggregation5;
 import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.Head_strs2;
+import edu.upenn.cis.citation.citation_view.citation_view;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test_opt;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test2;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_test;
+import edu.upenn.cis.citation.reasoning1.schema_reasoning;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_full_min_test;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_min_test;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning2_full_min_test;
@@ -39,7 +44,7 @@ import edu.upenn.cis.citation.stress_test.query_generator;
 import edu.upenn.cis.citation.stress_test.view_generator;
 import edu.upenn.cis.citation.user_query.query_storage;
 
-public class final_stress_test_view_num_min {
+public class final_stress_test_instance_size_min {
 	
 	static int size_range = 100;
 	
@@ -183,13 +188,15 @@ public class final_stress_test_view_num_min {
 	    
 	    int k = Integer.valueOf(args[0]);
 	    
-	    boolean new_query = Boolean.valueOf(args[1]);
+	    int view_size = Integer.valueOf(args[1]);
+	    
+	    int instance_size = Integer.valueOf(args[2]);
+	    
+	    boolean new_query = Boolean.valueOf(args[3]);
 		
-		boolean new_rounds = Boolean.valueOf(args[2]);
+		boolean new_rounds = Boolean.valueOf(args[4]);
 		
-		boolean tuple_level = Boolean.valueOf(args[3]);
-		
-		boolean new_start = Boolean.valueOf(args[4]);
+		boolean tuple_level = Boolean.valueOf(args[5]);
 		
 				
 //		Query query = query_storage.get_query_by_id(1);
@@ -199,11 +206,9 @@ public class final_stress_test_view_num_min {
 		
 		query_generator.init_parameterizable_attributes(c2, pst);
 		{
-			if(new_query)
+			if(new_query && new_rounds)
 			{
 				System.out.println("new query");
-				
-				reset(c1, pst);
 				
 				reset(c2, pst);
 			}
@@ -213,25 +218,39 @@ public class final_stress_test_view_num_min {
 			
 
 			
-			try{
-				query = query_storage.get_query_by_id(1, c2, pst);
-			}
-			catch(Exception e)
-			{
-				query = query_generator.gen_query(k, c2, pst);
-				query_storage.store_query(query, new Vector<Integer>(), c2, pst);
-				System.out.println(query);
-			}
+			
 			
 			if(new_query)
 			{
+				
+				try{
+					query = query_storage.get_query_by_id(1, c2, pst);
+					
+					query = query_generator.generate_query_with_new_instance_size(query, instance_size, c2, pst);
+					
+					query_storage.update_query_predicates(query, 1, c2, pst);
+					
+					System.out.println(query);
+				}
+				catch(Exception e)
+				{
+					query_generator.query_result_size = instance_size;
+					
+					query = query_generator.gen_query(k, c2, pst);
+					query_storage.store_query(query, new Vector<Integer>(), c2, pst);
+					System.out.println(query);
+				}
+				
 				Vector<String> sqls = new Vector<String>();
 				
 				sqls.add(Query_converter.datalog2sql_test(query));
 				
 				Query_operation.write2file(path + "user_query_sql", sqls);
 			}
-			
+			else
+			{
+				query = query_storage.get_query_by_id(1, c2, pst);
+			}
 			relations = get_unique_relation_names(query);
 			
 			Vector<Query> views = null;
@@ -245,7 +264,7 @@ public class final_stress_test_view_num_min {
 				
 				get_table_size(relations, c1, pst);
 				
-				views = view_generator.gen_default_views(relations, c1, c2, pst);
+				views = view_generator.gen_random_views(relations, view_size, query, c1, c2, pst);
 				
 //				views = view_generator.generate_store_views_without_predicates(relation_names, view_size, query.body.size());
 				
@@ -262,23 +281,23 @@ public class final_stress_test_view_num_min {
 			{
 				views = view_operation.get_all_views(c2, pst);
 				
-				if(new_start)
-				{
-					System.out.println();
-					
-					view_generator.initial();
-					
-					view_generator.gen_one_additional_view(views, relations, query.body.size(), query, c1, c2, pst);
-					
-					for(Iterator iter = views.iterator(); iter.hasNext();)
-					{
-						Query view = (Query) iter.next();
-						
-						System.out.println(view);
-					}
-					
-					get_table_size(relations, c1, pst);
-				}
+//				if(new_start)
+//				{
+//					System.out.println();
+//					
+//					view_generator.initial();
+//					
+//					view_generator.gen_one_additional_view(views, relations, query.body.size(), query, c1, c2, pst);
+//					
+//					for(Iterator iter = views.iterator(); iter.hasNext();)
+//					{
+//						Query view = (Query) iter.next();
+//						
+//						System.out.println(view);
+//					}
+//					
+//					get_table_size(relations, c1, pst);
+//				}
 			}
 			
 			Vector<Query> all_citation_queries = Query_operation.get_all_citation_queries(c2, pst);

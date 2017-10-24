@@ -62,7 +62,7 @@ public class query_generator {
 	
 	static double lambda2head_rate = 0.3;
 	
-	static double head_var_rate = 1;
+	static double head_var_rate = .5;
 	
 	static double global_predicate_rate = 1;
 	
@@ -476,6 +476,9 @@ public class query_generator {
 	
 	public static Query generate_query_with_new_instance_size(Query query, int size, Connection c, PreparedStatement pst) throws SQLException
 	{
+		
+		build_relation_primary_key_mapping(c, pst);
+		
 		HashMap<String, String> maps = query.subgoal_name_mapping;
 		
 		HashSet<String> relation_names = new HashSet<String>();
@@ -487,7 +490,7 @@ public class query_generator {
 			relation_names.add(subgoal.name);
 		}
 		
-		String new_lambda_string = gen_local_predicates_with_fixed_size(maps, relation_names, size, c, pst);
+		String new_lambda_string = gen_local_predicates_with_fixed_size_addition(maps, relation_names, size, c, pst);
 		
 		query.lambda_term.clear();
 		
@@ -872,6 +875,119 @@ public class query_generator {
 				
 				HashSet<Integer> id_list = new HashSet<Integer>();
 				
+				while(id_list.size() < selected_size)
+				{
+					Random r = new Random();
+					
+					int id = r.nextInt(max_size);
+					
+					id_list.add(relation_primary_key_ranges.get(relation_mapping.get(relations.get(i))).get(id));
+				}
+				
+				int num = 0;
+				
+				HashSet<Integer> integer_list = max_min_value_mapping.get(relation_mapping.get(relations.get(i)));
+				
+				if(integer_list == null)
+				{
+					integer_list = new HashSet<Integer>();
+				}
+				
+				
+				for(Iterator iter = id_list.iterator(); iter.hasNext();)
+				{
+					Integer id = (Integer) iter.next();
+					
+					integer_list.add(id);
+					
+					if(num >= 1)
+					{
+						selection_string += " or ";
+					}
+					
+					selection_string += relations.get(i) + "." + relation_primary_key_mapping.get(relation_mapping.get(relations.get(i))) + "=" + id;
+					
+					num++;
+					
+				}
+				
+				selection_string += ")";
+				
+				selection_strings += selection_string;
+				
+				max_min_value_mapping.put(relation_mapping.get(relations.get(i)), integer_list);
+			}
+		}
+		
+		output_selected_value2files(max_min_value_mapping);
+		
+//		System.out.println(real_size);
+//		
+//		System.out.println("selection_string:::" + selection_strings);
+		
+		return selection_strings;
+	}
+	
+	static String gen_local_predicates_with_fixed_size_addition(HashMap<String, String> relation_mapping, HashSet<String> relation_names, int size, Connection c, PreparedStatement pst) throws SQLException
+	{
+		
+		HashMap<String, int[]> selected_id = new HashMap<String, int[]>();
+		
+		HashMap<String, Integer> indexes = new HashMap<String, Integer>();
+		
+		view_generator.inputquery_conditions(selected_id, indexes);
+		
+		long total_range = 1;
+		
+		Vector<String> relations = new Vector<String>();
+		
+		relations.addAll(relation_names);
+		
+		HashMap<String, HashSet<Integer>> max_min_value_mapping = new HashMap<String, HashSet<Integer>>();
+		
+		for(int i = 0; i<relations.size(); i++)
+		{
+			
+//			System.out.println(relation_mapping.get(relations.get(i)));
+			
+//			System.out.println(relation_primary_key_ranges.get(relation_mapping.get(relations.get(i))).size());
+			
+			total_range = total_range * relation_primary_key_ranges.get(relation_mapping.get(relations.get(i))).size();
+		}
+		
+		int selected_size = (int)(Math.pow(size, 1.0/relations.size()) + 0.5);
+		
+		String selection_strings = new String();
+		
+		int real_size = 1;
+		
+//		if(ratio < 1)
+		{
+			
+			for(int i = 0; i<relations.size(); i++)
+			{
+				
+				if(i >= 1)
+					selection_strings += " and ";
+				
+				String selection_string = "(";
+				
+				int [] ids = selected_id.get(relations.get(i));
+				
+				int max_size = relation_primary_key_ranges.get(relation_mapping.get(relations.get(i))).size();
+				
+//				int selected_size = (int)(max_size * ratio + 0.5);
+				
+				real_size *= selected_size;
+				
+//				System.out.println(selected_size);
+				
+				HashSet<Integer> id_list = new HashSet<Integer>();
+				
+				for(int p = 0; p < ids.length; p++)
+				{
+					id_list.add(ids[p]);
+				}
 				while(id_list.size() < selected_size)
 				{
 					Random r = new Random();

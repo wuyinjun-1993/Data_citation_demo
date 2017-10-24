@@ -23,7 +23,7 @@ public class Tuple {
   public Query   query = null;
   public HashSet core = new HashSet();
     
-  public Vector<Conditions> conditions = null;
+  public Vector<Conditions> conditions = new Vector<Conditions>();
 
   HashSet equTuples = new HashSet(); // set of view tuples with the same tuple-core
   
@@ -323,6 +323,15 @@ public class Tuple {
 	    HashMap mapSubgoals = (HashMap) this.mapSubgoals.clone();
 	    HashMap mapSubgoals_str = (HashMap) this.mapSubgoals_str.clone();
 	  
-	  return new Tuple(name, args, phi, phi_str, mapSubgoals);
+	    
+	    
+	  Tuple tuple = new Tuple(name, args, phi, phi_str, mapSubgoals);
+	  
+	  tuple.lambda_terms.addAll(this.lambda_terms);
+	  
+	  tuple.conditions.addAll(this.conditions);
+	  
+	  return tuple;
+	  
   }
 }

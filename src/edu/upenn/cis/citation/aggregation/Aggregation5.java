@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +15,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
+import org.apache.jena.sparql.resultset.ResultSetMem;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -1344,16 +1346,33 @@ public class Aggregation5 {
 		
 		HashSet<String> values = new HashSet<String>();
 		
+		ResultSetMetaData meta = rs.getMetaData();
+		
+		int col_num = meta.getColumnCount();
+		
 		while(rs.next())
 		{
-			if(block_name.equals("author"))
+			
+			String value = new String();
+			
+			for(int i = 0; i<col_num; i++)
 			{
-				values.add(rs.getString(1) + " " + rs.getString(2));
+				if(i >= 1)
+					value += " ";
+				
+				value += rs.getString(i + 1);
 			}
 			
-			citations.put(block_name, values);
+			values.add(value);
+			
+//			if(block_name.equals("author"))
+//			{
+//				values.add(rs.getString(1) + " " + rs.getString(2));
+//			}
+			
 		}
 		
+		citations.put(block_name, values);
 		
 	}
 	

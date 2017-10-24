@@ -823,6 +823,14 @@ public class Tuple_reasoning2_full_min_test {
 		
 		max_author_num.put("author", -1);
 		
+		max_author_num.put("info", -1);
+		
+		max_author_num.put("Investigator", -1);
+		
+		max_author_num.put("Program", -1);
+		
+		max_author_num.put("Funding", -1);
+		
 		tuple_num = 0;
 		
 		group_num = 0;

@@ -337,6 +337,13 @@ public class Conditions {
 			{
 				return true;
 			}
+			else
+			{
+				if(!condition2.arg2.isConst() && condition1.subgoal1.equals(condition2.subgoal2) && condition1.subgoal2.equals(condition2.subgoal1) && condition1.arg1.equals(condition2.arg2) && condition1.arg2.equals(condition2.arg1))
+				{
+					return true;
+				}
+			}
 		}
 		
 		return false;

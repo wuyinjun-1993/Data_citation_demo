@@ -1,4 +1,4 @@
-package edu.upenn.cis.citation.final_test;
+package edu.upenn.cis.citation.final_test_partition_views;
 
 import java.io.IOException;
 import java.sql.Connection;

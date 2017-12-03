@@ -7,13 +7,12 @@ import edu.upenn.cis.citation.Pre_processing.citation_view_operation;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.Pre_processing.view_operation;
 import edu.upenn.cis.citation.citation_view.Head_strs;
+import edu.upenn.cis.citation.citation_view.citation_view;
 //import edu.upenn.cis.citation.Pre_processing.insert_new_view;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.dao.Database;
 import edu.upenn.cis.citation.datalog.Query_converter;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test_opt;
 import edu.upenn.cis.citation.user_query.query_storage;
 import java_cup.internal_error;
 import javafx.application.Application;
@@ -208,7 +207,7 @@ private Object String;
 
 	HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
 
-
+    Connection conn;
 	/**
 	 * GUI Main Method
 	 * 
@@ -516,7 +515,11 @@ private Object String;
             Vector<String> block_names = new Vector<String>();
     		if (dv !=null && !dv.isEmpty()) {
 					try {
-						Vector<String> q_names = Query_operation.get_connection_citation_with_query(dv, block_names);
+					  Class.forName("org.postgresql.Driver");
+	                  conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+	                  PreparedStatement st = null;
+					  
+						Vector<String> q_names = Query_operation.get_connection_citation_with_query(dv, block_names, conn, st);
 						Vector<String> cites = q_names;
 						ObservableList<java.lang.String> allCites = listViewCitationView.getItems();
 						for(int i = 0; i < allCites.size(); i++) {
@@ -541,15 +544,22 @@ private Object String;
 //	    	            		}
 //	    	            	}
 //	    	            }
+						conn.close();
 					} catch (Exception e1) {
 						e1.printStackTrace();
 					}
     		}
     		
             try {
-				Query currentQuery = view_operation.get_view_by_name(dv);
+              
+              Class.forName("org.postgresql.Driver");
+              conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+              PreparedStatement st = null;
+				Query currentQuery = view_operation.get_view_by_name(dv, conn, st);
 				System.out.println("[current view]" + dv);
 				addDataFromQuery(currentQuery);
+				
+				conn.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -580,8 +590,14 @@ private Object String;
 			searchBox.clear();
 			try {
 //				// show view info in dba scene
-				currentQuery = view_operation.get_view_by_name(dv);
+			  Class.forName("org.postgresql.Driver");
+              conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+              PreparedStatement st = null;
+			  
+				currentQuery = view_operation.get_view_by_name(dv, conn, st);
 				addDataFromQuery(currentQuery);
+				
+			  conn.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.out.println("data view edit error");
@@ -625,9 +641,13 @@ private Object String;
             for(String s : items) {
             	String dv = s;
             	try {
-    				citation_view_operation.delete_connection_view_with_citations(dv, dv);
-    				citation_view_operation.delete_citation_views(dv);
-    				view_operation.delete_view_by_name(dv);
+            	  Class.forName("org.postgresql.Driver");
+                  conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+                  PreparedStatement st = null;
+            	  
+    				citation_view_operation.delete_connection_view_with_citations(dv, dv, conn, st);
+    				citation_view_operation.delete_citation_views(dv, conn, st);
+    				view_operation.delete_view_by_name(dv, conn, st);
 //    				Alert alert = new Alert(Alert.AlertType.INFORMATION);
 //    	            alert.setTitle("Succeed");
 //    	            alert.setHeaderText(null);
@@ -635,6 +655,8 @@ private Object String;
 //    	            alert.showAndWait();
     				System.out.println("The data view is successfully deleted");
     				listDataViews.remove(dv);
+    				
+    				conn.close();
     			} catch (Exception e) {
     				System.out.println("view delete error");
     				e.printStackTrace();
@@ -678,7 +700,12 @@ private Object String;
 			else {
 				check1.setSelected(true);
 				try {
-					Vector<String> views = citation_view_operation.get_views(cv);
+				  
+				  Class.forName("org.postgresql.Driver");
+                  conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+                  PreparedStatement st = null;
+				  
+					Vector<String> views = citation_view_operation.get_views(cv, conn, st);
 					if(views != null) {
 						ObservableList<String> allViews = listViewDataViews.getItems();
 						for(int i = 0; i < allViews.size(); i++) {
@@ -690,6 +717,7 @@ private Object String;
 							}
 						}
 					}
+					conn.close();
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -698,10 +726,15 @@ private Object String;
 				hbox.getChildren().addAll(textDataLog, textFieldDataViewDataLog);
 				if (!hbox.isVisible()) hbox.setVisible(true);
 				try {
-					Query q_datalog = Query_operation.get_query_by_name(cv);
+				  Class.forName("org.postgresql.Driver");
+                  conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+                  PreparedStatement st = null;
+					Query q_datalog = Query_operation.get_query_by_name(cv, conn, st);
 					String q_sql = Query_converter.datalog2sql(q_datalog);
 					if (textFieldDataViewDataLog != null) textFieldDataViewDataLog.setText(splitSQL(q_sql));
 					cv = "";
+					
+				  conn.close();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -730,8 +763,12 @@ private Object String;
 			for(String s : items) {
 				cv = s;
 				try {
+				  
+				  Class.forName("org.postgresql.Driver");
+                  conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+                  PreparedStatement st = null;
 //					citation_view_operation.delete_citation_views(cv);
-					Query_operation.delete_query_by_name(cv);
+					Query_operation.delete_query_by_name(cv, conn, st);
 //					Alert alert = new Alert(Alert.AlertType.INFORMATION);
 //		            alert.setTitle("Succeed");
 //		            alert.setHeaderText(null);
@@ -739,6 +776,8 @@ private Object String;
 //		            alert.showAndWait();
 					System.out.println("The citation query view is successfully deleted");
 		            listCitationViews.remove(cv);
+		            
+		           conn.close();
 				} catch (Exception e) {
 					System.out.println("citation delete error!");
 					e.printStackTrace();
@@ -974,10 +1013,20 @@ private Object String;
 				try {
 					// generate all citations
 					
-					Vector<String> agg_citations = Tuple_reasoning1.tuple_gen_agg_citations(userGeneratedQuery);
+				  Class.forName("org.postgresql.Driver");
+                  conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+                  PreparedStatement st = null;
+				  
+                  ArrayList<HashSet<citation_view>> views_per_group = Tuple_reasoning1_full_test_opt.cal_covering_sets_schema_level(userGeneratedQuery, conn, st);
+				                    
+                  HashSet<String> agg_citations = Tuple_reasoning1_full_test_opt.gen_citation_schema_level(views_per_group, conn, st);
+                  
+//					Vector<String> agg_citations = Tuple_reasoning1_full_test_opt.tuple_gen_agg_citations(userGeneratedQuery);
 					for (String s : agg_citations) {
 						listCitations.add(s);
 					}
+					
+					conn.close();
 				} catch (ClassNotFoundException | SQLException | JSONException e1) {
 					e1.printStackTrace();
 				}
@@ -995,7 +1044,7 @@ private Object String;
 				}
 				// generated selected citations
 				try {
-					Vector<String> subset_agg_citations = Tuple_reasoning1.tuple_gen_agg_citations(userGeneratedQuery, names, citation_view_map);
+					Vector<String> subset_agg_citations = new Vector<String>();//Tuple_reasoning1_full_test_opt.tuple_gen_agg_citations(userGeneratedQuery, names, citation_view_map);
 					System.out.println("subset" + subset_agg_citations);
 					// XXX
 					for (String s : subset_agg_citations) {
@@ -1261,11 +1310,17 @@ private Object String;
 					setTooltip(null);
 				} else {
 					try {
-						Query query_datalog = Query_operation.get_query_by_name(name);
+					  
+					  Class.forName("org.postgresql.Driver");
+	                  conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+	                  PreparedStatement st = null;
+						Query query_datalog = Query_operation.get_query_by_name(name, conn, st);
 						String query_sql = Query_converter.datalog2sql(query_datalog);
 						query_sql = splitSQL(query_sql);
 						tp.setText(query_sql);
 						setTooltip(tp);
+						
+					   conn.close();
 					} catch (ClassNotFoundException | SQLException e) {
 						e.printStackTrace();
 					}
@@ -1336,9 +1391,15 @@ private Object String;
 				qname_block.add(q_b);
 			}
 			try {
-				Query_operation.delete_connection_citation_with_query(dv);
+			  Class.forName("org.postgresql.Driver");
+              conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+              PreparedStatement st = null;
+			  
+				Query_operation.delete_connection_citation_with_query(dv, conn, st);
 				System.out.println("[name+block] " + qname_block);
-				Query_operation.add_connection_citation_with_query(dv, qname_block);
+				Query_operation.add_connection_citation_with_query(dv, qname_block, conn, st);
+				
+			  conn.close();
 			} catch (Exception e1) {
 				System.out.println("Add new CQ connection error");
 				e1.printStackTrace();
@@ -1427,11 +1488,15 @@ private Object String;
 						setTooltip(null);
 					} else {
 						try {
-							Query query_datalog = Query_operation.get_query_by_name(name);
+						  Class.forName("org.postgresql.Driver");
+		                  conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+		                  PreparedStatement st = null;
+							Query query_datalog = Query_operation.get_query_by_name(name, conn, st);
 							String query_sql = Query_converter.datalog2sql(query_datalog);
 							query_sql = splitSQL(query_sql);
 							tp.setText(query_sql);
 							setTooltip(tp);
+						  conn.close();
 						} catch (ClassNotFoundException | SQLException e) {
 							e.printStackTrace();
 						}
@@ -1661,19 +1726,23 @@ private Object String;
             Query generatedQuery = addQueryByName(dv,data);
             if (listDataViews.contains(dv)) {
             	try {
-                	view_operation.save_view_by_name(oldName, dv, generatedQuery);
-                	citation_view_operation.update_citation_view(oldName, dv);
+            	  Class.forName("org.postgresql.Driver");
+                  conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+                  PreparedStatement st = null;
+                	view_operation.save_view_by_name(oldName, dv, generatedQuery, conn, st);
+                	citation_view_operation.update_citation_view(oldName, dv, conn, st);
                 	Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("Succeed");
                     alert.setHeaderText(null);
                     alert.setContentText("The view queries are successfully saved as " + dv);
                     alert.showAndWait();
+                    
+                    conn.close();
     			} catch (Exception e1) {
     				e1.printStackTrace();
     			}
             } else {
             	// add new view
-            	Connection conn;
     			
             	try {
             		
@@ -2987,7 +3056,12 @@ private Object String;
 				citation_view_map.clear();
 				
 				try {
-					Tuple_reasoning1.tuple_reasoning(userGeneratedQuery, citation_strs, citation_view_map, conn, st);
+				  
+				  Tuple_reasoning1_full_test_opt.prepare_info = true;
+				  
+				  Tuple_reasoning1_full_test_opt.test_case = false;
+				  
+				  Tuple_reasoning1_full_test_opt.tuple_reasoning(userGeneratedQuery, conn, st);
 				
 				} catch (IOException | InterruptedException | JSONException e) {
 					e.printStackTrace();
@@ -3338,7 +3412,10 @@ private Object String;
 		Vector<String> block_names = new Vector<String>();
 		if (dv !=null && !dv.isEmpty()) {
 			try {
-				Vector<String> q_names = Query_operation.get_connection_citation_with_query(dv, block_names);
+			  Class.forName("org.postgresql.Driver");
+              conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+              PreparedStatement st = null;
+				Vector<String> q_names = Query_operation.get_connection_citation_with_query(dv, block_names, conn, st);
 				System.out.println("[query_names] " + q_names);
 				System.out.println("[block_names] " + block_names);
 				List<String> list_q = new ArrayList<>();
@@ -3370,6 +3447,7 @@ private Object String;
 						}
 					}
 				}
+				conn.close();
 			} catch (ClassNotFoundException | SQLException e) {
 				e.printStackTrace();
 			}

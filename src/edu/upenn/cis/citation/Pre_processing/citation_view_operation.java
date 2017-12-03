@@ -15,7 +15,11 @@ public class citation_view_operation {
 	{
 		String c_names = "single_intro";
 		
-		Vector<String> v_names = get_views(c_names);
+		Class.forName("org.postgresql.Driver");
+        Connection c = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+        PreparedStatement pst = null;
+		
+		Vector<String> v_names = get_views(c_names, c, pst);
 		
 		System.out.println(v_names.toString());
 	}
@@ -31,15 +35,8 @@ public class citation_view_operation {
                 
 	}
 	
-	public static Vector<String> get_views(String c_name) throws SQLException, ClassNotFoundException
-	{
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-        
-        PreparedStatement pst = null;
-        
+	public static Vector<String> get_views(String c_name, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	{        
         Vector<String> view_names = new Vector<String>();
         
         String sql = "select view_table.name from view_table, citation2view, citation2query, query2head_variables where view_table.view = citation2view.view and citation2view.citation_view_id = citation2query.citation_view_id and citation2query.query_id = query2head_variables.query_id and query2head_variables.name = '" + c_name + "'";
@@ -52,8 +49,6 @@ public class citation_view_operation {
         {
         	view_names.add(rs.getString(1));
         }
-        
-        c.close();
         
         return view_names;
 	}
@@ -71,15 +66,8 @@ public class citation_view_operation {
 	
 
 	
-	public static void delete_connection_view_with_citations(String view_name, String citation_view_name) throws SQLException, ClassNotFoundException
-	{
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-        
-        PreparedStatement pst = null;
-		
+	public static void delete_connection_view_with_citations(String view_name, String citation_view_name, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	{	
 		int view_id = view_operation.get_view_id(view_name, c, pst);
 		
 		int citation_view_id = get_citation_id(citation_view_name, c, pst);
@@ -89,20 +77,10 @@ public class citation_view_operation {
 		pst = c.prepareStatement(query);
 		
 		pst.execute();
-		
-		c.close();
 	}
 	
-	public static void delete_citation_views(String citation_name) throws ClassNotFoundException, SQLException
-	{
-		
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-        
-        PreparedStatement pst = null;
-		
+	public static void delete_citation_views(String citation_name, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	{		
 		int citation_view_id = get_citation_id(citation_name, c, pst);
 		
 		delete_citation2query(citation_view_id, c, pst);
@@ -110,8 +88,6 @@ public class citation_view_operation {
 		delete_citation2view(citation_view_id, c, pst);
 		
 		delete_citation_table(citation_view_id, c, pst);
-		
-		c.close();
 	}
 	
 	public static void delete_citation_views_by_id(int citation_view_id, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
@@ -127,22 +103,12 @@ public class citation_view_operation {
 		
 	}
 
-	public static void update_citation_view(String old_name, String new_name) throws SQLException, ClassNotFoundException
+	public static void update_citation_view(String old_name, String new_name, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
-		
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-        
-        PreparedStatement pst = null;
 		
 		int citation_view_id = get_citation_id(old_name, c, pst);
 		
 		update_citation_view_name(citation_view_id, new_name, c, pst);
-		
-		c.close();
-		
 		
 	}
 	

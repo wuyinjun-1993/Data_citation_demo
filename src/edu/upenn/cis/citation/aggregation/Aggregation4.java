@@ -18,6 +18,7 @@ import org.json.JSONObject;
 
 import edu.upenn.cis.citation.Corecover.Lambda_term;
 import edu.upenn.cis.citation.Corecover.Query;
+import edu.upenn.cis.citation.Operation.Conditions;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.citation_view;
@@ -635,6 +636,62 @@ public class Aggregation4 {
 //		System.out.println(curr_res);
 		
 		return gen_citations(full_citations, max_num);
+	}
+	
+	public static int[] count_view_mapping_predicates_lambda_terms(citation_view_vector covering_set)
+	{
+		
+		HashSet<String> view_mapping_string = new HashSet<String>();
+		
+		HashSet<String> lambda_string = new HashSet<String> ();
+		
+		HashSet<String> predicate_string = new HashSet<String>();
+		
+//		for(int i = 0; i<curr_res.size(); i++)
+		{
+//			citation_view_vector covering_set = curr_res.get(i);
+			
+			for(int j = 0; j<covering_set.c_vec.size(); j++)
+			{
+				citation_view v = covering_set.c_vec.get(j);
+				
+				String view_name = v.get_name();
+				
+				String table_names = v.get_table_name_string();
+				
+				String index_string = view_name + populate_db.separator + table_names;
+				
+				
+				Vector<Conditions> conditions = v.get_view_tuple().conditions;
+				
+				Vector<Lambda_term> l_terms = v.get_view_tuple().lambda_terms;
+				
+				for(int k = 0; k<conditions.size(); k++)
+				{
+					predicate_string.add(conditions.get(k).toString());
+				}
+				
+				for(int k = 0; k<l_terms.size(); k++)
+				{
+					lambda_string.add(l_terms.get(k).toString());
+				}
+				
+//				if(view_mapping_string.contains(index_string))
+				{
+					view_mapping_string.add(index_string);
+				}
+			}
+		}
+		
+		int [] nums = new int[3];
+		
+		nums[0] = view_mapping_string.size();
+		
+		nums[1] = lambda_string.size();
+		
+		nums[2] = predicate_string.size();
+		
+		return nums;
 	}
 	
 	static HashMap<String, HashSet<String>> gen_citations_covering_set_level(ArrayList<HashMap<String, HashSet<String>>> citations, citation_view_vector curr_res, ArrayList<String> single_view_names, ArrayList<String> view_keys)

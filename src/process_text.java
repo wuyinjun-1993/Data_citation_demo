@@ -15,9 +15,9 @@ public class process_text {
 	
 	public static void main(String[] strs)
 	{
-		process_text_full_case(path + "final_stress_test_lambda_num_full.txt", path + "tuple_level_stress_test_lambda_num_full_agg_intersection.csv", path + "tuple_level_stress_test_lambda_num_full_agg_union.csv", path + "semi_schema_level_stress_test_lambda_num_full_agg_intersection.csv", path + "semi_schema_level_stress_test_lambda_num_full_agg_union.csv", path + "schema_level_stress_test_lambda_num_full.csv");
+//		process_text_full_case(path + "final_real_test_full2.txt", path + "exp_final_real_test_full2_tuple_agg_intersection.csv", path + "exp_final_real_test_full2_tuple_agg_union.csv", path + "exp_final_real_test_full2_semi_schema_agg_intersection.csv", path + "exp_final_real_test_full2_semi_schema_agg_union.csv", path + "exp_final_real_test_full2_schema.csv");
 		
-//		process_text_min_case(path + "final_real_test_min2.txt", path + "exp_final_real_test_min2_tuple.csv", path + "exp_final_real_test_min2_semi_schema.csv", path + "exp_final_real_test_min2_schema.csv");
+		process_text_min_case(path + "final_stress_test_view_num_min.txt", path + "exp_final_stress_test_view_num_min_tuple.csv", path + "exp_final_stress_test_view_num_min_semi_schema.csv", path + "exp_final_stress_test_view_num_min_schema.csv");
 	}
 
 	
@@ -254,7 +254,7 @@ public class process_text {
 	    
 	    Vector<Vector<Double>> schema = new Vector<Vector<Double>>();
 		
-	    int m = 3;
+	    int m = 10;
 	    
 		try (BufferedReader br = new BufferedReader(new FileReader(file_name))) {
 		    String line;		    

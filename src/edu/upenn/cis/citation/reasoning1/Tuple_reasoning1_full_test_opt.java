@@ -140,6 +140,8 @@ public class Tuple_reasoning1_full_test_opt {
 	
 	public static int unique_tuple_num = 0;
 	
+	public static HashSet<Tuple> viewTuples = new HashSet<Tuple>();
+	
 	static HashMap<String, Integer> q_subgoal_id = new HashMap<String, Integer>();
 	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException, IOException, InterruptedException, JSONException
@@ -979,6 +981,53 @@ public class Tuple_reasoning1_full_test_opt {
 //		return citations;
 //	}
 	
+	
+	public static HashSet<String> tuple_gen_citation_per_tuple(Vector<String> names, Connection c, PreparedStatement pst) throws JSONException, SQLException
+	{
+	  Head_strs head = new Head_strs(names);
+	  
+	  ArrayList<Integer> id_lists = head_strs_rows_mapping.get(head);
+	  
+	  Set<int[]> keys = c_view_map.keySet();
+
+	  HashSet<String> citations = new HashSet<String>();
+	  
+	  Iterator iter = keys.iterator();
+	  
+	  int i = 0;
+	  
+	  int tuple_id = id_lists.get(i);
+	    
+	    while(iter.hasNext())
+	    {
+	      int [] curr_tuple_key = (int[]) iter.next();
+	      
+	      while(tuple_id >= curr_tuple_key[0] && tuple_id < curr_tuple_key[1])
+	      {
+	        HashSet<citation_view_vector> c_views = c_view_map.get(curr_tuple_key);
+	        
+	        rs.absolute(tuple_id);
+	        
+	        HashSet<String> curr_citations = gen_citations_per_covering_set(c_views, rs, Resultset_prefix_col_num, tuple_id, c, pst);
+	        
+	        citations.addAll(curr_citations);
+	        
+	        i++;
+	       
+	        if(i >= id_lists.size())
+	            break;
+	        
+	        tuple_id = id_lists.get(i);
+	        
+	      }
+	      
+	      if(i >= id_lists.size())
+	        break;
+	    }
+	    
+	  return citations;
+	}
+	
 	public static HashSet<String> tuple_gen_agg_citations(Query query, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException, JSONException
 	{
 		start = System.nanoTime();
@@ -1688,7 +1737,7 @@ public class Tuple_reasoning1_full_test_opt {
 	    UserLib.myprintln("canDb = " + canDb.toString());
 
 	    // compute view tuples
-	    HashSet viewTuples = CoreCover.computeViewTuples(canDb, views);
+	    viewTuples = CoreCover.computeViewTuples(canDb, views);
 	    
 	    viewTuples = check_distinguished_variables(viewTuples, q);
 	    	    	    
@@ -2876,7 +2925,7 @@ public class Tuple_reasoning1_full_test_opt {
 			
 			citation_view_vector covering_set = (citation_view_vector) iter.next();
 									
-			HashSet<String> str = new HashSet<String>(); //gen_citation1.get_citations3(covering_set, c, pst, view_list, view_query_mapping, author_mapping, max_author_num, query_ids, query_lambda_str, view_author_mapping, star_op);
+			HashSet<String> str = gen_citation1.get_citations3(covering_set, c, pst, view_list, view_query_mapping, author_mapping, max_author_num, query_ids, query_lambda_str, view_author_mapping, star_op);
 			
 			citations.addAll(str);		
 		}
@@ -3167,6 +3216,111 @@ public class Tuple_reasoning1_full_test_opt {
 //			}
 		}
 	}
+	
+	public static HashSet<String> gen_citations_per_covering_set(HashSet<citation_view_vector> insert_c_view, ResultSet rs, int start_pos, int tuple_id, Connection c, PreparedStatement pst) throws SQLException, JSONException
+    {
+        
+//      HashSet<citation_view_vector2> update_c_views = new HashSet<citation_view_vector2>();
+        
+        HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping = new HashMap<String, HashMap<String, HashSet<String>>>();
+	  
+	    HashSet<String> citations = new HashSet<String>();
+	  
+        Set<String> head_sets = lambda_term_id_mapping.keySet();
+        
+        for(Iterator iter = insert_c_view.iterator(); iter.hasNext();)
+        {
+          citation_view_vector covering_set = (citation_view_vector) iter.next();
+          
+          for(int i = 0; i<covering_set.c_vec.size(); i++)
+          {
+            citation_view view = covering_set.c_vec.get(i);
+            
+            if(view.has_lambda_term())
+            {
+                citation_view_parametered curr_c_view = (citation_view_parametered) view;
+                
+                Vector<Lambda_term> lambda_terms = curr_c_view.lambda_terms;
+                
+                Vector<String> heads = new Vector<String>();
+                
+                for(int k = 0; k<lambda_terms.size(); k++)
+                {
+                    int id = lambda_term_id_mapping.get(lambda_terms.get(k).toString());
+                    
+                    heads.add(rs.getString(id + start_pos + 1));
+                    
+                    curr_c_view.put_lambda_paras(lambda_terms.get(k), rs.getString(id + start_pos + 1));
+                }                
+            }
+          }
+          
+          HashSet<String> curr_citations = gen_citation1.get_citations3(covering_set, c, pst, view_list, view_query_mapping, author_mapping, max_author_num, query_ids, query_lambda_str, view_author_mapping, populate_db.star_op);
+          
+          citations.addAll(curr_citations);
+          
+        }
+        
+
+        return citations;
+//        for(int i = 0; i<insert_c_view.size(); i++)
+//        {
+//            
+//            citation_view c_vec = insert_c_view.get(i);
+//            
+////          for(int j = 0; j<c_vec.c_vec.size(); j++)
+////          {
+////              citation_view c_view = c_vec.c_vec.get(j);
+//                
+//                if(c_vec.has_lambda_term())
+//                {
+//                    citation_view_parametered curr_c_view = (citation_view_parametered) c_vec;
+//                    
+//                    Vector<Lambda_term> lambda_terms = curr_c_view.lambda_terms;
+//                    
+//                    Vector<String> heads = new Vector<String>();
+//                    
+//                    for(int k = 0; k<lambda_terms.size(); k++)
+//                    {
+//                        int id = lambda_term_id_mapping.get(lambda_terms.get(k).toString());
+//                        
+//                        heads.add(rs.getString(id + start_pos + 1));
+//                        
+//                        curr_c_view.put_lambda_paras(lambda_terms.get(k), rs.getString(id + start_pos + 1));
+//                    }
+//                    
+//                    Head_strs head_values = new Head_strs(heads);
+//                    
+//                    if(values.size() > i)
+//                    {
+//                        values.get(i).add(head_values);
+//                    }
+//                    else
+//                    {
+//                        HashSet<Head_strs> curr_head_values = new HashSet<Head_strs>();
+//                        
+//                        curr_head_values.add(head_values);
+//                        
+//                        values.add(curr_head_values);
+//                    }
+//                    
+//                }
+//                else
+//                {
+//                    if(values.size() > i)
+//                    {
+//                        continue;
+//                    }
+//                    else
+//                    {
+//                        values.add(new HashSet<Head_strs>());
+//                    }
+//                }
+                
+//          }
+//        }
+    }
+	
 	
 	public static void get_views_parameters(ArrayList<citation_view> insert_c_view, ResultSet rs, int start_pos, ArrayList<HashSet<Head_strs>> values, ArrayList<Integer> view_ids) throws SQLException
 	{

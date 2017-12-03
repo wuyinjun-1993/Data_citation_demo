@@ -92,20 +92,13 @@ public class view_operation {
 		pst.execute();
 	}
 	
-	public static void save_view_by_name(String old_name, String new_name, Query view) throws SQLException, ClassNotFoundException
+	public static void save_view_by_name(String old_name, String new_name, Query view, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
-		save_view_by_name(old_name, new_name, view, true);
+		save_view_by_name(old_name, new_name, view, true, c, pst);
 	}
 	
-	public static void save_view_by_name(String old_name, String new_name, Query view, boolean tuple_level) throws SQLException, ClassNotFoundException
+	public static void save_view_by_name(String old_name, String new_name, Query view, boolean tuple_level, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-        
-        PreparedStatement pst = null;
-        
         int id = get_view_id(old_name, c, pst);
         
 //        String id = name;
@@ -135,8 +128,6 @@ public class view_operation {
         view.name = "v" + id;
         
         populate_db.update(view);
-        
-        c.close();
         
 	}
 	
@@ -243,15 +234,8 @@ public class view_operation {
 		return add(v, name, c, pst, true);
 	}
 	
-	public static Query get_view_by_name(String name) throws SQLException, ClassNotFoundException
-	{
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-        
-        PreparedStatement pst = null;
-        
+	public static Query get_view_by_name(String name, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	{        
         HashMap<String, String> subgoal_name_mapping = new HashMap<String, String>();
         
         Vector<Argument> head_var = new Vector<Argument>();
@@ -267,10 +251,7 @@ public class view_operation {
         Subgoal head = new Subgoal("v" + id, head_var);
                 
         Query view = new Query("v" + id, head, subgoals,lambda_terms, conditions, subgoal_name_mapping);
-        
-        
-        c.close();
-                
+                        
         return view;
 	}
 	

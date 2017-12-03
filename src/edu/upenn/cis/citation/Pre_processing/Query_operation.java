@@ -41,14 +41,17 @@ public class Query_operation {
 //		Vector<String> table_names = get_connection_citation_with_query("c1", block_names);
 //		
 //		System.out.println(table_names);
+	  Class.forName("org.postgresql.Driver");
+      Connection c = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+      PreparedStatement pst = null;
 		
-		
-		Query query = get_query_by_name("q2");
+		Query query = get_query_by_name("q2", c, pst);
 		
 		String query_str = covert2data_str(query);
 		
 		System.out.println(query_str);
 		
+		c.close();
 //		delete_query_by_id(10);
 		
 	}
@@ -183,14 +186,8 @@ public class Query_operation {
 		return ids;
 	}
 	
-	public static void add_connection_citation_with_query(String cname, Vector<String[]> qname_block) throws SQLException, ClassNotFoundException
+	public static void add_connection_citation_with_query(String cname, Vector<String[]> qname_block, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-        
-        PreparedStatement pst = null;
         
         int cid = citation_view_operation.get_citation_id(cname, c, pst);
         
@@ -200,10 +197,6 @@ public class Query_operation {
             
             insert_citation_query_connection(cid, qid, qname_block.get(i)[1], c, pst);
         }
-        
-        
-        
-        c.close();
         
 	}
 	
@@ -223,31 +216,15 @@ public class Query_operation {
                 
 	}
 	
-	public static void delete_connection_citation_with_query(String cname) throws SQLException, ClassNotFoundException
-	{
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-        
-        PreparedStatement pst = null;
-        
+	public static void delete_connection_citation_with_query(String cname, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	{        
         int cid = citation_view_operation.get_citation_id(cname, c, pst);
         
         citation_view_operation.delete_citation2query(cid, c, pst);
-        
-        c.close();
-	}
+   	}
 	
-	public static Vector<String> get_connection_citation_with_query(String citation_name, Vector<String> block_names) throws SQLException, ClassNotFoundException
-	{
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-        
-        PreparedStatement pst = null;
-        
+	public static Vector<String> get_connection_citation_with_query(String citation_name, Vector<String> block_names, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	{        
         int cid = citation_view_operation.get_citation_id(citation_name, c, pst);
         
         Vector<String> query_names = get_query_name(cid, block_names, c, pst);
@@ -346,15 +323,8 @@ public class Query_operation {
 		return id;
 	}
 	
-	public static void delete_query_by_name(String name) throws SQLException, ClassNotFoundException
-	{
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-        
-        PreparedStatement pst = null;
-        
+	public static void delete_query_by_name(String name, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	{        
         int id = get_query_id(name, c, pst);
         
 //        String id = name;
@@ -372,9 +342,7 @@ public class Query_operation {
         delete_citation_view(id, c, pst);
         
         delete_head_variables(id, c, pst);
-        
-        c.close();
-        
+                
 //        populate_db.delete(id, subgoals, subgoal_name_mapping, has_lambda);
 
 	}
@@ -531,13 +499,6 @@ public class Query_operation {
 	
 	public static Query get_query_by_id(int id, Connection c, PreparedStatement pst, boolean reasoning) throws SQLException
 	{
-//		Class.forName("org.postgresql.Driver");
-//        Connection c = DriverManager
-//           .getConnection(populate_db.db_url,
-//       	        populate_db.usr_name,populate_db.passwd);
-//        
-//        PreparedStatement pst = null;
-        
         Vector<Argument> head_var = new Vector<Argument>();
         
 //        String id = get_id_head_vars(name, head_var, c, pst);
@@ -565,15 +526,8 @@ public class Query_operation {
         return view;
 	}
 	
-	public static Query get_query_by_name(String name) throws SQLException, ClassNotFoundException
+	public static Query get_query_by_name(String name, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-        
-        PreparedStatement pst = null;
-        
         Vector<Argument> head_var = new Vector<Argument>();
         
         int id = get_query_id(name, c, pst);
@@ -593,10 +547,7 @@ public class Query_operation {
         Subgoal head = new Subgoal(q_name, head_var);
         
         Query view = new Query(q_name, head, subgoals,lambda_terms, conditions, subgoal_name_mapping);
-        
-        
-        c.close();
-                
+                        
         return view;
 	}
 	
@@ -693,12 +644,6 @@ public class Query_operation {
 	
 	static void insert_query(Query query, String name, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
-//		Class.forName("org.postgresql.Driver");
-//        Connection c = DriverManager
-//           .getConnection(populate_db.db_url,
-//       	        populate_db.usr_name,populate_db.passwd);
-//        
-//        PreparedStatement pst = null;
         
 //        update_table(view, c, pst);
         

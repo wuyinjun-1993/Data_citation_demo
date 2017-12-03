@@ -125,6 +125,8 @@ public class Tuple_reasoning2_full_test2 {
 	public static boolean test_case = true;
 	
 	public static int unique_tuple_num = 0;
+	
+	public static HashSet<Tuple> viewTuples = new HashSet<Tuple>();
 //	static HashMap<String, ArrayList<String>> 
 	
 //	static HashMap<String, ArrayList<Tuple>> tuple_mapping = new HashMap<String, ArrayList<Tuple>>(); 
@@ -780,7 +782,7 @@ public class Tuple_reasoning2_full_test2 {
 	    UserLib.myprintln("canDb = " + canDb.toString());
 
 	    // compute view tuples
-	    HashSet viewTuples = CoreCover.computeViewTuples(canDb, views);
+	    viewTuples = CoreCover.computeViewTuples(canDb, views);
 	    
 	    viewTuples = check_distinguished_variables(viewTuples, q);
 	    	    	    

@@ -22,6 +22,8 @@ import org.json.JSONObject;
 
 import edu.upenn.cis.citation.Corecover.Lambda_term;
 import edu.upenn.cis.citation.Corecover.Query;
+import edu.upenn.cis.citation.Corecover.Tuple;
+import edu.upenn.cis.citation.Operation.Conditions;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.citation_view;
@@ -769,6 +771,81 @@ public class Aggregation5 {
 		}
 	}
 
+	
+	public static int[] count_view_mapping_predicates_lambda_terms(HashSet<Tuple> tuples)
+	{
+		
+		HashSet<String> view_mapping_string = new HashSet<String>();
+		
+		HashSet<String> lambda_string = new HashSet<String> ();
+		
+		HashSet<String> predicate_string = new HashSet<String>();
+		
+		for(Iterator iter = tuples.iterator(); iter.hasNext();)
+		{
+			Tuple tuple = (Tuple) iter.next();
+			
+			Vector<Conditions> conditions = tuple.conditions;
+			
+			Vector<Lambda_term> l_terms = tuple.lambda_terms;
+			
+			for(int k = 0; k<conditions.size(); k++)
+			{
+				predicate_string.add(conditions.get(k).toString());
+			}
+			
+			for(int k = 0; k<l_terms.size(); k++)
+			{
+				lambda_string.add(l_terms.get(k).toString());
+			}
+		}
+		
+//		for(int i = 0; i<curr_res.size(); i++)
+//		{
+//			citation_view_vector covering_set = curr_res.get(i);
+//			
+//			for(int j = 0; j<covering_set.c_vec.size(); j++)
+//			{
+//				citation_view v = covering_set.c_vec.get(j);
+//				
+//				String view_name = v.get_name();
+//				
+//				String table_names = v.get_table_name_string();
+//				
+//				String index_string = view_name + populate_db.separator + table_names;
+//				
+//				
+//				Vector<Conditions> conditions = v.get_view_tuple().conditions;
+//				
+//				Vector<Lambda_term> l_terms = v.get_view_tuple().lambda_terms;
+//				
+//				for(int k = 0; k<conditions.size(); k++)
+//				{
+//					predicate_string.add(conditions.get(k).toString());
+//				}
+//				
+//				for(int k = 0; k<l_terms.size(); k++)
+//				{
+//					lambda_string.add(l_terms.get(k).toString());
+//				}
+//				
+////				if(view_mapping_string.contains(index_string))
+//				{
+//					view_mapping_string.add(index_string);
+//				}
+//			}
+//		}
+		
+		int [] nums = new int[3];
+		
+		nums[0] = tuples.size();
+		
+		nums[1] = lambda_string.size();
+		
+		nums[2] = predicate_string.size();
+		
+		return nums;
+	}
 	
 	public static ArrayList<HashSet<citation_view>> cal_covering_set_schema_level_union(ResultSet rs, HashMap<int[], HashSet<citation_view_vector> > c_view_map, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException
 	{

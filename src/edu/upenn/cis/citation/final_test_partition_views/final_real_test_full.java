@@ -1,4 +1,4 @@
-package edu.upenn.cis.citation.final_test;
+package edu.upenn.cis.citation.final_test_partition_views;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -45,7 +45,7 @@ import edu.upenn.cis.citation.stress_test.query_generator;
 import edu.upenn.cis.citation.stress_test.view_generator;
 import edu.upenn.cis.citation.user_query.query_storage;
 
-public class final_real_test_full2 {
+public class final_real_test_full {
 	
 	static int size_range = 100;
 	
@@ -65,7 +65,7 @@ public class final_real_test_full2 {
 	
 	static Vector<String> relations = new Vector<String>();
 	
-	static String path = "dblp_example/";
+	static String path = "real_example/";
 	
 	static String path2 = "reasoning_results/";
 	
@@ -152,10 +152,10 @@ public class final_real_test_full2 {
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");
 	    c1 = DriverManager
-	        .getConnection(populate_db.dblp_url1, populate_db.usr_name , populate_db.passwd);
+	        .getConnection(populate_db.db_url1, populate_db.usr_name , populate_db.passwd);
 		
 	    c2 = DriverManager
-	        .getConnection(populate_db.dblp_url2, populate_db.usr_name , populate_db.passwd);
+	        .getConnection(populate_db.db_url2, populate_db.usr_name , populate_db.passwd);
 		
 //	    System.out.println(get_single_table_size("family", c, pst));
 	    
@@ -257,7 +257,7 @@ public class final_real_test_full2 {
 		      PreparedStatement pst = null;
 			Class.forName("org.postgresql.Driver");
 		    c = DriverManager
-		        .getConnection(populate_db.dblp_url1, populate_db.usr_name , populate_db.passwd);
+		        .getConnection(populate_db.db_url1, populate_db.usr_name , populate_db.passwd);
 			
 		    Tuple_reasoning1_full_test_opt.prepare_info = false;
 		
@@ -271,15 +271,11 @@ public class final_real_test_full2 {
 			
 			double start_time = 0;
 			
-			double time1 = 0;
-			
 			HashSet<String> agg_citations = null;
 						
 			start_time = System.nanoTime();
 			
 			Tuple_reasoning1_full_test_opt.tuple_reasoning(query, c, pst);
-			
-			time1 = System.nanoTime();
 			
 			ArrayList<HashSet<citation_view>> views_per_group = Tuple_reasoning1_full_test_opt.cal_covering_sets_schema_level(query, c, pst);
 			
@@ -297,11 +293,9 @@ public class final_real_test_full2 {
 			
 			double time = (end_time - start_time)*1.0;
 			
-			double agg_time = (middle_time - time1) * 1.0/1000000000;
+			double agg_time = (end_time - middle_time) * 1.0/1000000000;
 			
 			double reasoning_time = (middle_time - start_time) * 1.0/1000000000;
-			
-			double citation_gen_time = (end_time - middle_time) * 1.0/1000000000;
 			
 			time = time /(times * 1000000000);
 						
@@ -317,9 +311,7 @@ public class final_real_test_full2 {
 			
 			System.out.print("aggregation_time::" + agg_time + "	");
 			
-			System.out.print("citation_gen_time::" + citation_gen_time + "	");
-			
-//			System.out.print("covering_sets::" + Aggregation5.curr_res + "	");
+			System.out.print("covering_sets::" + Aggregation5.curr_res + "	");
 			
 			System.out.print("covering_set_size::" + Aggregation5.curr_res.size() + "	");
 			
@@ -409,6 +401,7 @@ public class final_real_test_full2 {
 			
 			System.out.print("predicate num::" + nums[2] + "	");
 			
+			
 //			time = (end_time - start_time) * 1.0/1000000000;
 //			
 //			System.out.print("Aggregation_time::" + time + "	");
@@ -494,16 +487,6 @@ public class final_real_test_full2 {
 			
 			System.out.println();
 			
-			
-//			for(Iterator iter = agg_citations.iterator(); iter.hasNext();)
-//			{
-//				String citation = (String) iter.next();
-//				
-//				System.out.println(citation);
-//
-//			}
-			
-			
 //			System.out.println(agg_citations.toString());
 			
 			c.close();
@@ -521,7 +504,7 @@ public class final_real_test_full2 {
 			      PreparedStatement pst = null;
 				Class.forName("org.postgresql.Driver");
 			    c = DriverManager
-			        .getConnection(populate_db.dblp_url2, populate_db.usr_name , populate_db.passwd);
+			        .getConnection(populate_db.db_url2, populate_db.usr_name , populate_db.passwd);
 				
 			    Tuple_reasoning2_full_test2.prepare_info = false;
 			    
@@ -535,15 +518,11 @@ public class final_real_test_full2 {
 				
 				double start_time = 0;
 				
-				double time1 = 0;
-				
 				HashSet<String> agg_citations = null;
 							
 				start_time = System.nanoTime();
 				
 				Tuple_reasoning2_full_test2.tuple_reasoning(query, c, pst);
-				
-				time1 = System.nanoTime();
 				
 				ArrayList<HashSet<citation_view>> views_per_group = Tuple_reasoning2_full_test2.cal_covering_sets_schema_level(query, c, pst);
 				
@@ -551,21 +530,17 @@ public class final_real_test_full2 {
 				
 				Tuple_reasoning2_full_test2.prepare_citation_information(c, pst);
 				
-				Tuple_reasoning2_full_test2.gen_citation_schema_level(views_per_group, c, pst);
-				
-//				agg_citations = Tuple_reasoning2_full_test2.tuple_gen_agg_citations(query, c, pst);
-														
+				agg_citations =  Tuple_reasoning2_full_test2.gen_citation_schema_level(views_per_group, c, pst);
+																		
 				end_time = System.nanoTime();
 				
 				int [] nums = Aggregation5.count_view_mapping_predicates_lambda_terms(Tuple_reasoning2_full_test2.viewTuples);
 				
 				double time = (end_time - start_time)*1.0;
 				
-				double agg_time = (middle_time - time1) * 1.0/1000000000;
+				double agg_time = (end_time - middle_time) * 1.0/1000000000;
 				
 				double reasoning_time = (middle_time - start_time) * 1.0/1000000000;
-				
-				double citation_gen_time = (end_time - middle_time) * 1.0/1000000000;
 				
 				time = time /(times * 1000000000);
 							
@@ -580,10 +555,6 @@ public class final_real_test_full2 {
 				System.out.print("reasoning_time::" + reasoning_time + "	");
 				
 				System.out.print("aggregation_time::" + agg_time + "	");
-				
-				System.out.print("citation_gen_time::" + citation_gen_time + "	");
-
-//				System.out.print("covering_sets::" + Aggregation5.curr_res + "	");
 				
 				System.out.print("covering_set_size::" + Aggregation5.curr_res.size() + "	");
 				
@@ -705,7 +676,7 @@ public class final_real_test_full2 {
 			      PreparedStatement pst = null;
 				Class.forName("org.postgresql.Driver");
 			    c = DriverManager
-			        .getConnection(populate_db.dblp_url2, populate_db.usr_name , populate_db.passwd);
+			        .getConnection(populate_db.db_url2, populate_db.usr_name , populate_db.passwd);
 				
 			    schema_reasoning.prepare_info = false;
 			    
@@ -757,7 +728,7 @@ public class final_real_test_full2 {
 				
 				System.out.print("aggregation_time::" + agg_time + "	");
 				
-//				System.out.print("covering_sets::" + schema_reasoning.covering_set_query + "	");
+				System.out.print("covering_set::" + schema_reasoning.covering_set_query + "	");
 				
 				System.out.print("covering_set_size::" + schema_reasoning.covering_set_query.size() + "	");
 				

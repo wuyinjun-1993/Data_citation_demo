@@ -1,5 +1,8 @@
-package edu.upenn.cis.citation.final_test;
+package edu.upenn.cis.citation.final_test_partition_views;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -7,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -27,8 +31,6 @@ import edu.upenn.cis.citation.citation_view.Head_strs2;
 import edu.upenn.cis.citation.citation_view.citation_view;
 import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.datalog.Query_converter;
-import edu.upenn.cis.citation.examples.Example_real;
-import edu.upenn.cis.citation.examples.Load_views_and_citation_queries;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test_opt;
@@ -41,11 +43,11 @@ import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_full_min_test;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_min_test;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning2_full_min_test;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning2_min_test;
+import edu.upenn.cis.citation.stress_test.partition_view_generator;
 import edu.upenn.cis.citation.stress_test.query_generator;
-import edu.upenn.cis.citation.stress_test.view_generator;
 import edu.upenn.cis.citation.user_query.query_storage;
 
-public class final_real_test_full2 {
+public class final_stress_test_partition_lambda_num_full {
 	
 	static int size_range = 100;
 	
@@ -65,9 +67,10 @@ public class final_real_test_full2 {
 	
 	static Vector<String> relations = new Vector<String>();
 	
-	static String path = "dblp_example/";
+	static String path = "reasoning_results/";
 	
-	static String path2 = "reasoning_results/";
+	static HashSet<String> lambda_variable_string = new HashSet<String>();
+
 	
 	static Vector<String> get_unique_relation_names(Query query)
 	{
@@ -142,7 +145,7 @@ public class final_real_test_full2 {
 		
 		return 0;
 	}
-
+	
 	
 	public static void main(String [] args) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
 	{		
@@ -152,70 +155,195 @@ public class final_real_test_full2 {
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");
 	    c1 = DriverManager
-	        .getConnection(populate_db.dblp_url1, populate_db.usr_name , populate_db.passwd);
+	        .getConnection(populate_db.db_url1, populate_db.usr_name , populate_db.passwd);
 		
 	    c2 = DriverManager
-	        .getConnection(populate_db.dblp_url2, populate_db.usr_name , populate_db.passwd);
+	        .getConnection(populate_db.db_url2, populate_db.usr_name , populate_db.passwd);
 		
 //	    System.out.println(get_single_table_size("family", c, pst));
 	    
-	    int view_id = Integer.valueOf(args[0]);
 	    
-	    boolean load_views_queries = Boolean.valueOf(args[1]);
-	    	    
-    	Vector<Query> queries = Load_views_and_citation_queries.get_views(path + "real_queries", c2, pst);
+//	    query_generator.query_result_size = 10000;
 	    
-	    if(load_views_queries)
-	    {
-		    
-		    Example_real.load_view_and_citations(path + "views", path + "citation_queries", path + "connection", true, c1, pst);
-		    
-		    Example_real.load_view_and_citations(path + "views", path + "citation_queries", path + "connection", false, c2, pst);
-
-	    }
+	    int k = Integer.valueOf(args[0]);
 	    
-	    	    		
-		boolean tuple_level = Boolean.valueOf(args[2]);
+	    int view_size = Integer.valueOf(args[1]);
+	    
+	    boolean new_query = Boolean.valueOf(args[2]);
 		
-		boolean schema_level = Boolean.valueOf(args[3]);
+		boolean new_rounds = Boolean.valueOf(args[3]);
 		
-		boolean agg_intersection = Boolean.valueOf(args[4]);
+		boolean tuple_level = Boolean.valueOf(args[4]);
+		
+		boolean schema_level = Boolean.valueOf(args[5]);
+		
+		boolean new_start = Boolean.valueOf(args[6]);
+		
+		boolean agg_intersection = Boolean.valueOf(args[7]);
+		
+//		boolean cal_covering_set = Boolean.valueOf(args[8]);
+		
 				
-//		for(int i = 0; i<queries.size(); i++)
-		{
-//			System.out.println(i);
-			
-			
-			stress_test(queries.get(view_id), tuple_level, schema_level, agg_intersection);
-		}		
-		
-		Vector<Query> user_query = new Vector<Query>();
-		
-		user_query.add(queries.get(view_id));
-		
-		output_queries(user_query, path2 + "user_queries");
-		
-		Vector<Query> views = view_operation.get_all_views(c2, pst);
-		
-		output_queries(views, path2 + "views");
-		
-		Vector<Query> all_citation_queries = Query_operation.get_all_citation_queries(c2, pst);
-		
-		output_queries(all_citation_queries, path2 + "citation_query");
-		
-		Vector<String> sqls = new Vector<String>();
-		
-		sqls.add(Query_converter.datalog2sql(queries.get(view_id)));
-		
-		Query_operation.write2file(path2 + "user_query_sql", sqls);
-		
-		c1.close();
-		
-		c2.close();
-		
 //		Query query = query_storage.get_query_by_id(1);
 		
+		query_generator.init_parameterizable_attributes(c2, pst);
+
+		{
+			if(new_query)
+			{
+				System.out.println("new query");
+				
+				reset(c1, pst);
+				
+				reset(c2, pst);
+			}
+						
+			Query query = null;
+			
+			
+			try{
+				query = query_storage.get_query_by_id(1, c2, pst);
+			}
+			catch(Exception e)
+			{
+				query = query_generator.gen_query(k, c2, pst);
+				query_storage.store_query(query, new Vector<Integer>(), c2, pst);
+				System.out.println(query);
+			}
+			
+			if(new_query)
+			{
+				Vector<String> sqls = new Vector<String>();
+				
+				sqls.add(Query_converter.datalog2sql_test(query));
+				
+				Query_operation.write2file(path + "user_query_sql", sqls);
+			}
+			
+			relations = get_unique_relation_names(query);
+			
+			Vector<Query> views = null;
+			
+			if(new_rounds)
+			{
+				
+				populate_db.renew_table(c1, pst);
+				
+				get_table_size(relations, c1, pst);
+				
+				views = partition_view_generator.generate_store_views_without_lambda_terms_predicates(query, view_size, query.body.size(), c1, c2, pst);
+				
+//				views = view_generator.generate_store_views_without_predicates(relation_names, view_size, query.body.size());
+				
+				for(Iterator iter = views.iterator(); iter.hasNext();)
+				{
+					Query view = (Query) iter.next();
+					
+					System.out.println(view);
+				}
+				
+				get_table_size(relations, c1, pst);
+			}
+			else
+			{
+				views = view_operation.get_all_views(c2, pst);
+				
+				if(new_start)
+				{
+					System.out.println();
+					
+					partition_view_generator.initial();
+					
+					HashSet<String> view_strs = get_view_strs(path + "covering_sets");
+					
+					Vector<Integer> view_ids = get_view_ids(view_strs, views);
+					
+					if(!partition_view_generator.gen_one_addtional_lambda_term(views, lambda_variable_string, c1, c2, pst))
+						System.exit(1);
+					
+					for(Iterator iter = views.iterator(); iter.hasNext();)
+					{
+						Query view = (Query) iter.next();
+						
+						System.out.println(view.lambda_term.toString() + view.toString());
+					}
+					
+					get_table_size(relations, c1, pst);
+				}
+			}
+			
+			Vector<Query> all_citation_queries = Query_operation.get_all_citation_queries(c2, pst);
+			
+			c1.close();
+			
+			c2.close();
+			
+			stress_test(query, views, tuple_level, schema_level, agg_intersection);
+
+			
+			Vector<Query> user_query = new Vector<Query>();
+			
+			user_query.add(query);
+			
+			output_queries(user_query, path + "user_queries");
+			
+			output_queries(views, path + "views");
+			
+			output_queries(all_citation_queries, path + "citation_query");
+			
+		}
 		
+
+		
+		
+		
+		
+		
+	}
+	
+	static Vector<Integer> get_view_ids(HashSet<String> view_strs, Vector<Query> views)
+	{
+		Vector<Integer> view_ids = new Vector<Integer>();
+		
+		for(int i = 0; i<views.size(); i++)
+		{
+			if(view_strs.contains(views.get(i).name))
+			{
+				view_ids.add(i);
+			}
+		}
+		
+		return view_ids;
+	}
+	
+	static HashSet<String> get_view_strs(String file_name)
+	{
+		HashSet<String> covering_sets = new HashSet<String>();
+		
+		try (BufferedReader br = new BufferedReader(new FileReader(file_name))) {
+		    String line;
+		    
+		    if ((line = br.readLine()) != null) {
+		       // process the line.
+		    	
+		    	String [] view_strs = line.split("\\*");
+		    	
+		    	for(int i = 0; i<view_strs.length; i++)
+		    	{
+		    		String view_name = view_strs[i].split("\\(")[0];
+		    		
+		    		covering_sets.add(view_name);
+		    	}
+		    }
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return covering_sets;
 	}
 	
 	static void output_queries(Vector<Query> queries, String file_name) throws IOException
@@ -233,7 +361,7 @@ public class final_real_test_full2 {
 	}
 	
 	
-	static void stress_test(Query query, boolean tuple_level, boolean schema_level, boolean agg_intersection) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
+	static void stress_test(Query query, Vector<Query> views, boolean tuple_level, boolean schema_level, boolean agg_intersection) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
 	{
 		HashMap<Head_strs, HashSet<String> > citation_strs = new HashMap<Head_strs, HashSet<String>>();
 		
@@ -257,13 +385,11 @@ public class final_real_test_full2 {
 		      PreparedStatement pst = null;
 			Class.forName("org.postgresql.Driver");
 		    c = DriverManager
-		        .getConnection(populate_db.dblp_url1, populate_db.usr_name , populate_db.passwd);
+		        .getConnection(populate_db.db_url1, populate_db.usr_name , populate_db.passwd);
 			
 		    Tuple_reasoning1_full_test_opt.prepare_info = false;
 		
 		    Tuple_reasoning1_full_test_opt.agg_intersection = agg_intersection;
-		    
-		    Tuple_reasoning1_full_test_opt.test_case = false;
 		    
 		    double end_time = 0;
 
@@ -292,8 +418,6 @@ public class final_real_test_full2 {
 //			 Tuple_reasoning1_full_test_opt.tuple_gen_agg_citations(query, c, pst);
 													
 			end_time = System.nanoTime();
-			
-			int [] nums = Aggregation5.count_view_mapping_predicates_lambda_terms(Tuple_reasoning1_full_test_opt.viewTuples);
 			
 			double time = (end_time - start_time)*1.0;
 			
@@ -403,11 +527,7 @@ public class final_real_test_full2 {
 			
 			System.out.print("population::" + Tuple_reasoning1_full_test_opt.population_time + "	");
 			
-			System.out.print("view mapping size::" + nums[0] + "	");
 			
-			System.out.print("lambda term num::" + nums[1] + "	");
-			
-			System.out.print("predicate num::" + nums[2] + "	");
 			
 //			time = (end_time - start_time) * 1.0/1000000000;
 //			
@@ -494,16 +614,6 @@ public class final_real_test_full2 {
 			
 			System.out.println();
 			
-			
-//			for(Iterator iter = agg_citations.iterator(); iter.hasNext();)
-//			{
-//				String citation = (String) iter.next();
-//				
-//				System.out.println(citation);
-//
-//			}
-			
-			
 //			System.out.println(agg_citations.toString());
 			
 			c.close();
@@ -521,13 +631,11 @@ public class final_real_test_full2 {
 			      PreparedStatement pst = null;
 				Class.forName("org.postgresql.Driver");
 			    c = DriverManager
-			        .getConnection(populate_db.dblp_url2, populate_db.usr_name , populate_db.passwd);
+			        .getConnection(populate_db.db_url2, populate_db.usr_name , populate_db.passwd);
 				
 			    Tuple_reasoning2_full_test2.prepare_info = false;
 			    
 			    Tuple_reasoning2_full_test2.agg_intersection = agg_intersection;
-			    
-			    Tuple_reasoning2_full_test2.test_case = false;
 			    
 			    double end_time = 0;
 
@@ -535,7 +643,7 @@ public class final_real_test_full2 {
 				
 				double start_time = 0;
 				
-				double time1 = 0;
+				double time1 = 0.0;
 				
 				HashSet<String> agg_citations = null;
 							
@@ -556,8 +664,6 @@ public class final_real_test_full2 {
 //				agg_citations = Tuple_reasoning2_full_test2.tuple_gen_agg_citations(query, c, pst);
 														
 				end_time = System.nanoTime();
-				
-				int [] nums = Aggregation5.count_view_mapping_predicates_lambda_terms(Tuple_reasoning2_full_test2.viewTuples);
 				
 				double time = (end_time - start_time)*1.0;
 				
@@ -667,12 +773,6 @@ public class final_real_test_full2 {
 				
 				System.out.print("population::" + Tuple_reasoning2_full_test2.population_time + "	");
 				
-				System.out.print("view mapping size::" + nums[0] + "	");
-				
-				System.out.print("lambda term num::" + nums[1] + "	");
-				
-				System.out.print("predicate num::" + nums[2] + "	");
-				
 				System.out.println();
 				
 
@@ -705,11 +805,9 @@ public class final_real_test_full2 {
 			      PreparedStatement pst = null;
 				Class.forName("org.postgresql.Driver");
 			    c = DriverManager
-			        .getConnection(populate_db.dblp_url2, populate_db.usr_name , populate_db.passwd);
+			        .getConnection(populate_db.db_url2, populate_db.usr_name , populate_db.passwd);
 				
 			    schema_reasoning.prepare_info = false;
-			    
-			    schema_reasoning.test_case = false;
 			    			    
 			    double end_time = 0;
 

@@ -664,7 +664,7 @@ public class query_generator {
 		
 		for(int i = 0; i<size; i++)
 		{
-			int index = r.nextInt(attr_list.size());
+			int index = i;//r.nextInt(attr_list.size());
 			
 			if(parameterizable_attri.get(relation).contains(attr_list.get(index)))
 			{

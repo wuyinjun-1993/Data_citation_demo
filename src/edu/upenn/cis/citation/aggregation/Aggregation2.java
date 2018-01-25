@@ -44,9 +44,9 @@ public class Aggregation2 {
 				
 				HashSet<String> all_authors = new HashSet<String>();
 				
-				for(int j = 0; j<c_view.c_vec.size(); j++)
+				for(citation_view view_mapping: c_view.c_vec)
 				{
-					citation_view c_v = c_view.c_vec.get(j);
+					citation_view c_v = view_mapping;
 					
 					HashSet<String> authors = null;
 					
@@ -112,9 +112,9 @@ public class Aggregation2 {
 			
 			if(j < c_views.size())
 			{				
-				for(int k = 0; k<c_vector.c_vec.size(); k++)
+				for(citation_view view_mapping: c_vector.c_vec)
 				{
-					citation_view c_v = c_vector.c_vec.get(k);
+					citation_view c_v = view_mapping;
 					
 					HashSet<String> authors = null;
 					

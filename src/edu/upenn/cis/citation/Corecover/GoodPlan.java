@@ -173,49 +173,49 @@ public class GoodPlan {
     showStat();
   }
 
-//    static Query parse_query(String query)
-//    {
-//        
-//        String head = query.split(":")[0];
-//        
-//        String head_name=head.split("\\(")[0];
-//        
-//        String []head_var=head.split("\\(")[1].split("\\)")[0].split(",");
-//        
-//        Vector<Argument> head_v = new Vector<Argument>();
-//        
-//        for(int i=0;i<head_var.length;i++)
-//        {
-//        	head_v.add(new Argument(head_var[i]));
-//        }
-//        
-//        Subgoal head_subgoal = new Subgoal(head_name, head_v);
-//        
-//        String []body = query.split(":")[1].split("\\),");
-//        
-//        body[body.length-1]=body[body.length-1].split("\\)")[0];
-//        
-//        Vector<Subgoal> body_subgoals = new Vector<Subgoal>(body.length);
-//        
-//        for(int i=0; i<body.length; i++)
-//        {
-//        	String body_name=body[i].split("\\(")[0];
-//            
-//            String []body_var=body[i].split("\\(")[1].split(",");
-//            
-//            Vector<Argument> body_v = new Vector<Argument>();
-//            
-//            for(int j=0;j<body_var.length;j++)
-//            {
-//            	body_v.add(new Argument(body_var[j]));
-//            }
-//            
-//            Subgoal body_subgoal = new Subgoal(body_name, body_v);
-//            
-//            body_subgoals.add(body_subgoal);
-//        }
-//        return new Query(head_name, head_subgoal, body_subgoals);
-//    }
+    static Query parse_query(String query)
+    {
+        
+        String head = query.split(":")[0];
+        
+        String head_name=head.split("\\(")[0];
+        
+        String []head_var=head.split("\\(")[1].split("\\)")[0].split(",");
+        
+        Vector<Argument> head_v = new Vector<Argument>();
+        
+        for(int i=0;i<head_var.length;i++)
+        {
+        	head_v.add(new Argument(head_var[i]));
+        }
+        
+        Subgoal head_subgoal = new Subgoal(head_name, head_v);
+        
+        String []body = query.split(":")[1].split("\\),");
+        
+        body[body.length-1]=body[body.length-1].split("\\)")[0];
+        
+        Vector<Subgoal> body_subgoals = new Vector<Subgoal>(body.length);
+        
+        for(int i=0; i<body.length; i++)
+        {
+        	String body_name=body[i].split("\\(")[0];
+            
+            String []body_var=body[i].split("\\(")[1].split(",");
+            
+            Vector<Argument> body_v = new Vector<Argument>();
+            
+            for(int j=0;j<body_var.length;j++)
+            {
+            	body_v.add(new Argument(body_var[j]));
+            }
+            
+            Subgoal body_subgoal = new Subgoal(body_name, body_v);
+            
+            body_subgoals.add(body_subgoal);
+        }
+        return new Query(head_name, head_subgoal, body_subgoals);
+    }
 
     static void doOneTestYoli2() {
 
@@ -223,7 +223,7 @@ public class GoodPlan {
     	
    
 
-    String query_str = "q1(ty):r1(id,ty),r2(id1,ty)";
+    String query_str = "q1(id, ty1):r1(id,ty1),r1(id,ty2)";
     
     String []view_strs = new String[3];
     
@@ -236,7 +236,7 @@ public class GoodPlan {
     
     Vector dummyquery = new Vector();
     
-//    dummyquery.add(parse_query(query_str));
+    dummyquery.add(parse_query(query_str));
     
     Query query = (Query)dummyquery.elementAt(0);
 //    Vector views = readViews(viewFile);

@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -326,6 +327,8 @@ public class citation_view_parametered extends citation_view{
 			
 			table_names.add(subgoal.name);
 		}
+		
+		Collections.sort(table_names);
 		
 		table_name_str = table_names.toString();
 	}

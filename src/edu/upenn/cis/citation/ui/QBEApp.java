@@ -731,7 +731,7 @@ private Object String;
                   PreparedStatement st = null;
 					Query q_datalog = Query_operation.get_query_by_name(cv, conn, st);
 					String q_sql = Query_converter.datalog2sql(q_datalog);
-					if (textFieldDataViewDataLog != null) textFieldDataViewDataLog.setText(splitSQL(q_sql));
+					if (textFieldDataViewDataLog != null) textFieldDataViewDataLog.setText((q_sql));
 					cv = "";
 					
 				  conn.close();
@@ -1037,14 +1037,24 @@ private Object String;
 				for(int i = 0; i < l; i++) {
 					Vector<String> t = new Vector<String>();
 					int len = tuples.get(i).size();
-					for(int j = 0; j < len - 1; j++) {
+					for(int j = 0; j < len; j++) {
 						t.add("" + tuples.get(i).get(j) + "");
 					}
 					names.add(new Head_strs(t));
 				}
 				// generated selected citations
 				try {
-					Vector<String> subset_agg_citations = new Vector<String>();//Tuple_reasoning1_full_test_opt.tuple_gen_agg_citations(userGeneratedQuery, names, citation_view_map);
+				  
+				  Class.forName("org.postgresql.Driver");
+                  conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+                  PreparedStatement st = null;
+				  
+				  ArrayList<HashSet<citation_view>> views_per_group = Tuple_reasoning1_full_test_opt.cal_covering_sets_subset_tuples(userGeneratedQuery, names, conn, st);
+                  
+                  HashSet<String> subset_agg_citations = Tuple_reasoning1_full_test_opt.gen_citation_subset_tuples(views_per_group, conn, st);//(views_per_group, conn, st);
+				  
+				  
+//					Vector<String> subset_agg_citations = Tuple_reasoning1_full_test_opt.tuple_gen_agg_citations(userGeneratedQuery, names, citation_view_map);
 					System.out.println("subset" + subset_agg_citations);
 					// XXX
 					for (String s : subset_agg_citations) {
@@ -1278,8 +1288,10 @@ private Object String;
 //		blockCol.setCellValueFactory(cellData -> cellData.getValue().blockProperty());
 		blockCol.setCellValueFactory(new PropertyValueFactory<>("block"));
 		ObservableList<String> blockList = FXCollections.observableArrayList(
-				new java.lang.String("Author"),
-				new java.lang.String("Title"));
+				new java.lang.String("Contributor"),
+				new java.lang.String("Title"),
+				new java.lang.String("Family_id"),
+				new java.lang.String("FamilyIntro_id"));
 //		blockCol.setCellFactory(ComboBoxTableCell.forTableColumn(blockList));
 		blockCol.setCellFactory(new Callback<TableColumn<CQuery,String>, TableCell<CQuery,String>>() {
 			public TableCell<CQuery, String> call(TableColumn<CQuery,String> tc) {

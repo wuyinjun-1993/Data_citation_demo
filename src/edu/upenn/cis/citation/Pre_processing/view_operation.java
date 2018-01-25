@@ -413,6 +413,7 @@ public class view_operation {
         	update_name(view, ids.get(i), c, pst);
         	
         	views.add(view);
+        	
         }
                 
         return views;

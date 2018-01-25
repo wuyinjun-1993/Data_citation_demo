@@ -181,7 +181,7 @@ public class final_stress_test_view_num_full {
 	        .getConnection(populate_db.db_url1, populate_db.usr_name , populate_db.passwd);
 		
 	    c2 = DriverManager
-	        .getConnection(populate_db.db_url2, populate_db.usr_name , populate_db.passwd);
+	        .getConnection(populate_db.prov_url, populate_db.usr_name , populate_db.passwd);
 		
 //	    System.out.println(get_single_table_size("family", c, pst));
 	    
@@ -525,7 +525,7 @@ public class final_stress_test_view_num_full {
 //			
 //			agg_results.add(Tuple_reasoning1_full_min_test.covering_sets_query.toString());
 //			
-//			Query_operation.write2file(path + "covering_sets", agg_results);
+			Query_operation.write2file(path + "covering_sets", Aggregation5.curr_res);
 
 //			for(int k = 0; k<Aggregation5.curr_res.size(); k++)
 //			{

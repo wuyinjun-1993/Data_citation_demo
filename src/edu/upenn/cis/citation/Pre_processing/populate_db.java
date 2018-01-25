@@ -51,6 +51,8 @@ public class populate_db {
 	public static String dblp_url1 = "jdbc:postgresql://localhost:5432/dblp";
 	
 	public static String dblp_url2 = "jdbc:postgresql://localhost:5432/dblp";
+	
+	public static String prov_url = "jdbc:postgresql://localhost:5432/provenance";
 
 
 	
@@ -86,15 +88,15 @@ public class populate_db {
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");
 	    c = DriverManager
-	        .getConnection(db_url, usr_name , passwd);
+	        .getConnection(db_url2, usr_name , passwd);
 //		
 //		
 //		delete_view_single_table("v2", "family_c", c, pst);
 		
 //	    delete_views(c, pst);
-	    
+	    drop_citation_view_cols(c, pst);
 		
-		initial();
+//		initial();
 		
 		
 	}

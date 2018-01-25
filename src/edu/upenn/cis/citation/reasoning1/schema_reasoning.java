@@ -316,9 +316,9 @@ public class schema_reasoning {
 			
 			citation_view_vector c_vec = (citation_view_vector) iter.next();
 			
-			for(int j = 0; j<c_vec.c_vec.size(); j++)
+			for(citation_view curr_view_mapping:c_vec.c_vec)
 			{
-				citation_view c_view = c_vec.c_vec.get(j);
+				citation_view c_view = curr_view_mapping;
 				
 				if(c_view.has_lambda_term())
 				{
@@ -1212,9 +1212,9 @@ public class schema_reasoning {
 	
 	public static void gen_citation(citation_view_vector citation_views) throws ClassNotFoundException, SQLException
 	{
-		for(int i = 0; i<citation_views.c_vec.size();i++)
+		for(citation_view curr_view_mapping:citation_views.c_vec)
 		{
-			String query = citation_views.c_vec.get(i).get_full_query();
+			String query = curr_view_mapping.get_full_query();
 			
 			System.out.println(query);
 		}

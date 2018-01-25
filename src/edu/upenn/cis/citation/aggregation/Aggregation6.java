@@ -36,16 +36,12 @@ import edu.upenn.cis.citation.data_structure.StringList;
 import edu.upenn.cis.citation.data_structure.Unique_StringList;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.gen_citation.gen_citation1;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test_opt;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test2;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_test;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test_opt_copy;
+import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test2_copy;
 import edu.upenn.cis.citation.reasoning1.schema_reasoning;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_min_test;
 
-public class Aggregation5 {
+public class Aggregation6 {
 	
 	public static ArrayList<HashMap<String, HashSet<String>>> full_citations = new ArrayList<HashMap<String, HashSet<String>>>();
 	
@@ -247,40 +243,34 @@ public class Aggregation5 {
 			
 		}
 		
-		for(int i = 0; i<curr_res.size(); i++)
-		{
-			
-			String id1 = curr_res.get(i).view_name_str;
-			
-			String t_id1 = curr_res.get(i).table_name_str;
-			
-			int j = 0;
-						
-			for(Iterator iter = c_views.iterator(); iter.hasNext();)
-			{
-				
-				citation_view_vector covering_set = (citation_view_vector) iter.next();
-				
-				String id2 = covering_set.view_name_str;
-				
-				String t_id2 = covering_set.table_name_str;
-								
-				if(id1.equals(id2) && t_id1.equals(t_id2))
-				{
-					break;
-				}
-				
-				j++;
-			}
-			
-			if(j >= c_views.size())
-			{				
-					
-				curr_res.remove(i);
-				
-				i--;			
-			}
-		}
+	      for(int i = 0; i<curr_res.size(); i++)
+	        {
+	            
+	          citation_view_vector covering_set1 = curr_res.get(i);
+	          
+	            int j = 0;
+	                        
+	            for(Iterator iter = c_views.iterator(); iter.hasNext();)
+	            {
+	                
+	                citation_view_vector covering_set = (citation_view_vector) iter.next();
+	                
+	                if(covering_set.equals(covering_set1))
+	                {
+	                    break;
+	                }
+	                
+	                j++;
+	            }
+	            
+	            if(j >= c_views.size())
+	            {               
+	                    
+	                curr_res.remove(i);
+	                
+	                i--;            
+	            }
+	        }
 		
 	}
 	
@@ -609,16 +599,16 @@ public class Aggregation5 {
 		
 		ArrayList<String> single_view_names = get_citation_view_names(single_views);
 						
-		int tuple_num = (tuple_level) ? Tuple_reasoning1_full_test_opt.tuple_num : Tuple_reasoning2_full_test2.tuple_num;
+		int tuple_num = (tuple_level) ? Tuple_reasoning1_full_test_opt_copy.tuple_num : Tuple_reasoning2_full_test2_copy.tuple_num;
 		
 		for(i = 0; i<tuple_num; i++)
 		{
 			rs.absolute(i + 1);
 			
 			if(tuple_level)
-				Tuple_reasoning1_full_test_opt.get_views_parameters(single_views, rs, start_pos, lambda_values);
+				Tuple_reasoning1_full_test_opt_copy.get_views_parameters(single_views, rs, start_pos, lambda_values);
 			else
-				Tuple_reasoning2_full_test2.get_views_parameters(single_views, rs, start_pos, lambda_values);
+				Tuple_reasoning2_full_test2_copy.get_views_parameters(single_views, rs, start_pos, lambda_values);
 			
 //			convert_covering_set2citation(i, curr_res, author_lists, view_query_mapping, query_lambda_str, author_mapping, max_num, query_ids, view_list, c, pst, tuple_level);
 			
@@ -636,7 +626,7 @@ public class Aggregation5 {
 //		return new HashSet<String>();
 	}
 	
-	public static HashSet<String> do_agg_intersection2(ResultSet rs, HashMap<int[], HashSet<citation_view_vector> > c_view_map, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, JSONException
+	public static HashSet<String> do_agg_intersection2(ResultSet rs, HashMap<String, HashSet<citation_view_vector> > c_view_map, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, JSONException
 	{
 		
 		
@@ -646,7 +636,7 @@ public class Aggregation5 {
 //		return new HashSet<String>();
 	}
 	
-	public static HashSet<String> do_agg_intersection_subset(ResultSet rs, ArrayList<Integer> tuple_ids, HashMap<int[], HashSet<citation_view_vector> > c_view_map, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, JSONException
+	public static HashSet<String> do_agg_intersection_subset(ResultSet rs, HashSet<Integer> tuple_ids, HashMap<String, HashSet<citation_view_vector> > c_view_map, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, JSONException
     {
         
         
@@ -656,10 +646,10 @@ public class Aggregation5 {
 //      return new HashSet<String>();
     }
 	
-	public static HashSet<String> do_agg_intersection0(ResultSet rs, HashMap<int[], HashSet<citation_view_vector> > c_view_map, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, ClassNotFoundException, JSONException
+	public static HashSet<String> do_agg_intersection0(ResultSet rs, HashMap<String, HashSet<citation_view_vector> > c_view_map, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, ClassNotFoundException, JSONException
 	{
 		
-		Set<int[]> intervals = c_view_map.keySet();
+		Set<String> intervals = c_view_map.keySet();
 		
 		rs.beforeFirst();
 		
@@ -669,7 +659,7 @@ public class Aggregation5 {
 						
 		for(Iterator iter = intervals.iterator(); iter.hasNext();)
 		{
-			int [] interval = (int[]) iter.next();
+			String interval = (String) iter.next();
 			
 			HashSet<citation_view_vector> c_view = c_view_map.get(interval);
 			
@@ -712,13 +702,13 @@ public class Aggregation5 {
 		
 		if(tuple_level)
 		{
-			tuple_num = Tuple_reasoning1_full_test_opt.tuple_num;
+			tuple_num = Tuple_reasoning1_full_test_opt_copy.tuple_num;
 		}
 		else
 		{
 			if(!schema_level)
 			{
-				tuple_num = Tuple_reasoning2_full_test2.tuple_num;
+				tuple_num = Tuple_reasoning2_full_test2_copy.tuple_num;
 			}
 			else
 			{
@@ -731,11 +721,11 @@ public class Aggregation5 {
 			rs.absolute(i + 1);
 			
 			if(tuple_level)
-				Tuple_reasoning1_full_test_opt.get_views_parameters(single_views, rs, start_pos, lambda_values);
+				Tuple_reasoning1_full_test_opt_copy.get_views_parameters(single_views, rs, start_pos, lambda_values);
 			else
 			{
 				if(!schema_level)
-					Tuple_reasoning2_full_test2.get_views_parameters(single_views, rs, start_pos, lambda_values);
+					Tuple_reasoning2_full_test2_copy.get_views_parameters(single_views, rs, start_pos, lambda_values);
 				else
 					schema_reasoning.get_views_parameters(single_views, rs, start_pos, lambda_values);
 			}
@@ -754,7 +744,7 @@ public class Aggregation5 {
 		return gen_citations(full_citations, max_num);
 	}
 
-	public static HashSet<String> gen_citation_subset(ResultSet rs, ArrayList<Integer> id_list, boolean tuple_level, boolean schema_level, ArrayList<citation_view_vector> covering_sets, int start_pos, HashMap<String, Integer> max_num, Connection c, PreparedStatement pst) throws SQLException
+	public static HashSet<String> gen_citation_subset(ResultSet rs, HashSet<Integer> id_list, boolean tuple_level, boolean schema_level, ArrayList<citation_view_vector> covering_sets, int start_pos, HashMap<String, Integer> max_num, Connection c, PreparedStatement pst) throws SQLException
     {
         ArrayList<String> view_keys = new ArrayList<String>();
         
@@ -780,16 +770,16 @@ public class Aggregation5 {
 //            }
 //        }
         
-        for(int i = 0; i<id_list.size(); i++)
+        for(Integer id : id_list)
         {
-            rs.absolute(id_list.get(i));
+            rs.absolute(id);
             
             if(tuple_level)
-                Tuple_reasoning1_full_test_opt.get_views_parameters(single_views, rs, start_pos, lambda_values);
+                Tuple_reasoning1_full_test_opt_copy.get_views_parameters(single_views, rs, start_pos, lambda_values);
             else
             {
                 if(!schema_level)
-                    Tuple_reasoning2_full_test2.get_views_parameters(single_views, rs, start_pos, lambda_values);
+                    Tuple_reasoning2_full_test2_copy.get_views_parameters(single_views, rs, start_pos, lambda_values);
                 else
                     schema_reasoning.get_views_parameters(single_views, rs, start_pos, lambda_values);
             }
@@ -808,10 +798,10 @@ public class Aggregation5 {
         return gen_citations(full_citations, max_num);
     }
 	
-	public static ArrayList<Integer> get_valid_tuple_ids(HashMap<Head_strs, ArrayList<Integer>> head_strs_rows_mapping, Vector<Head_strs> names)
+	public static HashSet<Integer> get_valid_tuple_ids(HashMap<Head_strs, ArrayList<Integer>> head_strs_rows_mapping, Vector<Head_strs> names)
 	{
 	  
-	  ArrayList<Integer> valid_id_lists = new ArrayList<Integer>();
+	  HashSet<Integer> valid_id_lists = new HashSet<Integer>();
 	  
 	  for(int i = 0; i<names.size(); i++)
 	  {
@@ -822,7 +812,7 @@ public class Aggregation5 {
 	    valid_id_lists.addAll(id_lists);
 	  }
 	  
-	  Collections.sort(valid_id_lists, new IntegerComparator());
+//	  Set.sort(valid_id_lists, new IntegerComparator());
 	  
 	  return valid_id_lists;
 	  
@@ -840,12 +830,12 @@ public class Aggregation5 {
       }
   }
 	
-	public static void cal_covering_set_schema_level_intersection(ResultSet rs, ArrayList<Integer> tuple_ids, HashMap<int[], HashSet<citation_view_vector> > c_view_map, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException
+	public static void cal_covering_set_schema_level_intersection(ResultSet rs, HashSet<Integer> tuple_ids, HashMap<String, HashSet<citation_view_vector> > c_view_map, HashMap<String, HashSet<Integer>> signature_rid_mappings, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException
     {
 	  
 	    curr_res.clear();
 	  
-        Set<int[]> intervals = c_view_map.keySet();
+        Set<String> intervals = c_view_map.keySet();
         
         rs.beforeFirst();
         
@@ -855,27 +845,19 @@ public class Aggregation5 {
             
         Iterator iter = intervals.iterator();
         
-        int [] interval = null;
+        String interval = null;
         
         int group_num = 0;
         
         while(iter.hasNext())
         {
-          interval = (int[]) iter.next();
+          interval = (String) iter.next();
           
-          boolean match = false;
+          HashSet<Integer> rids = (HashSet<Integer>) signature_rid_mappings.get(interval).clone();
           
-          while(tuple_ids.get(i) >= interval[0] && tuple_ids.get(i) < interval[1])
-          {
-            match = true;
-            
-            i++;
-            
-            if(i >= tuple_ids.size())
-              break;
-          }
+          rids.retainAll(tuple_ids);
           
-          if(match)
+          if(!rids.isEmpty())
           {
             HashSet<citation_view_vector> c_view = c_view_map.get(interval);
             
@@ -884,16 +866,33 @@ public class Aggregation5 {
             group_num ++;
           }
           
-          if(i >= tuple_ids.size())
-            break;
+//          boolean match = false;
+//          
+//          while(tuple_ids.get(i) >= interval[0] && tuple_ids.get(i) < interval[1])
+//          {
+//            match = true;
+//            
+//            i++;
+//            
+//            if(i >= tuple_ids.size())
+//              break;
+//          }
+//          
+//          if(match)
+//          {
+//            
+//          }
+//          
+//          if(i >= tuple_ids.size())
+//            break;
         }
           
     }
 
 	
-	public static void cal_covering_set_schema_level_intersection(ResultSet rs, HashMap<int[], HashSet<citation_view_vector> > c_view_map, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException
+	public static void cal_covering_set_schema_level_intersection(ResultSet rs, HashMap<String, HashSet<citation_view_vector> > c_view_map, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException
 	{
-		Set<int[]> intervals = c_view_map.keySet();
+		Set<String> intervals = c_view_map.keySet();
 		
 		rs.beforeFirst();
 		
@@ -903,7 +902,7 @@ public class Aggregation5 {
 						
 		for(Iterator iter = intervals.iterator(); iter.hasNext();)
 		{
-			int [] interval = (int[]) iter.next();
+			String interval = (String) iter.next();
 			
 			HashSet<citation_view_vector> c_view = c_view_map.get(interval);
 			
@@ -1006,9 +1005,9 @@ public class Aggregation5 {
 		return nums;
 	}
 	
-	public static ArrayList<HashSet<citation_view>> cal_covering_set_schema_level_union(ResultSet rs, HashMap<int[], HashSet<citation_view_vector> > c_view_map, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException
+	public static ArrayList<HashSet<citation_view>> cal_covering_set_schema_level_union(ResultSet rs, HashMap<String, HashSet<citation_view_vector> > c_view_map, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException
 	{
-		Set<int[]> intervals = c_view_map.keySet();
+		Set<String> intervals = c_view_map.keySet();
 		
 		rs.beforeFirst();
 		
@@ -1016,9 +1015,9 @@ public class Aggregation5 {
 		
 		int i = 0;
 		
-		int tuple_num = (tuple_level) ? Tuple_reasoning1_full_test_opt.tuple_num : Tuple_reasoning2_full_test2.tuple_num;
+		int tuple_num = (tuple_level) ? Tuple_reasoning1_full_test_opt_copy.tuple_num : Tuple_reasoning2_full_test2_copy.tuple_num;
 
-		int group_num = (tuple_level) ? Tuple_reasoning1_full_test_opt.group_num : Tuple_reasoning2_full_test2.group_num;
+		int group_num = (tuple_level) ? Tuple_reasoning1_full_test_opt_copy.group_num : Tuple_reasoning2_full_test2_copy.group_num;
 		
 		HashSet<citation_view_vector> all_covering_sets = new HashSet<citation_view_vector>();
 		
@@ -1027,7 +1026,7 @@ public class Aggregation5 {
 		
 		for(Iterator iter = intervals.iterator(); iter.hasNext();)
 		{
-			int [] interval = (int[]) iter.next();
+			String interval = (String) iter.next();
 			
 			HashSet<citation_view_vector> c_view = c_view_map.get(interval);
 			
@@ -1068,10 +1067,10 @@ public class Aggregation5 {
 		return views_per_group;
 	}
 	
-	public static HashSet<String> do_agg_union(ArrayList<HashSet<citation_view>> views_per_group, ResultSet rs, HashMap<int[], HashSet<citation_view_vector> > c_view_map, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, JSONException
+	public static HashSet<String> do_agg_union(ArrayList<HashSet<citation_view>> views_per_group, ResultSet rs, HashMap<String, HashSet<citation_view_vector> > c_view_map, HashMap<String, HashSet<Integer>> signature_rids_mappings, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, JSONException
 	{
 		
-		Set<int[]> intervals = c_view_map.keySet();
+		Set<String> intervals = c_view_map.keySet();
 		
 		ArrayList<String> view_keys = new ArrayList<String>();
 		
@@ -1083,15 +1082,17 @@ public class Aggregation5 {
 				
 		int num = 0;
 		
-		int i = 0;
+//		int i = 0;
 		
 		for(Iterator iter = intervals.iterator(); iter.hasNext();)
 		{
-			int [] interval = (int[]) iter.next();
+			String interval = (String) iter.next();
 						
+			HashSet<Integer> rids = signature_rids_mappings.get(interval);
+			
 			ArrayList<Integer> view_ids = get_valid_view_id(single_views, views_per_group.get(num));
 			
-			for(i = interval[0]; i < interval[1]; i ++)
+			for(Integer i: rids)
 			{
 				
 //				if(selected_row_ids.get(i) < interval[1] && selected_row_ids.get(i) >= interval[0])
@@ -1099,9 +1100,9 @@ public class Aggregation5 {
 					rs.absolute(i + 1);
 					
 					if(tuple_level)
-						Tuple_reasoning1_full_test_opt.get_views_parameters(single_views, rs, start_pos, lambda_values, view_ids);
+						Tuple_reasoning1_full_test_opt_copy.get_views_parameters(single_views, rs, start_pos, lambda_values, view_ids);
 					else
-						Tuple_reasoning2_full_test2.get_views_parameters(single_views, rs, start_pos, lambda_values, view_ids);
+						Tuple_reasoning2_full_test2_copy.get_views_parameters(single_views, rs, start_pos, lambda_values, view_ids);
 					
 //					do_aggregate(curr_res, c_view, i);
 					
@@ -1139,10 +1140,10 @@ public class Aggregation5 {
 //		return new HashSet<String>();
 	}
 	
-	public static HashSet<String> do_agg_union0(ResultSet rs, HashMap<int[], HashSet<citation_view_vector> > c_view_map, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, ClassNotFoundException, JSONException
+	public static HashSet<String> do_agg_union0(ResultSet rs, HashMap<String, HashSet<citation_view_vector> > c_view_map, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, ClassNotFoundException, JSONException
 	{
 		
-		Set<int[]> intervals = c_view_map.keySet();
+		Set<String> intervals = c_view_map.keySet();
 		
 		rs.beforeFirst();
 		
@@ -1150,9 +1151,9 @@ public class Aggregation5 {
 		
 		int i = 0;
 		
-		int tuple_num = (tuple_level) ? Tuple_reasoning1_full_test_opt.tuple_num : Tuple_reasoning2_full_test2.tuple_num;
+		int tuple_num = (tuple_level) ? Tuple_reasoning1_full_test_opt_copy.tuple_num : Tuple_reasoning2_full_test2_copy.tuple_num;
 
-		int group_num = (tuple_level) ? Tuple_reasoning1_full_test_opt.group_num : Tuple_reasoning2_full_test2.group_num;
+		int group_num = (tuple_level) ? Tuple_reasoning1_full_test_opt_copy.group_num : Tuple_reasoning2_full_test2_copy.group_num;
 		
 		HashSet<citation_view_vector> all_covering_sets = new HashSet<citation_view_vector>();
 		
@@ -1161,7 +1162,7 @@ public class Aggregation5 {
 		
 		for(Iterator iter = intervals.iterator(); iter.hasNext();)
 		{
-			int [] interval = (int[]) iter.next();
+			String interval = (String) iter.next();
 			
 			HashSet<citation_view_vector> c_view = c_view_map.get(interval);
 			
@@ -1223,9 +1224,9 @@ public class Aggregation5 {
 					rs.absolute(i + 1);
 					
 					if(tuple_level)
-						Tuple_reasoning1_full_test_opt.get_views_parameters(single_views, rs, start_pos, lambda_values, view_ids);
+						Tuple_reasoning1_full_test_opt_copy.get_views_parameters(single_views, rs, start_pos, lambda_values, view_ids);
 					else
-						Tuple_reasoning2_full_test2.get_views_parameters(single_views, rs, start_pos, lambda_values, view_ids);
+						Tuple_reasoning2_full_test2_copy.get_views_parameters(single_views, rs, start_pos, lambda_values, view_ids);
 					
 //					do_aggregate(curr_res, c_view, i);
 					
@@ -1408,22 +1409,22 @@ public class Aggregation5 {
 		
 		if(tuple_level)
 		{
-			citation_queries_ids = Tuple_reasoning1_full_test_opt.get_citation_queries(single_view.get_name());
+			citation_queries_ids = Tuple_reasoning1_full_test_opt_copy.get_citation_queries(single_view.get_name());
 			
-			citation_queries = Tuple_reasoning1_full_test_opt.citation_queries;
+			citation_queries = Tuple_reasoning1_full_test_opt_copy.citation_queries;
 			
-			query_ids = Tuple_reasoning1_full_test_opt.query_ids;
+			query_ids = Tuple_reasoning1_full_test_opt_copy.query_ids;
 		}
 		else
 		{
 			
 			if(!schema_level)
 			{
-				citation_queries_ids = Tuple_reasoning2_full_test2.get_citation_queries(single_view.get_name());
+				citation_queries_ids = Tuple_reasoning2_full_test2_copy.get_citation_queries(single_view.get_name());
 				
-				citation_queries = Tuple_reasoning2_full_test2.citation_queries;
+				citation_queries = Tuple_reasoning2_full_test2_copy.citation_queries;
 				
-				query_ids = Tuple_reasoning2_full_test2.query_ids;
+				query_ids = Tuple_reasoning2_full_test2_copy.query_ids;
 			}
 			else
 			{

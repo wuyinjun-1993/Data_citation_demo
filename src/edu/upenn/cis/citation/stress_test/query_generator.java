@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -121,6 +122,9 @@ public class query_generator {
 			while(rs.next())
 			{
 				String attr_name = rs.getString(1);
+				
+				if(attr_name.equals("citation_view"))
+				  continue;
 				
 				String length_query = "select max(char_length(cast (" + attr_name + " as text))) from " + citatable_tables[i];
 				
@@ -470,9 +474,16 @@ public class query_generator {
 		
 		lambda_terms.add(new Lambda_term(query_local_predicate));
 						
+		gen_shuffled_head_args(heads);
+		
 		return new Query(name, new Subgoal(name, heads), body, lambda_terms, predicates, maps);
 	}
 	
+	
+	static void gen_shuffled_head_args(Vector<Argument> head_args)
+	{
+	  Collections.shuffle(head_args);
+	}
 	
 	public static Query generate_query_with_new_instance_size(Query query, int size, Connection c, PreparedStatement pst) throws SQLException
 	{

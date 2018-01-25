@@ -196,7 +196,7 @@ public class stress_test1 {
 			
 			
 			
-			query_storage.store_query(queries.get(0), new Vector<Integer>());
+			query_storage.store_query(queries.get(0), new Vector<Integer>(), c, pst);
 			
 			for(int i = 0; i<queries.size(); i++)
 			{

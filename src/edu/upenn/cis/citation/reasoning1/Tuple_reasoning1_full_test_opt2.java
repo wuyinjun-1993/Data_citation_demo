@@ -1810,9 +1810,9 @@ public class Tuple_reasoning1_full_test_opt2 {
 	
 	public static void gen_citation(citation_view_vector citation_views) throws ClassNotFoundException, SQLException
 	{
-		for(int i = 0; i<citation_views.c_vec.size();i++)
+		for(citation_view curr_view_mapping:citation_views.c_vec)
 		{
-			String query = citation_views.c_vec.get(i).get_full_query();
+			String query = curr_view_mapping.get_full_query();
 			
 			System.out.println(query);
 		}
@@ -2739,9 +2739,9 @@ public class Tuple_reasoning1_full_test_opt2 {
 						
 						citation_view_vector covering_set = (citation_view_vector) it.next();
 						
-						for(int p = 0; p<covering_set.c_vec.size(); p++)
+						for(citation_view curr_view_mapping:covering_set.c_vec)
 						{
-							c_view_index += covering_set.c_vec.get(p).get_name() + populate_db.separator + covering_set.c_vec.get(p).get_table_name_string();
+							c_view_index += curr_view_mapping.get_name() + populate_db.separator + curr_view_mapping.get_table_name_string();
 						}
 						
 						covering_set_strs.add(c_view_index);
@@ -2916,9 +2916,9 @@ public class Tuple_reasoning1_full_test_opt2 {
 			
 			citation_view_vector c_vec = (citation_view_vector) iter.next();
 			
-			for(int j = 0; j<c_vec.c_vec.size(); j++)
+			for(citation_view curr_view_mapping:c_vec.c_vec)
 			{
-				citation_view c_view = c_vec.c_vec.get(j);
+				citation_view c_view = curr_view_mapping;
 				
 				if(c_view.has_lambda_term())
 				{
@@ -4057,10 +4057,10 @@ public class Tuple_reasoning1_full_test_opt2 {
 		
 		String s2 = c_vec1.table_name_str;
 		
-		for(int i = 0; i<c_vec2.c_vec.size(); i++)
+		for(citation_view curr_view_mapping:c_vec2.c_vec)
 		{
 			
-			String str = c_vec2.c_vec.get(i).get_table_name_string();
+			String str = curr_view_mapping.get_table_name_string();
 			
 			str = str.replaceAll("\\[", "\\\\[");
 			

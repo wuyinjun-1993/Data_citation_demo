@@ -144,6 +144,12 @@ public class Tuple_reasoning1_full_test_opt {
 	
 	static HashMap<String, Integer> q_subgoal_id = new HashMap<String, Integer>();
 	
+	static ArrayList<Integer> tuple_id_list = null;
+	
+	public static double covering_set_time = 0.0;
+	
+	public static boolean isclustering = true;
+	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException, IOException, InterruptedException, JSONException
 	{
 		HashSet<String> sets = new HashSet<String>();
@@ -1032,6 +1038,8 @@ public class Tuple_reasoning1_full_test_opt {
 	{
 		start = System.nanoTime();
 		
+		Aggregation5.clear();
+		
 		int start_pos = Resultset_prefix_col_num;
 	    
 	    //rs, c_view_map, start_pos, view_query_mapping, query_lambda_str, author_mapping, max_author_num, query_ids, view_list, c, pst
@@ -1051,6 +1059,9 @@ public class Tuple_reasoning1_full_test_opt {
 	
 	public static ArrayList<HashSet<citation_view>> cal_covering_sets_schema_level(Query query, Connection c, PreparedStatement pst) throws SQLException
 	{
+	  
+	    Aggregation5.clear();
+	  
 		if(agg_intersection)
 		{
 			Aggregation5.cal_covering_set_schema_level_intersection(rs, c_view_map, Resultset_prefix_col_num, view_query_mapping, query_lambda_str, author_mapping, max_author_num, query_ids, view_list, c, pst, true);
@@ -1065,6 +1076,30 @@ public class Tuple_reasoning1_full_test_opt {
 			return views_per_group;
 		}
 	}
+	
+	public static ArrayList<HashSet<citation_view>> cal_covering_sets_subset_tuples(Query query, Vector<Head_strs> names, Connection c, PreparedStatement pst) throws SQLException
+    {
+	  
+	    Aggregation5.clear();
+	  
+	    tuple_id_list = Aggregation5.get_valid_tuple_ids(head_strs_rows_mapping, names);
+	    
+	  
+        if(agg_intersection)
+        {
+            Aggregation5.cal_covering_set_schema_level_intersection(rs, tuple_id_list, c_view_map, Resultset_prefix_col_num, view_query_mapping, query_lambda_str, author_mapping, max_author_num, query_ids, view_list, c, pst, true);
+            
+            return new ArrayList<HashSet<citation_view>>();
+            
+        }
+        else
+        {
+            ArrayList<HashSet<citation_view>> views_per_group = Aggregation5.cal_covering_set_schema_level_union(rs, c_view_map, Resultset_prefix_col_num, view_query_mapping, query_lambda_str, author_mapping, max_author_num, query_ids, view_list, c, pst, true);
+            
+            return views_per_group;
+        }
+    }
+	
 	
 	public static HashSet<String> gen_citation_schema_level(ArrayList<HashSet<citation_view>> views_per_group, Connection c, PreparedStatement pst) throws JSONException, SQLException
 	{
@@ -1081,6 +1116,22 @@ public class Tuple_reasoning1_full_test_opt {
 			return citations;
 		}
 	}
+	
+	public static HashSet<String> gen_citation_subset_tuples(ArrayList<HashSet<citation_view>> views_per_group, Connection c, PreparedStatement pst) throws JSONException, SQLException
+    {
+        if(agg_intersection)
+        {
+            HashSet<String> citations = Aggregation5.do_agg_intersection_subset(rs, tuple_id_list, c_view_map, Resultset_prefix_col_num, view_query_mapping, query_lambda_str, author_mapping, max_author_num, query_ids, view_list, c, pst, true);//(rs, c_view_map, Resultset_prefix_col_num, view_query_mapping, query_lambda_str, author_mapping, max_author_num, query_ids, view_list, c, pst, true);
+            
+            return citations;
+        }
+        else
+        {
+            HashSet<String> citations = Aggregation5.do_agg_union(views_per_group, rs, c_view_map, Resultset_prefix_col_num, view_query_mapping, query_lambda_str, author_mapping, max_author_num, query_ids, view_list, c, pst, true);
+            
+            return citations;
+        }
+    }
 	
 	public static HashSet<String> tuple_gen_agg_citations2(Query query) throws ClassNotFoundException, SQLException, JSONException
 	{
@@ -1232,7 +1283,7 @@ public class Tuple_reasoning1_full_test_opt {
 		
 		aggregation_time = 0.0;
 		
-		max_author_num.put("author", -1);
+		max_author_num.put("Contributor", -1);
 		
 		max_author_num.put("info", -1);
 		
@@ -1251,6 +1302,8 @@ public class Tuple_reasoning1_full_test_opt {
 		group_num = 0;
 		
 		q_subgoal_id.clear();
+		
+		query_ids = new IntList();
 	}
 	
 	public static String get_full_query(String query) throws ClassNotFoundException, SQLException
@@ -1911,9 +1964,9 @@ public class Tuple_reasoning1_full_test_opt {
 	
 	public static void gen_citation(citation_view_vector citation_views) throws ClassNotFoundException, SQLException
 	{
-		for(int i = 0; i<citation_views.c_vec.size();i++)
+		for(citation_view view_mapping: citation_views.c_vec)
 		{
-			String query = citation_views.c_vec.get(i).get_full_query();
+			String query = view_mapping.get_full_query();
 			
 			System.out.println(query);
 		}
@@ -2329,9 +2382,20 @@ public class Tuple_reasoning1_full_test_opt {
 					
 					ArrayList<ArrayList<Tuple>> c_unit_vec = get_citation_units_condition(c_units, query.body.size() + query.head.args.size(), query, all_head_vars, curr_tuple_mapping);
 					
-//					output_vec(c_unit_vec);				
+//					output_vec(c_unit_vec);		
 					
-					get_valid_citation_combination(c_view_template, c_unit_vec,query, all_head_vars);
+					
+					double start = System.nanoTime();
+					
+					
+					if(isclustering)
+					  get_valid_citation_combination(c_view_template, c_unit_vec,query, all_head_vars);
+					else
+					  get_valid_citation_combination_no_clustering(c_view_template, c_unit_vec,query, all_head_vars);
+					
+					double end = System.nanoTime();
+					
+					covering_set_time = (end - start)*1.0/second2nano;
 					
 //					System.out.println(c_view_template);
 					
@@ -2852,9 +2916,9 @@ public class Tuple_reasoning1_full_test_opt {
 						
 						citation_view_vector covering_set = (citation_view_vector) it.next();
 						
-						for(int p = 0; p<covering_set.c_vec.size(); p++)
+						for(citation_view view_mapping: covering_set.c_vec)
 						{
-							c_view_index += covering_set.c_vec.get(p).get_name() + populate_db.separator + covering_set.c_vec.get(p).get_table_name_string();
+							c_view_index += view_mapping.get_name() + populate_db.separator + view_mapping.get_table_name_string();
 						}
 						
 						covering_set_strs.add(c_view_index);
@@ -3029,9 +3093,9 @@ public class Tuple_reasoning1_full_test_opt {
 			
 			citation_view_vector c_vec = (citation_view_vector) iter.next();
 			
-			for(int j = 0; j<c_vec.c_vec.size(); j++)
+			for(citation_view view_mapping: c_vec.c_vec)
 			{
-				citation_view c_view = c_vec.c_vec.get(j);
+				citation_view c_view = view_mapping;
 				
 				if(c_view.has_lambda_term())
 				{
@@ -3232,9 +3296,9 @@ public class Tuple_reasoning1_full_test_opt {
         {
           citation_view_vector covering_set = (citation_view_vector) iter.next();
           
-          for(int i = 0; i<covering_set.c_vec.size(); i++)
+          for(citation_view view_mapping: covering_set.c_vec)
           {
-            citation_view view = covering_set.c_vec.get(i);
+            citation_view view = view_mapping;
             
             if(view.has_lambda_term())
             {
@@ -4082,9 +4146,9 @@ public class Tuple_reasoning1_full_test_opt {
 					
 					HashSet<String> string_list = new HashSet<String>();
 					
-					for(int j = 0; j<view_com.c_vec.size(); j++)
+					for(citation_view curr_view_mappipng: view_com.c_vec)
 					{
-						string_list.add(view_com.c_vec.get(j).get_name());
+						string_list.add(curr_view_mappipng.get_name());
 					}
 					
 //					if(string_list.contains("v4") && string_list.contains("v8") && string_list.contains("v11") && string_list.contains("v6") && string_list.contains("v14") && string_list.contains("v20"))
@@ -4108,34 +4172,179 @@ public class Tuple_reasoning1_full_test_opt {
 		}
 	}
 	
+	
+	public static HashSet<citation_view_vector> join_views_curr_relation(ArrayList<Tuple> tuples, HashSet<citation_view_vector> curr_view_com, Vector<Argument> curr_head_args, HashMap<String, Query> view_mapping)
+    {
+        if(curr_view_com.isEmpty())
+        {
+            if(tuples.isEmpty())
+                return new HashSet<citation_view_vector>();
+            else
+            {
+                HashSet<citation_view_vector> new_view_com = new HashSet<citation_view_vector>();
+                
+                for(int i = 0; i<tuples.size(); i++)
+                {
+                    
+                    Tuple valid_tuple = (Tuple) tuples.get(i).clone();
+                    
+                    valid_tuple.args.retainAll(curr_head_args);
+                    
+                    if(valid_tuple.lambda_terms.size() > 0)
+                    {
+                        
+                        citation_view_parametered c = new citation_view_parametered(valid_tuple.name, view_mapping.get(valid_tuple.name), valid_tuple);
+                        
+                        citation_view_vector curr_views = new citation_view_vector(c);
+                        
+                        remove_duplicate(new_view_com, curr_views);
+                    }   
+                    else
+                    {
+                        
+                        citation_view_unparametered c = new citation_view_unparametered(valid_tuple.name, valid_tuple);
+                        
+                        citation_view_vector curr_views = new citation_view_vector(c);
+                        
+                        remove_duplicate(new_view_com, curr_views);
+                    }
+                }
+                
+                return new_view_com;
+            }
+        }
+        
+        else
+        {
+            HashSet<citation_view_vector> new_view_com = new HashSet<citation_view_vector>();
+            
+            for(int i = 0; i<tuples.size(); i++)
+            {
+                Tuple valid_tuple = (Tuple) tuples.get(i).clone();
+                
+                valid_tuple.args.retainAll(curr_head_args);
+                
+                citation_view c = null;
+                
+                if(valid_tuple.lambda_terms.size() > 0)
+                {
+                    
+                    c = new citation_view_parametered(valid_tuple.name, view_mapping.get(valid_tuple.name), valid_tuple);
+                }   
+                else
+                {
+                    
+                    c = new citation_view_unparametered(valid_tuple.name, valid_tuple);
+                }
+                
+                for(Iterator iter = curr_view_com.iterator(); iter.hasNext();)
+                {
+                    citation_view_vector old_view_com = (citation_view_vector)iter.next();
+                    
+                    citation_view_vector old_view_com_copy = old_view_com.clone(); 
+                    
+                    citation_view_vector view_com = citation_view_vector.merge(old_view_com_copy, c);
+                    
+//                    if(view_com.toString().equals("v17*v23"))
+//                    {
+//                      System.out.println("tables::" + view_com.table_names);
+//                      
+//                      System.out.println("args::" + view_com.head_variables);
+//                      
+//                      System.out.println(view_com.c_vec);
+//                    }
+//                    
+//                    if(view_com.toString().equals("v17*v20*v23*v6"))
+//                    {
+//                      
+//                      System.out.println(old_view_com_copy);
+//                      
+//                      System.out.println(c);
+//                      
+//                      System.out.println("tables::" + view_com.table_names);
+//                      
+//                      System.out.println("args::" + view_com.head_variables);
+//                      
+//                      System.out.println(view_com.c_vec);
+//                    }
+                    
+                    remove_duplicate(new_view_com, view_com);
+                }
+            }
+            
+            return new_view_com;
+        }
+    }
+    
+	
 	public static HashSet<citation_view_vector> remove_duplicate(HashSet<citation_view_vector> c_combinations, citation_view_vector c_view)
 	{
 		int i = 0;
 		
 		if(c_combinations.contains(c_view))
-			return c_combinations;
+		{
+//		  if(c_view.toString().equals("v17*v23"))
+//		  {
+//		    System.out.println("contained");
+//		  }
+//		  
+//		  for(citation_view_vector view_mapping:c_combinations)
+//		  {
+//		    if(view_mapping.equals(c_view))
+//		    {
+//		      System.out.println(view_mapping);
+//		      
+//		      System.out.println(view_mapping.hashCode());
+//		      
+//		      System.out.println(c_view.hashCode());
+//		    }
+//		  }
+		  return c_combinations;
+		}
 				
 		for(Iterator iter = c_combinations.iterator(); iter.hasNext();)
 		{
-//			String str = (String) iter.next();
 						
 			citation_view_vector c_combination = (citation_view_vector) iter.next();
 			
-//			if(c_combination.toString().equals("v11*v20*v4*v8"))
-//			{
-//				int y = 0;
-//				
-//				y++;
-//			}
+            citation_view_vector curr_combination = c_view;
+            
+//            if(c_combination.toString().equals("v1*v4*v5*v6") && curr_combination.toString().equals("v1*v2*v4*v5*v6"))
+//            {
+//              System.out.println(c_combination.table_names);
+//              
+//              System.out.println(curr_combination.table_names);
+//              
+//              System.out.println(c_combination.head_variables);
+//              
+//              System.out.println(curr_combination.head_variables);
+//            }
+//            
+//            if(curr_combination.toString().equals("v1*v4*v5*v6") && c_combination.toString().equals("v1*v2*v4*v5*v6"))
+//            {
+//              System.out.println(c_combination.table_names);
+//              
+//              System.out.println(curr_combination.table_names);
+//              
+//              System.out.println(c_combination.head_variables);
+//              
+//              System.out.println(curr_combination.head_variables);
+//            }
+            
+			
 			{
 				{
-					citation_view_vector curr_combination = c_view;
-					if(view_vector_contains(c_combination, curr_combination)&& table_names_contains(c_combination, curr_combination) && c_combination.index_vec.size() > curr_combination.index_vec.size())
+					if(c_combination.c_vec.containsAll(curr_combination.c_vec)&& curr_combination.table_names.containsAll(c_combination.table_names) && curr_combination.head_variables.containsAll(c_combination.head_variables) && c_combination.c_vec.size() > curr_combination.c_vec.size())
 					{
+//					  if(c_combination.toString().equals("v17*v23"))
+//			          {
+//			            System.out.println("removed");
+//			          }
+					  
 						iter.remove();						
 					}
 					
-					if(view_vector_contains(curr_combination, c_combination) && table_names_contains(curr_combination, c_combination) && curr_combination.index_vec.size() > c_combination.index_vec.size())
+					if(curr_combination.c_vec.containsAll(c_combination.c_vec) && c_combination.table_names.containsAll(curr_combination.table_names) && c_combination.head_variables.containsAll(curr_combination.head_variables) && curr_combination.c_vec.size() > c_combination.c_vec.size())
 					{
 						break;
 					}
@@ -4148,7 +4357,14 @@ public class Tuple_reasoning1_full_test_opt {
 		
 		
 		if(i >= c_combinations.size())
-			c_combinations.add(c_view);
+		{
+//		  if(c_view.toString().equals("v17*v23"))
+//		  {
+//		    System.out.println("added");
+//		  }
+		  
+		  c_combinations.add(c_view);
+		}
 		
 				
 		return c_combinations;
@@ -4169,12 +4385,12 @@ public class Tuple_reasoning1_full_test_opt {
 			{
 				{
 					citation_view_vector curr_combination = c_view;
-					if(view_vector_contains(c_combination, curr_combination)&& curr_combination.head_variables.containsAll(c_combination.head_variables) && c_combination.index_vec.size() > curr_combination.index_vec.size())
+					if(c_combination.c_vec.containsAll(curr_combination.c_vec)&& curr_combination.head_variables.containsAll(c_combination.head_variables) && c_combination.index_vec.size() > curr_combination.index_vec.size())
 					{
 						iter.remove();						
 					}
 					
-					if(view_vector_contains(curr_combination, c_combination) && c_combination.head_variables.containsAll(curr_combination.head_variables) && curr_combination.index_vec.size() > c_combination.index_vec.size())
+					if(curr_combination.c_vec.containsAll(c_combination.c_vec) && c_combination.head_variables.containsAll(curr_combination.head_variables) && curr_combination.index_vec.size() > c_combination.index_vec.size())
 					{
 						break;
 					}
@@ -4247,6 +4463,8 @@ public class Tuple_reasoning1_full_test_opt {
 				
 				curr_tuples_copy.retainAll(available_tuples);
 				
+				
+				
 				view_com = join_views_curr_relation(curr_tuples_copy, view_com, curr_relation_head_vars, view_mapping);
 				
 //				remove_duplicate_view_combinations(view_com);
@@ -4273,6 +4491,85 @@ public class Tuple_reasoning1_full_test_opt {
 		
 		temp_combinations.clear();
 	}
+	
+	public static void get_valid_citation_combination_no_clustering(HashSet<citation_view_vector> c_view_template, ArrayList<ArrayList<Tuple>>c_unit_vec, Query query, ArrayList<HashSet<Argument>> all_head_vars) throws ClassNotFoundException, SQLException
+    {
+	  HashSet<citation_view_vector> temp_combinations = new HashSet<citation_view_vector>();
+      
+//    int valid_subgoal_num = 0;
+      
+//    for(int i = 0; i<c_unit_vec.size(); i++)
+//    {
+//        Vector<citation_view> curr_c_unit_vec = c_unit_vec.get(i);
+//        
+//        Subgoal subgoal = (Subgoal) query.body.get(i); 
+//        
+//        if(curr_c_unit_vec.size() != 0)
+//        {
+//            subgoal_names.add(subgoal.name);
+////              valid_subgoal_num ++;
+//        }
+//        
+//    }
+      
+      
+//    boolean final_col = false;
+      
+      for(int i = 0; i<c_unit_vec.size(); i++)
+      {
+          ArrayList<Tuple> curr_c_unit_vec = c_unit_vec.get(i);
+          
+          if(curr_c_unit_vec.size() == 0)
+              continue;
+          
+          Subgoal subgoal = (Subgoal) query.body.get(i);
+          
+          HashSet<Argument> curr_relation_head_vars = all_head_vars.get(i);
+          
+          find_max_covering(subgoal.name, curr_relation_head_vars);
+          
+          if(curr_relation_head_vars.isEmpty())
+              continue;
+          
+//          HashSet<citation_view_vector> view_com = new HashSet<citation_view_vector>();
+          
+          for(Iterator iter = curr_relation_head_vars.iterator(); iter.hasNext();)
+          {
+              
+              ArrayList<Tuple> curr_tuples_copy = (ArrayList<Tuple>) curr_c_unit_vec.clone();
+              
+              Argument curr_head_var = (Argument) iter.next();
+              
+              ArrayList<Tuple> available_tuples = head_variable_view_mapping.get(curr_head_var);
+              
+              curr_tuples_copy.retainAll(available_tuples);
+              
+              temp_combinations = join_views_curr_relation(curr_tuples_copy, temp_combinations, query.head.args, view_mapping);
+              
+//            remove_duplicate_view_combinations(view_com);
+          }
+          
+//        remove_duplicate_view_combinations(view_com);
+//        else
+//        {
+//            valid_subgoal_num --;
+//            
+//            if(valid_subgoal_num == 0)
+//                final_col = true;
+//        }           
+//          temp_combinations = join_operation(temp_combinations, view_com, temp_combinations.size());
+          
+//        remove_duplicate_view_combinations(temp_combinations);
+          
+          
+      }
+      
+//    remove_duplicate_view_combinations_final(temp_combinations);
+      
+      c_view_template.addAll(temp_combinations);
+      
+      temp_combinations.clear();
+    }
 	
 	static void remove_duplicate_view_combinations(ArrayList<citation_view_vector> c_view_template)
 	{
@@ -4566,10 +4863,10 @@ public class Tuple_reasoning1_full_test_opt {
 		
 		String s2 = c_vec1.table_name_str;
 		
-		for(int i = 0; i<c_vec2.c_vec.size(); i++)
+		for(citation_view view_mapping: c_vec2.c_vec)
 		{
 			
-			String str = c_vec2.c_vec.get(i).get_table_name_string();
+			String str = view_mapping.get_table_name_string();
 			
 			str = str.replaceAll("\\[", "\\\\[");
 			

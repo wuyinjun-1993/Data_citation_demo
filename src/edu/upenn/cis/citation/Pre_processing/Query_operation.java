@@ -10,7 +10,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
@@ -27,6 +29,7 @@ import edu.upenn.cis.citation.Operation.op_greater_equal;
 import edu.upenn.cis.citation.Operation.op_less;
 import edu.upenn.cis.citation.Operation.op_less_equal;
 import edu.upenn.cis.citation.Operation.op_not_equal;
+import edu.upenn.cis.citation.citation_view.citation_view_vector;
 import edu.upenn.cis.citation.datalog.Parse_datalog;
 import edu.upenn.cis.citation.datalog.Query_converter;
 
@@ -147,6 +150,36 @@ public class Query_operation {
 	 
 		bw.close();
 	}
+	
+	public static void write2file(String file_name, ArrayList<citation_view_vector> views) throws IOException
+    {
+        File fout = new File(file_name);
+        FileOutputStream fos = new FileOutputStream(fout);
+     
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+     
+        for (int i = 0; i < views.size(); i++) {
+            bw.write(views.get(i).toString());
+            bw.newLine();
+        }
+     
+        bw.close();
+    }
+	
+	   public static void write2file(String file_name, HashSet views) throws IOException
+	    {
+	        File fout = new File(file_name);
+	        FileOutputStream fos = new FileOutputStream(fout);
+	     
+	        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+	     
+	        for (Object view:views) {
+	            bw.write(view.toString());
+	            bw.newLine();
+	        }
+	     
+	        bw.close();
+	    }
 	
 	public static Vector<Query> get_all_citation_queries(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{

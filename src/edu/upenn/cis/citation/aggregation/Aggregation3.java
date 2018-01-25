@@ -582,33 +582,33 @@ public class Aggregation3 {
 					
 					do_aggregate(curr_res, c_view, i, author_lists, view_query_mapping, author_mapping, max_num, query_ids, query_lambda_str, view_list, full_flag, c, pst);
 					
-					for(int k = 0; k<curr_res.size(); k++)
-					{
-						citation_view_vector c_vector = curr_res.get(k);
-						
-						if(c_vector.table_name_str.equals("[introduction, object][object0, introduction]"))
-						{
-							if(c_vector.c_vec.get(0).get_name().equals("v4") && c_vector.c_vec.get(1).get_name().equals("v5"))
-							{
-								
-								if(author_lists.get(k).get("author").contains("Kouji Matsushima"))
-								{
-									int y = 0;
-									y++;
-								}
-								
-								citation_view_parametered curr_view = (citation_view_parametered) c_vector.c_vec.get(0);
-								
-								String value = curr_view.map.get("object|object_id");
-								
-								int value_id = Integer.valueOf(value);
-								
-								if(value_id >= 58 && value_id <= 75)							
-									System.out.println(c_vector);
-							}
-						}
-						
-					}
+//					for(int k = 0; k<curr_res.size(); k++)
+//					{
+//						citation_view_vector c_vector = curr_res.get(k);
+//						
+//						if(c_vector.table_name_str.equals("[introduction, object][object0, introduction]"))
+//						{
+//							if(c_vector.c_vec.get(0).get_name().equals("v4") && c_vector.c_vec.get(1).get_name().equals("v5"))
+//							{
+//								
+//								if(author_lists.get(k).get("author").contains("Kouji Matsushima"))
+//								{
+//									int y = 0;
+//									y++;
+//								}
+//								
+//								citation_view_parametered curr_view = (citation_view_parametered) c_vector.c_vec.get(0);
+//								
+//								String value = curr_view.map.get("object|object_id");
+//								
+//								int value_id = Integer.valueOf(value);
+//								
+//								if(value_id >= 58 && value_id <= 75)							
+//									System.out.println(c_vector);
+//							}
+//						}
+//						
+//					}
 					
 //					System.out.println(curr_res);
 				}

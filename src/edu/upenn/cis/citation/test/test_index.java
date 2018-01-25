@@ -10,7 +10,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Vector;
-
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import edu.upenn.cis.citation.Corecover.Argument;
 import edu.upenn.cis.citation.Corecover.CoreCover;
 import edu.upenn.cis.citation.Corecover.Database;
@@ -112,26 +113,118 @@ public class test_index {
 	{
 		
 		
-		Connection c = null;
-	      PreparedStatement pst = null;
-		Class.forName("org.postgresql.Driver");
-	    c = DriverManager
-	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
-		
-		Vector<Query> queries = Load_views_and_citation_queries.get_views("data/test/query", c, pst);
-
-	    
-		pre_processing(queries.get(0), c, pst);
-		
-		HashSet<Argument> all_covered_head_args = get_max_covered_head_args();
-		
-		System.out.println("all_tuples::" + all_tuples);
-		
-		Graph graph = new Graph(all_tuples, all_covered_head_args);
-		
-		System.out.println(graph.toString());
-		
-		c.close();
+//		Connection c = null;
+//	      PreparedStatement pst = null;
+//		Class.forName("org.postgresql.Driver");
+//	    c = DriverManager
+//	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
+//		
+//		Vector<Query> queries = Load_views_and_citation_queries.get_views("data/test/query", c, pst);
+//
+//	    
+//		pre_processing(queries.get(0), c, pst);
+//		
+//		HashSet<Argument> all_covered_head_args = get_max_covered_head_args();
+//		
+//		System.out.println("all_tuples::" + all_tuples);
+//		
+//		Graph graph = new Graph(all_tuples, all_covered_head_args);
+//		
+//		System.out.println(graph.toString());
+//		
+//		c.close();
+	  
+//	  Stream<String> a = Stream.of("one", "two");
+//	  Stream<String> b = Stream.of("three", "four");
+//	  Stream<String> out = Stream.concat(a, b);
+//	  out.forEach(System.out::println);
+//	  
+//	  
+//	  ArrayList<String> strings1 = new ArrayList<String>();
+//	  
+//	  strings1.add("1");
+//	  
+//	  strings1.add("1");
+//	  
+//	  strings1.add("2");
+//	  
+//	  ArrayList<String> strings2 = new ArrayList<String>();
+//	  
+//	  strings2.add("1");
+//	  
+//	  strings2.add("2");
+//	  
+//	  
+//	  System.out.println(strings2.containsAll(strings1));
+//	  
+//	  
+//	  
+//	  
+//	  ArrayList<String> list = new ArrayList<String>();
+//	  
+//	  for(int i = 0; i<10000000; i++)
+//	  {	    	    
+//	    list.add(String.valueOf(i));
+//	  }
+//	  
+//ArrayList<String> list1 = new ArrayList<String>();
+//      
+//      for(int i = 0; i<10000000; i++)
+//      {             
+//        list1.add(String.valueOf(i));
+//      }
+//	  
+//	  
+//	  double start = 0;
+//	  
+//	  double end = 0;
+//	  
+//	  double time1 = 0;
+//	  
+//	  double time2 = 0;
+//	  
+//start = System.nanoTime();
+//      
+//      for(int i = 0; i<list1.size(); i++)
+//      {
+//        list1.set(i, list1.get(i) + "|123");
+//      }
+//      
+//      end = System.nanoTime();
+//      
+//      time2 = end - start;
+//	  
+////	  start = System.nanoTime();
+////	  
+////	  list.parallelStream().forEach((str_list) -> {
+////        str_list = str_list + "|123";
+////    });
+////	  
+////	  end = System.nanoTime();
+////	  
+////	  time1 = end - start;
+//	  
+//	  
+//	  
+//	  
+//	  System.out.println(time1);
+//	  
+//	  System.out.println(time2);
+	  
+	  String s1 = "(F1,F2,F3)(F4,F5,F6)";
+	  
+	  String s2 = ".*\\(1.*3\\).*";
+	  
+	  System.out.println(s1.matches(s2));
+	  
+//	  Pattern P1 = Pattern.compile(s1);
+//	  
+//	  Pattern P2 = Pattern.compile(s2);
+//	  
+//	  P1.matcher(s2);
+	  
+	  
+	  
 	}
 	
 	static HashSet<Argument> get_max_covered_head_args()

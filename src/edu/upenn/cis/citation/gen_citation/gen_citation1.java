@@ -124,18 +124,18 @@ public class gen_citation1 {
 			citation_view_vector c_v = c_views.get(k);
 
 			
-			for(int i = 0; i<c_v.c_vec.size(); i++)
+			for(citation_view curr_view_mapping: c_v.c_vec)
 			{
 				
 //				System.out.println(c_v.c_vec);
 				
-				if(c_v.c_vec.get(i).has_lambda_term())
+				if(curr_view_mapping.has_lambda_term())
 				{								
-					authors.addAll(get_authors2((citation_view_parametered)c_v.c_vec.get(i), c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num));
+					authors.addAll(get_authors2((citation_view_parametered)curr_view_mapping, c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num));
 				}
 				else
 				{
-					authors.addAll(get_authors2((citation_view_unparametered)c_v.c_vec.get(i), c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num));
+					authors.addAll(get_authors2((citation_view_unparametered)curr_view_mapping, c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num));
 				}
 				
 			}
@@ -275,15 +275,15 @@ public class gen_citation1 {
 		
 //		System.out.println(c_vec.toString());
 		
-		for(int i = 0; i<c_vec.c_vec.size(); i++)
+		for(citation_view curr_view_mapping:c_vec.c_vec)
 		{
-			if(c_vec.c_vec.get(i).has_lambda_term())
+			if(curr_view_mapping.has_lambda_term())
 			{
-				authors.addAll(get_authors((citation_view_parametered)c_vec.c_vec.get(i),c, pst, query_str, max_num));
+				authors.addAll(get_authors((citation_view_parametered)curr_view_mapping,c, pst, query_str, max_num));
 			}
 			else
 			{
-				authors.addAll(get_authors((citation_view_unparametered)c_vec.c_vec.get(i),c, pst, query_str, max_num));
+				authors.addAll(get_authors((citation_view_unparametered)curr_view_mapping,c, pst, query_str, max_num));
 			}
 			
 			
@@ -342,18 +342,18 @@ public class gen_citation1 {
 		JSONObject json_obj = new JSONObject();
 		
 		
-		for(int i = 0; i<c_vec.c_vec.size(); i++)
+		for(citation_view curr_view_mapping:c_vec.c_vec)
 		{
-			if(c_vec.c_vec.get(i).has_lambda_term())
+			if(curr_view_mapping.has_lambda_term())
 			{
 				
 				if(authors.size() < max_num || max_num <= 0)
-					authors.addAll(get_authors2((citation_view_parametered)c_vec.c_vec.get(i), c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num));
+					authors.addAll(get_authors2((citation_view_parametered)curr_view_mapping, c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num));
 			}
 			else
 			{
 				if(authors.size() < max_num || max_num <= 0)
-					authors.addAll(get_authors2((citation_view_unparametered)c_vec.c_vec.get(i), c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num));
+					authors.addAll(get_authors2((citation_view_unparametered)curr_view_mapping, c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num));
 			}
 			
 			
@@ -552,15 +552,15 @@ public class gen_citation1 {
 		
 		HashMap<String, Integer> json_citation_size = new HashMap<String, Integer>();
 		
-		for(int i = 0; i<c_vec.c_vec.size(); i++)
+		for(citation_view curr_view_mapping:c_vec.c_vec)
 		{
 			
-			int view_index = view_list.find(c_vec.c_vec.get(i).get_name());
+			int view_index = view_list.find(curr_view_mapping.get_name());
 			
 			
-			if(c_vec.c_vec.get(i).has_lambda_term())
+			if(curr_view_mapping.has_lambda_term())
 			{
-				HashMap<String, HashSet<String>> j_citation = get_authors3((citation_view_parametered)c_vec.c_vec.get(i), c, pst, view_index, view_query_mapping, author_mapping, citation_max_num, query_ids, query_lambda_str, view_author_mapping);
+				HashMap<String, HashSet<String>> j_citation = get_authors3((citation_view_parametered)curr_view_mapping, c, pst, view_index, view_query_mapping, author_mapping, citation_max_num, query_ids, query_lambda_str, view_author_mapping);
 				
 				json_citation = join_citation(json_citation, j_citation, json_citation_size, citation_max_num);
 				
@@ -568,7 +568,7 @@ public class gen_citation1 {
 			else
 			{
 				
-				HashMap<String, HashSet<String>> j_citation = get_authors3((citation_view_unparametered)c_vec.c_vec.get(i), c, pst, view_index, view_query_mapping, author_mapping, citation_max_num, query_ids, query_lambda_str, view_author_mapping);
+				HashMap<String, HashSet<String>> j_citation = get_authors3((citation_view_unparametered)curr_view_mapping, c, pst, view_index, view_query_mapping, author_mapping, citation_max_num, query_ids, query_lambda_str, view_author_mapping);
 				
 				json_citation = join_citation(json_citation, j_citation, json_citation_size, citation_max_num);
 			}
@@ -658,15 +658,15 @@ public class gen_citation1 {
 		
 		if(star_op.equals(union))
 		{
-			for(int i = 0; i<c_vec.c_vec.size(); i++)
+			for(citation_view curr_view_mapping:c_vec.c_vec)
 			{
 				
-				int view_index = view_list.find(c_vec.c_vec.get(i).get_name());
+				int view_index = view_list.find(curr_view_mapping.get_name());
 				
 				
-				if(c_vec.c_vec.get(i).has_lambda_term())
+				if(curr_view_mapping.has_lambda_term())
 				{
-					HashMap<String, HashSet<String>> j_citation = get_authors3((citation_view_parametered)c_vec.c_vec.get(i), c, pst, view_index, view_query_mapping, author_mapping, citation_max_num, query_ids, query_lambda_str, view_author_mapping);
+					HashMap<String, HashSet<String>> j_citation = get_authors3((citation_view_parametered)curr_view_mapping, c, pst, view_index, view_query_mapping, author_mapping, citation_max_num, query_ids, query_lambda_str, view_author_mapping);
 					
 					JSONObject json_citation = get_json_citation(j_citation);
 					
@@ -678,7 +678,7 @@ public class gen_citation1 {
 				else
 				{
 					
-					HashMap<String, HashSet<String>> j_citation = get_authors3((citation_view_unparametered)c_vec.c_vec.get(i), c, pst, view_index, view_query_mapping, author_mapping, citation_max_num, query_ids, query_lambda_str, view_author_mapping);
+					HashMap<String, HashSet<String>> j_citation = get_authors3((citation_view_unparametered)curr_view_mapping, c, pst, view_index, view_query_mapping, author_mapping, citation_max_num, query_ids, query_lambda_str, view_author_mapping);
 					
 					JSONObject json_citation = get_json_citation(j_citation);
 					
@@ -709,15 +709,15 @@ public class gen_citation1 {
 		HashSet<String> authors = new HashSet<String>();
 		
 		
-		for(int i = 0; i<c_vec.c_vec.size(); i++)
+		for(citation_view curr_view_mapping:c_vec.c_vec)
 		{
-			if(c_vec.c_vec.get(i).has_lambda_term())
+			if(curr_view_mapping.has_lambda_term())
 			{
-				authors.addAll(get_authors((citation_view_parametered)c_vec.c_vec.get(i),c, pst, query_str, max_num));
+				authors.addAll(get_authors((citation_view_parametered)curr_view_mapping,c, pst, query_str, max_num));
 			}
 			else
 			{
-				authors.addAll(get_authors((citation_view_unparametered)c_vec.c_vec.get(i),c, pst, query_str, max_num));
+				authors.addAll(get_authors((citation_view_unparametered)curr_view_mapping,c, pst, query_str, max_num));
 			}
 			
 			
@@ -770,10 +770,10 @@ public class gen_citation1 {
 		
 		HashSet<String> authors = new HashSet<String>();
 		
-		for(int i = 0; i<c_views.c_vec.size(); i++)
+		for(citation_view curr_view_mapping:c_views.c_vec)
 		{
 			
-			citation_view c_view = c_views.c_vec.get(i);
+			citation_view c_view = curr_view_mapping;
 			
 			Vector<String> curr_str = query_str.get(c_view.get_name());
 			
@@ -859,10 +859,10 @@ public class gen_citation1 {
 //		HashSet<String> authors = new HashSet<String>();
 		
 		
-		for(int i = 0; i<c_views.c_vec.size(); i++)
+		for(citation_view curr_view_mapping:c_views.c_vec)
 		{
 			
-			citation_view c_view = c_views.c_vec.get(i);
+			citation_view c_view = curr_view_mapping;
 			
 //			Vector<Integer> query_ids = get_query_id(c_view.get_name(), c, pst);
 			
@@ -1903,8 +1903,18 @@ public class gen_citation1 {
 				
 				String block_name = (String) iter.next();
 				
-				int block_max_size = max_num.get(block_name);
+				int block_max_size = 0;
 				
+				if(max_num.get(block_name) ==null)
+				{
+				  block_max_size = -1;
+				}
+				else
+				{
+				  block_max_size = max_num.get(block_name);
+				}
+				
+				 
 				Integer id = curr_query_ids.get(block_name);
 				
 				HashMap<Head_strs, Unique_StringList> curr_author_mapping = new HashMap<Head_strs, Unique_StringList>(); 

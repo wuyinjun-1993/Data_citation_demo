@@ -651,9 +651,9 @@ public class Aggregation4 {
 		{
 //			citation_view_vector covering_set = curr_res.get(i);
 			
-			for(int j = 0; j<covering_set.c_vec.size(); j++)
+			for(citation_view view_mapping: covering_set.c_vec)
 			{
-				citation_view v = covering_set.c_vec.get(j);
+				citation_view v = view_mapping;
 				
 				String view_name = v.get_name();
 				
@@ -701,10 +701,10 @@ public class Aggregation4 {
 			
 			HashMap<String, HashSet<String>> curr_full_citations = new HashMap<String, HashSet<String>>();
 			
-			for(int j = 0; j<c_vector.c_vec.size(); j++)
+			for(citation_view view_mapping: c_vector.c_vec)
 			{
 				
-				String view_key = c_vector.c_vec.get(j).get_name() + populate_db.separator + c_vector.c_vec.get(j).get_table_name_string();
+				String view_key = view_mapping.get_name() + populate_db.separator + view_mapping.get_table_name_string();
 				
 				int id = view_keys.indexOf(view_key);
 				
@@ -953,10 +953,10 @@ public class Aggregation4 {
 		
 		HashSet<String> view_names = new HashSet<String>();
 		
-		for(int j = 0; j<curr_res.c_vec.size(); j++)
+		for(citation_view view_mapping: curr_res.c_vec)
 		{
 			
-			citation_view c = curr_res.c_vec.get(j);
+			citation_view c = view_mapping;
 			
 			String key = c.get_name() + populate_db.separator + c.get_table_name_string();
 			

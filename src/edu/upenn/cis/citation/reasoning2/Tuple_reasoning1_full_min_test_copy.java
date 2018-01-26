@@ -39,10 +39,7 @@ import edu.upenn.cis.citation.Operation.op_less_equal;
 import edu.upenn.cis.citation.Operation.op_not_equal;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.Pre_processing.view_operation;
-import edu.upenn.cis.citation.aggregation.Aggregation1;
-import edu.upenn.cis.citation.aggregation.Aggregation2;
-import edu.upenn.cis.citation.aggregation.Aggregation3;
-import edu.upenn.cis.citation.aggregation.Aggregation4;
+import edu.upenn.cis.citation.aggregation.Aggregation7;
 import edu.upenn.cis.citation.citation_view.*;
 import edu.upenn.cis.citation.data_structure.IntList;
 import edu.upenn.cis.citation.data_structure.Query_lm_authors;
@@ -58,7 +55,7 @@ import edu.upenn.cis.citation.set_cover_algo.cost_function;
 import edu.upenn.cis.citation.user_query.query_storage;
 import sun.util.resources.cldr.ur.CurrencyNames_ur;
 
-public class Tuple_reasoning1_full_min_test2 {
+public class Tuple_reasoning1_full_min_test_copy {
 		
 	static HashMap<String, Integer> max_author_num = new HashMap<String, Integer>();
 			
@@ -77,7 +74,7 @@ public class Tuple_reasoning1_full_min_test2 {
 	static HashMap<String, ArrayList<String>> lambda_terms_map = new HashMap<String, ArrayList<String>>();
 	
 	static HashMap<String, ArrayList<Tuple>> tuple_mapping = new HashMap<String, ArrayList<Tuple>>();
-							
+	
 	static String file_name = "tuple_level.xlsx";
 	
 	static HashMap<Head_strs, Vector<HashSet<String>>> authors = new HashMap<Head_strs, Vector<HashSet<String>>>();
@@ -92,7 +89,9 @@ public class Tuple_reasoning1_full_min_test2 {
 		
 	static HashMap<String, Unique_StringList> author_mapping = new HashMap<String, Unique_StringList>(); 
 	
-	public static HashMap<int[], citation_view_vector > c_view_map = new HashMap<int[], citation_view_vector>();
+	public static HashMap<String, citation_view_vector > c_view_map = new HashMap<String, citation_view_vector>();
+	
+    public static HashMap<String, HashSet<Integer>> signiture_rid_mappings = new HashMap<String, HashSet<Integer>>();
 	
 	static ResultSet rs = null;
 	
@@ -116,7 +115,7 @@ public class Tuple_reasoning1_full_min_test2 {
 	
 	static Tuple [] viewtuples = null;
 	
-	public static HashMap<Head_strs, ArrayList<Integer>> head_strs_rows_mapping = new HashMap<Head_strs, ArrayList<Integer>>();
+	public static HashMap<Head_strs, HashSet<Integer>> head_strs_rows_mapping = new HashMap<Head_strs, HashSet<Integer>>();
 	
 	static int Resultset_prefix_col_num = 0;
 	
@@ -173,15 +172,14 @@ public class Tuple_reasoning1_full_min_test2 {
 		
 		tuple_reasoning(queries.get(0), c, pst);
 		
-		Set<int[]> keys = c_view_map.keySet();
+		Set<String> keys = c_view_map.keySet();
 		
-		for(Iterator iter = keys.iterator(); iter.hasNext();)
+		for(Iterator<String> iter = keys.iterator(); iter.hasNext();)
 		{
-			int [] key = (int []) iter.next();
+			String key = (String) iter.next();
 			
 			citation_view_vector c_views = c_view_map.get(key);
 			
-			System.out.println(key[0] + "," + key[1] + ":::" + c_views);
 		}
 		
 //		
@@ -1178,7 +1176,7 @@ public class Tuple_reasoning1_full_min_test2 {
 	        .getConnection(populate_db.db_url,
 	    	        populate_db.usr_name,populate_db.passwd);
 		
-		HashSet<String> citations = Aggregation4.do_agg_intersection_min(rs, c_view_map, covering_sets_query, start_pos, heads, head_strs_rows_mapping, view_query_mapping, query_lambda_str, author_mapping, max_author_num, query_ids, view_list, c, pst, true);
+		HashSet<String> citations = Aggregation7.do_agg_intersection_min(rs, c_view_map, signiture_rid_mappings, covering_sets_query, start_pos, heads, head_strs_rows_mapping, view_query_mapping, query_lambda_str, author_mapping, max_author_num, query_ids, view_list, c, pst, true);
 		
 		c.close();
 		
@@ -1193,7 +1191,7 @@ public class Tuple_reasoning1_full_min_test2 {
 		
 	    
 	    //rs, c_view_map, start_pos, view_query_mapping, query_lambda_str, author_mapping, max_author_num, query_ids, view_list, c, pst
-		HashSet<String> citations = Aggregation4.do_agg_intersection_min(rs, covering_sets_query, entire_interval, start_pos, view_query_mapping, query_lambda_str, author_mapping, max_author_num, query_ids, view_list, c, pst, true);
+		HashSet<String> citations = Aggregation7.do_agg_intersection_min(rs, c_view_map, covering_sets_query, start_pos, view_query_mapping, query_lambda_str, author_mapping, max_author_num, query_ids, view_list, c, pst, true);
 				
 		end = System.nanoTime();
 		
@@ -2176,9 +2174,9 @@ public class Tuple_reasoning1_full_min_test2 {
 		String sql = null;
 		
 		if(test_case)
-			sql = Query_converter.datalog2sql_citation_test(query, valid_lambda_terms, valid_conditions);
+			sql = Query_converter.datalog2sql_citation_test3(query, valid_lambda_terms, valid_conditions);
 		else
-			sql = Query_converter.datalog2sql_citation(query, valid_lambda_terms, valid_conditions, c, pst);
+			sql = Query_converter.datalog2sql_citation2(query, valid_lambda_terms, valid_conditions, c, pst);
 						
 		end = System.nanoTime();
 		
@@ -2356,72 +2354,20 @@ public class Tuple_reasoning1_full_min_test2 {
 
 				
 				
-				if(!curr_str.equals(old_value))
+				if(signiture_rid_mappings.get(curr_str) == null)
 				{		
 										
 					start = System.nanoTime();
 					
 					group_num ++;
 					
-//					System.out.println(h_vals);
-					if(c_view_template != null)
-					{
-//						c_view_template.clear();
-						end_pos = tuple_num;
-						
-						int [] interval = {start_pos, end_pos};
-						
-						
-						c_view_map.put(interval, c_view_template);
-						
-						start_pos = tuple_num;
-					}
+					HashSet<Integer> rids = new HashSet<Integer>();
 					
-//					c_view_template = new ArrayList<citation_view_vector>();
-										
-//					HashMap<String, ArrayList<Tuple>> curr_tuple_mapping = (HashMap<String, ArrayList<Tuple>>) tuple_mapping.clone();
-//					
-//					int i = pos1;
+					rids.add(tuple_num);
+					
+					signiture_rid_mappings.put(curr_str, rids);
 
 					HashMap<String, ArrayList<Tuple>> curr_tuple_mapping = get_valid_view_mapping(pos1);
-					
-					
-//					for(Iterator iter = valid_conditions.iterator(); iter.hasNext();)
-//					{
-//						boolean condition = rs.getBoolean(i + 1);
-//						
-//						Conditions curr_condition = (Conditions) iter.next();
-//						
-//						if(!condition)
-//						{							
-//							String condition_str = curr_condition.toString();
-//							
-//							ArrayList<Tuple> invalid_views = conditions_map.get(condition_str);
-//							
-//							for(int k = 0; k<invalid_views.size(); k++)
-//							{
-//								Tuple tuple = invalid_views.get(k);
-//								
-//								ArrayList<Tuple> curr_tuples = new ArrayList<Tuple>();
-//								
-//								curr_tuples.addAll(curr_tuple_mapping.get(tuple.name));
-//								
-//								curr_tuples.remove(tuple);
-//								
-//								curr_tuple_mapping.put(tuple.name, curr_tuples);
-//							}
-//							
-//							
-//							
-//						}
-//						i++;
-//					}	
-					
-//					citation_strings = new HashMap<String, HashSet<String>>();
-					
-
-										
-//					start_pos = query.body.size() + query.head.args.size();
 					
 					Resultset_prefix_col_num = query.body.size() + query.head.args.size();
 					
@@ -2434,17 +2380,17 @@ public class Tuple_reasoning1_full_min_test2 {
 					
 					ArrayList<Integer> tuple_ids = get_citation_units_condition(c_units, curr_tuple_mapping, query.body.size() + query.head.args.size(), query, covered_relations, covered_head_args);
 					
-//					output_vec(c_unit_vec);				
-					
 					ArrayList<Integer> citation_view_ids = greedy_algorithm(tuple_ids, covered_relations, covered_head_args);
 										
 					c_view_template = get_valid_citation_combination(citation_view_ids);
 
+                    c_view_map.put(curr_str, c_view_template);
+					
 					old_value = curr_str;
 					
 					if(head_strs_rows_mapping.get(h_vals) == null)
 					{
-						ArrayList<Integer> int_list = new ArrayList<Integer>();
+					  HashSet<Integer> int_list = new HashSet<Integer>();
 						
 						int_list.add(tuple_num);
 						
@@ -2452,7 +2398,7 @@ public class Tuple_reasoning1_full_min_test2 {
 					}
 					else
 					{
-						ArrayList<Integer> int_list = head_strs_rows_mapping.get(h_vals);
+						HashSet<Integer> int_list = head_strs_rows_mapping.get(h_vals);
 						
 						int_list.add(tuple_num);
 						
@@ -2471,10 +2417,12 @@ public class Tuple_reasoning1_full_min_test2 {
 				else
 				{					
 					start = System.nanoTime();
-									
+						
+					signiture_rid_mappings.get(curr_str).add(tuple_num);
+					
 					if(head_strs_rows_mapping.get(h_vals) == null)
 					{
-						ArrayList<Integer> int_list = new ArrayList<Integer>();
+						HashSet<Integer> int_list = new HashSet<Integer>();
 						
 						int_list.add(tuple_num);
 						
@@ -2482,7 +2430,7 @@ public class Tuple_reasoning1_full_min_test2 {
 					}
 					else
 					{
-						ArrayList<Integer> int_list = head_strs_rows_mapping.get(h_vals);
+						HashSet<Integer> int_list = head_strs_rows_mapping.get(h_vals);
 						
 						int_list.add(tuple_num);
 						
@@ -2497,19 +2445,6 @@ public class Tuple_reasoning1_full_min_test2 {
 			}
 		}
 
-		if(c_view_template != null)
-		{			
-			end_pos = tuple_num;
-			
-			
-			int [] interval = {start_pos, end_pos};
-			
-			
-			c_view_map.put(interval, c_view_template);
-			
-		}
-
-		
 		ArrayList<Integer> valid_tuple_ids = new ArrayList<Integer>();
 		
 		for(int i = 0; i<view_mapping_global_valid.length; i++)
@@ -2527,8 +2462,6 @@ public class Tuple_reasoning1_full_min_test2 {
 		covering_sets_query = get_valid_citation_combination(valid_view_mapping_ids);
 		
 		entire_interval[1] = end_pos;
-		
-//		compute_citation_view_query();
 		
 		System.out.print(group_num + "	");
 		
@@ -2828,48 +2761,63 @@ public class Tuple_reasoning1_full_min_test2 {
 		
 		rs.beforeFirst();
 		
-		ArrayList<Integer> int_list = head_strs_rows_mapping.get(h_vals);
+		HashSet<Integer> int_list = head_strs_rows_mapping.get(h_vals);
 		
 //		System.out.println(int_list.toString());
 		
-		Set<int[]> intervals = c_view_map.keySet();
+		Set<String> intervals = c_view_map.keySet();
 		
 		HashSet<String> citations = new HashSet<String>();
 		
 		for(Iterator iter = intervals.iterator(); iter.hasNext();)
 		{
-			int [] interval = (int[]) iter.next();
+			String interval = (String) iter.next();
 			
 			citation_view_vector c_views = c_view_map.get(interval);
 			
-//			if(c_views.size() == 0)
-//				citations.add("{\"db_name\":\"IUPHAR/BPS Guide to PHARMACOLOGY\",\"author\":[]}");
 			
-			for(int i = index; i < int_list.size(); i ++)
+			HashSet<Integer> rids = signiture_rid_mappings.get(interval);
+			
+			
+			HashSet<Integer> int_list_copy = (HashSet<Integer>) int_list.clone();
+			
+			int_list_copy.retainAll(rids);
+			
+			for(int rid: int_list_copy)
 			{
-				
-				
-				if(int_list.get(i) <= interval[1] && int_list.get(i) > interval[0])
-				{
-					rs.absolute(int_list.get(i));
-					
-					update_valid_citation_combination(c_views, rs, Resultset_prefix_col_num);
-					
-//					System.out.println(c_views.toString());
-					
-//					do_aggregate(curr_res, c_view, i, author_lists, view_query_mapping, query_lambda_str, author_mapping, max_num, c, pst);
-					
-					citations.addAll(gen_citation(c_views, c, pst, view_query_mapping, populate_db.star_op, populate_db.plus_op));
-				}
-				
-				
-				if(int_list.get(i) >= interval[1])
-				{
-					index = i;
-					
-					break;
-				}
+              rs.absolute(rid);
+              
+              update_valid_citation_combination(c_views, rs, Resultset_prefix_col_num);
+              
+              citations.addAll(gen_citation(c_views, c, pst, view_query_mapping, populate_db.star_op, populate_db.plus_op));
+
+
 			}
+//			for(int i = index; i < int_list.size(); i ++)
+//			{
+//				
+//				
+//				if(int_list.get(i) <= interval[1] && int_list.get(i) > interval[0])
+//				{
+//					rs.absolute(int_list.get(i));
+//					
+//					update_valid_citation_combination(c_views, rs, Resultset_prefix_col_num);
+//					
+////					System.out.println(c_views.toString());
+//					
+////					do_aggregate(curr_res, c_view, i, author_lists, view_query_mapping, query_lambda_str, author_mapping, max_num, c, pst);
+//					
+//					citations.addAll(gen_citation(c_views, c, pst, view_query_mapping, populate_db.star_op, populate_db.plus_op));
+//				}
+//				
+//				
+//				if(int_list.get(i) >= interval[1])
+//				{
+//					index = i;
+//					
+//					break;
+//				}
+//			}
 		}
 		
 		return citations;

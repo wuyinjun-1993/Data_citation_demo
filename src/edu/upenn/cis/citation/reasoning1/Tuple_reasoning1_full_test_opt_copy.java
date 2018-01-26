@@ -2304,10 +2304,6 @@ public class Tuple_reasoning1_full_test_opt_copy {
                   
                   c_view_map.put(curr_str, c_view_template);
                   
-                  System.out.println(c_view_template);
-                  
-                  System.out.println(c_view_map);
-                  
                   double end = System.nanoTime();
                   
                   covering_set_time = (end - start)*1.0/second2nano;
@@ -2347,11 +2343,7 @@ public class Tuple_reasoning1_full_test_opt_copy {
 				  
                   start = System.nanoTime();
                   
-//                update_valid_citation_combination(c_view_template, rs, query.head.args.size() + query.body.size());
-                  
                   covering_set_num += c_view_template.size();
-                  
-//                HashSet<String> citations = new HashSet<String>();
                   
                   if(head_strs_rows_mapping.get(h_vals) == null)
                   {
@@ -2376,43 +2368,6 @@ public class Tuple_reasoning1_full_test_opt_copy {
 				  
 				}
 
-				
-				
-//				if(!curr_str.equals(old_value))
-//				{		
-//										
-//					
-//									
-//				}
-//				
-//				else
-//				{					
-//					start = System.nanoTime();
-//					
-//					covering_set_num += c_view_template.size();
-//					
-//					if(head_strs_rows_mapping.get(h_vals) == null)
-//					{
-//						ArrayList<Integer> int_list = new ArrayList<Integer>();
-//						
-//						int_list.add(tuple_num);
-//						
-//						head_strs_rows_mapping.put(h_vals, int_list);
-//					}
-//					else
-//					{
-//						ArrayList<Integer> int_list = head_strs_rows_mapping.get(h_vals);
-//						
-//						int_list.add(tuple_num);
-//						
-//						head_strs_rows_mapping.put(h_vals, int_list);
-//					}
-//					
-//					end = System.nanoTime();
-//					
-//					population_time += (end - start) * 1.0/second2nano;
-//					
-//				}
 			}
 		}
 		

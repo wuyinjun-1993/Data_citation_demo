@@ -15,9 +15,9 @@ public class process_text {
 	
 	public static void main(String[] strs)
 	{
-//		process_text_full_case(path + "final_real_test_full2.txt", path + "exp_final_real_test_full2_tuple_agg_intersection.csv", path + "exp_final_real_test_full2_tuple_agg_union.csv", path + "exp_final_real_test_full2_semi_schema_agg_intersection.csv", path + "exp_final_real_test_full2_semi_schema_agg_union.csv", path + "exp_final_real_test_full2_schema.csv");
+		process_text_full_case(path + "final_stress_test_group_full.txt", path + "exp_final_group_test_full_tuple_agg_intersection.csv", path + "exp_final_group_test_full_tuple_agg_union.csv", path + "exp_final_group_test_full_semi_schema_agg_intersection.csv", path + "exp_final_group_test_full_semi_schema_agg_union.csv", path + "exp_final_group_test_full_schema.csv");
 		
-		process_text_min_case(path + "final_stress_test_view_num_min.txt", path + "exp_final_stress_test_view_num_min_tuple.csv", path + "exp_final_stress_test_view_num_min_semi_schema.csv", path + "exp_final_stress_test_view_num_min_schema.csv");
+//		process_text_min_case(path + "final_stress_test_view_num_min.txt", path + "exp_final_stress_test_view_num_min_tuple.csv", path + "exp_final_stress_test_view_num_min_semi_schema.csv", path + "exp_final_stress_test_view_num_min_schema.csv");
 	}
 
 	
@@ -254,7 +254,7 @@ public class process_text {
 	    
 	    Vector<Vector<Double>> schema = new Vector<Vector<Double>>();
 		
-	    int m = 10;
+	    int m = 3;
 	    
 		try (BufferedReader br = new BufferedReader(new FileReader(file_name))) {
 		    String line;		    
@@ -312,10 +312,10 @@ public class process_text {
 		    					{
 		    						semi_schema_agg_union.add(curr_values);
 		    					}
-		    					else
-		    					{
-		    						schema.add(curr_values);
-		    					}
+//		    					else
+//		    					{
+//		    						schema.add(curr_values);
+//		    					}
 		    				}
 		    			}
 		    		}
@@ -336,13 +336,23 @@ public class process_text {
 			e.printStackTrace();
 		}
 		
+		System.out.println("00000000");
+		
 		Vector<Vector<Double>> tuple_level_agg_intersection_average = cal_average(tuple_level_agg_intersection, m);		    
 	    
+	      System.out.println("111111");
+		
 	    Vector<Vector<Double>> tuple_level_agg_union_average = cal_average(tuple_level_agg_union, m);
 	    
+	       System.out.println("22222");
+
 	    Vector<Vector<Double>> semi_schema_agg_intersection_average = cal_average(semi_schema_agg_intersection, m);
+
+	       System.out.println("33333");
 	    
 	    Vector<Vector<Double>> semi_schema_agg_union_average = cal_average(semi_schema_agg_union, m);
+	    
+        System.out.println("444444");
 	    
 	    Vector<Vector<Double>> schema_average = cal_average(schema, m);
 	    
@@ -528,6 +538,8 @@ public class process_text {
 					for(int k = 0; k<num; k++)
 					{
 						value += values.get(i * num + k).get(j);
+						
+						System.out.println(values.get(i * num + k));
 					}
 					
 					value = value / num;

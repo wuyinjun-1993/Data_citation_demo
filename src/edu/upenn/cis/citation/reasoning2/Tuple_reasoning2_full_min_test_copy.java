@@ -998,9 +998,9 @@ public class Tuple_reasoning2_full_min_test_copy {
 		String sql = null;
 		
 		if(test_case)
-			sql = Query_converter.datalog2sql_citation2_test(query, valid_conditions, valid_lambda_terms);
+			sql = Query_converter.datalog2sql_citation2_test2(query, valid_conditions, valid_lambda_terms);
 		else
-			sql = Query_converter.datalog2sql_citation2(query, valid_conditions, valid_lambda_terms);
+			sql = Query_converter.datalog2sql_citation3(query, valid_conditions, valid_lambda_terms);
 
 		end = System.nanoTime();
 		
@@ -1638,18 +1638,6 @@ public class Tuple_reasoning2_full_min_test_copy {
 		}
 		
 		
-		if(c_view_template != null)
-		{			
-			end_pos = tuple_num;
-			
-			
-			int [] interval = {start_pos, end_pos};
-			
-			
-			
-			
-		}
-
 		ArrayList<Integer> valid_tuple_ids = new ArrayList<Integer>();
 		
 		for(int i = 0; i<view_mapping_global_valid.length; i++)

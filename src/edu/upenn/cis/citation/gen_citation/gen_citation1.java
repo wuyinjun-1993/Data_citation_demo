@@ -2325,7 +2325,9 @@ public class gen_citation1 {
 			
 			Head_strs h_str = new Head_strs(head_strs);
 			
-			Unique_StringList curr_author_list = author_mapping.get(c_view.name + populate_db.separator + populate_db.separator + h_str + populate_db.separator + curr_query_ids.get(block_name));
+//			Unique_StringList curr_author_list = author_mapping.get(c_view.name + populate_db.separator + populate_db.separator + h_str + populate_db.separator + curr_query_ids.get(block_name));
+			
+			Unique_StringList curr_author_list = author_mapping.get(c_view.name+ populate_db.separator + block_name + populate_db.separator+ populate_db.separator + curr_query_ids.get(block_name));
 			
 			HashSet<String> authors = new HashSet<String>();
 			

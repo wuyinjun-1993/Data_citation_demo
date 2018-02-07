@@ -22,6 +22,8 @@ public class Query {
   int     queryType = GoodPlan.randomQuery;
   
   public HashMap<String, String> subgoal_name_mapping;
+  
+  public HashMap<String, Integer> subgoal_id_mappings;
 
   int     count = 0; // number of equivalent views in the same class
 

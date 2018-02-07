@@ -86,43 +86,43 @@ public class final_stress_test_group_min3 {
 		
 	}
 	
-	public static void get_table_size(Vector<String> relations, Connection c, PreparedStatement pst) throws SQLException
-	{
-		int original_size = 0;
-		
-		int annotated_relation_size = 0;
-		
-		for(int i = 0; i<relations.size(); i++)
-		{
-			original_size += get_single_table_size(relations.get(i), c, pst);
-			
-//			annotated_relation_size += get_single_table_size(relations.get(i) + populate_db.suffix, c, pst);
-		}
-		
-		System.out.println("original_relation_size::" + original_size);
-		
-//		System.out.println("annotated_relation_size::" + annotated_relation_size);
-	}
-	
-	static int get_single_table_size(String relation, Connection c, PreparedStatement pst) throws SQLException
-	{
-		String query = "SELECT pg_total_relation_size('"+ relation +"')";
-		
-		pst = c.prepareStatement(query);
-		
-		ResultSet rs = pst.executeQuery();
-		
-		if(rs.next())
-		{
-			int size =  rs.getInt(1);
-			
-//			int size_int = Integer.valueOf(size.substring(0, size.indexOf(" ")));
-			
-			return size;
-		}
-		
-		return 0;
-	}
+//	public static void get_table_size(Vector<String> relations, Connection c, PreparedStatement pst) throws SQLException
+//	{
+//		int original_size = 0;
+//		
+//		int annotated_relation_size = 0;
+//		
+//		for(int i = 0; i<relations.size(); i++)
+//		{
+//			original_size += get_single_table_size(relations.get(i), c, pst);
+//			
+////			annotated_relation_size += get_single_table_size(relations.get(i) + populate_db.suffix, c, pst);
+//		}
+//		
+//		System.out.println("original_relation_size::" + original_size);
+//		
+////		System.out.println("annotated_relation_size::" + annotated_relation_size);
+//	}
+//	
+//	static int get_single_table_size(String relation, Connection c, PreparedStatement pst) throws SQLException
+//	{
+//		String query = "SELECT pg_total_relation_size('"+ relation +"')";
+//		
+//		pst = c.prepareStatement(query);
+//		
+//		ResultSet rs = pst.executeQuery();
+//		
+//		if(rs.next())
+//		{
+//			int size =  rs.getInt(1);
+//			
+////			int size_int = Integer.valueOf(size.substring(0, size.indexOf(" ")));
+//			
+//			return size;
+//		}
+//		
+//		return 0;
+//	}
 	
 	
 	public static void main(String [] args) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
@@ -202,7 +202,7 @@ public class final_stress_test_group_min3 {
 				
 				populate_db.renew_table(c1, pst);
 				
-				get_table_size(relations, c1, pst);
+//				get_table_size(relations, c1, pst);
 				
 				views = view_generator.generate_store_views_without_predicates(relations, view_size, query.body.size(), c1, c2, pst);//(relations, c1, c2, pst);
 				
@@ -215,7 +215,7 @@ public class final_stress_test_group_min3 {
 					System.out.println(view);
 				}
 				
-				get_table_size(relations, c1, pst);
+//				get_table_size(relations, c1, pst);
 			}
 			else
 			{
@@ -236,7 +236,7 @@ public class final_stress_test_group_min3 {
 						System.out.println(view);
 					}
 					
-					get_table_size(relations, c1, pst);
+//					get_table_size(relations, c1, pst);
 				}
 			}
 			

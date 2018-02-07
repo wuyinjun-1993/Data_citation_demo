@@ -40,7 +40,7 @@ public class populate_db {
 
 //	public static String[] base_tables = {"gpcr","object","interaction","ligand","pathophysiology","interaction_affinity_refs","gtip_process","process_assoc","disease", "family", "introduction"};
 
-	public static String db_url = "jdbc:postgresql://localhost:5432/test1";
+	public static String db_url = "jdbc:postgresql://localhost:5432/example";
 	
 	public static String db_url1 = "jdbc:postgresql://localhost:5432/test1";
 

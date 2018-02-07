@@ -15,9 +15,9 @@ public class process_text {
 	
 	public static void main(String[] strs)
 	{
-		process_text_full_case(path + "final_stress_test_group_full.txt", path + "exp_final_group_test_full_tuple_agg_intersection.csv", path + "exp_final_group_test_full_tuple_agg_union.csv", path + "exp_final_group_test_full_semi_schema_agg_intersection.csv", path + "exp_final_group_test_full_semi_schema_agg_union.csv", path + "exp_final_group_test_full_schema.csv");
+//		process_text_full_case(path + "final_stress_test_group_full.txt", path + "exp_final_group_test_full_tuple_agg_intersection.csv", path + "exp_final_group_test_full_tuple_agg_union.csv", path + "exp_final_group_test_full_semi_schema_agg_intersection.csv", path + "exp_final_group_test_full_semi_schema_agg_union.csv", path + "exp_final_group_test_full_schema.csv");
 		
-//		process_text_min_case(path + "final_stress_test_view_num_min.txt", path + "exp_final_stress_test_view_num_min_tuple.csv", path + "exp_final_stress_test_view_num_min_semi_schema.csv", path + "exp_final_stress_test_view_num_min_schema.csv");
+		process_text_min_case(path + "final_stress_test_group_min.txt", path + "exp_final_stress_test_group_min_tuple.csv", path + "exp_final_stress_test_group_min_semi_schema.csv", path + "exp_final_stress_test_group_min_schema.csv");
 	}
 
 	
@@ -277,7 +277,7 @@ public class process_text {
 		    			{
 		    				String num_val = str[i].split("::")[1];
 		    				
-		    				System.out.print(str[i].split("::")[0] + "	");
+//		    				System.out.print(str[i].split("::")[0] + "	");
 		    				
 		    				if(isNumeric(num_val))
 		    				{
@@ -288,7 +288,7 @@ public class process_text {
 		    			}
 		    		}
 		    		
-		    		System.out.println();
+//		    		System.out.println(curr_values);
 		    		
 		    		if(num % (5*m) <m)
 		    		{
@@ -311,6 +311,8 @@ public class process_text {
 		    					if(num % (5*m) < 4*m && num % (5*m) >= 3*m)
 		    					{
 		    						semi_schema_agg_union.add(curr_values);
+		    						
+		    						System.out.println(num + " " + curr_values);
 		    					}
 //		    					else
 //		    					{
@@ -538,8 +540,6 @@ public class process_text {
 					for(int k = 0; k<num; k++)
 					{
 						value += values.get(i * num + k).get(j);
-						
-						System.out.println(values.get(i * num + k));
 					}
 					
 					value = value / num;

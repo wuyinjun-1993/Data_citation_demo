@@ -22,6 +22,8 @@ public class CoreCover {
   public static long timeFirstGMR = 0; // time when the 1st GMR is generated
   public static long timeAllGMR = 0;   // time when all GMRs are generated
 
+  public static HashMap<String, HashSet<Integer>> query_subgoal_id_mappings = new HashMap<String, HashSet<Integer>>();
+  
 
   static long startTime = 0;
   static long endTime   = 0;
@@ -103,12 +105,58 @@ public class CoreCover {
       tuples.add(tuple);  // we treat each subgoal as a "tuple"
     }
 
-    return new Database(tuples, query.subgoal_name_mapping);
+    HashMap<String, HashSet<Integer>> cluster_subgoal_ids = get_cluster_subgoal_ids(query.body, query.subgoal_name_mapping);
+    
+    return new Database(tuples, query.subgoal_name_mapping, cluster_subgoal_ids);
   }
+  
+  static HashMap<String, HashSet<Integer>> get_cluster_subgoal_ids(Vector<Subgoal> subgoals, HashMap<String, String> subgoal_name_mappings)
+  {
+    HashMap<String, HashSet<Integer>> cluster_subgoal_ids = new HashMap<String, HashSet<Integer>>();
+    
+    for(int i = 0; i<subgoals.size(); i++)
+    {
+      Subgoal subgoal = (Subgoal) subgoals.get(i);
+      
+      String origin_subgoal_name = subgoal_name_mappings.get(subgoal.name);
+      
+      if(cluster_subgoal_ids.get(origin_subgoal_name) == null)
+      {
+        HashSet<Integer> ids = new HashSet<Integer>();
+        
+        ids.add(i);
+        
+        cluster_subgoal_ids.put(origin_subgoal_name, ids);
+      }
+      else
+      {
+        cluster_subgoal_ids.get(origin_subgoal_name).add(i);
+      }
+      
+    }
+    
+    return cluster_subgoal_ids;
+  }
+  
     
  /**
   * given a canonical db and a set of views, computes the view tuples
   */
+  
+  static HashMap<String, Integer> get_subgoal_id_mappings(Query view)
+  {
+    HashMap<String, Integer> subgoal_id_mappings = new HashMap<String, Integer>();
+    
+    for(int i = 0; i<view.body.size(); i++)
+    {
+      Subgoal subgoal = (Subgoal) view.body.get(i);
+      
+      subgoal_id_mappings.put(subgoal.name, i);
+    }
+    
+    return subgoal_id_mappings;
+    
+  }
   
   public static HashSet computeViewTuples(Database canDb, Vector views) {
 	HashSet viewTuples = new HashSet();
@@ -120,7 +168,7 @@ public class CoreCover {
 
 //      System.out.println(view);
       
-      Relation rel = canDb.execQuery(view);
+      HashSet<Tuple> all_view_mappings = canDb.execQuery2(view);
       
 //      System.out.println("relation:::" + rel);
       
@@ -137,20 +185,24 @@ public class CoreCover {
 //    	  System.out.println();
 //      }
 //      
-      for (Iterator iter = rel.getTuples().iterator(); iter.hasNext();) {
+      view.subgoal_id_mappings = get_subgoal_id_mappings(view);
+      
+      for (Iterator iter = all_view_mappings.iterator(); iter.hasNext();) {
     	      	  
     	  Tuple tuple = (Tuple) iter.next();
     	  
-//          System.out.println("valid_tuple::" + tuple);
+//          System.out.println(tuple.toString() + tuple.mapSubgoals_str);
     	  
     	  if(!set_tuple_lambda_term(tuple, view))
     	  {
     		  continue;
     	  }
 
-    	  set_tuple_conditions(tuple, view);
+    	  set_tuple_conditions(tuple, view.conditions, view);
     	  
           viewTuples.add(tuple);
+          
+          tuple.setQuery(view);
       }
        // add them to the results
     }
@@ -178,6 +230,245 @@ public class CoreCover {
 	  tuple.lambda_terms = lambda_terms;
 	  
 	  return true;
+  }
+  
+  static void set_tuple_conditions(Tuple tuple, Vector<Conditions> view_conditions, Query view)
+  {
+      Vector<Conditions> conditions = new Vector<Conditions>();
+      
+      for(int i = 0; i<view_conditions.size(); i++)
+      {
+          boolean get_mapping1 = true;
+          
+          boolean get_mapping2 = true;
+          
+          String curr_arg1 = tuple.phi_str.apply(view_conditions.get(i).subgoal1 + populate_db.separator + view_conditions.get(i).arg1.name);
+          
+          if(curr_arg1 == null)
+              get_mapping1 = false;
+          
+          String subgoal1 = (get_mapping1 == true) ? curr_arg1.substring(0, curr_arg1.indexOf(populate_db.separator)) : view_conditions.get(i).subgoal1;
+          
+          curr_arg1 = (get_mapping1 == true) ? curr_arg1.substring(curr_arg1.indexOf(populate_db.separator) + 1, curr_arg1.length()):view_conditions.get(i).arg1.name;
+          
+          String curr_arg2 = new String();
+          
+          String subgoal2 = new String();
+          
+          Conditions condition = null;
+          
+          if(view_conditions.get(i).arg2.isConst())
+          {
+              curr_arg2 = view_conditions.get(i).arg2.name;
+              
+//            if(get_mapping1)
+                  get_mapping2 = true;
+              
+              condition = new Conditions(new Argument(curr_arg1, subgoal1), subgoal1, view_conditions.get(i).op, new Argument(curr_arg2), subgoal2);
+          }
+          else
+          {
+              curr_arg2 = tuple.phi_str.apply(view_conditions.get(i).subgoal2 + populate_db.separator + view_conditions.get(i).arg2.name);
+                          
+              if(curr_arg2 == null)
+                  get_mapping2 = false;
+              
+              subgoal2 = (get_mapping2 == true) ? curr_arg2.substring(0, curr_arg2.indexOf(populate_db.separator)):view_conditions.get(i).subgoal2;
+              
+              curr_arg2 = (get_mapping2 == true) ? curr_arg2.substring(curr_arg2.indexOf(populate_db.separator) + 1, curr_arg2.length()): view_conditions.get(i).arg2.name;
+              
+              condition = new Conditions(new Argument(curr_arg1, subgoal1), subgoal1, view_conditions.get(i).op, new Argument(curr_arg2, subgoal2), subgoal2);
+          }
+                  
+          condition.get_mapping1 = get_mapping1;
+          
+          condition.get_mapping2 = get_mapping2;
+          
+//        if(!get_mapping1 && get_mapping2)
+//        {
+//          condition.swap_args();
+//        }
+          
+          
+          if((condition.get_mapping1 & condition.get_mapping2) == false)
+          {
+            cluster_relational_subgoals(view, tuple, view_conditions.get(i), i, condition.get_mapping1, condition.get_mapping2);
+            
+          }
+          
+          if(!get_mapping1 && !get_mapping2)
+          {
+            
+//          cluster_relational_subgoals(view, tuple, condition, i, condition.get_mapping1, condition.get_mapping2);
+            
+            continue;
+            
+            
+          }
+          if(!get_mapping1 && view_conditions.get(i).arg2.isConst())
+          {
+//          cluster_relational_subgoals(view, tuple, condition, i, condition.get_mapping1, condition.get_mapping2);
+            
+            continue;
+          }
+          
+          conditions.add(condition);
+          
+//          System.out.println(condition);
+//          
+//          System.out.println(condition.get_mapping1);
+//          
+//          System.out.println(condition.get_mapping2);
+          
+      }
+      
+      tuple.conditions = conditions;
+      
+//    System.out.println(tuple.cluster_subgoal_ids);
+//    
+//    System.out.println(tuple.cluster_patial_mapping_condition_ids);
+//    
+//    System.out.println(tuple.cluster_non_mapping_condition_ids);
+  }
+  
+  static void cluster_relational_subgoals(Query view, Tuple tuple, Conditions condition, int j, boolean get_mapping1, boolean get_mapping2)
+  {
+//    Vector<HashSet<Integer>> cluster_ids = new Vector<HashSet<Integer>>();
+    
+//    for(int j = 0; j<view.conditions.size(); j++)
+    {
+      String subgoal1 = condition.subgoal1;
+      
+      String subgoal2 = condition.subgoal2;
+      
+      int id1 = view.subgoal_id_mappings.get(subgoal1);
+      
+      int id2 = -1;
+      
+      if(!(subgoal2 == null) && !subgoal2.isEmpty())
+        id2 = view.subgoal_id_mappings.get(subgoal2);
+      
+      
+      int i = 0;
+      
+      int matched_cluster_id1 = -1;
+      
+      int matched_cluster_id2 = -1;
+      
+      for(i = 0; i<tuple.cluster_subgoal_ids.size(); i++)
+      {
+        HashSet<Integer> curr_cluster = tuple.cluster_subgoal_ids.get(i);
+        
+        
+        
+        for(Integer id:curr_cluster)
+        {
+          if(id == id1)
+          {
+            matched_cluster_id1 = i;
+            
+          }
+          
+          if(id == id2)
+          {
+            matched_cluster_id2 = i;
+            
+          }
+        }
+      }
+      
+      if(matched_cluster_id1 < 0 && matched_cluster_id2 < 0)
+      {
+        HashSet<Integer> new_clusters = new HashSet<Integer>();
+        
+        System.out.println(id1);
+        
+        System.out.println(id2);
+        
+        System.out.println(get_mapping1);
+        
+        System.out.println(get_mapping2);
+        
+        if(!get_mapping1)
+          new_clusters.add(id1);
+        
+        if(id2 >= 0 && !get_mapping2)
+          new_clusters.add(id2);
+        
+        HashSet<Integer> curr_cluster_condition_ids = new HashSet<Integer>();
+        
+        curr_cluster_condition_ids.add(j);
+        
+        if(get_mapping1 | get_mapping2 == true)
+        {
+          tuple.cluster_patial_mapping_condition_ids.add(curr_cluster_condition_ids);
+          
+          tuple.cluster_non_mapping_condition_ids.add(new HashSet<Integer>());
+        }
+        else
+        {
+          tuple.cluster_patial_mapping_condition_ids.add(new HashSet<Integer>());
+          
+          tuple.cluster_non_mapping_condition_ids.add(curr_cluster_condition_ids);
+        }
+        
+        tuple.cluster_subgoal_ids.add(new_clusters);
+        
+      }
+      else
+      {
+        if(matched_cluster_id1 < 0 && matched_cluster_id2 >= 0)
+        {
+          if(!get_mapping1)
+            tuple.cluster_subgoal_ids.get(matched_cluster_id2).add(id1);
+          if(get_mapping1 | get_mapping2 == true)
+          {
+            tuple.cluster_patial_mapping_condition_ids.get(matched_cluster_id2).add(j);
+          }
+          else
+          {
+            tuple.cluster_non_mapping_condition_ids.get(matched_cluster_id2).add(j);
+          }
+        }
+        else
+        {
+          if(matched_cluster_id2 < 0 && matched_cluster_id1 >= 0)
+          {
+            
+            if(id2 >= 0 && !get_mapping2)
+              tuple.cluster_subgoal_ids.get(matched_cluster_id1).add(id2);
+            
+            if(get_mapping1 | get_mapping2 == true)
+            {
+              tuple.cluster_patial_mapping_condition_ids.get(matched_cluster_id1).add(j);
+            }
+            else
+            {
+              tuple.cluster_non_mapping_condition_ids.get(matched_cluster_id1).add(j);
+            }
+
+          }
+          else
+          {
+            tuple.cluster_subgoal_ids.get(matched_cluster_id1).addAll(tuple.cluster_subgoal_ids.get(matched_cluster_id2));
+                        
+            tuple.cluster_subgoal_ids.removeElementAt(matched_cluster_id2);
+            
+            tuple.cluster_patial_mapping_condition_ids.get(matched_cluster_id1).addAll(tuple.cluster_patial_mapping_condition_ids.get(matched_cluster_id2));
+            
+            tuple.cluster_patial_mapping_condition_ids.removeElementAt(matched_cluster_id2);
+            
+            tuple.cluster_non_mapping_condition_ids.get(matched_cluster_id1).addAll(tuple.cluster_non_mapping_condition_ids.get(matched_cluster_id2));
+            
+            tuple.cluster_non_mapping_condition_ids.removeElementAt(matched_cluster_id2);
+            
+          }
+        }
+      }
+      
+      
+    }
+    
   }
   
   static void set_tuple_conditions(Tuple tuple, Query view)
@@ -249,14 +540,14 @@ public class CoreCover {
 	    for (int i = 0; i < views.size(); i ++) {
 	      Query view = (Query) views.elementAt(i);
 
-	      Relation rel = canDb.execQuery(view);
+	      viewTuples.addAll(canDb.execQuery2(view));
 	      
-	      for (Iterator iter = rel.getTuples().iterator(); iter.hasNext();) {
-	    	  Tuple tuple = (Tuple) iter.next();
-	          tuple.lambda_terms = view.lambda_term;
-	          tuple.conditions = view.conditions;
-	          viewTuples.add(tuple);
-	      }
+//	      for (Iterator iter = rel.getTuples().iterator(); iter.hasNext();) {
+//	    	  Tuple tuple = (Tuple) iter.next();
+//	          tuple.lambda_terms = view.lambda_term;
+//	          tuple.conditions = view.conditions;
+//	          viewTuples.add(tuple);
+//	      }
 	       // add them to the results
 	    }
 	    return viewTuples;

@@ -2649,6 +2649,9 @@ public class view_generator {
 //			const_id = conflict_ids.get(0) + r.nextInt(range);
 //		}
 		
+		if(ids.size() <= 1)
+		  return false;
+		
 		int selected_curr_id = r.nextInt(ids.size() - 1);
 		
 		int lower_value = ids.get(selected_curr_id);

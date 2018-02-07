@@ -36,6 +36,7 @@ import edu.upenn.cis.citation.aggregation.Aggregation1;
 import edu.upenn.cis.citation.aggregation.Aggregation2;
 import edu.upenn.cis.citation.aggregation.Aggregation3;
 import edu.upenn.cis.citation.aggregation.Aggregation5;
+import edu.upenn.cis.citation.aggregation.Aggregation6;
 import edu.upenn.cis.citation.citation_view.*;
 import edu.upenn.cis.citation.data_structure.IntList;
 import edu.upenn.cis.citation.data_structure.StringList;
@@ -2987,85 +2988,155 @@ public class schema_reasoning {
 ////		return insert_c_view;
 //	}
 //	
-	public static void get_views_parameters(ArrayList<citation_view> insert_c_view, ResultSet rs, int start_pos, ArrayList<HashSet<Head_strs>> values) throws SQLException
-	{
-		
-//		HashSet<citation_view_vector> update_c_views = new HashSet<citation_view_vector>();
-		
-//		Vector<String> heads = new Vector<String>();
+//	public static void get_views_parameters(ArrayList<citation_view> insert_c_view, ResultSet rs, int start_pos, ArrayList<HashSet<Head_strs>> values) throws SQLException
+//	{
 //		
-//		Set<String> head_sets = lambda_term_id_mapping.keySet();
+////		HashSet<citation_view_vector> update_c_views = new HashSet<citation_view_vector>();
 //		
-//		for(Iterator iter = head_sets.iterator(); iter.hasNext();)
+////		Vector<String> heads = new Vector<String>();
+////		
+////		Set<String> head_sets = lambda_term_id_mapping.keySet();
+////		
+////		for(Iterator iter = head_sets.iterator(); iter.hasNext();)
+////		{
+////			String lambda_terms = (String) iter.next();
+////			
+////			int id = lambda_term_id_mapping.get(lambda_terms);
+////			
+////			heads.add(rs.getString(id + start_pos + 1));
+////		}
+////		
+////		Head_strs lambda_values = new Head_strs(heads);
+////		
+////		values.add(lambda_values);
+//		
+//		for(int i = 0; i<insert_c_view.size(); i++)
 //		{
-//			String lambda_terms = (String) iter.next();
 //			
-//			int id = lambda_term_id_mapping.get(lambda_terms);
+//			citation_view c_vec = insert_c_view.get(i);
 //			
-//			heads.add(rs.getString(id + start_pos + 1));
+////			for(int j = 0; j<c_vec.c_vec.size(); j++)
+////			{
+////				citation_view c_view = c_vec.c_vec.get(j);
+//				
+//				if(c_vec.has_lambda_term())
+//				{
+//					citation_view_parametered curr_c_view = (citation_view_parametered) c_vec;
+//					
+//					Vector<Lambda_term> lambda_terms = curr_c_view.lambda_terms;
+//					
+//					Vector<String> heads = new Vector<String>();
+//					
+//					for(int k = 0; k<lambda_terms.size(); k++)
+//					{
+//						int id = lambda_term_id_mapping.get(lambda_terms.get(k).toString());
+//						
+//						heads.add(rs.getString(id + start_pos + 1));
+//						
+//						curr_c_view.put_lambda_paras(lambda_terms.get(k), rs.getString(id + start_pos + 1));
+//					}
+//					
+//					Head_strs head_values = new Head_strs(heads);
+//					
+//					if(values.size() > i)
+//					{
+//						values.get(i).add(head_values);
+//					}
+//					else
+//					{
+//						HashSet<Head_strs> curr_head_values = new HashSet<Head_strs>();
+//						
+//						curr_head_values.add(head_values);
+//						
+//						values.add(curr_head_values);
+//					}
+//					
+//				}
+//				else
+//				{
+//					if(values.size() > i)
+//					{
+//						continue;
+//					}
+//					else
+//					{
+//						values.add(new HashSet<Head_strs>());
+//					}
+//				}
+//				
+////			}
 //		}
-//		
-//		Head_strs lambda_values = new Head_strs(heads);
-//		
-//		values.add(lambda_values);
-		
-		for(int i = 0; i<insert_c_view.size(); i++)
-		{
-			
-			citation_view c_vec = insert_c_view.get(i);
-			
-//			for(int j = 0; j<c_vec.c_vec.size(); j++)
-//			{
-//				citation_view c_view = c_vec.c_vec.get(j);
-				
-				if(c_vec.has_lambda_term())
-				{
-					citation_view_parametered curr_c_view = (citation_view_parametered) c_vec;
-					
-					Vector<Lambda_term> lambda_terms = curr_c_view.lambda_terms;
-					
-					Vector<String> heads = new Vector<String>();
-					
-					for(int k = 0; k<lambda_terms.size(); k++)
-					{
-						int id = lambda_term_id_mapping.get(lambda_terms.get(k).toString());
-						
-						heads.add(rs.getString(id + start_pos + 1));
-						
-						curr_c_view.put_lambda_paras(lambda_terms.get(k), rs.getString(id + start_pos + 1));
-					}
-					
-					Head_strs head_values = new Head_strs(heads);
-					
-					if(values.size() > i)
-					{
-						values.get(i).add(head_values);
-					}
-					else
-					{
-						HashSet<Head_strs> curr_head_values = new HashSet<Head_strs>();
-						
-						curr_head_values.add(head_values);
-						
-						values.add(curr_head_values);
-					}
-					
-				}
-				else
-				{
-					if(values.size() > i)
-					{
-						continue;
-					}
-					else
-					{
-						values.add(new HashSet<Head_strs>());
-					}
-				}
-				
-//			}
-		}
-	}
+//	}
+	
+	   public static void get_views_parameters(HashSet<Tuple> insert_c_view, ResultSet rs, int start_pos, HashMap<Tuple, HashSet<Head_strs>> values) throws SQLException
+	    {
+	        
+//	      HashSet<citation_view_vector2> update_c_views = new HashSet<citation_view_vector2>();
+	        
+	        Set<String> head_sets = lambda_term_id_mapping.keySet();
+	        
+	        for(Tuple view_mapping: insert_c_view)
+	        {
+	            
+//	          citation_view c_vec = insert_c_view.get(i);
+	            
+//	          for(int j = 0; j<c_vec.c_vec.size(); j++)
+//	          {
+//	              citation_view c_view = c_vec.c_vec.get(j);
+	                
+	                if(view_mapping.lambda_terms.size() > 0)
+	                {
+//	                  citation_view_parametered curr_c_view = (citation_view_parametered) c_vec;
+	                    
+//	                  Vector<Lambda_term> lambda_terms = curr_c_view.lambda_terms;
+	                    
+	                    Vector<String> heads = new Vector<String>();
+	                    
+	                    for(int k = 0; k<view_mapping.lambda_terms.size(); k++)
+	                    {
+	                        int id = lambda_term_id_mapping.get(view_mapping.lambda_terms.get(k).toString());
+	                        
+	                        heads.add(rs.getString(id + start_pos + 1));
+	                        
+//	                      curr_c_view.put_lambda_paras(lambda_terms.get(k), rs.getString(id + start_pos + 1));
+	                    }
+	                    
+	                    Head_strs head_values = new Head_strs(heads);
+	                    
+	                    if(values.get(view_mapping) == null)
+	                    {
+	                      
+	                      HashSet<Head_strs> curr_head_values = new HashSet<Head_strs>();
+	                      
+	                      curr_head_values.add(head_values);
+	                      
+	                        values.put(view_mapping, curr_head_values);
+	                    }
+	                    else
+	                    {
+//	                      HashSet<Head_strs> curr_head_values = new HashSet<Head_strs>();
+//	                      
+//	                      curr_head_values.add(head_values);
+	                        
+	                        values.get(view_mapping).add(head_values);//add(curr_head_values);
+	                    }
+	                    
+	                }
+//	              else
+//	              {
+//	                  if(values.size() > i)
+//	                  {
+//	                      continue;
+//	                  }
+//	                  else
+//	                  {
+//	                      values.add(new HashSet<Head_strs>());
+//	                  }
+//	              }
+	                
+//	          }
+	        }
+	    }
 	
 	public static void get_views_parameters(ArrayList<citation_view> insert_c_view, ResultSet rs, int start_pos, ArrayList<HashSet<Head_strs>> values, ArrayList<Integer> view_ids) throws SQLException
 	{

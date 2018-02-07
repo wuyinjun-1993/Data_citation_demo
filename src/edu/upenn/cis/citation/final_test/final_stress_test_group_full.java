@@ -92,23 +92,23 @@ public class final_stress_test_group_full {
 		
 	}
 	
-	public static void get_table_size(Vector<String> relations, Connection c, PreparedStatement pst) throws SQLException
-	{
-		int original_size = 0;
-		
-		int annotated_relation_size = 0;
-		
-		for(int i = 0; i<relations.size(); i++)
-		{
-			original_size += get_single_table_size(relations.get(i), c, pst);
-			
-//			annotated_relation_size += get_single_table_size(relations.get(i) + populate_db.suffix, c, pst);
-		}
-		
-		System.out.println("original_relation_size::" + original_size);
-		
-//		System.out.println("annotated_relation_size::" + annotated_relation_size);
-	}
+//	public static void get_table_size(Vector<String> relations, Connection c, PreparedStatement pst) throws SQLException
+//	{
+//		int original_size = 0;
+//		
+//		int annotated_relation_size = 0;
+//		
+//		for(int i = 0; i<relations.size(); i++)
+//		{
+//			original_size += get_single_table_size(relations.get(i), c, pst);
+//			
+////			annotated_relation_size += get_single_table_size(relations.get(i) + populate_db.suffix, c, pst);
+//		}
+//		
+//		System.out.println("original_relation_size::" + original_size);
+//		
+////		System.out.println("annotated_relation_size::" + annotated_relation_size);
+//	}
 	
 	static int get_single_table_size(String relation, Connection c, PreparedStatement pst) throws SQLException
 	{
@@ -137,7 +137,7 @@ public class final_stress_test_group_full {
 		
 		Connection c2 = null;
 		
-		System.out.println("predicate_test");
+//		System.out.println("predicate_test");
 		
 //		Connection c3 = null;
 	      PreparedStatement pst = null;
@@ -217,7 +217,7 @@ public class final_stress_test_group_full {
 				
 				populate_db.renew_table(c1, pst);
 				
-				get_table_size(relations, c1, pst);
+//				get_table_size(relations, c1, pst);
 				
 				views = view_generator.generate_store_views_without_predicates(relations, view_size, query.body.size(), c1, c2, pst);//(relations, c1, c2, pst);
 				
@@ -230,7 +230,7 @@ public class final_stress_test_group_full {
 					System.out.println(view);
 				}
 				
-				get_table_size(relations, c1, pst);
+//				get_table_size(relations, c1, pst);
 			}
 			else
 			{
@@ -251,7 +251,7 @@ public class final_stress_test_group_full {
 						System.out.println(view);
 					}
 					
-					get_table_size(relations, c1, pst);
+//					get_table_size(relations, c1, pst);
 				}
 			}
 			
@@ -350,13 +350,11 @@ public class final_stress_test_group_full {
 			
 			time1 = System.nanoTime();
 			
-			ArrayList<HashSet<citation_view>> views_per_group = Tuple_reasoning1_full_test_opt_copy.cal_covering_sets_schema_level(query, c, pst);
-			
 			middle_time = System.nanoTime();
 			
 			Tuple_reasoning1_full_test_opt_copy.prepare_citation_information(c, pst);
 			
-			agg_citations = Tuple_reasoning1_full_test_opt_copy.gen_citation_schema_level(views_per_group, c, pst);
+			agg_citations = Tuple_reasoning1_full_test_opt_copy.gen_citation_schema_level(c, pst);
 			
 //			 Tuple_reasoning1_full_test_opt.tuple_gen_agg_citations(query, c, pst);
 													
@@ -388,7 +386,7 @@ public class final_stress_test_group_full {
 			
 			System.out.print("covering_sets::" + Aggregation5.curr_res + "	");
 			
-			System.out.print("covering_set_size::" + Aggregation6.curr_res.size() + "	");
+			System.out.print("covering_set_size::" + Tuple_reasoning1_full_test_opt_copy.covering_set_schema_level.size() + "	");
 			
 			int distinct_view_size = Aggregation6.cal_distinct_views();
 			
@@ -596,13 +594,11 @@ public class final_stress_test_group_full {
 				
 				time1 = System.nanoTime();
 				
-				ArrayList<HashSet<citation_view>> views_per_group = Tuple_reasoning2_full_test2_copy.cal_covering_sets_schema_level(query, c, pst);
-				
 				middle_time = System.nanoTime();
 				
 				Tuple_reasoning2_full_test2_copy.prepare_citation_information(c, pst);
 				
-				Tuple_reasoning2_full_test2_copy.gen_citation_schema_level(views_per_group, c, pst);
+				Tuple_reasoning2_full_test2_copy.gen_citation_schema_level(c, pst);
 				
 //				agg_citations = Tuple_reasoning2_full_test2.tuple_gen_agg_citations(query, c, pst);
 														
@@ -634,7 +630,7 @@ public class final_stress_test_group_full {
 
 //				System.out.print("covering_sets::" + Aggregation5.curr_res + "	");
 				
-				System.out.print("covering_set_size::" + Aggregation6.curr_res.size() + "	");
+				System.out.print("covering_set_size::" + Tuple_reasoning2_full_test2_copy.covering_set_schema_level.size() + "	");
 				
 				int distinct_view_size = Aggregation6.cal_distinct_views();
 				
@@ -774,7 +770,7 @@ public class final_stress_test_group_full {
 				
 				schema_reasoning.prepare_citation_information(c, pst);
 				
-				agg_citations = schema_reasoning.tuple_gen_agg_citations(query, c, pst);
+//				agg_citations = schema_reasoning.tuple_gen_agg_citations(query, c, pst);
 														
 				end_time = System.nanoTime();
 				

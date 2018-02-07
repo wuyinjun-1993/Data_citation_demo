@@ -2121,9 +2121,9 @@ public class Tuple_reasoning1_full_test_opt {
 		String sql = null;
 		
 		if(!test_case)
-			sql = Query_converter.datalog2sql_citation(query, valid_lambda_terms, valid_conditions, c, pst);
+			sql = Query_converter.datalog2sql_citation(query, valid_lambda_terms, valid_conditions, viewTuples, c, pst);
 		else
-			sql = Query_converter.datalog2sql_citation_test(query, valid_lambda_terms, valid_conditions);
+			sql = Query_converter.datalog2sql_citation_test(query, valid_lambda_terms, valid_conditions, viewTuples);
 								
 		end = System.nanoTime();
 		

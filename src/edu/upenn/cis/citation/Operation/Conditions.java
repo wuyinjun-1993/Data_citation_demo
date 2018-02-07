@@ -318,7 +318,29 @@ public class Conditions {
 	@Override
 	public int hashCode()
 	{
-		return this.arg1.hashCode() * 10000 + this.subgoal1.hashCode()*1000 + this.op.hashCode()*100 + this.arg2.hashCode()*10 + this.subgoal2.hashCode();
+	  if(this.subgoal2 ==null || this.subgoal2.isEmpty())
+	  {
+	    String string = this.subgoal1 + populate_db.separator + this.arg1.name + this.op + this.arg2.name + populate_db.separator + this.get_mapping1 + populate_db.separator + this.get_mapping2;
+	    
+	    return string.hashCode();
+	  }
+	  else
+	  {
+	    if(this.subgoal1.compareTo(this.subgoal2) > 0 || ((this.subgoal1.compareTo(this.subgoal2) == 0) && this.arg1.name.compareTo(this.arg2.name) > 0))
+	    {
+	      String string = this.subgoal1 + populate_db.separator + this.arg1.name + this.op + this.subgoal2 + populate_db.separator + this.arg2.name + populate_db.separator + this.get_mapping1 + populate_db.separator + this.get_mapping2;
+	        
+	      return string.hashCode();
+	    }
+	    else
+	    {
+	          String string = this.subgoal2 + populate_db.separator + this.arg2.name + this.op + this.subgoal1 + populate_db.separator + this.arg1.name + populate_db.separator + this.get_mapping2 + populate_db.separator + this.get_mapping1;
+	            
+	          return string.hashCode();
+	    }
+	  }
+	  
+//		return this.arg1.hashCode() * 10000 + this.subgoal1.hashCode()*1000 + this.op.hashCode()*100 + this.arg2.hashCode()*10 + this.subgoal2.hashCode();
 	}
 	
 	

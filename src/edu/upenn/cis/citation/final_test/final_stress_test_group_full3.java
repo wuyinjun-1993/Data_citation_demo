@@ -98,23 +98,23 @@ public class final_stress_test_group_full3 {
 		
 	}
 	
-	public static void get_table_size(Vector<String> relations, Connection c, PreparedStatement pst) throws SQLException
-	{
-		int original_size = 0;
-		
-		int annotated_relation_size = 0;
-		
-		for(int i = 0; i<relations.size(); i++)
-		{
-			original_size += get_single_table_size(relations.get(i), c, pst);
-			
-//			annotated_relation_size += get_single_table_size(relations.get(i) + populate_db.suffix, c, pst);
-		}
-		
-		System.out.println("original_relation_size::" + original_size);
-		
-//		System.out.println("annotated_relation_size::" + annotated_relation_size);
-	}
+//	public static void get_table_size(Vector<String> relations, Connection c, PreparedStatement pst) throws SQLException
+//	{
+//		int original_size = 0;
+//		
+//		int annotated_relation_size = 0;
+//		
+//		for(int i = 0; i<relations.size(); i++)
+//		{
+//			original_size += get_single_table_size(relations.get(i), c, pst);
+//			
+////			annotated_relation_size += get_single_table_size(relations.get(i) + populate_db.suffix, c, pst);
+//		}
+//		
+//		System.out.println("original_relation_size::" + original_size);
+//		
+////		System.out.println("annotated_relation_size::" + annotated_relation_size);
+//	}
 	
 	static int get_single_table_size(String relation, Connection c, PreparedStatement pst) throws SQLException
 	{
@@ -182,7 +182,7 @@ public class final_stress_test_group_full3 {
 		
 		boolean agg_intersection = Boolean.valueOf(args[7]);
 		
-		query_generator.query_result_size = 100000;
+		query_generator.query_result_size = 10000;
 				
 //		Query query = query_storage.get_query_by_id(1);
 		query_generator.init_parameterizable_attributes(c2, pst);
@@ -229,7 +229,7 @@ public class final_stress_test_group_full3 {
 				
 				populate_db.renew_table(c1, pst);
 				
-				get_table_size(relations, c1, pst);
+//				get_table_size(relations, c1, pst);
 				
 				views = view_generator.generate_store_views_without_predicates2(relations, view_size, query.body.size(), c2, c3, pst);//(relations, c1, c2, pst);
 				
@@ -242,7 +242,7 @@ public class final_stress_test_group_full3 {
 					System.out.println(view);
 				}
 				
-				get_table_size(relations, c1, pst);
+//				get_table_size(relations, c1, pst);
 			}
 			else
 			{
@@ -263,7 +263,7 @@ public class final_stress_test_group_full3 {
 						System.out.println(view);
 					}
 					
-					get_table_size(relations, c1, pst);
+//					get_table_size(relations, c1, pst);
 				}
 				
 
@@ -407,13 +407,11 @@ public class final_stress_test_group_full3 {
 			
 			time1 = System.nanoTime();
 			
-			ArrayList<HashSet<citation_view>> views_per_group = Tuple_reasoning1_full_test_opt_copy.cal_covering_sets_schema_level(query, c, pst);
-			
 			middle_time = System.nanoTime();
 			
 			Tuple_reasoning1_full_test_opt_copy.prepare_citation_information(c, pst);
 			
-			agg_citations = Tuple_reasoning1_full_test_opt_copy.gen_citation_schema_level(views_per_group, c, pst);
+			agg_citations = Tuple_reasoning1_full_test_opt_copy.gen_citation_schema_level(c, pst);
 //			
 ////			 Tuple_reasoning1_full_test_opt.tuple_gen_agg_citations(query, c, pst);
 //													
@@ -445,7 +443,7 @@ public class final_stress_test_group_full3 {
 			
 			write2file(path + "covering_sets_per_group2", Tuple_reasoning1_full_test_opt_copy.c_view_map);
 			
-			Query_operation.write2file(path + "covering_sets2", Aggregation6.curr_res);
+			Query_operation.write2file(path + "covering_sets2", Tuple_reasoning1_full_test_opt_copy.covering_set_schema_level);
 
             Query_operation.write2file(path + "citations", agg_citations);
 			
@@ -663,15 +661,13 @@ public class final_stress_test_group_full3 {
 				
 				time1 = System.nanoTime();
 				
-				ArrayList<HashSet<citation_view>> views_per_group = Tuple_reasoning2_full_test2_copy.cal_covering_sets_schema_level(query, c, pst);
-				
 				middle_time = System.nanoTime();
 				
 				Tuple_reasoning2_full_test2_copy.prepare_citation_information(c, pst);
 				
-				Tuple_reasoning2_full_test2_copy.gen_citation_schema_level(views_per_group, c, pst);
+				agg_citations = Tuple_reasoning2_full_test2_copy.gen_citation_schema_level(c, pst);
 				
-				agg_citations = Tuple_reasoning2_full_test2_copy.tuple_gen_agg_citations(query, c, pst);
+//				agg_citations = Tuple_reasoning2_full_test2_copy.tuple_gen_agg_citations(query, c, pst);
 														
 				end_time = System.nanoTime();
 				
@@ -691,7 +687,7 @@ public class final_stress_test_group_full3 {
 	            
 	            write2file(path + "covering_sets_per_group1", Tuple_reasoning2_full_test2_copy.c_view_map);
 	            
-	            Query_operation.write2file(path + "covering_sets1", Aggregation6.curr_res);
+	            Query_operation.write2file(path + "covering_sets1", Tuple_reasoning2_full_test2_copy.covering_set_schema_level);
 
 	            Query_operation.write2file(path + "citations", agg_citations);
 			}

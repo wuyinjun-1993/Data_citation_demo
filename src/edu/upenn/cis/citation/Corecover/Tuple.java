@@ -30,6 +30,13 @@ public class Tuple {
   public Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();
   
   double cost = 1;
+  
+  public Vector<HashSet<Integer>> cluster_subgoal_ids = new Vector<HashSet<Integer>>();
+  
+  public Vector<HashSet<Integer>> cluster_patial_mapping_condition_ids = new Vector<HashSet<Integer>>();
+
+  public Vector<HashSet<Integer>> cluster_non_mapping_condition_ids = new Vector<HashSet<Integer>>();
+
 
   public double get_cost()
   {

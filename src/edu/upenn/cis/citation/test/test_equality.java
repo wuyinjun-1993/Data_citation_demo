@@ -11,7 +11,7 @@ import edu.upenn.cis.citation.Corecover.Query;
 
 public class test_equality {
 	
-	static String file1 = "reasoning_results/covering_sets";
+	static String file1 = "reasoning_results/covering_sets1";
 	
 	static String file2 = "reasoning_results/covering_sets2";
 	
@@ -30,6 +30,8 @@ public class test_equality {
 	public static void main(String [] args)
 	{
 	  test_equality2();
+	  
+	  test_equality1();
 	}
 	
 	static void test_equality2()
@@ -41,7 +43,7 @@ public class test_equality {
 	  System.out.println("covering_set_group2");
 	  
 	  HashSet<HashSet<String>> arr2 = get_covering_sets_group_strs(covering_set_group_file2);
-      
+	  
 	  if(arr1.size() != arr2.size())
 	  {
 	    System.out.println("false");
@@ -131,17 +133,25 @@ public class test_equality {
 	{
 	  Vector<String> arr1 = get_view_strs(file1);
       
-      Vector<String> arr2 = get_view_strs(file2);
+//      Vector<String> arr2 = get_view_strs(file2);
       
       Vector<String> arr3 = get_view_strs(file3);
       
-      Vector<String> arr4 = get_view_strs(file4);
+//      Vector<String> arr4 = get_view_strs(file4);
       
-        System.out.println(compare_arrs(arr1, arr2));
+      System.out.println(arr1);
+      
+//      System.out.println(arr2);
+      
+      System.out.println(arr3);
+      
+//      System.out.println(arr4);
+      
+        System.out.println(compare_arrs(arr1, arr3));
         
-        System.out.println(compare_arrs(arr2, arr3));
+//        System.out.println(compare_arrs(arr2, arr3));
         
-        System.out.println(compare_arrs(arr3, arr4));
+//        System.out.println(compare_arrs(arr3, arr4));
         
         Vector<String> arr1_copy = new Vector<String>();
           
@@ -149,9 +159,9 @@ public class test_equality {
           
           arr1_copy.addAll(arr1);
           
-          arr2_copy.addAll(arr2);
+//          arr2_copy.addAll(arr2);
         
-          arr1.removeAll(arr2);  
+//          arr1.removeAll(arr2);  
           
           arr2_copy.removeAll(arr1_copy);
         

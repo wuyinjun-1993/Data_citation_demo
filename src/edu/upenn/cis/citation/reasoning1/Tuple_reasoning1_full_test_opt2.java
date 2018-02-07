@@ -1964,7 +1964,7 @@ public class Tuple_reasoning1_full_test_opt2 {
 		
 		remove_conflict_duplicate_view_mapping(query);
 					
-		String sql = Query_converter.datalog2sql_citation(query, valid_lambda_terms, valid_conditions, c, pst);
+		String sql = Query_converter.datalog2sql_citation(query, valid_lambda_terms, valid_conditions, viewTuples, c, pst);
 						
 		end = System.nanoTime();
 		

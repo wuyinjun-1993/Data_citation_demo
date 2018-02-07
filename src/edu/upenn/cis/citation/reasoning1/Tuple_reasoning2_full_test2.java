@@ -1173,9 +1173,9 @@ public class Tuple_reasoning2_full_test2 {
 		String sql = null;
 		
 		if(!test_case)
-			sql = Query_converter.datalog2sql_citation2(query, valid_conditions, valid_lambda_terms);
+			sql = Query_converter.datalog2sql_citation2(query, valid_conditions, valid_lambda_terms, views);
 		else
-			sql = Query_converter.datalog2sql_citation2_test(query, valid_conditions, valid_lambda_terms);
+			sql = Query_converter.datalog2sql_citation2_test(query, valid_conditions, valid_lambda_terms, views);
 		
 //		System.out.println(sql);
 

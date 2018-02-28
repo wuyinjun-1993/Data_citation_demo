@@ -40,6 +40,9 @@ public abstract class citation_view {
 	public abstract Tuple get_view_tuple();
 	
 	@Override
+	public abstract int hashCode();
+	
+	@Override
 	public abstract boolean equals(Object o);
 
 }

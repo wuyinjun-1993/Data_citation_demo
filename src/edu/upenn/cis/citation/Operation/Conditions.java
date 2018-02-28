@@ -40,11 +40,15 @@ public class Conditions {
 	
 	public static void main(String [] args)
 	{
-		String str1 = "other_protein";
+		Conditions condition1 = new Conditions(new Argument("family_id", "family"), "family" , new op_greater(), new Argument("family_id", "introduction"), "introduction");
 		
-		String str2 = "gpcr";
+		Conditions condition2 = new Conditions(new Argument("family_id", "introduction"), "introduction" , new op_less(), new Argument("family_id", "family"), "family");
 		
-		System.out.println(str1.compareTo(str2));
+		Vector<Conditions> conditions = new Vector<Conditions>();
+		
+		conditions.add(condition1);
+		
+		System.out.println(conditions.contains(condition2));
 	}
 	
 	@Override
@@ -307,10 +311,13 @@ public class Conditions {
 		
 		Conditions condition = (Conditions) obj;
 		
-		if(this.arg1.name.equals(condition.arg1.name) && this.arg1.relation_name.equals(condition.arg1.relation_name) 
-				&& this.arg2.name.equals(condition.arg2.name) && this.arg2.relation_name.equals(condition.arg2.relation_name) 
-				&& this.subgoal1.equals(condition.subgoal1) && this.subgoal2.equals(condition.subgoal2) && this.op.get_op_name().equals(condition.op.get_op_name()))
-			return true;
+//		if(this.arg1.name.equals(condition.arg1.name) && this.arg1.relation_name.equals(condition.arg1.relation_name) 
+//				&& this.arg2.name.equals(condition.arg2.name) && this.arg2.relation_name.equals(condition.arg2.relation_name) 
+//				&& this.subgoal1.equals(condition.subgoal1) && this.subgoal2.equals(condition.subgoal2) && this.op.get_op_name().equals(condition.op.get_op_name()))
+//			return true;
+		
+		if(condition.hashCode() == this.hashCode())
+		  return true;
 		
 		return false;
 	}
@@ -334,7 +341,7 @@ public class Conditions {
 	    }
 	    else
 	    {
-	          String string = this.subgoal2 + populate_db.separator + this.arg2.name + this.op + this.subgoal1 + populate_db.separator + this.arg1.name + populate_db.separator + this.get_mapping2 + populate_db.separator + this.get_mapping1;
+	          String string = this.subgoal2 + populate_db.separator + this.arg2.name + this.op.counter_direction() + this.subgoal1 + populate_db.separator + this.arg1.name + populate_db.separator + this.get_mapping2 + populate_db.separator + this.get_mapping1;
 	            
 	          return string.hashCode();
 	    }

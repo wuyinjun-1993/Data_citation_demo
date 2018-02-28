@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.Vector;
 
 import edu.upenn.cis.citation.Corecover.Query;
@@ -31,6 +32,8 @@ public class citation_view_unparametered extends citation_view{
 	
 	public Tuple view_tuple = null;
 	
+	public String unique_id_string = new String();
+	
 	public citation_view_unparametered(String name, Tuple tuple)
 	{
 		this.name = name;
@@ -38,6 +41,8 @@ public class citation_view_unparametered extends citation_view{
 		set_table_name(tuple);
 	
 		this.view_tuple = tuple;
+		
+		unique_id_string = get_unique_string_id();
 //		Connection c = null;
 //		
 //	    PreparedStatement pst = null;
@@ -55,6 +60,41 @@ public class citation_view_unparametered extends citation_view{
 //	    c.close();
 //		lambda = false;
 	}
+	
+	public String get_unique_string_id()
+    {
+          
+          String sorted_mapping_string = get_sorted_mapping_string(this.get_view_tuple(), this.get_view_tuple().mapSubgoals_str);
+          
+          return (this.get_name() + populate_db.separator + sorted_mapping_string);
+          
+    }
+	
+	static String get_sorted_mapping_string(Tuple view_mapping, HashMap<String, String> subgoal_name_mappings)
+    {
+      Set<String> subgoal_names =  view_mapping.mapSubgoals_str.keySet(); 
+      
+      Vector<String> subgoal_name_list = new Vector<String>(subgoal_names);
+      
+      Collections.sort(subgoal_name_list);
+      
+      String sorted_mapping_string = new String();
+      
+      int count = 0;
+      
+      for(String subgoal_name: subgoal_name_list)
+      {
+        if(count >= 1)
+          sorted_mapping_string += ",";
+        
+        sorted_mapping_string += subgoal_name + "=" + subgoal_name_mappings.get(subgoal_name);
+        
+        count ++;
+      }
+      
+      return sorted_mapping_string;
+      
+    }
 	
 	void set_table_name(Tuple tuple)
 	{
@@ -333,6 +373,8 @@ public class citation_view_unparametered extends citation_view{
 				
 		c_v.view_tuple = this.view_tuple;
 		
+		c_v.unique_id_string = unique_id_string;
+		
 		return c_v;
 	}
 
@@ -381,8 +423,7 @@ public class citation_view_unparametered extends citation_view{
 	@Override
 	public int hashCode()
 	{
-		String string = this.get_name() + populate_db.separator + this.get_table_name_string();
-		
-		return string.hashCode();
+	     return unique_id_string.hashCode();
+
 	}
 }

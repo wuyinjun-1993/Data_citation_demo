@@ -37,7 +37,8 @@ public class Tuple {
 
   public Vector<HashSet<Integer>> cluster_non_mapping_condition_ids = new Vector<HashSet<Integer>>();
 
-
+  public String hash_string = new String();
+  
   public double get_cost()
   {
 	  return cost;
@@ -71,10 +72,18 @@ public class Tuple {
   }
   
   
-  Tuple(Subgoal subgoal) {
+  Tuple(Subgoal subgoal, HashMap<String, String> subgoal_mappings) {
     this.subgoal = subgoal;
     this.name = subgoal.getName();
     this.args = (Vector) subgoal.getArgs().clone();
+    
+    mapSubgoals_str = new HashMap<>();
+    
+    mapSubgoals_str.put(subgoal.name, subgoal_mappings.get(subgoal.name));
+    
+    String sorted_mapping_string = get_sorted_mapping_string(mapSubgoals_str);
+    
+    this.hash_string = name + "|" + sorted_mapping_string;
   }
 
   Tuple(String name, Vector args, Mapping phi, HashMap mapSubgoals) {
@@ -84,6 +93,10 @@ public class Tuple {
     this.mapSubgoals = mapSubgoals;
     this.mapSubgoals_str = new HashMap<>();
     set_map_subgoal_str(mapSubgoals);
+    
+    String sorted_mapping_string = get_sorted_mapping_string(mapSubgoals_str);
+    
+    this.hash_string = name + "|" + sorted_mapping_string;
   }
 
   Tuple(String name, Vector args, Mapping phi, Mapping phi_str, HashMap mapSubgoals) {
@@ -94,6 +107,11 @@ public class Tuple {
 	    this.mapSubgoals = mapSubgoals;
 	    this.mapSubgoals_str = new HashMap<>();
 	    set_map_subgoal_str(mapSubgoals);
+	    
+	    String sorted_mapping_string = get_sorted_mapping_string(mapSubgoals_str);
+	    
+	    this.hash_string = name + "|" + sorted_mapping_string;
+	    
 	  }
   
   void set_map_subgoal_str(HashMap mapSubgoals)
@@ -275,26 +293,63 @@ public class Tuple {
   public int hashCode() {
 	  
 	  
-	  if(this.mapSubgoals_str == null)
-	  {
-		  String hash_string = this.getName();
-		  
-//	    int hashCode = this.getName().hashCode();
-//	    for (int i = 0; i < args.size(); i ++) {
-//	      Argument arg  = (Argument) args.elementAt(i);
-//	      hashCode += arg.hashCode();
-//	    }
-	    
-	    return hash_string.hashCode();
-	  }
-	  
-	  String hash_string = this.getName() + this.mapSubgoals_str.toString();
+//	  if(this.mapSubgoals_str == null)
+//	  {
+//		  String hash_string = this.getName();
+//		  
+////	    int hashCode = this.getName().hashCode();
+////	    for (int i = 0; i < args.size(); i ++) {
+////	      Argument arg  = (Argument) args.elementAt(i);
+////	      hashCode += arg.hashCode();
+////	    }
+//	    
+//	    return hash_string.hashCode();
+//	  }
+//	  
+//	  
+//	  
+//	  
+//	  
+//	  String hash_string = this.getName() + "|" + get_sorted_mapping_string(this.mapSubgoals_str);
 	  
 	  
 
     
     return hash_string.hashCode();
   }
+  
+  static String get_sorted_mapping_string(HashMap mapSubgoals_str)
+  {
+    ArrayList<String> sorted_keys = sort_map_strings(mapSubgoals_str);
+    
+    String mapping_string = new String();
+    
+    for(int i = 0; i<sorted_keys.size(); i++)
+    {
+      if(i >= 1)
+        mapping_string += ",";
+      
+      String key = sorted_keys.get(i);
+      
+      String pairs = key + "=" + mapSubgoals_str.get(key);
+      
+      mapping_string += pairs;
+    }
+    
+    return mapping_string;
+  }
+  
+  static ArrayList<String> sort_map_strings(HashMap mapSubgoals_str)
+  {
+    Set<String> keys = mapSubgoals_str.keySet();
+    
+    ArrayList<String> strings = new ArrayList<String>(keys);
+    
+    Collections.sort(strings);
+    
+    return strings;
+  }
+  
   
   @Override
   public boolean equals(Object obj)
@@ -305,14 +360,16 @@ public class Tuple {
   }
 
   public String toString() {
-    StringBuffer result = new StringBuffer();
-    if (name != null)
-      result.append(name);
-    result.append(args.toString());
-
-    /*if (phi != null)
-      result.append("; " + phi.toString());*/
-    return (result.toString());
+//    StringBuffer result = new StringBuffer();
+//    if (name != null)
+//      result.append(name);
+//    result.append(args.toString());
+//
+//    /*if (phi != null)
+//      result.append("; " + phi.toString());*/
+//    return (result.toString());
+    
+    return hash_string;
   }
   
   @Override

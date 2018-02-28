@@ -156,6 +156,43 @@ public class Tuple_reasoning1_full_test_opt_copy {
 	
 	public static boolean isclustering = true;
 	
+	public static HashMap<Tuple, Integer> count_view_mapping_valid_row_numbers()
+    {
+      Set<String> signatures = signiture_view_mappings_mappings.keySet();
+      
+      HashMap<Tuple, Integer> view_mapping_count_mappings = new HashMap<Tuple, Integer>();
+      
+      for(String signature: signatures)
+      {
+        HashSet<Tuple> view_mappings = signiture_view_mappings_mappings.get(signature);
+        
+        HashSet<Integer> rids = signiture_rid_mappings.get(signature);
+        
+        
+        for(Tuple view_mapping: view_mappings)
+        {
+          if(view_mapping_count_mappings.get(view_mapping) == null)
+          {
+            view_mapping_count_mappings.put(view_mapping, rids.size());
+          }
+          else
+          {
+            int old_count = view_mapping_count_mappings.get(view_mapping);
+            
+            old_count += rids.size();
+            
+            view_mapping_count_mappings.put(view_mapping, old_count);
+            
+          }
+        }
+        
+        
+      }
+      
+      return view_mapping_count_mappings;
+      
+    }
+	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException, IOException, InterruptedException, JSONException
 	{
 		HashSet<String> sets = new HashSet<String>();

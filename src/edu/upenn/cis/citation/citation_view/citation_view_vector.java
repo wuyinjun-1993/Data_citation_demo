@@ -3,6 +3,7 @@ package edu.upenn.cis.citation.citation_view;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import edu.upenn.cis.citation.Corecover.Argument;
+import edu.upenn.cis.citation.Corecover.Tuple;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.sort_citation_view_vec.binary_compare;
 import edu.upenn.cis.citation.sort_citation_view_vec.sort_insert;
@@ -408,6 +410,7 @@ public class citation_view_vector {
 //			return merge_vector(new citation_view_vector(c), vec);
 	}
 	
+
 	public static citation_view_vector merge(citation_view_vector vec, citation_view_vector c)
 	{
 		citation_view_vector c1 = vec.clone();
@@ -605,7 +608,7 @@ public class citation_view_vector {
       {
         
         
-        str_arr[i] = view_mappping.get_name();
+        str_arr[i] = view_mappping.get_view_tuple().toString();
           
         i++;
       }
@@ -721,7 +724,9 @@ public class citation_view_vector {
 		for(citation_view view_mapping: c_vec)
 		{
 		  
-		  view_mapping_id.add(view_mapping.get_name() + populate_db.separator + view_mapping.get_table_name_string());
+		  String sorted_mapping_string = get_sorted_mapping_string(view_mapping.get_view_tuple(), view_mapping.get_view_tuple().mapSubgoals_str);
+		  
+		  view_mapping_id.add(view_mapping.get_name() + populate_db.separator + sorted_mapping_string);
 		  
 		}
 		
@@ -731,5 +736,31 @@ public class citation_view_vector {
 		
 //		return string;
 	}
+	
+	static String get_sorted_mapping_string(Tuple view_mapping, HashMap<String, String> subgoal_name_mappings)
+	  {
+	    Set<String> subgoal_names =  view_mapping.mapSubgoals_str.keySet(); 
+	    
+	    Vector<String> subgoal_name_list = new Vector<String>(subgoal_names);
+	    
+	    Collections.sort(subgoal_name_list);
+	    
+	    String sorted_mapping_string = new String();
+	    
+	    int count = 0;
+	    
+	    for(String subgoal_name: subgoal_name_list)
+	    {
+	      if(count >= 1)
+	        sorted_mapping_string += ",";
+	      
+	      sorted_mapping_string += subgoal_name + "=" + subgoal_name_mappings.get(subgoal_name);
+	      
+	      count ++;
+	    }
+	    
+	    return sorted_mapping_string;
+	    
+	  }
 
 }

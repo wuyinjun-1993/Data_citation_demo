@@ -101,7 +101,7 @@ public class CoreCover {
 
     for (Iterator iter = query.getBody().iterator(); iter.hasNext();) {
       Subgoal subgoal = (Subgoal) iter.next();
-      Tuple tuple = new Tuple(subgoal);
+      Tuple tuple = new Tuple(subgoal, query.subgoal_name_mapping);
       tuples.add(tuple);  // we treat each subgoal as a "tuple"
     }
 
@@ -381,13 +381,13 @@ public class CoreCover {
       {
         HashSet<Integer> new_clusters = new HashSet<Integer>();
         
-        System.out.println(id1);
-        
-        System.out.println(id2);
-        
-        System.out.println(get_mapping1);
-        
-        System.out.println(get_mapping2);
+//        System.out.println(id1);
+//        
+//        System.out.println(id2);
+//        
+//        System.out.println(get_mapping1);
+//        
+//        System.out.println(get_mapping2);
         
         if(!get_mapping1)
           new_clusters.add(id1);

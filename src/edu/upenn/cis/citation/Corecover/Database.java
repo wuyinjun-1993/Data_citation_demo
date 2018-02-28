@@ -417,7 +417,7 @@ public class Database {
 	      if (unifiable) {
 		HashMap mapSubgoals = new HashMap();
 		mapSubgoals.put(subgoal, tuple.getSubgoal()); // subgoal mapped
-		resTuples.add(new Tuple(subgoal.getName(), 
+		resTuples.add(new Tuple(view.getName(), 
 					resTupleArgs, phi, phi_str, mapSubgoals));
 	      }
 	    }

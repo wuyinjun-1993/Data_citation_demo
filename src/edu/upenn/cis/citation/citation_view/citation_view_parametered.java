@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.Vector;
 import com.sun.org.apache.xml.internal.dtm.ref.DTMDefaultBaseIterators.ParentIterator;
 
@@ -39,6 +40,7 @@ public class citation_view_parametered extends citation_view{
 	
 	public HashMap<String, String> map = new HashMap<String, String>();
 	
+	public String unique_id_string = new String();
 	
 	//relation_name in the body of query
 	public Vector<String> table_names = new Vector<String>();
@@ -72,6 +74,41 @@ public class citation_view_parametered extends citation_view{
 	    
 
 	}
+	
+	static String get_sorted_mapping_string(Tuple view_mapping, HashMap<String, String> subgoal_name_mappings)
+    {
+      Set<String> subgoal_names =  view_mapping.mapSubgoals_str.keySet(); 
+      
+      Vector<String> subgoal_name_list = new Vector<String>(subgoal_names);
+      
+      Collections.sort(subgoal_name_list);
+      
+      String sorted_mapping_string = new String();
+      
+      int count = 0;
+      
+      for(String subgoal_name: subgoal_name_list)
+      {
+        if(count >= 1)
+          sorted_mapping_string += ",";
+        
+        sorted_mapping_string += subgoal_name + "=" + subgoal_name_mappings.get(subgoal_name);
+        
+        count ++;
+      }
+      
+      return sorted_mapping_string;
+      
+    }
+	
+	public String get_unique_string_id()
+    {
+          
+          String sorted_mapping_string = get_sorted_mapping_string(this.get_view_tuple(), this.get_view_tuple().mapSubgoals_str);
+          
+          return (this.get_name() + populate_db.separator + sorted_mapping_string);
+          
+    }
 	
 	void gen_lambda_terms(boolean web_view, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
@@ -289,6 +326,8 @@ public class citation_view_parametered extends citation_view{
 		
 		set_table_names(tuple);
 		
+		unique_id_string = get_unique_string_id();
+		
 //		gen_index();
 			    
 //		gen_table_names(c,pst);
@@ -309,6 +348,8 @@ public class citation_view_parametered extends citation_view{
 		Vector<Conditions> conditions = tuple.conditions;
 				
 		set_table_names(tuple);
+		
+		unique_id_string = get_unique_string_id();
 		
 //		gen_index();
 			    
@@ -619,6 +660,8 @@ public class citation_view_parametered extends citation_view{
 		
 		c_v.view_tuple = this.view_tuple;
 		
+	    c_v.unique_id_string = unique_id_string;
+		
 		return c_v;
 	}
 
@@ -661,9 +704,9 @@ public class citation_view_parametered extends citation_view{
 	@Override
 	public int hashCode()
 	{
-		String string = this.get_name() + populate_db.separator + this.get_table_name_string();
+//		String string = this.get_name() + populate_db.separator + this.get_table_name_string();
 		
-		return string.hashCode();
+		return unique_id_string.hashCode();
 	}
 	
 

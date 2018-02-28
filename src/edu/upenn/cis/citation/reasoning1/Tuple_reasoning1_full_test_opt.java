@@ -4188,7 +4188,7 @@ public class Tuple_reasoning1_full_test_opt {
                     
                     Tuple valid_tuple = (Tuple) tuples.get(i).clone();
                     
-                    valid_tuple.args.retainAll(curr_head_args);
+//                    valid_tuple.args.retainAll(curr_head_args);
                     
                     if(valid_tuple.lambda_terms.size() > 0)
                     {
@@ -4222,7 +4222,7 @@ public class Tuple_reasoning1_full_test_opt {
             {
                 Tuple valid_tuple = (Tuple) tuples.get(i).clone();
                 
-                valid_tuple.args.retainAll(curr_head_args);
+//                valid_tuple.args.retainAll(curr_head_args);
                 
                 citation_view c = null;
                 

@@ -35,6 +35,19 @@ public class Query {
   {
 	  return lambda_term;
   }
+  
+  
+  public HashSet<Conditions> get_all_negated_conditions()
+  {
+    HashSet<Conditions> negated_conditions = new HashSet<Conditions>();
+    
+    for(Conditions condition: conditions)
+    {
+      negated_conditions.add(Conditions.negation(condition));
+    }
+    
+    return negated_conditions;
+  }
   /**
    * Creates a query given an id.
    */

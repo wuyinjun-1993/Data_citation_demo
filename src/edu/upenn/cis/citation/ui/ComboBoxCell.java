@@ -7,7 +7,8 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Vector;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test_opt;
+import edu.upenn.cis.citation.UI_reasoning.Reasoning;
+//import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test_opt;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -48,12 +49,13 @@ class ComboBoxCell extends TableCell<ObservableList, String> {
               Class.forName("org.postgresql.Driver");
               
               Connection conn;
-              conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+              conn = DriverManager.getConnection(QBEApp.url, QBEApp.usr_name, QBEApp.passwd);
               
               PreparedStatement st = null;
               
-              citations = Tuple_reasoning1_full_test_opt.tuple_gen_citation_per_tuple(names, conn, st);
+              citations = Reasoning.tuple_gen_citation_per_tuple(names, conn, st);
 
+              System.out.println(citations);
               conn.close();
               
             } catch (Exception e) {

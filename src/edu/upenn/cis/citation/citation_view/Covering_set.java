@@ -19,7 +19,7 @@ import edu.upenn.cis.citation.sort_citation_view_vec.sort_insert;
 
 import static org.junit.Assert.*;
 
-public class citation_view_vector {
+public class Covering_set {
 	
 	public HashSet<citation_view> c_vec;
 	
@@ -39,7 +39,7 @@ public class citation_view_vector {
 //	
 //	public String head_var_string = new String();
 	
-	public citation_view_vector()
+	public Covering_set()
 	{
 		c_vec = new HashSet<citation_view>();
 		
@@ -72,7 +72,7 @@ public class citation_view_vector {
 		
 	}
 	
-	public citation_view_vector(Vector<citation_view> vec){
+	public Covering_set(Vector<citation_view> vec){
 		
 		
 		index_vec = new Vector<String>();
@@ -121,7 +121,7 @@ public class citation_view_vector {
 		
 	}
 	
-	public citation_view_vector merge(citation_view c)
+	public Covering_set merge(citation_view c)
 	{
 		
 		HashSet<citation_view> vec_new = (HashSet<citation_view>) c_vec.clone();
@@ -172,7 +172,7 @@ public class citation_view_vector {
 //			table_name_str += view_mapping.get_table_name_string();
 //		}
 		
-		citation_view_vector c_v = new citation_view_vector(vec_new, index_new, table_names_new);
+		Covering_set c_v = new Covering_set(vec_new, index_new, table_names_new);
 		
 //		c_v.head_variables = new HashSet<Argument>();
 		
@@ -357,7 +357,7 @@ public class citation_view_vector {
 //		return pos;
 //	}
 	
-	public citation_view_vector(HashSet<citation_view> vec, Vector<String> index_vec, HashSet<String> table_names){
+	public Covering_set(HashSet<citation_view> vec, Vector<String> index_vec, HashSet<String> table_names){
 		
 		this.c_vec = vec;
 		
@@ -368,7 +368,7 @@ public class citation_view_vector {
 		
 	}
 	
-	public citation_view_vector(citation_view c){
+	public Covering_set(citation_view c){
 		
 		c_vec = new HashSet<citation_view>();
 		
@@ -397,7 +397,7 @@ public class citation_view_vector {
 	}
 	
 	
-	public static citation_view_vector merge(citation_view_vector vec, citation_view c)
+	public static Covering_set merge(Covering_set vec, citation_view c)
 	{
 		
 		return vec.merge(c);
@@ -411,11 +411,11 @@ public class citation_view_vector {
 	}
 	
 
-	public static citation_view_vector merge(citation_view_vector vec, citation_view_vector c)
+	public static Covering_set merge(Covering_set vec, Covering_set c)
 	{
-		citation_view_vector c1 = vec.clone();
+		Covering_set c1 = vec.clone();
 		
-		citation_view_vector c2 = c.clone();
+		Covering_set c2 = c.clone();
 		
 		HashSet<citation_view> new_citation_vec = new HashSet<citation_view>();
 		
@@ -548,7 +548,7 @@ public class citation_view_vector {
 //			}
 //		}
 		
-		citation_view_vector merged_citation_view_vectors = new citation_view_vector(new_citation_vec, index_vec, tables);
+		Covering_set merged_citation_view_vectors = new Covering_set(new_citation_vec, index_vec, tables);
 		
 		merged_citation_view_vectors.head_variables = args;
 		
@@ -565,11 +565,11 @@ public class citation_view_vector {
 		return merged_citation_view_vectors;
 	}
 	
-	public citation_view_vector merge(citation_view_vector c)
+	public Covering_set merge(Covering_set c)
 	{
-		citation_view_vector updated_covering_set = this.clone();
+		Covering_set updated_covering_set = this.clone();
 		
-		citation_view_vector insert_covering_set = c.clone();
+		Covering_set insert_covering_set = c.clone();
 		
 		return merge(updated_covering_set, insert_covering_set);
 	}
@@ -626,9 +626,9 @@ public class citation_view_vector {
 	}
 
 	
-	public citation_view_vector clone()
+	public Covering_set clone()
 	{
-		citation_view_vector c_v = new citation_view_vector();
+		Covering_set c_v = new Covering_set();
 		
 		for(citation_view view_mapping: c_vec)
 		{
@@ -661,7 +661,7 @@ public class citation_view_vector {
 	@Override
 	public boolean equals(Object o)
 	{
-		citation_view_vector c_vec = (citation_view_vector) o;
+		Covering_set c_vec = (Covering_set) o;
 		
 //		if(c_vec.c_vec.size() != this.c_vec.size())
 //			return false;

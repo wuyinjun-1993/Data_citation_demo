@@ -30,7 +30,7 @@ import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.citation_view;
 import edu.upenn.cis.citation.citation_view.citation_view_parametered;
 import edu.upenn.cis.citation.citation_view.citation_view_unparametered;
-import edu.upenn.cis.citation.citation_view.citation_view_vector;
+import edu.upenn.cis.citation.citation_view.Covering_set;
 import edu.upenn.cis.citation.data_structure.IntList;
 import edu.upenn.cis.citation.data_structure.StringList;
 import edu.upenn.cis.citation.data_structure.Unique_StringList;
@@ -43,11 +43,11 @@ import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_min_test;
 
 public class Aggregation6 {
 	
-	public static ArrayList<HashMap<String, HashSet<String>>> full_citations = new ArrayList<HashMap<String, HashSet<String>>>();
+	public static HashSet<HashMap<String, HashSet<String>>> full_citations = new HashSet<HashMap<String, HashSet<String>>>();
 	
 	public static HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping = new HashMap<String, HashMap<String, HashSet<String>>>();
 	
-	static HashMap<Tuple, HashSet<Head_strs>> lambda_values = new HashMap<Tuple, HashSet<Head_strs>>();
+	public static HashMap<Tuple, ArrayList<Head_strs>> lambda_values = new HashMap<Tuple, ArrayList<Head_strs>>();
 	
 	public static void clear()
 	{
@@ -181,7 +181,7 @@ public class Aggregation6 {
 //		
 //	}
 	
-	public static void do_aggregate(ArrayList<citation_view_vector> curr_res, ArrayList<citation_view_vector> c_views, int seq) throws ClassNotFoundException, SQLException
+	public static void do_aggregate(ArrayList<Covering_set> curr_res, ArrayList<Covering_set> c_views, int seq) throws ClassNotFoundException, SQLException
 	{
 		
 	
@@ -226,7 +226,7 @@ public class Aggregation6 {
 		
 	}
 	
-	public static void do_aggregate(ArrayList<citation_view_vector> curr_res, HashSet<citation_view_vector> c_views, int seq)
+	public static void do_aggregate(ArrayList<Covering_set> curr_res, HashSet<Covering_set> c_views, int seq)
 	{
 		
 	
@@ -242,14 +242,14 @@ public class Aggregation6 {
 	      for(int i = 0; i<curr_res.size(); i++)
 	        {
 	            
-	          citation_view_vector covering_set1 = curr_res.get(i);
+	          Covering_set covering_set1 = curr_res.get(i);
 	          
 	            int j = 0;
 	                        
 	            for(Iterator iter = c_views.iterator(); iter.hasNext();)
 	            {
 	                
-	                citation_view_vector covering_set = (citation_view_vector) iter.next();
+	                Covering_set covering_set = (Covering_set) iter.next();
 	                
 	                if(covering_set.equals(covering_set1))
 	                {
@@ -435,7 +435,7 @@ public class Aggregation6 {
 		return all_row_ids;
 	}
 	
-	public static HashSet<String> do_agg_intersection(ResultSet rs, HashMap<int[], ArrayList<citation_view_vector> > c_view_map, int start_pos, ArrayList<Head_strs> heads, HashMap<Head_strs, ArrayList<Integer>> head_strs_rows_mapping, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, ClassNotFoundException, JSONException
+	public static HashSet<String> do_agg_intersection(ResultSet rs, HashMap<int[], ArrayList<Covering_set> > c_view_map, int start_pos, ArrayList<Head_strs> heads, HashMap<Head_strs, ArrayList<Integer>> head_strs_rows_mapping, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, ClassNotFoundException, JSONException
 	{
 		
 		HashMap<String, Boolean> full_flag = new HashMap<String, Boolean>();
@@ -453,15 +453,15 @@ public class Aggregation6 {
 		
 		rs.beforeFirst();
 		
-		ArrayList<HashMap<String, HashSet<String>>> author_lists = new ArrayList<HashMap<String, HashSet<String>>>();
+		HashSet<HashMap<String, HashSet<String>>> author_lists = new HashSet<HashMap<String, HashSet<String>>>();
 		
-		ArrayList<citation_view_vector> curr_res = new ArrayList<citation_view_vector>();
+		ArrayList<Covering_set> curr_res = new ArrayList<Covering_set>();
 				
 		for(Iterator iter = intervals.iterator(); iter.hasNext();)
 		{
 			int [] interval = (int[]) iter.next();
 			
-			ArrayList<citation_view_vector> c_view = c_view_map.get(interval);
+			ArrayList<Covering_set> c_view = c_view_map.get(interval);
 			
 			for(int i = index; i < all_row_ids.size(); i ++)
 			{				
@@ -495,15 +495,13 @@ public class Aggregation6 {
 		
 	}
 	
-	static HashSet<String> gen_citations(ArrayList<HashMap<String, HashSet<String>>> author_lists, HashMap<String, Integer> max_num)
+	public static HashSet<String> gen_citations(HashSet<HashMap<String, HashSet<String>>> author_lists, HashMap<String, Integer> max_num)
 	{
 		HashSet<String> json_string = new HashSet<String>();
 			
-		for(int i = 0; i<author_lists.size(); i++)
+		for(HashMap<String, HashSet<String>> authors: author_lists)
 		{
 //			boolean empty = false;
-			
-			HashMap<String, HashSet<String>> authors = author_lists.get(i);
 			
 			JSONObject json = gen_citation1.get_json_citation(authors);
 			
@@ -622,7 +620,7 @@ public class Aggregation6 {
 ////		return new HashSet<String>();
 //	}
 	
-	public static HashSet<String> do_agg_intersection2(HashSet<citation_view_vector> covering_set_schema_level, HashSet<Tuple> valid_view_mappings_schema_level, ResultSet rs, HashMap<String, HashSet<citation_view_vector> > c_view_map, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, JSONException
+	public static HashSet<String> do_agg_intersection2(HashSet<Covering_set> covering_set_schema_level, HashSet<Tuple> valid_view_mappings_schema_level, ResultSet rs, HashMap<String, HashSet<Covering_set> > c_view_map, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, JSONException
 	{
 		
 		
@@ -714,7 +712,7 @@ public class Aggregation6 {
 	  return citation_views;
 	}
 	
-	public static HashSet<String> gen_citation_entire_query(HashSet<citation_view_vector> covering_set_schema_level, ResultSet rs, boolean tuple_level, boolean schema_level, HashSet<Tuple> valid_view_mappings_schema_level, int start_pos, HashMap<String, Integer> max_num, Connection c, PreparedStatement pst) throws SQLException
+	public static HashSet<String> gen_citation_entire_query(HashSet<Covering_set> covering_set_schema_level, ResultSet rs, boolean tuple_level, boolean schema_level, HashSet<Tuple> valid_view_mappings_schema_level, int start_pos, HashMap<String, Integer> max_num, Connection c, PreparedStatement pst) throws SQLException
 	{
 		ArrayList<String> view_keys = new ArrayList<String>();
 		
@@ -1089,7 +1087,7 @@ public class Aggregation6 {
 //		return views_per_group;
 //	}
 	
-	public static HashSet<String> do_agg_union(HashSet<citation_view_vector> covering_set_schema_level, HashSet<Tuple> valid_view_mapping_schema_level,  HashMap<String, HashSet<Tuple>> signature_view_mappings_mappings, HashMap<String, HashSet<Integer>> signiture_rid_mappings, ResultSet rs, HashMap<String, HashSet<citation_view_vector> > c_view_map, HashMap<String, HashSet<Integer>> signature_rids_mappings, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, JSONException
+	public static HashSet<String> do_agg_union(HashSet<Covering_set> covering_set_schema_level, HashSet<Tuple> valid_view_mapping_schema_level,  HashMap<String, HashSet<Tuple>> signature_view_mappings_mappings, HashMap<String, HashSet<Integer>> signiture_rid_mappings, ResultSet rs, HashMap<String, HashSet<Covering_set> > c_view_map, HashMap<String, HashSet<Integer>> signature_rids_mappings, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, JSONException
 	{
 		
 		Set<String> signature_set = signature_view_mappings_mappings.keySet();
@@ -1358,11 +1356,11 @@ public class Aggregation6 {
 		return names;
 	}
 	
-	static ArrayList<HashMap<String, HashSet<String>>> gen_citations_covering_set_level(HashMap<Tuple, HashMap<String, HashSet<String>>> citations, HashSet<citation_view_vector> curr_res, HashSet<Tuple> valid_view_mappings_schema_level)
+	static HashSet<HashMap<String, HashSet<String>>> gen_citations_covering_set_level(HashMap<Tuple, HashMap<String, HashSet<String>>> citations, HashSet<Covering_set> curr_res, HashSet<Tuple> valid_view_mappings_schema_level)
 	{
-		ArrayList<HashMap<String, HashSet<String>>> full_citations = new ArrayList<HashMap<String, HashSet<String>>>();
+	    HashSet<HashMap<String, HashSet<String>>> full_citations = new HashSet<HashMap<String, HashSet<String>>>();
 		
-		for(citation_view_vector c_vector : curr_res)
+		for(Covering_set c_vector : curr_res)
 		{
 			HashMap<String, HashSet<String>> curr_full_citations = new HashMap<String, HashSet<String>>();
 			
@@ -1419,13 +1417,17 @@ public class Aggregation6 {
 		return full_citations;
 	}
 	
-	static HashMap<Tuple, HashMap<String, HashSet<String>>> gen_citation_view_level(HashSet<Tuple> single_views, HashMap<Tuple, HashSet<Head_strs>> lambda_values, boolean tuple_level, boolean schema_level, Connection c, PreparedStatement pst) throws SQLException
+	static HashMap<Tuple, HashMap<String, HashSet<String>>> gen_citation_view_level(HashSet<Tuple> single_views, HashMap<Tuple, ArrayList<Head_strs>> lambda_values, boolean tuple_level, boolean schema_level, Connection c, PreparedStatement pst) throws SQLException
 	{
 		HashMap<Tuple, HashMap<String, HashSet<String>>> all_citations = new HashMap<Tuple, HashMap<String, HashSet<String>>>();
 		
 		for(Tuple tuple: single_views)
 		{
-			HashMap<String, HashSet<String>> citations = gen_citation_view_level(tuple, lambda_values.get(tuple), tuple_level, schema_level, c, pst);
+		  HashSet<Head_strs> citation_info = new HashSet<Head_strs>();
+		  
+		  citation_info.addAll(lambda_values.get(tuple));
+		  
+			HashMap<String, HashSet<String>> citations = gen_citation_view_level(tuple, citation_info, tuple_level, schema_level, c, pst);
 			
 			all_citations.put(tuple, citations);
 		}
@@ -1650,7 +1652,7 @@ public class Aggregation6 {
 		
 	}
 	
-	static ArrayList<citation_view> get_single_citation_views(ArrayList<citation_view_vector> curr_res, ArrayList<String> view_keys)
+	static ArrayList<citation_view> get_single_citation_views(ArrayList<Covering_set> curr_res, ArrayList<String> view_keys)
 	{
 		ArrayList<citation_view> views = new ArrayList<citation_view>();
 		
@@ -1683,7 +1685,7 @@ public class Aggregation6 {
 		return views;
 	}
 	
-	static ArrayList<citation_view> get_single_citation_views(HashSet<citation_view_vector> curr_res, ArrayList<String> view_keys)
+	static ArrayList<citation_view> get_single_citation_views(HashSet<Covering_set> curr_res, ArrayList<String> view_keys)
 	{
 		ArrayList<citation_view> views = new ArrayList<citation_view>();
 		
@@ -1692,7 +1694,7 @@ public class Aggregation6 {
 		for(Iterator iter = curr_res.iterator(); iter.hasNext();)
 		{
 			
-			citation_view_vector covering_set = (citation_view_vector) iter.next();
+			Covering_set covering_set = (Covering_set) iter.next();
 			
 			for(citation_view view_mapping: covering_set.c_vec)
 			{
@@ -1720,14 +1722,14 @@ public class Aggregation6 {
 	}
 	
 	
-	static void convert_covering_set2citation(int seq, ArrayList<citation_view_vector> curr_res, ArrayList<HashMap<String, HashSet<String>>> author_lists, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws ClassNotFoundException, SQLException
+	static void convert_covering_set2citation(int seq, ArrayList<Covering_set> curr_res, ArrayList<HashMap<String, HashSet<String>>> author_lists, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws ClassNotFoundException, SQLException
 	{
 		
 		if(seq == 0)
 		{
 			for(int i = 0; i<curr_res.size(); i++)
 			{
-				citation_view_vector covering_set = curr_res.get(i);
+				Covering_set covering_set = curr_res.get(i);
 				
 				HashMap<String, HashSet<String>> citations = gen_citation1.join_covering_sets(covering_set, c, pst, view_list, view_query_mapping, author_mapping, max_num, query_ids, query_lambda_str, view_author_mapping);
 				
@@ -1738,7 +1740,7 @@ public class Aggregation6 {
 		{
 			for(int i = 0; i<curr_res.size(); i++)
 			{
-				citation_view_vector covering_set = curr_res.get(i);
+				Covering_set covering_set = curr_res.get(i);
 				
 				HashMap<String, HashSet<String>> citations = gen_citation1.join_covering_sets(covering_set, c, pst, view_list, view_query_mapping, author_mapping, max_num, query_ids, query_lambda_str, view_author_mapping);
 				

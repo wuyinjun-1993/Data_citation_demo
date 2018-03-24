@@ -26,7 +26,7 @@ import edu.upenn.cis.citation.aggregation.Aggregation6;
 import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.Head_strs2;
 import edu.upenn.cis.citation.citation_view.citation_view;
-import edu.upenn.cis.citation.citation_view.citation_view_vector;
+import edu.upenn.cis.citation.citation_view.Covering_set;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test_opt_copy;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test2_copy;
@@ -303,17 +303,17 @@ public class test_new_group_reasoning_correct {
 		Query_operation.write2file(file_name, query_strs);
 	}
 	
-	static boolean check_equality(HashSet<citation_view_vector> covering_set1, HashSet<citation_view_vector> covering_set2)
+	static boolean check_equality(HashSet<Covering_set> covering_set1, HashSet<Covering_set> covering_set2)
 	{
 	  if(covering_set1.size() != covering_set2.size())
 	    return false;
 	  
-	  for(citation_view_vector c1 : covering_set1)
+	  for(Covering_set c1 : covering_set1)
 	  {
 	    
 	    boolean exist = false;
 	    
-	    for(citation_view_vector c2 : covering_set2)
+	    for(Covering_set c2 : covering_set2)
 	    {
 	      if(c1.equals(c2))
 	      {
@@ -330,21 +330,21 @@ public class test_new_group_reasoning_correct {
 	  return true;
 	}
 	
-	static boolean test_covering_set_equality(HashMap<int[], HashSet<citation_view_vector>> covering_set1, HashMap<String, HashSet<citation_view_vector>> covering_set2)
+	static boolean test_covering_set_equality(HashMap<int[], HashSet<Covering_set>> covering_set1, HashMap<String, HashSet<Covering_set>> covering_set2)
 	{
 	  
 	  Set<int[]> keys1 = covering_set1.keySet();
 	  
 	  Set<String> keys2 = covering_set2.keySet();
 	  
-	  ArrayList<HashSet<citation_view_vector>> covering_set_list1 = new ArrayList<HashSet<citation_view_vector>>();
+	  ArrayList<HashSet<Covering_set>> covering_set_list1 = new ArrayList<HashSet<Covering_set>>();
 	  
-	  ArrayList<HashSet<citation_view_vector>> covering_set_list2 = new ArrayList<HashSet<citation_view_vector>>();
+	  ArrayList<HashSet<Covering_set>> covering_set_list2 = new ArrayList<HashSet<Covering_set>>();
 	  
 	  
 	  for(int [] key1 : keys1)
 	  {
-	    HashSet<citation_view_vector> curr_covering_set = covering_set1.get(key1);
+	    HashSet<Covering_set> curr_covering_set = covering_set1.get(key1);
 	    
 	    
 	    covering_set_list1.add(curr_covering_set);
@@ -353,18 +353,18 @@ public class test_new_group_reasoning_correct {
 	  
 	  for(String key2 : keys2)
 	  {
-	    HashSet<citation_view_vector> curr_covering_set = covering_set2.get(key2);
+	    HashSet<Covering_set> curr_covering_set = covering_set2.get(key2);
 	    covering_set_list2.add(curr_covering_set);
 	  }
 	  
 	  if(covering_set_list1.size() != covering_set_list2.size())
 	    return false;
 	  
-	  for(HashSet<citation_view_vector> list1 : covering_set_list1)
+	  for(HashSet<Covering_set> list1 : covering_set_list1)
 	  {
 	    boolean exist = false;
 	    
-	    for(HashSet<citation_view_vector> list2 : covering_set_list2)
+	    for(HashSet<Covering_set> list2 : covering_set_list2)
 	    {
 	      if(check_equality(list1, list2))
 	      {
@@ -382,21 +382,21 @@ public class test_new_group_reasoning_correct {
 	  return true;
 	}
 	
-	   static boolean test_covering_set_equality2(HashMap<String, HashSet<citation_view_vector>> covering_set1, HashMap<String, HashSet<citation_view_vector>> covering_set2)
+	   static boolean test_covering_set_equality2(HashMap<String, HashSet<Covering_set>> covering_set1, HashMap<String, HashSet<Covering_set>> covering_set2)
 	    {
 	      
 	      Set<String> keys1 = covering_set1.keySet();
 	      
 	      Set<String> keys2 = covering_set2.keySet();
 	      
-	      ArrayList<HashSet<citation_view_vector>> covering_set_list1 = new ArrayList<HashSet<citation_view_vector>>();
+	      ArrayList<HashSet<Covering_set>> covering_set_list1 = new ArrayList<HashSet<Covering_set>>();
 	      
-	      ArrayList<HashSet<citation_view_vector>> covering_set_list2 = new ArrayList<HashSet<citation_view_vector>>();
+	      ArrayList<HashSet<Covering_set>> covering_set_list2 = new ArrayList<HashSet<Covering_set>>();
 	      
 	      
 	      for(String key1 : keys1)
 	      {
-	        HashSet<citation_view_vector> curr_covering_set = covering_set1.get(key1);
+	        HashSet<Covering_set> curr_covering_set = covering_set1.get(key1);
 	        
 	        
 	        covering_set_list1.add(curr_covering_set);
@@ -405,18 +405,18 @@ public class test_new_group_reasoning_correct {
 	      
 	      for(String key2 : keys2)
 	      {
-	        HashSet<citation_view_vector> curr_covering_set = covering_set2.get(key2);
+	        HashSet<Covering_set> curr_covering_set = covering_set2.get(key2);
 	        covering_set_list2.add(curr_covering_set);
 	      }
 	      
 	      if(covering_set_list1.size() != covering_set_list2.size())
 	        return false;
 	      
-	      for(HashSet<citation_view_vector> list1 : covering_set_list1)
+	      for(HashSet<Covering_set> list1 : covering_set_list1)
 	      {
 	        boolean exist = false;
 	        
-	        for(HashSet<citation_view_vector> list2 : covering_set_list2)
+	        for(HashSet<Covering_set> list2 : covering_set_list2)
 	        {
 	          if(check_equality(list1, list2))
 	          {
@@ -434,17 +434,17 @@ public class test_new_group_reasoning_correct {
 	      return true;
 	    }
 	
-	static boolean check_covering_sets_schema_level_equality(ArrayList<citation_view_vector> covering_sets1, ArrayList<citation_view_vector> covering_sets2)
+	static boolean check_covering_sets_schema_level_equality(ArrayList<Covering_set> covering_sets1, ArrayList<Covering_set> covering_sets2)
 	{
 	  if(covering_sets1.size() != covering_sets2.size())
 	    return false;
 	  
 	  
-	  for(citation_view_vector covering_set1: covering_sets1)
+	  for(Covering_set covering_set1: covering_sets1)
 	  {
 	    boolean exist = false;
 	    
-	    for(citation_view_vector covering_set2: covering_sets2)
+	    for(Covering_set covering_set2: covering_sets2)
 	    {
 	      if(covering_set1.equals(covering_set2))
 	      {
@@ -472,11 +472,11 @@ public class test_new_group_reasoning_correct {
 		
 		String f_name = new String();
 		
-		HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map1 = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
+		HashMap<Head_strs, Vector<Vector<Covering_set>>> citation_view_map1 = new HashMap<Head_strs, Vector<Vector<Covering_set>>>();
 
-		HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map2 = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
+		HashMap<Head_strs, Vector<Vector<Covering_set>>> citation_view_map2 = new HashMap<Head_strs, Vector<Vector<Covering_set>>>();
 		
-		Vector<Vector<citation_view_vector>> citation_view2 = new Vector<Vector<citation_view_vector>>();
+		Vector<Vector<Covering_set>> citation_view2 = new Vector<Vector<Covering_set>>();
 
 		
 //		while(views.size() < view_max_size)
@@ -516,7 +516,7 @@ public class test_new_group_reasoning_correct {
 			
 			ArrayList<HashSet<citation_view>> views_per_group = Tuple_reasoning2_full_test2_copy.cal_covering_sets_schema_level(query, c2, pst);
 
-            ArrayList<citation_view_vector> covering_sets_schema_level = new ArrayList<citation_view_vector>();
+            ArrayList<Covering_set> covering_sets_schema_level = new ArrayList<Covering_set>();
             
             covering_sets_schema_level.addAll(Aggregation6.curr_res);
             
@@ -543,7 +543,7 @@ public class test_new_group_reasoning_correct {
 			
 			ArrayList<HashSet<citation_view>> views_per_group2 = Tuple_reasoning1_full_test_opt_copy.cal_covering_sets_schema_level(query, c1, pst);
 			
-			ArrayList<citation_view_vector> covering_sets_schema_level2 = new ArrayList<citation_view_vector>();
+			ArrayList<Covering_set> covering_sets_schema_level2 = new ArrayList<Covering_set>();
 			
 			covering_sets_schema_level2.addAll(Aggregation6.curr_res);
 			

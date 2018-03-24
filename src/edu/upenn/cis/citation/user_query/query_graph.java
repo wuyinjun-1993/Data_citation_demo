@@ -26,7 +26,9 @@ public class query_graph {
 	
 	public Vector<query_edge> q_edges;
 	
-	public query_graph(Query query)
+	public String version;
+	
+	public query_graph(Query query, String version)
 	{
 		
 		q_nodes = new Vector<query_node>();
@@ -57,7 +59,11 @@ public class query_graph {
 				
 				query_node q2 = subgoal_mapping.get(condition.subgoal2);
 				
-				query_edge q_edge = new query_edge(q1, q2, condition.arg1.name, condition.arg2.name, condition.op);
+				String arg1 = condition.arg1.name;
+				
+				String arg2 = condition.arg2.name;
+				
+				query_edge q_edge = new query_edge(q1, q2, arg1.substring(arg1.indexOf(populate_db.separator) + 1, arg1.length()), arg2.substring(arg2.indexOf(populate_db.separator) + 1, arg2.length()), condition.op);
 				
 				sort_insert.insert_sort(q_edges, q_edge);
 			}
@@ -73,9 +79,9 @@ public class query_graph {
 		
 		Query q2 = gen_query2();
 		
-		query_graph g1 = new query_graph(q1);
+		query_graph g1 = new query_graph(q1, "0");
 		
-		query_graph g2 = new query_graph(q2);
+		query_graph g2 = new query_graph(q2, "0");
 		
 		System.out.println(g1.equals(g2));
 	}
@@ -358,6 +364,8 @@ public class query_graph {
 			
 			str += "]";
 		}
+		
+		str += "," + version;
 		
 		return str.hashCode();
 		

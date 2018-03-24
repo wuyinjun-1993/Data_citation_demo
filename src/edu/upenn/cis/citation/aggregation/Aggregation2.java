@@ -20,7 +20,7 @@ import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.citation_view;
 import edu.upenn.cis.citation.citation_view.citation_view_parametered;
 import edu.upenn.cis.citation.citation_view.citation_view_unparametered;
-import edu.upenn.cis.citation.citation_view.citation_view_vector;
+import edu.upenn.cis.citation.citation_view.Covering_set;
 import edu.upenn.cis.citation.gen_citation.gen_citation1;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
@@ -28,7 +28,7 @@ import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test_stable;
 
 public class Aggregation2 {
 	
-	public static void do_aggregate(Vector<citation_view_vector> curr_res, Vector<citation_view_vector> c_views, int seq, Vector<HashSet<String> > author_list, HashMap<String, Vector<Integer> > view_query_mapping, HashMap<Integer, Vector<Lambda_term>> query_lambda_str, HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping, int max_num, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	public static void do_aggregate(Vector<Covering_set> curr_res, Vector<Covering_set> c_views, int seq, Vector<HashSet<String> > author_list, HashMap<String, Vector<Integer> > view_query_mapping, HashMap<Integer, Vector<Lambda_term>> query_lambda_str, HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping, int max_num, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{		
 		if(seq == 0)
 		{
@@ -40,7 +40,7 @@ public class Aggregation2 {
 			for(int i = 0; i<curr_res.size(); i++)
 			{
 				
-				citation_view_vector c_view = curr_res.get(i);
+				Covering_set c_view = curr_res.get(i);
 				
 				HashSet<String> all_authors = new HashSet<String>();
 				
@@ -83,7 +83,7 @@ public class Aggregation2 {
 		
 		
 		
-		Vector<Vector<citation_view_vector>> agg_res = new Vector<Vector<citation_view_vector>>();
+		Vector<Vector<Covering_set>> agg_res = new Vector<Vector<Covering_set>>();
 		
 		int i1 = 0;
 		
@@ -96,7 +96,7 @@ public class Aggregation2 {
 			
 			int j = 0;
 			
-			citation_view_vector c_vector = null;
+			Covering_set c_vector = null;
 			
 			for(j = 0; j<c_views.size(); j++)
 			{
@@ -153,7 +153,7 @@ public class Aggregation2 {
 		
 	}
 	
-	public static Vector<String> do_agg_intersection(ResultSet rs, HashMap<int[], Vector<citation_view_vector> > c_view_map, Vector<Integer> selected_row_ids, int start_pos, HashMap<String, Vector<Integer> > view_query_mapping, HashMap<Integer, Vector<Lambda_term>> query_lambda_str, HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping, int max_num, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException, JSONException
+	public static Vector<String> do_agg_intersection(ResultSet rs, HashMap<int[], Vector<Covering_set> > c_view_map, Vector<Integer> selected_row_ids, int start_pos, HashMap<String, Vector<Integer> > view_query_mapping, HashMap<Integer, Vector<Lambda_term>> query_lambda_str, HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping, int max_num, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException, JSONException
 	{
 		Set<int[]> intervals = c_view_map.keySet();
 		
@@ -163,7 +163,7 @@ public class Aggregation2 {
 		
 		Vector<HashSet<String>> author_lists = new Vector<HashSet<String>>();
 		
-		Vector<citation_view_vector> curr_res = new Vector<citation_view_vector>();
+		Vector<Covering_set> curr_res = new Vector<Covering_set>();
 		
 		HashSet<String> citation_list = new HashSet<String>();
 		
@@ -171,7 +171,7 @@ public class Aggregation2 {
 		{
 			int [] interval = (int[]) iter.next();
 			
-			Vector<citation_view_vector> c_view = c_view_map.get(interval);
+			Vector<Covering_set> c_view = c_view_map.get(interval);
 			
 			for(int i = index; i < selected_row_ids.size(); i ++)
 			{
@@ -243,10 +243,10 @@ public class Aggregation2 {
 		return json_string;
 	}
 	
-	public static Vector<String> do_agg_intersection(Vector<Head_strs> heads, HashMap<Head_strs, Vector<Vector<citation_view_vector>>> heads_citation_views, HashMap<String, Vector<Integer> > view_query_mapping, HashMap<Integer, Vector<Lambda_term>> query_lambda_str, HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping, int max_num, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	public static Vector<String> do_agg_intersection(Vector<Head_strs> heads, HashMap<Head_strs, Vector<Vector<Covering_set>>> heads_citation_views, HashMap<String, Vector<Integer> > view_query_mapping, HashMap<Integer, Vector<Lambda_term>> query_lambda_str, HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping, int max_num, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
 		
-		Vector<citation_view_vector> curr_res = new Vector<citation_view_vector>();
+		Vector<Covering_set> curr_res = new Vector<Covering_set>();
 		
 		Vector<HashSet<String>> author_lists = new Vector<HashSet<String>>();
 		
@@ -254,7 +254,7 @@ public class Aggregation2 {
 		
 		for(int i = 0; i<heads.size(); i++)
 		{
-			Vector<Vector<citation_view_vector>> citation_views = heads_citation_views.get(heads.get(i));
+			Vector<Vector<Covering_set>> citation_views = heads_citation_views.get(heads.get(i));
 			
 			for(int j = 0; j<citation_views.size(); j++)
 			{
@@ -268,7 +268,7 @@ public class Aggregation2 {
 		return gen_citations(author_lists, max_num);
 	}
 	
-	public static Vector<String> do_agg_intersection(ResultSet rs, HashMap<int[], Vector<citation_view_vector> > c_view_map, int start_pos, HashMap<String, Vector<Integer> > view_query_mapping, HashMap<Integer, Vector<Lambda_term>> query_lambda_str, HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping, int max_num, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException, JSONException
+	public static Vector<String> do_agg_intersection(ResultSet rs, HashMap<int[], Vector<Covering_set> > c_view_map, int start_pos, HashMap<String, Vector<Integer> > view_query_mapping, HashMap<Integer, Vector<Lambda_term>> query_lambda_str, HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping, int max_num, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException, JSONException
 	{
 		Set<int[]> intervals = c_view_map.keySet();
 		
@@ -278,7 +278,7 @@ public class Aggregation2 {
 		
 		Vector<HashSet<String>> author_lists = new Vector<HashSet<String>>();
 		
-		Vector<citation_view_vector> curr_res = new Vector<citation_view_vector>();
+		Vector<Covering_set> curr_res = new Vector<Covering_set>();
 		
 		HashSet<String> citation_list = new HashSet<String>();
 		
@@ -286,7 +286,7 @@ public class Aggregation2 {
 		{
 			int [] interval = (int[]) iter.next();
 			
-			Vector<citation_view_vector> c_view = c_view_map.get(interval);
+			Vector<Covering_set> c_view = c_view_map.get(interval);
 			
 			for(int i = interval[0]; i < interval[1]; i ++)
 			{

@@ -31,7 +31,7 @@ import edu.upenn.cis.citation.aggregation.Aggregation5;
 import edu.upenn.cis.citation.aggregation.Aggregation6;
 import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.citation_view;
-import edu.upenn.cis.citation.citation_view.citation_view_vector;
+import edu.upenn.cis.citation.citation_view.Covering_set;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test_opt_copy;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test2_copy;
@@ -303,7 +303,7 @@ public class final_stress_test_group_full3 {
 		
 	}
 	
-	  public static void write2file(String file_name, HashMap<String, HashSet<citation_view_vector>> views) throws IOException
+	  public static void write2file(String file_name, HashMap<String, HashSet<Covering_set>> views) throws IOException
 	  {
 	    File fout = new File(file_name);
 	    FileOutputStream fos = new FileOutputStream(fout);
@@ -319,13 +319,13 @@ public class final_stress_test_group_full3 {
 	      bw.write("group " + num);
 	      bw.newLine();
 	      
-	      HashSet<citation_view_vector> covering_sets = views.get(label);
+	      HashSet<Covering_set> covering_sets = views.get(label);
 	      
 	      String [] covering_set_string = new String [covering_sets.size()];
 	      
 	      int id = 0;
 	      
-	      for(citation_view_vector covering_set: covering_sets)
+	      for(Covering_set covering_set: covering_sets)
 	      {
 	        covering_set_string[id ++] = covering_set.toString(); 
 	      }
@@ -370,11 +370,11 @@ public class final_stress_test_group_full3 {
 		
 		String f_name = new String();
 		
-		HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map1 = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
+		HashMap<Head_strs, Vector<Vector<Covering_set>>> citation_view_map1 = new HashMap<Head_strs, Vector<Vector<Covering_set>>>();
 
-		HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map2 = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
+		HashMap<Head_strs, Vector<Vector<Covering_set>>> citation_view_map2 = new HashMap<Head_strs, Vector<Vector<Covering_set>>>();
 		
-		Vector<Vector<citation_view_vector>> citation_view2 = new Vector<Vector<citation_view_vector>>();
+		Vector<Vector<Covering_set>> citation_view2 = new Vector<Vector<Covering_set>>();
 
 		
 //		while(views.size() < view_max_size)

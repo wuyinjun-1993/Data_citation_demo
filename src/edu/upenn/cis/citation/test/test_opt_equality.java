@@ -28,8 +28,8 @@ import edu.upenn.cis.citation.aggregation.Aggregation3;
 import edu.upenn.cis.citation.aggregation.Aggregation5;
 import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.Head_strs2;
-import edu.upenn.cis.citation.citation_view.citation_view_vector;
-import edu.upenn.cis.citation.citation_view.citation_view_vector;
+import edu.upenn.cis.citation.citation_view.Covering_set;
+import edu.upenn.cis.citation.citation_view.Covering_set;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test;
@@ -304,13 +304,13 @@ public class test_opt_equality {
 		
 		String f_name = new String();
 		
-		HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map1 = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
+		HashMap<Head_strs, Vector<Vector<Covering_set>>> citation_view_map1 = new HashMap<Head_strs, Vector<Vector<Covering_set>>>();
 
-		HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map2 = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
+		HashMap<Head_strs, Vector<Vector<Covering_set>>> citation_view_map2 = new HashMap<Head_strs, Vector<Vector<Covering_set>>>();
 		
-		Vector<Vector<citation_view_vector>> citation_view1 = new Vector<Vector<citation_view_vector>>();
+		Vector<Vector<Covering_set>> citation_view1 = new Vector<Vector<Covering_set>>();
 
-		Vector<Vector<citation_view_vector>> citation_view2 = new Vector<Vector<citation_view_vector>>();
+		Vector<Vector<Covering_set>> citation_view2 = new Vector<Vector<Covering_set>>();
 
 		
 		if(tuple_level)
@@ -432,7 +432,7 @@ public class test_opt_equality {
 			
 			for(Iterator iter = schema_reasoning.covering_set_query.iterator(); iter.hasNext();)
 			{
-				citation_view_vector covering_set = (citation_view_vector) iter.next();
+				Covering_set covering_set = (Covering_set) iter.next();
 				 
 				agg_results.add(covering_set.toString());
 			}
@@ -470,7 +470,7 @@ public class test_opt_equality {
 			
 			Set<int[]> keys = Tuple_reasoning1_full_test_opt.c_view_map.keySet();
 			
-			HashSet<citation_view_vector> covering_sets2 = null;
+			HashSet<Covering_set> covering_sets2 = null;
 			
 			for(Iterator it1 = keys.iterator(); it1.hasNext();)
 			{
@@ -481,7 +481,7 @@ public class test_opt_equality {
 			
 			schema_reasoning.tuple_reasoning(query, c, pst);
 			
-			HashSet<citation_view_vector> minus = schema_reasoning.covering_set_query;
+			HashSet<Covering_set> minus = schema_reasoning.covering_set_query;
 			
 			System.out.println(covering_sets2.size());
 			
@@ -554,7 +554,7 @@ public class test_opt_equality {
 			
 			for(Iterator iter = covering_sets2.iterator(); iter.hasNext();)
 			{
-				citation_view_vector covering_set = (citation_view_vector) iter.next();
+				Covering_set covering_set = (Covering_set) iter.next();
 				
 				agg_results.add(covering_set.toString());
 			}

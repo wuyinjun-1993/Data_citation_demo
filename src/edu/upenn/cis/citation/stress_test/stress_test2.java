@@ -17,7 +17,7 @@ import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Corecover.Subgoal;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.citation_view.Head_strs;
-import edu.upenn.cis.citation.citation_view.citation_view_vector;
+import edu.upenn.cis.citation.citation_view.Covering_set;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
@@ -75,13 +75,13 @@ public class stress_test2 {
 		
 		String f_name = new String();
 		
-		HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map1 = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
+		HashMap<Head_strs, Vector<Vector<Covering_set>>> citation_view_map1 = new HashMap<Head_strs, Vector<Vector<Covering_set>>>();
 
-		HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map2 = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
+		HashMap<Head_strs, Vector<Vector<Covering_set>>> citation_view_map2 = new HashMap<Head_strs, Vector<Vector<Covering_set>>>();
 		
-		Vector<Vector<citation_view_vector>> citation_view1 = new Vector<Vector<citation_view_vector>>();
+		Vector<Vector<Covering_set>> citation_view1 = new Vector<Vector<Covering_set>>();
 
-		Vector<Vector<citation_view_vector>> citation_view2 = new Vector<Vector<citation_view_vector>>();
+		Vector<Vector<Covering_set>> citation_view2 = new Vector<Vector<Covering_set>>();
 		
 		reset();
 		
@@ -184,7 +184,7 @@ public class stress_test2 {
 				{
 					Head_strs head_val = (Head_strs) iter.next();
 					
-					Vector<Vector<citation_view_vector>> c_view = citation_view_map1.get(head_val);
+					Vector<Vector<Covering_set>> c_view = citation_view_map1.get(head_val);
 					
 					row_num++;
 					
@@ -266,7 +266,7 @@ public class stress_test2 {
 				{
 					Head_strs head_val = (Head_strs) iter.next();
 					
-					Vector<Vector<citation_view_vector>> c_view = citation_view_map2.get(head_val);
+					Vector<Vector<Covering_set>> c_view = citation_view_map2.get(head_val);
 					
 					row_num++;
 					

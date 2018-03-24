@@ -12,7 +12,7 @@ import java.util.Vector;
 import edu.upenn.cis.citation.Corecover.Argument;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.citation_view.citation_view;
-import edu.upenn.cis.citation.citation_view.citation_view_vector;
+import edu.upenn.cis.citation.citation_view.Covering_set;
 import edu.upenn.cis.citation.sort_citation_view_vec.binary_compare;
 import edu.upenn.cis.citation.sort_citation_view_vec.sort_insert;
 
@@ -318,10 +318,10 @@ public class node_index_vector {
 	}
 
 	
-	public HashSet<citation_view_vector> cal_covering_sets() throws ClassNotFoundException, SQLException
+	public HashSet<Covering_set> cal_covering_sets() throws ClassNotFoundException, SQLException
 	{
 		
-		HashSet<citation_view_vector> covering_sets = new HashSet<citation_view_vector>();
+		HashSet<Covering_set> covering_sets = new HashSet<Covering_set>();
 		
 		for(int i = 0; i<c_vec.size();i++)
 		{
@@ -331,7 +331,7 @@ public class node_index_vector {
 		return covering_sets;
 	}
 	
-	public static HashSet<citation_view_vector> join_views_curr_relation(node_index nodes, HashSet<citation_view_vector> curr_view_com) throws ClassNotFoundException, SQLException
+	public static HashSet<Covering_set> join_views_curr_relation(node_index nodes, HashSet<Covering_set> curr_view_com) throws ClassNotFoundException, SQLException
 	{
 		if(curr_view_com.isEmpty())
 		{
@@ -339,7 +339,7 @@ public class node_index_vector {
 //				return new ArrayList<citation_view_vector2>();
 //			else
 			{
-				HashSet<citation_view_vector> new_view_com = new HashSet<citation_view_vector>();
+				HashSet<Covering_set> new_view_com = new HashSet<Covering_set>();
 				
 //				for(int i = 0; i<nodes.size(); i++)
 				{
@@ -348,7 +348,7 @@ public class node_index_vector {
 					{
 						citation_view curr_view = nodes.views.get(j);
 						
-						citation_view_vector curr_views = new citation_view_vector(curr_view);
+						Covering_set curr_views = new Covering_set(curr_view);
 						
 						new_view_com.add(curr_views);
 					}
@@ -360,7 +360,7 @@ public class node_index_vector {
 		
 		else
 		{
-			HashSet<citation_view_vector> new_view_com = new HashSet<citation_view_vector>();
+			HashSet<Covering_set> new_view_com = new HashSet<Covering_set>();
 			
 			
 			for(int j = 0; j<nodes.views.size(); j++)
@@ -372,9 +372,9 @@ public class node_index_vector {
 					
 					
 					
-					citation_view_vector old_view_com = ((citation_view_vector)iter.next()).clone();
+					Covering_set old_view_com = ((Covering_set)iter.next()).clone();
 					
-					citation_view_vector view_com = citation_view_vector.merge(old_view_com, c);
+					Covering_set view_com = Covering_set.merge(old_view_com, c);
 					
 					new_view_com.add(view_com);
 				}
@@ -384,10 +384,10 @@ public class node_index_vector {
 		}
 	}
 	
-	public static void remove_duplicate_view_combinations(HashSet<citation_view_vector> c_view_template)
+	public static void remove_duplicate_view_combinations(HashSet<Covering_set> c_view_template)
 	{
 		
-		HashSet<citation_view_vector> c_view_template_cp = new HashSet<citation_view_vector>();
+		HashSet<Covering_set> c_view_template_cp = new HashSet<Covering_set>();
 		
 		for(Iterator it1 = c_view_template.iterator(); it1.hasNext();)
 		{
@@ -395,7 +395,7 @@ public class node_index_vector {
 			
 //			boolean contains = false;
 			
-			citation_view_vector c_combination = (citation_view_vector) it1.next();
+			Covering_set c_combination = (Covering_set) it1.next();
 			
 			int num = 0;
 
@@ -404,7 +404,7 @@ public class node_index_vector {
 			{
 //				String string = (String) iterator.next();
 				
-				citation_view_vector curr_combination = (citation_view_vector) it2.next();
+				Covering_set curr_combination = (Covering_set) it2.next();
 				
 //				if(str!=string)
 				if(!c_combination.equals(curr_combination))
@@ -453,7 +453,7 @@ public class node_index_vector {
 		
 	}
 	
-	static boolean table_names_contains(citation_view_vector c_vec1, citation_view_vector c_vec2)
+	static boolean table_names_contains(Covering_set c_vec1, Covering_set c_vec2)
 	{
 		String s1 = ".*";
 		
@@ -475,7 +475,7 @@ public class node_index_vector {
 		return s2.matches(s1);
 	}
 	
-	static boolean view_vector_contains(citation_view_vector c_vec1, citation_view_vector c_vec2)
+	static boolean view_vector_contains(Covering_set c_vec1, Covering_set c_vec2)
 	{
 		
 		String s1 = ".*";

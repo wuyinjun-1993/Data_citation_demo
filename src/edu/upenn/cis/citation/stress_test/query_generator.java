@@ -371,20 +371,35 @@ public class query_generator {
 		
 		build_relation_primary_key_mapping(c, pst);
 								
-			Query query = generate_query(size, c, pst);
+			Query[] queries = generate_query(size, c, pst);
 		
-		return query;
+		return queries[0];
 	}
 	
-	static Query generate_query(int size, Connection c, PreparedStatement pst) throws SQLException
+	public static Query[] gen_query_for_provenance(int size, Connection c, PreparedStatement pst) throws SQLException
+    {       
+        
+        build_relation_primary_key_mapping(c, pst);
+                                
+            Query []queries = generate_query(size, c, pst);
+        
+        return queries;
+    }
+	
+	static Query[] generate_query(int size, Connection c, PreparedStatement pst) throws SQLException
 	{
+	  
+	  Query [] queries = new Query[2];
+	  
 		Random r = new Random();
 		
 		HashSet<String> relation_names = new HashSet<String>();
 				
 		Vector<Argument> heads = new Vector<Argument>();
 		
-		Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();
+		Vector<Lambda_term> lambda_terms1 = new Vector<Lambda_term>();
+		
+		Vector<Lambda_term> lambda_terms2 = new Vector<Lambda_term>();
 		
 		Vector<Conditions> local_predicates = new Vector<Conditions>();
 		
@@ -466,17 +481,23 @@ public class query_generator {
 			body.add(new Subgoal(relation_name, args));
 		}
 		
-		String query_local_predicate = gen_local_predicates_with_fixed_size(maps, relation_names, c, pst);
+		String[] query_local_predicate = gen_local_predicates_with_fixed_size(maps, relation_names, c, pst);
 		
 		String name = "Q";
 				
 		Vector<Conditions> predicates = new Vector<Conditions>();
 		
-		lambda_terms.add(new Lambda_term(query_local_predicate));
+		lambda_terms1.add(new Lambda_term(query_local_predicate[0]));
+		
+		lambda_terms2.add(new Lambda_term(query_local_predicate[1]));
 						
 		gen_shuffled_head_args(heads);
 		
-		return new Query(name, new Subgoal(name, heads), body, lambda_terms, predicates, maps);
+		queries[0] = new Query(name, new Subgoal(name, heads), body, lambda_terms1, predicates, maps);
+		
+		queries[1] = new Query(name, new Subgoal(name, heads), body, lambda_terms2, predicates, maps);
+		
+		return queries;
 	}
 	
 	
@@ -737,7 +758,7 @@ public class query_generator {
 	}
 
 	
-	static String gen_local_predicates_with_fixed_size(HashMap<String, String> relation_mapping, HashSet<String> relation_names, Connection c, PreparedStatement pst) throws SQLException
+	static String[] gen_local_predicates_with_fixed_size(HashMap<String, String> relation_mapping, HashSet<String> relation_names, Connection c, PreparedStatement pst) throws SQLException
 	{
 		
 		long total_range = 1;
@@ -760,7 +781,11 @@ public class query_generator {
 		
 		int selected_size = (int)(Math.pow(query_result_size, 1.0/relations.size()) + 0.5);
 		
-		String selection_strings = new String();
+		String []selection_strings = new String[2];
+		
+		selection_strings[0] = new String();
+		
+		selection_strings[1] = new String();
 		
 		int real_size = 1;
 		
@@ -771,9 +796,15 @@ public class query_generator {
 			{
 				
 				if(i >= 1)
-					selection_strings += " and ";
+				{
+				  selection_strings[0] += " and ";
+				  
+				  selection_strings[1] += " and ";
+				}
 				
-				String selection_string = "(";
+				String selection_string1 = "(";
+				
+				String selection_string2 = "("; 
 				
 				int max_size = relation_primary_key_ranges.get(relation_mapping.get(relations.get(i))).size();
 				
@@ -812,18 +843,26 @@ public class query_generator {
 					
 					if(num >= 1)
 					{
-						selection_string += " or ";
+						selection_string1 += " or ";
+						
+						selection_string2 += " or ";
 					}
 					
-					selection_string += relations.get(i) + "." + relation_primary_key_mapping.get(relation_mapping.get(relations.get(i))) + "=" + id;
+					selection_string1 += relations.get(i) + "." + relation_primary_key_mapping.get(relation_mapping.get(relations.get(i))) + "=" + id;
+					
+					selection_string2 += "\"" + relations.get(i) + "\".\"" + relation_primary_key_mapping.get(relation_mapping.get(relations.get(i))) + "\"" + "=" + id;
 					
 					num++;
 					
 				}
 				
-				selection_string += ")";
+				selection_string1 += ")";
 				
-				selection_strings += selection_string;
+				selection_string2 += ")";
+				
+				selection_strings[0] += selection_string1;
+				
+				selection_strings[1] += selection_string2;
 				
 				max_min_value_mapping.put(relation_mapping.get(relations.get(i)), integer_list);
 			}

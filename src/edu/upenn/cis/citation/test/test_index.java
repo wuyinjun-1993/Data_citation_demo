@@ -23,7 +23,7 @@ import edu.upenn.cis.citation.Corecover.UserLib;
 import edu.upenn.cis.citation.Operation.Conditions;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.citation_view.Head_strs;
-import edu.upenn.cis.citation.citation_view.citation_view_vector;
+import edu.upenn.cis.citation.citation_view.Covering_set;
 import edu.upenn.cis.citation.data_structure.IntList;
 import edu.upenn.cis.citation.data_structure.StringList;
 import edu.upenn.cis.citation.data_structure.Unique_StringList;
@@ -65,7 +65,7 @@ public class test_index {
 		
 	static HashMap<String, Unique_StringList> author_mapping = new HashMap<String, Unique_StringList>(); 
 	
-	public static HashMap<int[], ArrayList<citation_view_vector> > c_view_map = new HashMap<int[], ArrayList<citation_view_vector>>();
+	public static HashMap<int[], ArrayList<Covering_set> > c_view_map = new HashMap<int[], ArrayList<Covering_set>>();
 	
 	static ResultSet rs = null;
 	

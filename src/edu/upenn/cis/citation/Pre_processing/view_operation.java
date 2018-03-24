@@ -295,7 +295,7 @@ public class view_operation {
 //        return view;
 //	}
 	
-	public static Query get_view_by_id(int id, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	public static Query get_view_by_id(int id, Connection c, PreparedStatement pst) throws SQLException
 	{
         
         Vector<Argument> head_var = get_head_vars(id, c, pst);

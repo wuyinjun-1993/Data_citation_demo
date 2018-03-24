@@ -1,6 +1,9 @@
 package edu.upenn.cis.citation.ui;
 
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,6 +25,117 @@ import org.w3c.dom.Text;
 
 public class CitationConverter {
 	
+  public static String formatCitation(String citation) {
+    String[] split = citation.split("\\},");
+    String jsonString = "";
+    for (int i = 0; i < split.length; i++ ) {
+        if(i == 0)
+            jsonString += "{\"citation\":[" + split[i];
+        else {
+            jsonString += split[i] + "},";
+        }
+    }
+    jsonString += "]}";
+    return jsonString;
+}
+  
+  public static void main(String [] args)
+  {
+    HashMap<String, HashSet<String>> maps = new HashMap<String, HashSet<String>>();
+    
+    HashSet<String> set1 = new HashSet<String>();
+    
+    set1.add("2");
+    
+    HashSet<String> set2 = new HashSet<String>();
+    
+    set2.add("4");
+    
+    maps.put("1", set1);
+    
+    maps.put("3", set2);
+    
+    HashMap<String, HashSet<String>> maps2 = new HashMap<String, HashSet<String>>();
+    
+    HashSet<String> set3 = new HashSet<String>();
+    
+    set3.add("2");
+    
+    HashSet<String> set4 = new HashSet<String>();
+    
+    set4.add("4");
+    
+    maps2.put("5", set3);
+    
+    maps2.put("6", set4);
+    
+    HashSet<HashMap<String, HashSet<String>>> super_maps = new HashSet<HashMap<String, HashSet<String>>>();
+    
+    super_maps.add(maps);
+    
+    super_maps.add(maps2);
+    
+    System.out.println(formatCitation(super_maps));
+  }
+  
+  static String add_qutation(HashSet<String> set)
+  {
+    String string = "[";
+    
+    int count = 0;
+    
+    for(String s : set)
+    {
+      if(count >= 1)
+        string += ",";
+      
+      string += "\"" + s + "\"";
+      
+      count ++;
+    }
+    
+    string += "]";
+    
+    return string;
+  }
+  
+  public static String formatCitation(HashSet<HashMap<String, HashSet<String>>> citation_infos) {
+    
+    String string = "{\"citation\":[";
+    
+    int citation_count = 0;
+    
+    for(HashMap<String, HashSet<String>> citation_info : citation_infos)
+    {
+      Set<String> keys = citation_info.keySet();
+      
+      if(citation_count >= 1)
+        string += ",";
+      
+      int count = 0;
+      
+      string += "{";
+      
+      for(String key :keys)
+      {
+        if(count >= 1)
+          string += ",";
+        
+        string += "\"" + key + "\"" + ":" + add_qutation(citation_info.get(key));
+        
+        count ++;
+      }
+      
+      string += "}";
+      
+      citation_count ++;
+    }
+    
+    
+    string += "]}";
+    
+    return string;
+}
 	
 	public static String convertToXML(String jsonStr) throws Exception 
 	{

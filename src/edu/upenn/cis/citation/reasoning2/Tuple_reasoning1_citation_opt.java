@@ -122,11 +122,11 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 		
 		
 		
-		HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map3 = null;
+		HashMap<Head_strs, Vector<Vector<Covering_set>>> citation_view_map3 = null;
 		
-		HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map2 = null;
+		HashMap<Head_strs, Vector<Vector<Covering_set>>> citation_view_map2 = null;
 		
-		HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map1 = null;
+		HashMap<Head_strs, Vector<Vector<Covering_set>>> citation_view_map1 = null;
 		
 		Vector<Head_strs> head_vals = new Vector<Head_strs>();
 		
@@ -152,11 +152,11 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 		for(int i = 0; i<100; i++)
 		{
 			
-			citation_view_map1 = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
+			citation_view_map1 = new HashMap<Head_strs, Vector<Vector<Covering_set>>>();
 			
 			HashMap<Head_strs, HashSet<String> > citation_strs1 = new HashMap<Head_strs, HashSet<String> >();
 			
-			Vector<Vector<citation_view_vector>> c_views = tuple_reasoning(q, citation_strs1, citation_view_map1, c, pst);
+			Vector<Vector<Covering_set>> c_views = tuple_reasoning(q, citation_strs1, citation_view_map1, c, pst);
 		}
 		
 		
@@ -177,12 +177,12 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 		for(int i = 0; i<100; i++)
 		{
 			
-			citation_view_map2 = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
+			citation_view_map2 = new HashMap<Head_strs, Vector<Vector<Covering_set>>>();
 
 			HashMap<Head_strs, HashSet<String> > citation_strs3 = new HashMap<Head_strs, HashSet<String> >();
 
 			
-			Vector<Vector<citation_view_vector>> c_views1 = Tuple_reasoning2.tuple_reasoning(q, citation_strs3, citation_view_map2, c, pst);
+			Vector<Vector<Covering_set>> c_views1 = Tuple_reasoning2.tuple_reasoning(q, citation_strs3, citation_view_map2, c, pst);
 
 		}
 		
@@ -196,11 +196,11 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 			
 			HashMap<Head_strs, HashSet<String> > citation_strs2 = new HashMap<Head_strs, HashSet<String> >();
 			
-			citation_view_map3 = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
+			citation_view_map3 = new HashMap<Head_strs, Vector<Vector<Covering_set>>>();
 
 
 			
-			Vector<Vector<citation_view_vector>> c_views2 = Tuple_reasoning2_opt.tuple_reasoning(q, citation_strs2, citation_view_map3, c, pst);
+			Vector<Vector<Covering_set>> c_views2 = Tuple_reasoning2_opt.tuple_reasoning(q, citation_strs2, citation_view_map3, c, pst);
 
 		}
 				
@@ -236,7 +236,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 
 	}
 	
-	static void compare(HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map1, HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map2)
+	static void compare(HashMap<Head_strs, Vector<Vector<Covering_set>>> citation_view_map1, HashMap<Head_strs, Vector<Vector<Covering_set>>> citation_view_map2)
 	{
 		
 		System.out.println("COMPARE::::");
@@ -247,9 +247,9 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 		{
 			Head_strs h_val = (Head_strs) h_val_iter.next();
 	
-			Vector<Vector<citation_view_vector>> c_views1 = citation_view_map1.get(h_val);
+			Vector<Vector<Covering_set>> c_views1 = citation_view_map1.get(h_val);
 			
-			Vector<Vector<citation_view_vector>> c_views2 = citation_view_map2.get(h_val);
+			Vector<Vector<Covering_set>> c_views2 = citation_view_map2.get(h_val);
 			
 			System.out.println(h_val.toString());
 			
@@ -260,7 +260,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 		
 	}
 	
-	static void compare(Vector<Vector<citation_view_vector>> c_views, Vector<Vector<citation_view_vector>> c_views1)
+	static void compare(Vector<Vector<Covering_set>> c_views, Vector<Vector<Covering_set>> c_views1)
 	{
 		for(int i = 0; i<c_views.size(); i++)
 		{
@@ -288,7 +288,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 	}
 	
 	
-	static boolean do_compare(Vector<citation_view_vector> c1, Vector<citation_view_vector> c2)
+	static boolean do_compare(Vector<Covering_set> c1, Vector<Covering_set> c2)
 	{
 		if(c1.size() != c2.size())
 			return false;
@@ -441,9 +441,9 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 		
 	}
 	
-	public static Vector<String> tuple_gen_agg_citations(Vector<Vector<citation_view_vector>> c_views) throws ClassNotFoundException, SQLException, JSONException
+	public static Vector<String> tuple_gen_agg_citations(Vector<Vector<Covering_set>> c_views) throws ClassNotFoundException, SQLException, JSONException
 	{
-		Vector<Vector<citation_view_vector>> agg_res = Aggregation1.aggregate(c_views);
+		Vector<Vector<Covering_set>> agg_res = Aggregation1.aggregate(c_views);
 		
 		Vector<String> citation_aggs = new Vector<String>();
 		
@@ -464,9 +464,9 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 		return citation_aggs;
 	}
 	
-	public static Vector<String> tuple_gen_agg_citations(Vector<Vector<citation_view_vector>> c_views, Vector<Integer> ids) throws ClassNotFoundException, SQLException, JSONException
+	public static Vector<String> tuple_gen_agg_citations(Vector<Vector<Covering_set>> c_views, Vector<Integer> ids) throws ClassNotFoundException, SQLException, JSONException
 	{
-		Vector<Vector<citation_view_vector>> agg_res = Aggregation1.aggegate(c_views, ids);
+		Vector<Vector<Covering_set>> agg_res = Aggregation1.aggegate(c_views, ids);
 		
 		Vector<String> citation_aggs = new Vector<String>();
 		
@@ -603,11 +603,11 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
          return args;
 	}
 	
-	public static void gen_citation_all(Vector<Vector<citation_view_vector>> citation_views) throws ClassNotFoundException, SQLException
+	public static void gen_citation_all(Vector<Vector<Covering_set>> citation_views) throws ClassNotFoundException, SQLException
 	{
 		for(int i = 0; i<citation_views.size(); i++)
 		{
-			Vector<citation_view_vector> c_vec = citation_views.get(i);
+			Vector<Covering_set> c_vec = citation_views.get(i);
 			
 			for(int j = 0; j< c_vec.size(); j++)
 			{
@@ -616,11 +616,11 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 		}
 	}
 	
-	public static void output_sql(Vector<Vector<citation_view_vector>> citation_views) throws ClassNotFoundException, SQLException
+	public static void output_sql(Vector<Vector<Covering_set>> citation_views) throws ClassNotFoundException, SQLException
 	{
 		for(int i = 0; i<citation_views.size(); i++)
 		{
-			Vector<citation_view_vector> c_vec = citation_views.get(i);
+			Vector<Covering_set> c_vec = citation_views.get(i);
 			
 			for(int j = 0; j<c_vec.size(); j++)
 			{
@@ -1086,7 +1086,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 	    
 	}
 		
-	public static Vector<Vector<citation_view_vector>> tuple_reasoning(Query q, HashMap<Head_strs, HashSet<String> > citation_strs,HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map1, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException, IOException, InterruptedException
+	public static Vector<Vector<Covering_set>> tuple_reasoning(Query q, HashMap<Head_strs, HashSet<String> > citation_strs,HashMap<Head_strs, Vector<Vector<Covering_set>>> citation_view_map1, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException, IOException, InterruptedException
 	{
 		
 //		Query q = Parse_datalog.parse_query(query, valid_subgoal_id);
@@ -1109,7 +1109,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 	    
 		pre_processing(q ,c,pst);
 		
-		Vector<Vector<citation_view_vector>> citation_views = get_citation_views(q, c, pst, citation_strs, citation_view_map1);
+		Vector<Vector<Covering_set>> citation_views = get_citation_views(q, c, pst, citation_strs, citation_view_map1);
 				
 		
 		
@@ -1151,7 +1151,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 		return new Vector<citation_view>(views.size());
 	}
 	
-	public static void gen_citation(citation_view_vector citation_views) throws ClassNotFoundException, SQLException
+	public static void gen_citation(Covering_set citation_views) throws ClassNotFoundException, SQLException
 	{
 		for(int i = 0; i<citation_views.c_vec.size();i++)
 		{
@@ -1161,9 +1161,9 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 		}
 	}
 	
-	public static Vector<Vector<citation_view_vector>> get_citation_views(Query query,Connection c, PreparedStatement pst, HashMap<Head_strs, HashSet<String> > citation_strs, HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map1) throws SQLException, ClassNotFoundException, IOException, InterruptedException
+	public static Vector<Vector<Covering_set>> get_citation_views(Query query,Connection c, PreparedStatement pst, HashMap<Head_strs, HashSet<String> > citation_strs, HashMap<Head_strs, Vector<Vector<Covering_set>>> citation_view_map1) throws SQLException, ClassNotFoundException, IOException, InterruptedException
 	{
-		Vector<Vector<citation_view_vector>> c_views = query_execution(query, c, pst, citation_strs, citation_view_map1);
+		Vector<Vector<Covering_set>> c_views = query_execution(query, c, pst, citation_strs, citation_view_map1);
 				
 		return c_views;
 	}
@@ -1285,10 +1285,10 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 		}
 	}
 	
-	public static Vector<Vector<citation_view_vector>> query_execution(Query query, Connection c, PreparedStatement pst, HashMap<Head_strs, HashSet<String> > citation_strs, HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map1) throws SQLException, ClassNotFoundException, IOException, InterruptedException
+	public static Vector<Vector<Covering_set>> query_execution(Query query, Connection c, PreparedStatement pst, HashMap<Head_strs, HashSet<String> > citation_strs, HashMap<Head_strs, Vector<Vector<Covering_set>>> citation_view_map1) throws SQLException, ClassNotFoundException, IOException, InterruptedException
 	{
 				
-		Vector<Vector<citation_view_vector>> c_views = new Vector<Vector<citation_view_vector>>();
+		Vector<Vector<Covering_set>> c_views = new Vector<Vector<Covering_set>>();
 								
 //		Query_converter.post_processing(query);
 		
@@ -1337,7 +1337,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 //		}
 //	}
 //	
-	public static void reasoning(Vector<Vector<citation_view_vector>> c_views, Query query, Connection c, PreparedStatement pst, String sql, HashMap<Head_strs, Vector<Vector<citation_view_vector> > > citation_view_map1, HashMap<Head_strs, HashSet<String> > citation_strs) throws ClassNotFoundException, IOException, InterruptedException, SQLException
+	public static void reasoning(Vector<Vector<Covering_set>> c_views, Query query, Connection c, PreparedStatement pst, String sql, HashMap<Head_strs, Vector<Vector<Covering_set> > > citation_view_map1, HashMap<Head_strs, HashSet<String> > citation_strs) throws ClassNotFoundException, IOException, InterruptedException, SQLException
 	{
 		pst = c.prepareStatement(sql);
 				
@@ -1368,7 +1368,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 		if(!valid_conditions.isEmpty())
 		{
 			
-			Vector<citation_view_vector> c_view_template = null;
+			Vector<Covering_set> c_view_template = null;
 
 			
 			while(rs.next())
@@ -1411,7 +1411,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 				if(!curr_str.equals(old_value))
 				{
 					
-					c_view_template = new Vector<citation_view_vector>();
+					c_view_template = new Vector<Covering_set>();
 					
 					group_num++;
 										
@@ -1435,7 +1435,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 					
 //					output_vec(c_unit_vec);				
 					
-					Vector<citation_view_vector> c_unit_combinaton = get_valid_citation_combination(c_view_template, c_unit_vec,query);
+					Vector<Covering_set> c_unit_combinaton = get_valid_citation_combination(c_view_template, c_unit_vec,query);
 
 					c_views.add(c_unit_combinaton);
 					
@@ -1461,7 +1461,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 					
 					if(citation_view_map1.get(h_vals) == null)
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = new Vector<Vector<citation_view_vector>>();
+						Vector<Vector<Covering_set>> curr_c_view_vector = new Vector<Vector<Covering_set>>();
 						
 						curr_c_view_vector.add(c_unit_combinaton);
 						
@@ -1470,7 +1470,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 					}
 					else
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = citation_view_map1.get(h_vals);
+						Vector<Vector<Covering_set>> curr_c_view_vector = citation_view_map1.get(h_vals);
 												
 						curr_c_view_vector.add(c_unit_combinaton);
 						
@@ -1489,11 +1489,11 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 				{
 //					HashMap<String,citation_view> c_unit_vec = get_citation_units_unique(c_units);
 					
-					Vector<citation_view_vector> curr_c_view = c_view_template;
+					Vector<Covering_set> curr_c_view = c_view_template;
 					
 //					output_vec_com(curr_c_view);
 					
-					Vector<citation_view_vector> insert_c_view = new Vector<citation_view_vector>();
+					Vector<Covering_set> insert_c_view = new Vector<Covering_set>();
 					
 					for(int i = 0; i<curr_c_view.size(); i++)
 					{
@@ -1502,7 +1502,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 						insert_c_view.add(curr_c_view.get(i).clone());
 					}
 					
-					Vector<citation_view_vector> update_c_view = update_valid_citation_combination(insert_c_view, rs, query.head.args.size() + query.body.size());
+					Vector<Covering_set> update_c_view = update_valid_citation_combination(insert_c_view, rs, query.head.args.size() + query.body.size());
 					
 //					output_vec_com(update_c_view);
 					
@@ -1526,7 +1526,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 					
 					if(citation_view_map1.get(h_vals) == null)
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = new Vector<Vector<citation_view_vector>>();
+						Vector<Vector<Covering_set>> curr_c_view_vector = new Vector<Vector<Covering_set>>();
 						
 						curr_c_view_vector.add(update_c_view);
 						
@@ -1535,7 +1535,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 					}
 					else
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = citation_view_map1.get(h_vals);
+						Vector<Vector<Covering_set>> curr_c_view_vector = citation_view_map1.get(h_vals);
 												
 						curr_c_view_vector.add(update_c_view);
 												
@@ -1554,7 +1554,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 			
 			boolean first = true;
 			
-			Vector<citation_view_vector> c_view_template = null;
+			Vector<Covering_set> c_view_template = null;
 
 			while(rs.next())
 			{				
@@ -1573,7 +1573,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 				if(first)
 				{
 					
-					c_view_template = new Vector<citation_view_vector>();
+					c_view_template = new Vector<Covering_set>();
 					
 					group_num++;
 										
@@ -1596,7 +1596,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 					
 					Vector<Vector<citation_view>> c_unit_vec = get_citation_units_condition(c_units, rs, query.body.size() + query.head.args.size(), query);
 					
-					Vector<citation_view_vector> c_unit_combinaton = get_valid_citation_combination(c_view_template, c_unit_vec,query);
+					Vector<Covering_set> c_unit_combinaton = get_valid_citation_combination(c_view_template, c_unit_vec,query);
 					
 //					Vector<String> citations = gen_citation(c_unit_combinaton, vals, c, pst, citation_strings);
 //					
@@ -1622,7 +1622,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 					
 					if(citation_view_map1.get(h_vals) == null)
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = new Vector<Vector<citation_view_vector>>();
+						Vector<Vector<Covering_set>> curr_c_view_vector = new Vector<Vector<Covering_set>>();
 						
 						curr_c_view_vector.add(c_unit_combinaton);
 						
@@ -1631,7 +1631,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 					}
 					else
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = citation_view_map1.get(h_vals);
+						Vector<Vector<Covering_set>> curr_c_view_vector = citation_view_map1.get(h_vals);
 												
 						curr_c_view_vector.add(c_unit_combinaton);
 						
@@ -1648,16 +1648,16 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 					
 //					HashMap<String,citation_view> c_unit_vec = get_citation_units_unique(c_units);
 					
-					Vector<citation_view_vector> curr_c_view = c_view_template;
+					Vector<Covering_set> curr_c_view = c_view_template;
 					
-					Vector<citation_view_vector> insert_c_view = new Vector<citation_view_vector>();
+					Vector<Covering_set> insert_c_view = new Vector<Covering_set>();
 					
 					for(int i = 0; i<curr_c_view.size(); i++)
 					{
 						insert_c_view.add(curr_c_view.get(i).clone());
 					}
 					
-					Vector<citation_view_vector> update_c_view = update_valid_citation_combination(insert_c_view, rs, query.head.args.size() + query.body.size());
+					Vector<Covering_set> update_c_view = update_valid_citation_combination(insert_c_view, rs, query.head.args.size() + query.body.size());
 					
 					c_views.add(update_c_view);
 					
@@ -1678,7 +1678,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 					
 					if(citation_view_map1.get(h_vals) == null)
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = new Vector<Vector<citation_view_vector>>();
+						Vector<Vector<Covering_set>> curr_c_view_vector = new Vector<Vector<Covering_set>>();
 						
 						curr_c_view_vector.add(update_c_view);
 						
@@ -1687,7 +1687,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 					}
 					else
 					{
-						Vector<Vector<citation_view_vector>> curr_c_view_vector = citation_view_map1.get(h_vals);
+						Vector<Vector<Covering_set>> curr_c_view_vector = citation_view_map1.get(h_vals);
 												
 						curr_c_view_vector.add(update_c_view);
 						
@@ -1762,7 +1762,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 	
 	
 	
-	static void gen_citations(HashMap<Head_strs, HashSet<String>> citation_strs, Vector<citation_view_vector> c_views, String curr_str, Query q, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	static void gen_citations(HashMap<Head_strs, HashSet<String>> citation_strs, Vector<Covering_set> c_views, String curr_str, Query q, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
 		
 		String group_vars = Query_converter.get_group_item(q);
@@ -1785,7 +1785,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 		}
 	}
 	
-	static void do_gen_citations(HashSet<Head_strs> head_vs, String head_vars, String query_relations, String group_vars, String group_condition_str, String query_condition_str, HashMap<Head_strs, HashSet<String>> citation_strs, citation_view_vector c_views, String curr_str, Query q, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	static void do_gen_citations(HashSet<Head_strs> head_vs, String head_vars, String query_relations, String group_vars, String group_condition_str, String query_condition_str, HashMap<Head_strs, HashSet<String>> citation_strs, Covering_set c_views, String curr_str, Query q, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{		
 		Vector<String> queries = Query_converter.group_sub_query_citations(head_vars, query_relations, group_vars, query_condition_str, group_condition_str, c_views, valid_conditions, curr_str, q, authors, c, pst);
 		
@@ -1929,7 +1929,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 	
 	
 	
-	static Vector<String> populate_citation(Vector<citation_view_vector> update_c_view, Vector<String> vals, Connection c, PreparedStatement pst, Vector<HashMap<String, Vector<String>>> citation_strings) throws SQLException
+	static Vector<String> populate_citation(Vector<Covering_set> update_c_view, Vector<String> vals, Connection c, PreparedStatement pst, Vector<HashMap<String, Vector<String>>> citation_strings) throws SQLException
 	{
 		Vector<String> citations = new Vector<String>();
 		
@@ -1980,7 +1980,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 	}
 	
 	
-	public static void output_vec_com(Vector<citation_view_vector>c_unit_combinaton)
+	public static void output_vec_com(Vector<Covering_set>c_unit_combinaton)
 	{
 		for(int i = 0; i<c_unit_combinaton.size(); i++)
 		{
@@ -1992,13 +1992,13 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 		System.out.println();
 	}
 	
-	public static Vector<citation_view_vector> update_valid_citation_combination(Vector<citation_view_vector> insert_c_view, ResultSet rs, int start_pos) throws SQLException
+	public static Vector<Covering_set> update_valid_citation_combination(Vector<Covering_set> insert_c_view, ResultSet rs, int start_pos) throws SQLException
 	{
 		
 		for(int i = 0; i<insert_c_view.size(); i++)
 		{
 			
-			citation_view_vector c_vec = insert_c_view.get(i);
+			Covering_set c_vec = insert_c_view.get(i);
 			
 			for(int j = 0; j<c_vec.c_vec.size(); j++)
 			{
@@ -2021,7 +2021,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 				
 			}
 			
-			c_vec = new citation_view_vector(c_vec.c_vec);
+			c_vec = new Covering_set(c_vec.c_vec);
 			
 			insert_c_view.remove(i);
 			
@@ -2672,9 +2672,9 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 //	
 	
 	
-	public static Vector<citation_view_vector> get_valid_citation_combination(Vector<citation_view_vector> c_view_template, Vector<Vector<citation_view>>c_unit_vec, Query query)
+	public static Vector<Covering_set> get_valid_citation_combination(Vector<Covering_set> c_view_template, Vector<Vector<citation_view>>c_unit_vec, Query query)
 	{
-		Vector<citation_view_vector> c_combinations = new Vector<citation_view_vector>();
+		Vector<Covering_set> c_combinations = new Vector<Covering_set>();
 				
 		Vector<String> subgoal_names = new Vector<String>();
 		
@@ -2723,13 +2723,13 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 		return (c_combinations);
 	}
 	
-	public static Vector<citation_view_vector> remove_duplicate_final(Vector<citation_view_vector> c_combinations)
+	public static Vector<Covering_set> remove_duplicate_final(Vector<Covering_set> c_combinations)
 	{
 //		Vector<Boolean> retains = new Vector<Boolean>();
 		
 //		HashMap<String, Vector<citation_view>> update_combinations = new HashMap<String, Vector<citation_view>>();
 		
-		Vector<citation_view_vector> update_combinations = new Vector<citation_view_vector>();
+		Vector<Covering_set> update_combinations = new Vector<Covering_set>();
 		
 //		Set set = c_combinations.keySet();
 		
@@ -2740,7 +2740,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 			
 			boolean contains = false;
 			
-			citation_view_vector c_combination = c_combinations.get(i);
+			Covering_set c_combination = c_combinations.get(i);
 			
 			
 			for(int j = i+1; j<c_combinations.size(); j++)
@@ -2750,7 +2750,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 //				if(str!=string)
 				if(i != j)
 				{
-					citation_view_vector curr_combination = c_combinations.get(j);
+					Covering_set curr_combination = c_combinations.get(j);
 					
 					if(c_combination.index_str.equals(curr_combination.index_str))
 					{
@@ -2773,7 +2773,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 	}
 	
 	
-	public static Vector<citation_view_vector> remove_duplicate(Vector<citation_view_vector> c_combinations)
+	public static Vector<Covering_set> remove_duplicate(Vector<Covering_set> c_combinations)
 	{
 //		Vector<Boolean> retains = new Vector<Boolean>();
 		
@@ -2790,7 +2790,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 			
 //			boolean contains = false;
 			
-			citation_view_vector c_combination = c_combinations.get(i);
+			Covering_set c_combination = c_combinations.get(i);
 			
 			for(int j = 0; j<c_combinations.size(); j++)
 			{
@@ -2799,7 +2799,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 //				if(str!=string)
 				if(i != j)
 				{
-					citation_view_vector curr_combination = c_combinations.get(j);
+					Covering_set curr_combination = c_combinations.get(j);
 					
 //					if((c_combination.index_vec.containsAll(curr_combination.index_vec) && c_combination.index_vec.size() > curr_combination.index_vec.size()) || (c_combination.index_vec.equals(curr_combination.index_vec)))
 					if((view_vector_contains(c_combination, curr_combination) && c_combination.index_vec.size() > curr_combination.index_vec.size()))
@@ -2823,7 +2823,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 		return c_combinations;
 	}
 	
-	static boolean view_vector_contains(citation_view_vector c_vec1, citation_view_vector c_vec2)
+	static boolean view_vector_contains(Covering_set c_vec1, Covering_set c_vec2)
 	{
 		
 		Vector<String> c1 = new Vector<String>();
@@ -2902,7 +2902,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 //		return update_combinations;
 //	}
 //	
-	public static Vector<citation_view_vector> join_operation(Vector<citation_view_vector> c_combinations, Vector<citation_view> insert_citations,  Vector<String> subgoal_names, int i)
+	public static Vector<Covering_set> join_operation(Vector<Covering_set> c_combinations, Vector<citation_view> insert_citations,  Vector<String> subgoal_names, int i)
 	{
 		if(i == 0)
 		{
@@ -2914,7 +2914,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 				
 				String str = String.valueOf(insert_citations.get(k).get_index());
 				
-				c_combinations.add(new citation_view_vector(c));
+				c_combinations.add(new Covering_set(c));
 				
 			}
 			
@@ -2924,7 +2924,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 		{
 //			HashMap<String, citation_view_vector> updated_c_combinations = new HashMap<String, citation_view_vector>();
 			
-			Vector<citation_view_vector> updated_c_combinations = new Vector<citation_view_vector>();
+			Vector<Covering_set> updated_c_combinations = new Vector<Covering_set>();
 			
 			
 			
@@ -2941,12 +2941,12 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 			{
 //				String string = (String) iter.next();
 				
-				citation_view_vector curr_combination = c_combinations.get(j);
+				Covering_set curr_combination = c_combinations.get(j);
 								
 				for(int k = 0; k<insert_citations.size(); k++)
 				{
 					
-					citation_view_vector new_citation_vec = citation_view_vector.merge(curr_combination, insert_citations.get(k));
+					Covering_set new_citation_vec = Covering_set.merge(curr_combination, insert_citations.get(k));
 					
 //					System.out.print(curr_combination.index_str);
 //					

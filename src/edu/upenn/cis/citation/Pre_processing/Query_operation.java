@@ -29,7 +29,7 @@ import edu.upenn.cis.citation.Operation.op_greater_equal;
 import edu.upenn.cis.citation.Operation.op_less;
 import edu.upenn.cis.citation.Operation.op_less_equal;
 import edu.upenn.cis.citation.Operation.op_not_equal;
-import edu.upenn.cis.citation.citation_view.citation_view_vector;
+import edu.upenn.cis.citation.citation_view.Covering_set;
 import edu.upenn.cis.citation.datalog.Parse_datalog;
 import edu.upenn.cis.citation.datalog.Query_converter;
 
@@ -151,7 +151,7 @@ public class Query_operation {
 		bw.close();
 	}
 	
-	public static void write2file(String file_name, ArrayList<citation_view_vector> views) throws IOException
+	public static void write2file(String file_name, ArrayList<Covering_set> views) throws IOException
     {
         File fout = new File(file_name);
         FileOutputStream fos = new FileOutputStream(fout);

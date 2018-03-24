@@ -192,7 +192,7 @@ public class query_node {
 			
 			if(arg.relation_name.equals(subgoal_name))
 			{
-				head_vars.add(arg.name.substring(arg.name.indexOf("_") + 1, arg.name.length()));
+				head_vars.add(arg.name.substring(arg.name.indexOf(populate_db.separator) + 1, arg.name.length()));
 			}
 			
 		}
@@ -205,7 +205,9 @@ public class query_node {
 			{
 				if(condition.subgoal1.equals(subgoal_name))
 				{
-					local_predicates.add(condition.arg1.name + condition.op.toString() + condition.arg2.name);
+				  String arg1 = condition.arg1.name;
+				  
+					local_predicates.add(arg1.substring(arg1.indexOf(populate_db.separator) + 1, arg1.length()) + condition.op.toString() + condition.arg2.name);
 				}
 			}
 //			else
@@ -222,6 +224,8 @@ public class query_node {
 		}
 		
 		System.out.println(head_vars.toString());
+		
+		System.out.println(local_predicates.toString());
 	}
 	
 	@Override

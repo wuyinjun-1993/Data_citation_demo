@@ -74,13 +74,13 @@ public class Tuple_reasoning2_full_test2_copy {
 	
 	static HashMap<String, Unique_StringList> author_mapping = new HashMap<String, Unique_StringList>(); 
 	
-	public static HashMap<String, HashSet<citation_view_vector> > c_view_map = new HashMap<String, HashSet<citation_view_vector>>();
+	public static HashMap<String, HashSet<Covering_set> > c_view_map = new HashMap<String, HashSet<Covering_set>>();
 	
 	public static HashMap<String, HashSet<Integer>> signiture_rid_mappings = new HashMap<String, HashSet<Integer>>();
 	
 	public static HashMap<String, HashSet<Tuple>> signature_view_mappings_mappings = new HashMap<String, HashSet<Tuple>>();
 	
-	public static HashSet<citation_view_vector> covering_set_schema_level = new HashSet<citation_view_vector>();
+	public static HashSet<Covering_set> covering_set_schema_level = new HashSet<Covering_set>();
 	
     public static HashSet<Tuple> valid_view_mappings_schema_level = null;
 	
@@ -127,7 +127,7 @@ public class Tuple_reasoning2_full_test2_copy {
 	
 	public static boolean agg_intersection = true;
 	
-	public static boolean test_case = true;
+	public static boolean test_case = false;
 	
 	public static int unique_tuple_num = 0;
 	
@@ -206,7 +206,7 @@ public class Tuple_reasoning2_full_test2_copy {
 		{
 		  String key = (String) iter.next();
 			
-			HashSet<citation_view_vector> c_views = c_view_map.get(key);
+			HashSet<Covering_set> c_views = c_view_map.get(key);
 			
 			System.out.println(c_views);
 		}
@@ -392,6 +392,126 @@ public class Tuple_reasoning2_full_test2_copy {
 //		}
 //	}
 	
+//	 public static HashSet<String> gen_citation_subset_tuples(Vector<Head_strs> names, Query query, Connection c, PreparedStatement pst) throws JSONException, SQLException
+//    {
+//        if(agg_intersection)
+//        {
+//            HashSet<String> citations = Aggregation6.do_agg_intersection_subset(rs, tuple_id_list, c_view_map, Resultset_prefix_col_num, view_query_mapping, query_lambda_str, author_mapping, max_author_num, query_ids, view_list, c, pst, true);//(rs, c_view_map, Resultset_prefix_col_num, view_query_mapping, query_lambda_str, author_mapping, max_author_num, query_ids, view_list, c, pst, true);
+//            
+//            return citations;
+//        }
+//        else
+//        {
+//            HashSet<String> citations = Aggregation6.do_agg_union(views_per_group, rs, c_view_map, signiture_rid_mappings, Resultset_prefix_col_num, view_query_mapping, query_lambda_str, author_mapping, max_author_num, query_ids, view_list, c, pst, true);
+//            
+//            return citations;
+//        }
+//    }
+	
+	   public static HashSet<String> tuple_gen_citation_per_tuple(Vector<String> names, Connection c, PreparedStatement pst) throws JSONException, SQLException
+	    {
+	      Head_strs head = new Head_strs(names);
+	      
+	      ArrayList<Integer> id_lists = head_strs_rows_mapping.get(head);
+	      
+	      Set<String> keys = c_view_map.keySet();
+
+	      HashSet<String> citations = new HashSet<String>();
+	      
+	      Iterator<String> iter = keys.iterator();
+	      
+	      int i = 0;
+	      
+	        
+	        while(iter.hasNext())
+	        {
+	          String curr_tuple_key = iter.next();
+	          
+	          HashSet<Integer> rids = signiture_rid_mappings.get(curr_tuple_key);
+	          
+	          HashSet<Covering_set> c_views = c_view_map.get(curr_tuple_key);
+	          
+	          for(i = 0; i<id_lists.size(); i++)
+	          {
+	            int tuple_id = id_lists.get(i);
+	            
+	            if(rids.contains(tuple_id))
+	              {
+	                
+	                rs.absolute(tuple_id);
+	                
+	                HashSet<String> curr_citations = gen_citations_per_covering_set(c_views, rs, Resultset_prefix_col_num, tuple_id, c, pst);
+	                
+	                citations.addAll(curr_citations);
+	                
+//	              i++;
+//	             
+//	              if(i >= id_lists.size())
+//	                  break;
+//	              
+//	              tuple_id = id_lists.get(i);
+	                
+	              }
+	            
+	          }
+	          
+	          
+	          
+//	        if(i >= id_lists.size())
+//	          break;
+	        }
+	        
+	      return citations;
+	    }
+	
+	   public static HashSet<String> gen_citations_per_covering_set(HashSet<Covering_set> insert_c_view, ResultSet rs, int start_pos, int tuple_id, Connection c, PreparedStatement pst) throws SQLException, JSONException
+	    {
+	        
+//	      HashSet<citation_view_vector2> update_c_views = new HashSet<citation_view_vector2>();
+	        
+	        HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping = new HashMap<String, HashMap<String, HashSet<String>>>();
+	      
+	        HashSet<String> citations = new HashSet<String>();
+	      
+	        Set<String> head_sets = lambda_term_id_mapping.keySet();
+	        
+	        for(Iterator iter = insert_c_view.iterator(); iter.hasNext();)
+	        {
+	          Covering_set covering_set = (Covering_set) iter.next();
+	          
+	          for(citation_view view_mapping: covering_set.c_vec)
+	          {
+	            citation_view view = view_mapping;
+	            
+	            if(view.has_lambda_term())
+	            {
+	                citation_view_parametered curr_c_view = (citation_view_parametered) view;
+	                
+	                Vector<Lambda_term> lambda_terms = curr_c_view.lambda_terms;
+	                
+	                Vector<String> heads = new Vector<String>();
+	                
+	                for(int k = 0; k<lambda_terms.size(); k++)
+	                {
+	                    int id = lambda_term_id_mapping.get(lambda_terms.get(k).toString());
+	                    
+	                    heads.add(rs.getString(id + start_pos + 1));
+	                    
+	                    curr_c_view.put_lambda_paras(lambda_terms.get(k), rs.getString(id + start_pos + 1));
+	                }                
+	            }
+	          }
+	          
+	          HashSet<String> curr_citations = gen_citation1.get_citations3(covering_set, c, pst, view_list, view_query_mapping, author_mapping, max_author_num, query_ids, query_lambda_str, view_author_mapping, populate_db.star_op);
+	          
+	          citations.addAll(curr_citations);
+	          
+	        }
+	        
+
+	        return citations;
+	    }
+	   
 	public static HashSet<String> gen_citation_schema_level(Connection c, PreparedStatement pst) throws JSONException, SQLException
 	{
 	  
@@ -628,11 +748,11 @@ public class Tuple_reasoning2_full_test2_copy {
          return args;
 	}
 	
-	public static void gen_citation_all(Vector<Vector<citation_view_vector>> citation_views) throws ClassNotFoundException, SQLException
+	public static void gen_citation_all(Vector<Vector<Covering_set>> citation_views) throws ClassNotFoundException, SQLException
 	{
 		for(int i = 0; i<citation_views.size(); i++)
 		{
-			Vector<citation_view_vector> c_vec = citation_views.get(i);
+			Vector<Covering_set> c_vec = citation_views.get(i);
 			
 			for(int j = 0; j< c_vec.size(); j++)
 			{
@@ -641,11 +761,11 @@ public class Tuple_reasoning2_full_test2_copy {
 		}
 	}
 	
-	public static void output_sql(Vector<Vector<citation_view_vector>> citation_views) throws ClassNotFoundException, SQLException
+	public static void output_sql(Vector<Vector<Covering_set>> citation_views) throws ClassNotFoundException, SQLException
 	{
 		for(int i = 0; i<citation_views.size(); i++)
 		{
-			Vector<citation_view_vector> c_vec = citation_views.get(i);
+			Vector<Covering_set> c_vec = citation_views.get(i);
 			
 			for(int j = 0; j<c_vec.size(); j++)
 			{
@@ -816,7 +936,7 @@ public class Tuple_reasoning2_full_test2_copy {
 		}
 	}
 	
-	public static HashSet pre_processing(Vector<Query> views, Query q, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, HashMap<String, Integer> with_sub_queries_id_mappings, Vector<String> full_mapping_condition_str, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	public static HashSet pre_processing(Vector<Query> views, Query q, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, HashMap<String, Integer> with_sub_queries_id_mappings, Vector<String> full_mapping_condition_str, Connection c, PreparedStatement pst) throws SQLException
 	{
 		
 		build_query_head_variable_mapping(q);
@@ -1175,7 +1295,7 @@ public class Tuple_reasoning2_full_test2_copy {
 		valid_view_mappings_schema_level = null;
 	}
 	
-	public static void tuple_reasoning(Query q, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException, JSONException, IOException, InterruptedException
+	public static void tuple_reasoning(Query q, Connection c, PreparedStatement pst) throws SQLException, JSONException, IOException, InterruptedException
 	{
 				
 		reset();
@@ -1242,7 +1362,7 @@ public class Tuple_reasoning2_full_test2_copy {
 		return new Vector<citation_view>(views.size());
 	}
 	
-	public static void gen_citation(citation_view_vector citation_views) throws ClassNotFoundException, SQLException
+	public static void gen_citation(Covering_set citation_views) throws ClassNotFoundException, SQLException
 	{
 		for(citation_view view_mapping: citation_views.c_vec)
 		{
@@ -1341,10 +1461,10 @@ public class Tuple_reasoning2_full_test2_copy {
 //	}
 	
 	
-	public static Vector<Vector<citation_view_vector>> query_execution(HashSet<Tuple> views, Query query, String sql, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException, JSONException, IOException, InterruptedException
+	public static Vector<Vector<Covering_set>> query_execution(HashSet<Tuple> views, Query query, String sql, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException, JSONException, IOException, InterruptedException
 	{
 				
-		Vector<Vector<citation_view_vector>> c_views = new Vector<Vector<citation_view_vector>>();
+		Vector<Vector<Covering_set>> c_views = new Vector<Vector<Covering_set>>();
 								
 //		Query_converter.post_processing(query);
 		
@@ -1406,15 +1526,15 @@ public class Tuple_reasoning2_full_test2_copy {
 //	  return view_mapping_valid_rid_mappings;
 	}
 	
-	static ArrayList<citation_view_vector> join_views_curr_relation(ArrayList<Tuple> tuples, ArrayList<citation_view_vector> curr_view_com) throws ClassNotFoundException, SQLException
+	static ArrayList<Covering_set> join_views_curr_relation(ArrayList<Tuple> tuples, ArrayList<Covering_set> curr_view_com) throws ClassNotFoundException, SQLException
 	{
 		if(curr_view_com.isEmpty())
 		{
 			if(tuples.isEmpty())
-				return new ArrayList<citation_view_vector>();
+				return new ArrayList<Covering_set>();
 			else
 			{
-				ArrayList<citation_view_vector> new_view_com = new ArrayList<citation_view_vector>();
+				ArrayList<Covering_set> new_view_com = new ArrayList<Covering_set>();
 				
 				for(int i = 0; i<tuples.size(); i++)
 				{
@@ -1426,7 +1546,7 @@ public class Tuple_reasoning2_full_test2_copy {
 						
 						citation_view_parametered c = new citation_view_parametered(valid_tuple.name, view_mapping.get(valid_tuple.name), valid_tuple);
 						
-						citation_view_vector curr_views = new citation_view_vector(c);
+						Covering_set curr_views = new Covering_set(c);
 						
 						new_view_com.add(curr_views);
 					}	
@@ -1435,7 +1555,7 @@ public class Tuple_reasoning2_full_test2_copy {
 						
 						citation_view_unparametered c = new citation_view_unparametered(valid_tuple.name, valid_tuple);
 						
-						citation_view_vector curr_views = new citation_view_vector(c);
+						Covering_set curr_views = new Covering_set(c);
 						
 						new_view_com.add(curr_views);
 					}
@@ -1447,7 +1567,7 @@ public class Tuple_reasoning2_full_test2_copy {
 		
 		else
 		{
-			ArrayList<citation_view_vector> new_view_com = new ArrayList<citation_view_vector>();
+			ArrayList<Covering_set> new_view_com = new ArrayList<Covering_set>();
 			
 			for(int i = 0; i<tuples.size(); i++)
 			{
@@ -1468,9 +1588,9 @@ public class Tuple_reasoning2_full_test2_copy {
 				
 				for(int j = 0; j < curr_view_com.size(); j++)
 				{
-					citation_view_vector old_view_com = curr_view_com.get(j).clone();
+					Covering_set old_view_com = curr_view_com.get(j).clone();
 					
-					citation_view_vector view_com = citation_view_vector.merge(old_view_com, c);
+					Covering_set view_com = Covering_set.merge(old_view_com, c);
 					
 					new_view_com.add(view_com);
 				}
@@ -1481,12 +1601,12 @@ public class Tuple_reasoning2_full_test2_copy {
 	}
 	
 	
-	static void reasoning_single_tuple(HashSet views, Query query, ResultSet rs, HashSet<citation_view_vector> c_view_template, HashSet<Argument> curr_head_vars) throws ClassNotFoundException, SQLException
+	static void reasoning_single_tuple(HashSet views, Query query, ResultSet rs, HashSet<Covering_set> c_view_template, HashSet<Argument> curr_head_vars)
 	{
 		
 //		ArrayList<citation_view_vector> view_com = new ArrayList<citation_view_vector>();
 		
-		HashSet<citation_view_vector> all_covering_sets = new HashSet<citation_view_vector>();
+		HashSet<Covering_set> all_covering_sets = new HashSet<Covering_set>();
 		
 		Set<String> relations = head_variable_query_mapping.keySet();
 		
@@ -1555,12 +1675,12 @@ public class Tuple_reasoning2_full_test2_copy {
 		
 	}
 	
-	   static void reasoning_single_tuple_no_clustering(HashSet views, Query query, ResultSet rs, HashSet<citation_view_vector> c_view_template, HashSet<Argument> curr_head_vars) throws ClassNotFoundException, SQLException
+	   static void reasoning_single_tuple_no_clustering(HashSet views, Query query, ResultSet rs, HashSet<Covering_set> c_view_template, HashSet<Argument> curr_head_vars)
 	    {
 	        
 //	      ArrayList<citation_view_vector> view_com = new ArrayList<citation_view_vector>();
 	        
-	        HashSet<citation_view_vector> all_covering_sets = new HashSet<citation_view_vector>();
+	        HashSet<Covering_set> all_covering_sets = new HashSet<Covering_set>();
 	        
 	        Set<Argument> args = head_variable_view_mapping.keySet();
 	        
@@ -1681,7 +1801,7 @@ public class Tuple_reasoning2_full_test2_copy {
 //		return c_view_template;
 //	}
 	
-	public static Vector<citation_view_vector> remove_duplicate(Vector<citation_view_vector> c_combinations)
+	public static Vector<Covering_set> remove_duplicate(Vector<Covering_set> c_combinations)
 	{
 //		Vector<Boolean> retains = new Vector<Boolean>();
 		
@@ -1698,7 +1818,7 @@ public class Tuple_reasoning2_full_test2_copy {
 			
 //			boolean contains = false;
 			
-			citation_view_vector c_combination = c_combinations.get(i);
+			Covering_set c_combination = c_combinations.get(i);
 			
 			for(int j = 0; j<c_combinations.size(); j++)
 			{
@@ -1707,7 +1827,7 @@ public class Tuple_reasoning2_full_test2_copy {
 //				if(str!=string)
 				if(i != j)
 				{
-					citation_view_vector curr_combination = c_combinations.get(j);
+					Covering_set curr_combination = c_combinations.get(j);
 					
 //					if((c_combination.index_vec.containsAll(curr_combination.index_vec) && c_combination.index_vec.size() > curr_combination.index_vec.size()) || (c_combination.index_vec.equals(curr_combination.index_vec)))
 					if((Tuple_reasoning1.view_vector_contains(c_combination, curr_combination) && c_combination.index_vec.size() > curr_combination.index_vec.size()))
@@ -1731,13 +1851,13 @@ public class Tuple_reasoning2_full_test2_copy {
 		return c_combinations;
 	}
 	
-	public static ArrayList<citation_view_vector> remove_duplicate(ArrayList<citation_view_vector> c_combinations, citation_view_vector c_view)
+	public static ArrayList<Covering_set> remove_duplicate(ArrayList<Covering_set> c_combinations, Covering_set c_view)
 	{
 //		Vector<Boolean> retains = new Vector<Boolean>();
 		
 //		HashMap<String, Vector<citation_view>> update_combinations = new HashMap<String, Vector<citation_view>>();
 		
-		Vector<citation_view_vector> update_combinations = new Vector<citation_view_vector>();
+		Vector<Covering_set> update_combinations = new Vector<Covering_set>();
 		
 //		Set set = c_combinations.keySet();
 		
@@ -1748,7 +1868,7 @@ public class Tuple_reasoning2_full_test2_copy {
 		{
 //			String str = (String) iter.next();
 						
-			citation_view_vector c_combination = c_combinations.get(i);
+			Covering_set c_combination = c_combinations.get(i);
 			
 //			for(int j = 0; j<c_combinations.size(); j++)
 			{
@@ -1757,7 +1877,7 @@ public class Tuple_reasoning2_full_test2_copy {
 //				if(str!=string)
 //				if(i != j)
 				{
-					citation_view_vector curr_combination = c_view;
+					Covering_set curr_combination = c_view;
 					
 //					if((c_combination.index_vec.containsAll(curr_combination.index_vec) && c_combination.index_vec.size() > curr_combination.index_vec.size()))
 					if(Tuple_reasoning1.view_vector_contains(c_combination, curr_combination)&& Tuple_reasoning1.table_names_contains(c_combination, curr_combination) && c_combination.index_vec.size() > curr_combination.index_vec.size())
@@ -1807,13 +1927,13 @@ public class Tuple_reasoning2_full_test2_copy {
 	
 	
 	
-	public static Vector<citation_view_vector> remove_duplicate_final(Vector<citation_view_vector> c_combinations)
+	public static Vector<Covering_set> remove_duplicate_final(Vector<Covering_set> c_combinations)
 	{
 //		Vector<Boolean> retains = new Vector<Boolean>();
 		
 //		HashMap<String, Vector<citation_view>> update_combinations = new HashMap<String, Vector<citation_view>>();
 		
-		Vector<citation_view_vector> update_combinations = new Vector<citation_view_vector>();
+		Vector<Covering_set> update_combinations = new Vector<Covering_set>();
 		
 //		Set set = c_combinations.keySet();
 		
@@ -1824,7 +1944,7 @@ public class Tuple_reasoning2_full_test2_copy {
 			
 			boolean contains = false;
 			
-			citation_view_vector c_combination = c_combinations.get(i);
+			Covering_set c_combination = c_combinations.get(i);
 			
 			for(int j = i+1; j<c_combinations.size(); j++)
 			{
@@ -1833,7 +1953,7 @@ public class Tuple_reasoning2_full_test2_copy {
 //				if(str!=string)
 				if(i != j)
 				{
-					citation_view_vector curr_combination = c_combinations.get(j);
+					Covering_set curr_combination = c_combinations.get(j);
 					
 					if(c_combination.index_str.equals(curr_combination.index_str))
 					{
@@ -1898,7 +2018,7 @@ public class Tuple_reasoning2_full_test2_copy {
 		return head_args;
 	}
 	
-	public static void reasoning(Query query, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, Connection c, PreparedStatement pst, String sql, HashSet<Tuple> views) throws SQLException, ClassNotFoundException, IOException, InterruptedException, JSONException
+	public static void reasoning(Query query, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, Connection c, PreparedStatement pst, String sql, HashSet<Tuple> views) throws SQLException, IOException, InterruptedException, JSONException
 	{
 		
 		start = System.nanoTime();
@@ -1921,7 +2041,7 @@ public class Tuple_reasoning2_full_test2_copy {
 		Vector<Vector<String>> values = new Vector<Vector<String>>(); 
 				
 				
-		HashSet<citation_view_vector> c_view_template = null;
+		HashSet<Covering_set> c_view_template = null;
 		
 		int start_pos = 0;
 		
@@ -2002,7 +2122,7 @@ public class Tuple_reasoning2_full_test2_copy {
 
                   group_num++;
                   
-                      c_view_template = new HashSet<citation_view_vector>();
+                      c_view_template = new HashSet<Covering_set>();
                                               
                       HashSet<Tuple> curr_views = (HashSet<Tuple>) views.clone();
                                           
@@ -2549,7 +2669,7 @@ public class Tuple_reasoning2_full_test2_copy {
 //		return citations;
 //	}
 
-	static HashSet<String> gen_citation(ArrayList<citation_view_vector> c_views, Connection c, PreparedStatement pst, ArrayList<HashMap<String, Integer>> view_query_mapping) throws ClassNotFoundException, SQLException, JSONException
+	static HashSet<String> gen_citation(ArrayList<Covering_set> c_views, Connection c, PreparedStatement pst, ArrayList<HashMap<String, Integer>> view_query_mapping) throws ClassNotFoundException, SQLException, JSONException
 	{
 		HashSet<String> citations = new HashSet<String>();
 						
@@ -3041,7 +3161,7 @@ public class Tuple_reasoning2_full_test2_copy {
 	}
 	
 	
-	public static void output_vec_com(Vector<citation_view_vector>c_unit_combinaton)
+	public static void output_vec_com(Vector<Covering_set>c_unit_combinaton)
 	{
 		for(int i = 0; i<c_unit_combinaton.size(); i++)
 		{
@@ -3053,7 +3173,7 @@ public class Tuple_reasoning2_full_test2_copy {
 		System.out.println();
 	}
 	
-	public static void update_valid_citation_combination(HashSet<citation_view_vector> insert_c_view, ResultSet rs, int start_pos) throws SQLException
+	public static void update_valid_citation_combination(HashSet<Covering_set> insert_c_view, ResultSet rs, int start_pos) throws SQLException
 	{
 		
 //		HashSet<citation_view_vector> update_c_views = new HashSet<citation_view_vector>();
@@ -3061,7 +3181,7 @@ public class Tuple_reasoning2_full_test2_copy {
 		for(Iterator iter = insert_c_view.iterator(); iter.hasNext();)
 		{
 			
-			citation_view_vector c_vec = (citation_view_vector) iter.next();
+			Covering_set c_vec = (Covering_set) iter.next();
 			
 			for(citation_view view_mapping: c_vec.c_vec)
 			{
@@ -3126,7 +3246,7 @@ public class Tuple_reasoning2_full_test2_copy {
 //		return insert_c_view;
 	}
 
-	   public static void get_views_parameters(HashSet<Tuple> insert_c_view, ResultSet rs, int start_pos, HashMap<Tuple, HashSet<Head_strs>> values) throws SQLException
+	   public static void get_views_parameters(HashSet<Tuple> insert_c_view, ResultSet rs, int start_pos, HashMap<Tuple, ArrayList<Head_strs>> values) throws SQLException
 	    {
 	        
 //	      HashSet<citation_view_vector2> update_c_views = new HashSet<citation_view_vector2>();
@@ -3164,7 +3284,7 @@ public class Tuple_reasoning2_full_test2_copy {
 	                    if(values.get(view_mapping) == null)
 	                    {
 	                      
-	                      HashSet<Head_strs> curr_head_values = new HashSet<Head_strs>();
+	                      ArrayList<Head_strs> curr_head_values = new ArrayList<Head_strs>();
 	                      
 	                      curr_head_values.add(head_values);
 	                      

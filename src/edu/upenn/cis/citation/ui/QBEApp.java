@@ -4,15 +4,15 @@ import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Pre_processing.Gen_query;
 import edu.upenn.cis.citation.Pre_processing.Query_operation;
 import edu.upenn.cis.citation.Pre_processing.citation_view_operation;
-import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.Pre_processing.view_operation;
+import edu.upenn.cis.citation.UI_reasoning.Reasoning;
 import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.citation_view;
 //import edu.upenn.cis.citation.Pre_processing.insert_new_view;
-import edu.upenn.cis.citation.citation_view.citation_view_vector;
+import edu.upenn.cis.citation.citation_view.Covering_set;
 import edu.upenn.cis.citation.dao.Database;
 import edu.upenn.cis.citation.datalog.Query_converter;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test_opt;
+//import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test_opt;
 import edu.upenn.cis.citation.user_query.query_storage;
 import java_cup.internal_error;
 import javafx.application.Application;
@@ -194,7 +194,7 @@ public class QBEApp extends Application {
 	
 	TableRowExpanderColumn<Entry> expanderColumn;
 	
-	Vector<Vector<citation_view_vector>> c_views = null;
+	Vector<Vector<Covering_set>> c_views = null;
 
 	// Dropdown Table Field
     ObservableList<String> optionsField = FXCollections.observableArrayList(Database.getTableList());
@@ -205,15 +205,29 @@ public class QBEApp extends Application {
     
 private Object String;
 
-	HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
+	HashMap<Head_strs, Vector<Vector<Covering_set>>> citation_view_map = new HashMap<Head_strs, Vector<Vector<Covering_set>>>();
 
     Connection conn;
+    
+    public static String url = new String();
+    
+    public static String usr_name = new String();
+    
+    public static String passwd = new String();
 	/**
 	 * GUI Main Method
 	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
+	  String db_name = args[0];
+	  
+	  url = "jdbc:postgresql://localhost:5432/" + db_name;
+	  
+	  usr_name = args[1];
+	  
+	  passwd = args[2];
+	  
 		launch(args);
 	}
 
@@ -516,7 +530,7 @@ private Object String;
     		if (dv !=null && !dv.isEmpty()) {
 					try {
 					  Class.forName("org.postgresql.Driver");
-	                  conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+	                  conn = DriverManager.getConnection(url, usr_name, passwd);
 	                  PreparedStatement st = null;
 					  
 						Vector<String> q_names = Query_operation.get_connection_citation_with_query(dv, block_names, conn, st);
@@ -553,7 +567,7 @@ private Object String;
             try {
               
               Class.forName("org.postgresql.Driver");
-              conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+              conn = DriverManager.getConnection(url, usr_name, passwd);
               PreparedStatement st = null;
 				Query currentQuery = view_operation.get_view_by_name(dv, conn, st);
 				System.out.println("[current view]" + dv);
@@ -591,7 +605,7 @@ private Object String;
 			try {
 //				// show view info in dba scene
 			  Class.forName("org.postgresql.Driver");
-              conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+              conn = DriverManager.getConnection(url, usr_name, passwd);
               PreparedStatement st = null;
 			  
 				currentQuery = view_operation.get_view_by_name(dv, conn, st);
@@ -642,7 +656,7 @@ private Object String;
             	String dv = s;
             	try {
             	  Class.forName("org.postgresql.Driver");
-                  conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+                  conn = DriverManager.getConnection(url, usr_name, passwd);
                   PreparedStatement st = null;
             	  
     				citation_view_operation.delete_connection_view_with_citations(dv, dv, conn, st);
@@ -702,7 +716,7 @@ private Object String;
 				try {
 				  
 				  Class.forName("org.postgresql.Driver");
-                  conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+                  conn = DriverManager.getConnection(url, usr_name, passwd);
                   PreparedStatement st = null;
 				  
 					Vector<String> views = citation_view_operation.get_views(cv, conn, st);
@@ -727,7 +741,7 @@ private Object String;
 				if (!hbox.isVisible()) hbox.setVisible(true);
 				try {
 				  Class.forName("org.postgresql.Driver");
-                  conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+                  conn = DriverManager.getConnection(url, usr_name, passwd);
                   PreparedStatement st = null;
 					Query q_datalog = Query_operation.get_query_by_name(cv, conn, st);
 					String q_sql = Query_converter.datalog2sql(q_datalog);
@@ -765,7 +779,7 @@ private Object String;
 				try {
 				  
 				  Class.forName("org.postgresql.Driver");
-                  conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+                  conn = DriverManager.getConnection(url, usr_name, passwd);
                   PreparedStatement st = null;
 //					citation_view_operation.delete_citation_views(cv);
 					Query_operation.delete_query_by_name(cv, conn, st);
@@ -1014,12 +1028,12 @@ private Object String;
 					// generate all citations
 					
 				  Class.forName("org.postgresql.Driver");
-                  conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+                  conn = DriverManager.getConnection(url, usr_name, passwd);
                   PreparedStatement st = null;
 				  
-                  ArrayList<HashSet<citation_view>> views_per_group = Tuple_reasoning1_full_test_opt.cal_covering_sets_schema_level(userGeneratedQuery, conn, st);
+//                  ArrayList<HashSet<citation_view>> views_per_group = Tuple_reasoning1_full_test_opt.cal_covering_sets_schema_level(userGeneratedQuery, conn, st);
 				                    
-                  HashSet<String> agg_citations = Tuple_reasoning1_full_test_opt.gen_citation_schema_level(views_per_group, conn, st);
+                  HashSet<String> agg_citations = Reasoning.gen_citation_schema_level(conn, st);
                   
 //					Vector<String> agg_citations = Tuple_reasoning1_full_test_opt.tuple_gen_agg_citations(userGeneratedQuery);
 					for (String s : agg_citations) {
@@ -1046,12 +1060,12 @@ private Object String;
 				try {
 				  
 				  Class.forName("org.postgresql.Driver");
-                  conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+                  conn = DriverManager.getConnection(url, usr_name, passwd);
                   PreparedStatement st = null;
 				  
-				  ArrayList<HashSet<citation_view>> views_per_group = Tuple_reasoning1_full_test_opt.cal_covering_sets_subset_tuples(userGeneratedQuery, names, conn, st);
+//				  ArrayList<HashSet<citation_view>> views_per_group = Tuple_reasoning1_full_test_opt.cal_covering_sets_subset_tuples(userGeneratedQuery, names, conn, st);
                   
-                  HashSet<String> subset_agg_citations = Tuple_reasoning1_full_test_opt.gen_citation_subset_tuples(views_per_group, conn, st);//(views_per_group, conn, st);
+                  HashSet<String> subset_agg_citations = new HashSet<String>();//Tuple_reasoning1_full_test_opt.gen_citation_subset_tuples(views_per_group, conn, st);//(views_per_group, conn, st);
 				  
 				  
 //					Vector<String> subset_agg_citations = Tuple_reasoning1_full_test_opt.tuple_gen_agg_citations(userGeneratedQuery, names, citation_view_map);
@@ -1324,7 +1338,7 @@ private Object String;
 					try {
 					  
 					  Class.forName("org.postgresql.Driver");
-	                  conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+	                  conn = DriverManager.getConnection(url, usr_name, passwd);
 	                  PreparedStatement st = null;
 						Query query_datalog = Query_operation.get_query_by_name(name, conn, st);
 						String query_sql = Query_converter.datalog2sql(query_datalog);
@@ -1404,7 +1418,7 @@ private Object String;
 			}
 			try {
 			  Class.forName("org.postgresql.Driver");
-              conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+              conn = DriverManager.getConnection(url, usr_name, passwd);
               PreparedStatement st = null;
 			  
 				Query_operation.delete_connection_citation_with_query(dv, conn, st);
@@ -1501,7 +1515,7 @@ private Object String;
 					} else {
 						try {
 						  Class.forName("org.postgresql.Driver");
-		                  conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+		                  conn = DriverManager.getConnection(url, usr_name, passwd);
 		                  PreparedStatement st = null;
 							Query query_datalog = Query_operation.get_query_by_name(name, conn, st);
 							String query_sql = Query_converter.datalog2sql(query_datalog);
@@ -1739,7 +1753,7 @@ private Object String;
             if (listDataViews.contains(dv)) {
             	try {
             	  Class.forName("org.postgresql.Driver");
-                  conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+                  conn = DriverManager.getConnection(url, usr_name, passwd);
                   PreparedStatement st = null;
                 	view_operation.save_view_by_name(oldName, dv, generatedQuery, conn, st);
                 	citation_view_operation.update_citation_view(oldName, dv, conn, st);
@@ -1759,7 +1773,7 @@ private Object String;
             	try {
             		
             		Class.forName("org.postgresql.Driver");
-        			conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+        			conn = DriverManager.getConnection(url, usr_name, passwd);
         			PreparedStatement st = conn.prepareStatement(lambdaSQL);
 					view_operation.add(generatedQuery, dv, conn, st);
 					citation_view_operation.add_citation_view(dv, conn, st);
@@ -1988,7 +2002,7 @@ private Object String;
 
             	try {
             		Class.forName("org.postgresql.Driver");
-        			conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+        			conn = DriverManager.getConnection(url, usr_name, passwd);
         			PreparedStatement st = conn.prepareStatement(lambdaSQL);
             		
     				if (!listCitationViews.contains(cv)) {
@@ -2010,7 +2024,7 @@ private Object String;
             	
             	try {
             		Class.forName("org.postgresql.Driver");
-        			conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+        			conn = DriverManager.getConnection(url, usr_name, passwd);
         			PreparedStatement st = conn.prepareStatement(lambdaSQL);
             		
     				if (!dbaListCitationViews.contains(cv)) {
@@ -2433,7 +2447,7 @@ private Object String;
 				}
 			}
 			try {
-				int query_list_id = query_storage.store_user_query(citeQuery, id_list);
+				int query_list_id = 0;//;query_storage.store_user_query(citeQuery, "0", con, pst);
 					if (!listQueries.contains(query_list_id)) {
 						listQueries.add(Integer.toString(query_list_id));
 					}
@@ -2958,7 +2972,7 @@ private Object String;
 		try {
 			Connection conn;
 			Class.forName("org.postgresql.Driver");
-			conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+			conn = DriverManager.getConnection(url, usr_name, passwd);
 			PreparedStatement st = conn.prepareStatement(lambdaSQL);
 			// lambdaData.clear();
 			if (hBoxLambda != null) hBoxLambda.getChildren().clear();
@@ -3069,11 +3083,11 @@ private Object String;
 				
 				try {
 				  
-				  Tuple_reasoning1_full_test_opt.prepare_info = true;
+				  Reasoning.set_prepare_info(true);
 				  
-				  Tuple_reasoning1_full_test_opt.test_case = false;
+				  Reasoning.set_test_case(false);
 				  
-				  Tuple_reasoning1_full_test_opt.tuple_reasoning(userGeneratedQuery, conn, st);
+				  Reasoning.tuple_reasoning(userGeneratedQuery, conn, st);
 				
 				} catch (IOException | InterruptedException | JSONException e) {
 					e.printStackTrace();
@@ -3425,7 +3439,7 @@ private Object String;
 		if (dv !=null && !dv.isEmpty()) {
 			try {
 			  Class.forName("org.postgresql.Driver");
-              conn = DriverManager.getConnection(populate_db.db_url, populate_db.usr_name, populate_db.passwd);
+              conn = DriverManager.getConnection(url, usr_name, passwd);
               PreparedStatement st = null;
 				Vector<String> q_names = Query_operation.get_connection_citation_with_query(dv, block_names, conn, st);
 				System.out.println("[query_names] " + q_names);

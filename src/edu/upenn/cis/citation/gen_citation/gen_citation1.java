@@ -35,7 +35,7 @@ import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.citation_view;
 import edu.upenn.cis.citation.citation_view.citation_view_parametered;
 import edu.upenn.cis.citation.citation_view.citation_view_unparametered;
-import edu.upenn.cis.citation.citation_view.citation_view_vector;
+import edu.upenn.cis.citation.citation_view.Covering_set;
 import edu.upenn.cis.citation.data_structure.IntList;
 import edu.upenn.cis.citation.data_structure.Query_lm_authors;
 import edu.upenn.cis.citation.data_structure.StringList;
@@ -103,7 +103,7 @@ public class gen_citation1 {
 	
 	public static String db_name = "IUPHAR/BPS Guide to PHARMACOLOGY";
 	
-	public static String get_citation_agg(Vector<citation_view_vector> c_views, int max_num, HashMap<String, Vector<Integer> > view_query_mapping, HashMap<Integer, Vector<Lambda_term>> query_lambda_str, HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping) throws ClassNotFoundException, SQLException, JSONException
+	public static String get_citation_agg(Vector<Covering_set> c_views, int max_num, HashMap<String, Vector<Integer> > view_query_mapping, HashMap<Integer, Vector<Lambda_term>> query_lambda_str, HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping) throws ClassNotFoundException, SQLException, JSONException
 	{
 		
 		Connection c = null;
@@ -121,7 +121,7 @@ public class gen_citation1 {
 		
 		for(int k = 0; k<c_views.size(); k++)
 		{
-			citation_view_vector c_v = c_views.get(k);
+			Covering_set c_v = c_views.get(k);
 
 			
 			for(citation_view curr_view_mapping: c_v.c_vec)
@@ -267,7 +267,7 @@ public class gen_citation1 {
         return dateFormat.format(date);
 }
 	
-	public static String get_citations(citation_view_vector c_vec, Vector<String> vals, Connection c, PreparedStatement pst, HashMap<String, HashSet<String>> query_str, int max_num, HashSet<String> authors) throws ClassNotFoundException, SQLException
+	public static String get_citations(Covering_set c_vec, Vector<String> vals, Connection c, PreparedStatement pst, HashMap<String, HashSet<String>> query_str, int max_num, HashSet<String> authors) throws ClassNotFoundException, SQLException
 	{
 		String author_str = new String();
 		
@@ -331,7 +331,7 @@ public class gen_citation1 {
 	}
 	
 	
-	public static String get_citations2(citation_view_vector c_vec, Vector<String> vals, Connection c, PreparedStatement pst, HashMap<String, Vector<Integer> > view_query_mapping, HashMap<Integer, Vector<Lambda_term>> query_lambda_str, HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping, int max_num, HashSet<String> authors) throws ClassNotFoundException, SQLException, JSONException
+	public static String get_citations2(Covering_set c_vec, Vector<String> vals, Connection c, PreparedStatement pst, HashMap<String, Vector<Integer> > view_query_mapping, HashMap<Integer, Vector<Lambda_term>> query_lambda_str, HashMap<Integer, HashMap<Head_strs, HashSet<String>>> author_mapping, int max_num, HashSet<String> authors) throws ClassNotFoundException, SQLException, JSONException
 	{
 //		String author_str = new String();
 		
@@ -546,7 +546,7 @@ public class gen_citation1 {
 		return json_obj;
 	}
 	
-	public static HashMap<String, HashSet<String>> join_covering_sets(citation_view_vector c_vec, Connection c, PreparedStatement pst, StringList view_list, ArrayList<HashMap<String, Integer>> view_query_mapping, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> citation_max_num, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping) throws SQLException
+	public static HashMap<String, HashSet<String>> join_covering_sets(Covering_set c_vec, Connection c, PreparedStatement pst, StringList view_list, ArrayList<HashMap<String, Integer>> view_query_mapping, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> citation_max_num, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping) throws SQLException
 	{
 		HashMap<String, HashSet<String>> json_citation = new HashMap<String, HashSet<String>>();
 		
@@ -582,7 +582,7 @@ public class gen_citation1 {
 		return json_citation;
 	}
 	
-	public static HashSet<String> get_citations3(citation_view_vector c_vec, Connection c, PreparedStatement pst, StringList view_list, ArrayList<HashMap<String, Integer>> view_query_mapping, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> citation_max_num, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping, String star_op) throws SQLException, JSONException
+	public static HashSet<String> get_citations3(Covering_set c_vec, Connection c, PreparedStatement pst, StringList view_list, ArrayList<HashMap<String, Integer>> view_query_mapping, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> citation_max_num, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping, String star_op) throws SQLException, JSONException
 	{
 //		String author_str = new String();
 		
@@ -702,7 +702,7 @@ public class gen_citation1 {
 	}
 	
 	
-	public static String get_citations(citation_view_vector c_vec, Vector<String> vals, Connection c, PreparedStatement pst, HashMap<String, HashSet<String>> query_str, int max_num) throws ClassNotFoundException, SQLException
+	public static String get_citations(Covering_set c_vec, Vector<String> vals, Connection c, PreparedStatement pst, HashMap<String, HashSet<String>> query_str, int max_num) throws ClassNotFoundException, SQLException
 	{
 		String author_str = new String();
 		
@@ -765,7 +765,7 @@ public class gen_citation1 {
 	}
 	
 	
-	public static String populate_citation(citation_view_vector c_views, Vector<String> values, Connection c, PreparedStatement pst, HashMap<String, Vector<String>> query_str, int max_num) throws SQLException
+	public static String populate_citation(Covering_set c_views, Vector<String> values, Connection c, PreparedStatement pst, HashMap<String, Vector<String>> query_str, int max_num) throws SQLException
 	{
 		
 		HashSet<String> authors = new HashSet<String>();
@@ -853,7 +853,7 @@ public class gen_citation1 {
 		return citation;
 	}
 	
-	public static String populate_citation(citation_view_vector c_views, Vector<String> values, Connection c, PreparedStatement pst, HashMap<String, HashSet<String>> query_str, int max_num, HashSet<String> authors) throws SQLException, ClassNotFoundException
+	public static String populate_citation(Covering_set c_views, Vector<String> values, Connection c, PreparedStatement pst, HashMap<String, HashSet<String>> query_str, int max_num, HashSet<String> authors) throws SQLException, ClassNotFoundException
 	{
 		
 //		HashSet<String> authors = new HashSet<String>();
@@ -1931,7 +1931,7 @@ public class gen_citation1 {
 				}
 				
 //				.addAll(q.lambda_term);				
-				query_lambda_str.add(id, l_terms);
+				query_lambda_str.set(id, l_terms);
 				
 				String sql = Query_converter.datalog2sql_citation_query(q);
 				

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Vector;
 
-import edu.upenn.cis.citation.citation_view.citation_view_vector;
+import edu.upenn.cis.citation.citation_view.Covering_set;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
 
 public class Aggregation1 {
@@ -13,7 +13,7 @@ public class Aggregation1 {
 	
 	static String query = "q(object_c_object_id):object_c()";
 	
-	public static Vector<Vector<citation_view_vector>> do_aggregate(Vector<Vector<citation_view_vector>> curr_res, Vector<citation_view_vector> c, int seq)
+	public static Vector<Vector<Covering_set>> do_aggregate(Vector<Vector<Covering_set>> curr_res, Vector<Covering_set> c, int seq)
 	{
 		
 		if(seq == 0)
@@ -21,7 +21,7 @@ public class Aggregation1 {
 			
 			for(int i = 0; i<c.size(); i++)
 			{
-				Vector<citation_view_vector> c_vec = new Vector<citation_view_vector>();
+				Vector<Covering_set> c_vec = new Vector<Covering_set>();
 				
 				c_vec.add(c.get(i));
 				
@@ -35,7 +35,7 @@ public class Aggregation1 {
 		
 		
 		
-		Vector<Vector<citation_view_vector>> agg_res = new Vector<Vector<citation_view_vector>>();
+		Vector<Vector<Covering_set>> agg_res = new Vector<Vector<Covering_set>>();
 		
 		int i1 = 0;
 		
@@ -77,9 +77,9 @@ public class Aggregation1 {
 		
 	}
 	
-	public static Vector<Vector<citation_view_vector>> aggregate(Vector<Vector<citation_view_vector>> c_views)
+	public static Vector<Vector<Covering_set>> aggregate(Vector<Vector<Covering_set>> c_views)
 	{
-		Vector<Vector<citation_view_vector>> agg_res = new Vector<Vector<citation_view_vector>>();
+		Vector<Vector<Covering_set>> agg_res = new Vector<Vector<Covering_set>>();
 		
 		for(int i = 0; i<c_views.size(); i++)
 		{			
@@ -90,9 +90,9 @@ public class Aggregation1 {
 	}
 	
 	
-	public static Vector<Vector<citation_view_vector>> aggegate(Vector<Vector<citation_view_vector>> c_views, Vector<Integer> indexes)
+	public static Vector<Vector<Covering_set>> aggegate(Vector<Vector<Covering_set>> c_views, Vector<Integer> indexes)
 	{
-		Vector<Vector<citation_view_vector>> agg_res = new Vector<Vector<citation_view_vector>>();
+		Vector<Vector<Covering_set>> agg_res = new Vector<Vector<Covering_set>>();
 		
 		for(int i = 0; i<indexes.size(); i++)
 		{
@@ -116,11 +116,11 @@ public class Aggregation1 {
 	}
 	
 	
-	public static void output(Vector<Vector<citation_view_vector>> agg_res)
+	public static void output(Vector<Vector<Covering_set>> agg_res)
 	{
 		for(int i = 0; i < agg_res.size(); i++)
 		{
-			Vector<citation_view_vector> c_vec = agg_res.get(i);
+			Vector<Covering_set> c_vec = agg_res.get(i);
 			
 			
 			for(int j = 0; j<c_vec.size(); j++)

@@ -180,9 +180,10 @@ public class citation_view_operation {
 		pst.execute();
 	}
 	
-	static int get_citation_id(String name, Connection c, PreparedStatement pst) throws SQLException
+	static int get_citation_id_by_view_name(String name, Connection c, PreparedStatement pst) throws SQLException
 	{
-		String query = "select citation_view_id from citation_table where citation_view_name = '" + name + "'";
+		String query = "select citation_table.citation_view_id from citation_table join citation2view on (citation_table.citation_view_id = citation2view.citation_view_id) "
+		    + "join view_table on (view_table.view = citation2view.view) where view_table.name = '" + name + "'";
 		
 		pst = c.prepareStatement(query);
 		
@@ -196,6 +197,22 @@ public class citation_view_operation {
 		return id;
 	}
 	
+	
+	   static int get_citation_id(String name, Connection c, PreparedStatement pst) throws SQLException
+	    {
+	        String query = "select citation_view_id from citation_table where citation_view_name = '" + name + "'";
+	        
+	        pst = c.prepareStatement(query);
+	        
+	        ResultSet rs = pst.executeQuery();
+	        
+	        int id = 0;
+	        
+	        if(rs.next())
+	            id = rs.getInt(1);
+	        
+	        return id;
+	    }
 	
 	static void insert_citation2view(int view_id, int citation_id, Connection c, PreparedStatement pst) throws SQLException
 	{

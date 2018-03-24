@@ -12,7 +12,7 @@ import edu.upenn.cis.citation.Corecover.Tuple;
 import edu.upenn.cis.citation.citation_view.citation_view;
 import edu.upenn.cis.citation.citation_view.citation_view_parametered;
 import edu.upenn.cis.citation.citation_view.citation_view_unparametered;
-import edu.upenn.cis.citation.citation_view.citation_view_vector;
+import edu.upenn.cis.citation.citation_view.Covering_set;
 
 public class Graph {
 
@@ -28,7 +28,7 @@ public class Graph {
 	
 	HashSet<Argument> max_covered_head_args = new HashSet<Argument>();
 	
-	public HashSet<citation_view_vector> covering_sets = new HashSet<citation_view_vector>();
+	public HashSet<Covering_set> covering_sets = new HashSet<Covering_set>();
 	
 	HashSet<node_index_vector> node_sets = new HashSet<node_index_vector>();
 	
@@ -194,7 +194,7 @@ public class Graph {
 	{
 		HashMap<Argument, ArrayList<node_index>> arg_node_mapping = node_index.build_arg_node_mapping(tops);
 		
-		covering_sets = new HashSet<citation_view_vector>();
+		covering_sets = new HashSet<Covering_set>();
 		
 		node_sets = new HashSet<node_index_vector>();
 		
@@ -214,7 +214,7 @@ public class Graph {
 		node_index.remove_duplicate_nodes(node_sets);
 	}
 	
-	static HashSet<citation_view_vector> join_views_curr_relation(ArrayList<node_index> nodes, HashSet<citation_view_vector> curr_view_com) throws ClassNotFoundException, SQLException
+	static HashSet<Covering_set> join_views_curr_relation(ArrayList<node_index> nodes, HashSet<Covering_set> curr_view_com) throws ClassNotFoundException, SQLException
 	{
 		if(curr_view_com.isEmpty())
 		{
@@ -222,7 +222,7 @@ public class Graph {
 //				return new ArrayList<citation_view_vector2>();
 //			else
 			{
-				HashSet<citation_view_vector> new_view_com = new HashSet<citation_view_vector>();
+				HashSet<Covering_set> new_view_com = new HashSet<Covering_set>();
 				
 				for(int i = 0; i<nodes.size(); i++)
 				{
@@ -233,7 +233,7 @@ public class Graph {
 					{
 						citation_view curr_view = curr_node.views.get(j);
 						
-						citation_view_vector curr_views = new citation_view_vector(curr_view);
+						Covering_set curr_views = new Covering_set(curr_view);
 						
 						new_view_com.add(curr_views);
 					}
@@ -245,7 +245,7 @@ public class Graph {
 		
 		else
 		{
-			HashSet<citation_view_vector> new_view_com = new HashSet<citation_view_vector>();
+			HashSet<Covering_set> new_view_com = new HashSet<Covering_set>();
 			
 			for(int i = 0; i<nodes.size(); i++)
 			{
@@ -261,9 +261,9 @@ public class Graph {
 						
 						
 						
-						citation_view_vector old_view_com = ((citation_view_vector)iter.next()).clone();
+						Covering_set old_view_com = ((Covering_set)iter.next()).clone();
 						
-						citation_view_vector view_com = citation_view_vector.merge(old_view_com, c);
+						Covering_set view_com = Covering_set.merge(old_view_com, c);
 						
 						new_view_com.add(view_com);
 					}
@@ -292,7 +292,7 @@ public class Graph {
 			
 			System.out.println(old_node_sets);
 			
-			HashSet<citation_view_vector> update_covering_sets = new HashSet<citation_view_vector>(); 
+			HashSet<Covering_set> update_covering_sets = new HashSet<Covering_set>(); 
 			
 			for(Iterator iter = old_node_sets.iterator(); iter.hasNext();)
 			{

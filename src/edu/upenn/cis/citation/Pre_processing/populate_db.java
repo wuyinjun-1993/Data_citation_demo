@@ -1158,7 +1158,7 @@ public class populate_db {
 	    
 	}
 	
-	public static Vector<Query> get_views_schema(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	public static Vector<Query> get_views_schema(Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query= "select * from view_table";
 		

@@ -450,6 +450,16 @@ public class CoreCover {
           }
           else
           {
+            
+            if(get_mapping1 | get_mapping2 == true)
+            {
+              tuple.cluster_patial_mapping_condition_ids.get(matched_cluster_id1).add(j);
+            }
+            else
+            {
+              tuple.cluster_non_mapping_condition_ids.get(matched_cluster_id1).add(j);
+            }
+            
             tuple.cluster_subgoal_ids.get(matched_cluster_id1).addAll(tuple.cluster_subgoal_ids.get(matched_cluster_id2));
                         
             tuple.cluster_subgoal_ids.removeElementAt(matched_cluster_id2);

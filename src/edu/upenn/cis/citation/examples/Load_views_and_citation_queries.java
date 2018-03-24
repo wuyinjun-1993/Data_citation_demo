@@ -9,6 +9,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.Vector;
 
 import edu.upenn.cis.citation.Corecover.Argument;
@@ -45,7 +46,7 @@ public class Load_views_and_citation_queries {
 		c.close();
 	}
 	
-	public static Vector<Query> get_views(String file, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	public static Vector<Query> get_views(String file, Connection c, PreparedStatement pst) throws SQLException
 	{
 		Vector<Query> queries = new Vector<Query>();
 		
@@ -99,6 +100,120 @@ public class Load_views_and_citation_queries {
 		
 		return new Query(view_name, head_subgoal, relational_subgoals, l_terms, predicate_subgoal, relation_mapping);
 		
+	}
+	
+	static String Convert_query2string(Query query)
+	{
+	  String string = new String();
+	  
+	  string += query.name + split1;
+	  
+	  string += convert_head2string(query.head) + split1;
+	  
+	  string += convert_subgoal2string(query.body) + split1;
+	  
+	  string += convert_condition2string(query.conditions) + split1;
+	  
+	  string += convert_lambda_terms2string(query.lambda_term) + split1;
+	  
+	  string += convert_subgoal_mapping2string(query.subgoal_name_mapping);
+	  
+	  return string;
+	  
+	}
+	
+	static String convert_subgoal_mapping2string(HashMap<String, String> subgoal_mappings)
+	{
+	  String string = new String();
+	  
+	  Set<String> origin_subgoal_names = subgoal_mappings.keySet();
+	  
+	  int count = 0;
+	  
+	  for(String subgoal_name : origin_subgoal_names)
+	  {
+	    if(count >= 1)
+	      string += ",";
+	    
+	    string += subgoal_name + ":" + subgoal_mappings.get(subgoal_name);
+	    
+	    count++;
+	  }
+	  
+	  return string;
+	}
+	
+	static String convert_head2string(Subgoal head)
+	{
+	  Vector<Argument> args = head.args;
+	  
+	  String string = new String();
+	  
+	  for(int i = 0; i<args.size(); i++)
+	  {
+	    Argument arg = args.get(i);
+	    
+	    if(i >= 1)
+	      string += ",";
+	    
+	    String arg_name = arg.name.substring(arg.name.indexOf(populate_db.separator) + 1, arg.name.length());
+	    
+	    string += arg_name;
+	    
+	  }
+	  
+	  return string;
+	}
+	
+	static String convert_subgoal2string(Vector<Subgoal> subgoals)
+	{
+	  String string = new String();
+	  
+	  for(int i = 0; i<subgoals.size(); i++)
+	  {
+	    if(i >= 1)
+	      string += ",";
+	      
+	    string += subgoals.get(i).name;
+	  }
+	  
+	  return string;
+	}
+	
+	static String convert_condition2string(Vector<Conditions> conditions)
+	{
+	  String string = new String();
+	  
+	  for(int i = 0; i<conditions.size(); i++)
+	  {
+	    Conditions condition = conditions.get(i);
+	    
+	    if(i >= 1)
+	      string += ",";
+	    
+	    string += condition.subgoal1 + "." + condition.arg1.name + condition.op + condition.subgoal2 + "." + condition.arg2.name;
+	  }
+	  
+	  return string;
+	}
+	
+	static String convert_lambda_terms2string(Vector<Lambda_term> lambda_terms)
+	{
+	  String string = new String();
+	  
+	  for(int i = 0; i<lambda_terms.size(); i++)
+	  {
+	    if(i >= 1)
+	      string += ",";
+	    
+	    String l_term = lambda_terms.get(i).name;
+	    
+	    l_term = l_term.replace(populate_db.separator, ".");
+	    
+	    string += l_term;
+	  }
+	  
+	  return string;
 	}
 	
 	static Vector<Lambda_term> split_lambda_terms(String lambda_term_str)

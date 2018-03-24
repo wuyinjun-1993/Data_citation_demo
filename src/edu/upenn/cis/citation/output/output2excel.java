@@ -16,7 +16,7 @@ import org.apache.poi.xssf.usermodel.*;
 
 import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Corecover.Subgoal;
-import edu.upenn.cis.citation.citation_view.citation_view_vector;
+import edu.upenn.cis.citation.citation_view.Covering_set;
 
 public class output2excel {
 	
@@ -66,7 +66,7 @@ public class output2excel {
         }
 	}
 	
-	public static void citation_output(ResultSet rs, Query q, Vector<Vector<String>> values , Vector<Vector<citation_view_vector>> c_views, String file_name, Vector<Vector<String>> citation_strs) throws SQLException
+	public static void citation_output(ResultSet rs, Query q, Vector<Vector<String>> values , Vector<Vector<Covering_set>> c_views, String file_name, Vector<Vector<String>> citation_strs) throws SQLException
 	{
 		
 		ResultSetMetaData rsmd = rs.getMetaData();
@@ -127,7 +127,7 @@ public class output2excel {
 				
 			}
 			
-			Vector<citation_view_vector> c_vec = c_views.get(k);
+			Vector<Covering_set> c_vec = c_views.get(k);
 			
 			for(int i = 0; i<c_vec.size();i++)
 			{				
@@ -170,7 +170,7 @@ public class output2excel {
         }
 	}
 	
-	public static void citation_output_row(ResultSet rs, Query q, Vector<String> values , Vector<citation_view_vector> c_views, String file_name, int row_id, Vector<String> citation_str) throws SQLException, IOException, InterruptedException
+	public static void citation_output_row(ResultSet rs, Query q, Vector<String> values , Vector<Covering_set> c_views, String file_name, int row_id, Vector<String> citation_str) throws SQLException, IOException, InterruptedException
 	{
 		
 		ResultSetMetaData rsmd = rs.getMetaData();

@@ -24,6 +24,8 @@ import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.Pre_processing.view_operation;
 
 public class query_storage {
+  
+  static String[] user_query_relations = {"user_query2citation", "user_query2subgoals", "user_query2conditions", "user_query2covering_set", "user_query2head_var", "user_query_view_mapping2parameters", "user_query_table"};
 	
 	public static void main(String [] args) throws ClassNotFoundException, SQLException
 	{
@@ -171,11 +173,11 @@ public class query_storage {
         
         Vector<Subgoal> subgoals = get_query_subgoals(id, subgoal_name_mapping, c, pst);
         
-        String predicate = get_query_predicate(id, c, pst);
+//        String predicate = get_query_predicate(id, c, pst);
         
         Vector<Lambda_term> lambda_terms = new Vector<Lambda_term>();//get_query_lambda_terms(id, c, pst);
         
-        lambda_terms.add(new Lambda_term(predicate));
+//        lambda_terms.add(new Lambda_term(predicate));
         
         Subgoal head = new Subgoal("q" + id, head_var);
         
@@ -219,21 +221,21 @@ public class query_storage {
         return view;
 	}
 	
-	static String get_query_predicate(int id, Connection c, PreparedStatement pst) throws SQLException
-	{
-		String query = "select string from user_query_conditions where query_id = " + id;
-		
-		pst = c.prepareStatement(query);
-		
-		ResultSet rs = pst.executeQuery();
-		
-		if(rs.next())
-		{
-			return rs.getString(1);
-		}
-		
-		return null;
-	}
+//	static String get_query_predicate(int id, Connection c, PreparedStatement pst) throws SQLException
+//	{
+//		String query = "select string from user_query_conditions where query_id = " + id;
+//		
+//		pst = c.prepareStatement(query);
+//		
+//		ResultSet rs = pst.executeQuery();
+//		
+//		if(rs.next())
+//		{
+//			return rs.getString(1);
+//		}
+//		
+//		return null;
+//	}
 	
 	public static Vector<Integer> get_query_list_by_id(int id) throws SQLException, ClassNotFoundException
 	{
@@ -474,73 +476,116 @@ public class query_storage {
 		return values;
 	}
 	
-	
-	public static int store_query(Query query, Vector<Integer> id_list, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	static void store_hash_code_query(int id, int hashCode, String version, Connection c, PreparedStatement pst) throws SQLException
 	{
-	    
-	    query_graph q_graph = new query_graph(query);
-	    
-	    int hashcode = q_graph.hashCode();
-	    
-	    int id = check_existence(hashcode, c, pst);
-	    
-	    if(id <= 0)
-	    {
-	    	int query_num = gen_query_id(c, pst) + 1;
-			
-			store_query_head_variables(query.head.args, id_list, query_num, hashcode, c, pst);
-			
-			store_query_conditions(query.conditions, query_num, c, pst);
-			
-			store_query_subgoals(query, query_num, query.body, c, pst);
-			
-			store_query_predicates(query, query_num, c, pst);
-			
-	    }
-	    	    
-	    return id;
-		
-		
-		
+	  String sql = "insert into user_query_table values ('" + id + "','" + hashCode + "','" + version + "')";
+	  
+	  pst = c.prepareStatement(sql);
+	  
+	  pst.execute();
+	  
 	}
 	
-	public static int store_user_query(Query query, Vector<Integer> id_list) throws SQLException, ClassNotFoundException
+//	public static int store_query(Query query, String version, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+//	{
+//	    
+//	    query_graph q_graph = new query_graph(query);
+//	    
+//	    int hashcode = q_graph.hashCode();
+//	    
+//	    int id = check_existence(hashcode, c, pst);
+//	    
+//	    if(id <= 0)
+//	    {
+//	    	int query_num = gen_query_id(c, pst) + 1;
+//	    	
+//	    	store_hash_code_query(query_num, hashcode, version, c, pst);
+//			
+//			store_query_head_variables(query.head.args, query_num, c, pst);
+//			
+//			store_query_conditions(query.conditions, query_num, c, pst);
+//			
+//			store_query_subgoals(query, query_num, query.body, c, pst);
+//			
+//			store_query_predicates(query, query_num, c, pst);
+//			
+//	    }
+//	    	    
+//	    return id;
+//		
+//		
+//		
+//	}
+	
+	public static int get_query_id(Query query, String version, Connection c, PreparedStatement pst) throws SQLException
+	{
+	  query_graph q_graph = new query_graph(query, version);
+	  
+	  int hashcode = q_graph.hashCode();
+	  
+	  return check_existence(hashcode, version, c, pst);
+	}
+	
+	public static int store_user_query(Query query, String version, Connection c, PreparedStatement pst) throws SQLException
 	{
 		
-		Connection c = null;
-	      PreparedStatement pst = null;
-		Class.forName("org.postgresql.Driver");
-	    c = DriverManager
-	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
-	    
-	    query_graph q_graph = new query_graph(query);
+	    query_graph q_graph = new query_graph(query, version);
 	    
 	    int hashcode = q_graph.hashCode();
 	    
-	    int id = check_existence(hashcode, c, pst);
+	    int id = check_existence(hashcode, version, c, pst);
 	    
 	    if(id <= 0)
 	    {
 	    	int query_num = gen_query_id(c, pst) + 1;
+	    	
+	    	store_hash_code_query(query_num, hashcode, version, c, pst);
 			
-			store_query_head_variables(query.head.args, id_list, query_num, hashcode, c, pst);
+			store_query_head_variables(query.head.args, query_num, c, pst);
 			
 			store_query_conditions(query.conditions, query_num, c, pst);
 			
 			store_query_subgoals(query, query_num, query.body, c, pst);
 			
-//			return query_num;
+			return query_num;
 //			store_query_predicates(query, query_num, c, pst);
 			
 	    }
 	    
-	    c.close();
-	    
 	    return id;
 		
-		
-		
 	}
+	
+	   public static int store_user_query(Query query, String version, boolean test, Connection c, PreparedStatement pst) throws SQLException
+	    {
+	        
+	        query_graph q_graph = new query_graph(query, version);
+	        
+	        int hashcode = q_graph.hashCode();
+	        
+	        int id = check_existence(hashcode, version, c, pst);
+	        
+	        if(id <= 0)
+	        {
+	            int query_num = gen_query_id(c, pst) + 1;
+	            
+	            store_hash_code_query(query_num, hashcode, version, c, pst);
+	            
+	            store_query_head_variables(query.head.args, query_num, c, pst);
+	            
+	            store_query_conditions(query.conditions, query_num, c, pst);
+	            
+	            store_query_subgoals(query, query_num, query.body, c, pst);
+	            
+	            store_query_predicates(query, query_num, c, pst);
+
+	            return query_num;
+	            
+	        }
+	        
+	        return id;
+	        
+	    }
 	
 	public static  Vector<Integer> store_user_query_ids() throws SQLException, ClassNotFoundException
 	{
@@ -584,18 +629,18 @@ public class query_storage {
 		pst.execute();
 	}
 	
-	public static void update_query_predicates(Query query, int id, Connection c, PreparedStatement pst) throws SQLException
-	{
-		String sql = "update user_query_conditions set string = '" + query.lambda_term.get(0) + "' where query_id = " + id;
-		
-		pst = c.prepareStatement(sql);
-		
-		pst.execute();
-	}
+//	public static void update_query_predicates(Query query, int id, Connection c, PreparedStatement pst) throws SQLException
+//	{
+//		String sql = "update user_query_conditions set string = '" + query.lambda_term.get(0) + "' where query_id = " + id;
+//		
+//		pst = c.prepareStatement(sql);
+//		
+//		pst.execute();
+//	}
 	
-	static int check_existence(int hashcode, Connection c, PreparedStatement pst) throws SQLException
+	static int check_existence(int hashcode, String version, Connection c, PreparedStatement pst) throws SQLException
 	{
-		String query = "SELECT query_id FROM user_query_table WHERE hash_value = " + hashcode;
+		String query = "SELECT query_id FROM user_query_table WHERE hash_value = " + hashcode + " and version = '" + version + "'";
 		
 		pst = c.prepareStatement(query);
 		
@@ -642,25 +687,16 @@ public class query_storage {
 		return str;
 	}
 	
-	static void store_query_head_variables(Vector<Argument> head_args, Vector<Integer> int_list, int query_id, int hashcode, Connection c, PreparedStatement pst) throws SQLException
+	static void store_query_head_variables(Vector<Argument> head_args, int query_id, Connection c, PreparedStatement pst) throws SQLException
 	{
-		String head_var_str = new String();
-		
 		for(int i = 0; i<head_args.size(); i++)
 		{
-			if(i >= 1)
-				head_var_str += ",";
-			
-			head_var_str += head_args.get(i).name.trim();
+		    String query = "insert into user_query2head_var values ('" + query_id + "','" + head_args.get(i).name + "')";
+	        
+	        pst = c.prepareStatement(query);
+	        
+	        pst.execute();
 		}
-		
-		String id_list = vector2string(int_list);
-		
-		String query = "insert into user_query_table values ('" + query_id + "','" + head_var_str + "','" + id_list + "','" + hashcode + "')";
-		
-		pst = c.prepareStatement(query);
-		
-		pst.execute();
 		
 	}
 	
@@ -696,5 +732,17 @@ public class query_storage {
 		}
 	}
 	
+	
+	public static void reset(Connection c, PreparedStatement pst) throws SQLException
+	{
+	  for(String relation: user_query_relations)
+	  {
+	    String sql = "delete from " + relation;
+	    
+	    pst = c.prepareStatement(sql);
+	    
+	    pst.execute();
+	  }
+	}
 
 }

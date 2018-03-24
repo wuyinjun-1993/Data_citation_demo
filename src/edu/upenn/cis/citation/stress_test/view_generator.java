@@ -3675,7 +3675,7 @@ public class view_generator {
         
         int rel_subgoal_id = 0;
         
-        for(int i = 0; i<size; i++)
+        for(int i = 0; i<size/2; i++)
         {
             int index = r.nextInt((int) (subgoal_names.size()));
             
@@ -3743,7 +3743,7 @@ public class view_generator {
             body.add(new Subgoal(relation_name, args));
         }
         
-        int partial_mapping_relation_size = 1;//r.nextInt(all_citable_tables.size());
+        int partial_mapping_relation_size = 3;//r.nextInt(all_citable_tables.size());
         
         int parital_mapping_num = 0;
         
@@ -3833,6 +3833,12 @@ public class view_generator {
 //            boolean partial_mapping_join_condition = r.nextBoolean();
 //            
 //            if(partial_mapping_join_condition)
+            
+            int partial_mapping_size = r.nextInt(relation_names.size()) + 1;
+            
+//            int partial_mapping_size = relation_names.size();
+            
+            for(int l = 0; l < partial_mapping_size; l++)
             {
               int subgoal_id = r.nextInt(body.size());
               
@@ -3903,11 +3909,14 @@ public class view_generator {
         
         for(int j = 0; j<partial_mapping_subgoals.size() - 1; j++)
         {
-          if(r.nextBoolean())
+//          if(r.nextBoolean())
           {
             int join_subgoal_id = r.nextInt(partial_mapping_subgoals.size() - j - 1) + 1;
             
             join_subgoal_id += j;
+            
+            if(maps.get(partial_mapping_subgoals.get(join_subgoal_id).name).equals(maps.get(partial_mapping_subgoals.get(j).name)))
+              continue;
 
             Conditions curr_no_mapping_condition = new Conditions(new Argument(relation_primary_key_mappings.get(maps.get(partial_mapping_subgoals.get(j).name)), partial_mapping_subgoals.get(j).name), partial_mapping_subgoals.get(j).name, new op_equal(), new Argument(relation_primary_key_mappings.get(maps.get(partial_mapping_subgoals.get(join_subgoal_id).name)), partial_mapping_subgoals.get(join_subgoal_id).name), partial_mapping_subgoals.get(join_subgoal_id).name);
             

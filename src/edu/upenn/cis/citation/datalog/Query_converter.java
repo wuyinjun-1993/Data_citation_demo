@@ -28,7 +28,7 @@ import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.citation_view;
 import edu.upenn.cis.citation.citation_view.citation_view_parametered;
-import edu.upenn.cis.citation.citation_view.citation_view_vector;
+import edu.upenn.cis.citation.citation_view.Covering_set;
 import edu.upenn.cis.citation.gen_citation.gen_citation1;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
@@ -68,7 +68,7 @@ public class Query_converter {
 	
 	
 	
-	public static Vector<String> group_sub_query_citations(String head_vars, String query_relations, String group_vars, String group_condition_str, String query_condition_str, citation_view_vector c_views, HashSet<Conditions> valid_conditions, String curr_str, Query q, HashMap<Head_strs, Vector<HashSet<String>>> author_lists, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	public static Vector<String> group_sub_query_citations(String head_vars, String query_relations, String group_vars, String group_condition_str, String query_condition_str, Covering_set c_views, HashSet<Conditions> valid_conditions, String curr_str, Query q, HashMap<Head_strs, Vector<HashSet<String>>> author_lists, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{		
 		
 				
@@ -81,7 +81,7 @@ public class Query_converter {
 	}
 	
 	
-	static Vector<String> gen_query_author_block(citation_view_vector c_views, Query q, String head_vars, String query_condition_str, String group_condition_str, String query_relations, String group_vars, HashMap<Head_strs, Vector<HashSet<String>>> author_lists, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	static Vector<String> gen_query_author_block(Covering_set c_views, Query q, String head_vars, String query_condition_str, String group_condition_str, String query_relations, String group_vars, HashMap<Head_strs, Vector<HashSet<String>>> author_lists, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
 		
 //		Connection c = null;
@@ -221,7 +221,7 @@ public class Query_converter {
 	}
 	
 	
-	public static Vector<String> group_sub_query_citations(String head_vars, String query_relations, String group_vars, String group_condition_str, String query_condition_str, citation_view_vector c_views, HashSet<Conditions> valid_conditions, String curr_str, Query q, HashMap<Head_strs, Vector<HashSet<String>>> author_lists, HashMap<String, HashMap<String, Vector<Integer>>> citation_query_mapping, HashMap<Integer, Query> citation_query, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	public static Vector<String> group_sub_query_citations(String head_vars, String query_relations, String group_vars, String group_condition_str, String query_condition_str, Covering_set c_views, HashSet<Conditions> valid_conditions, String curr_str, Query q, HashMap<Head_strs, Vector<HashSet<String>>> author_lists, HashMap<String, HashMap<String, Vector<Integer>>> citation_query_mapping, HashMap<Integer, Query> citation_query, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{		
 		
 				
@@ -234,7 +234,7 @@ public class Query_converter {
 	}
 	
 	
-	static Vector<String> gen_query_author_block(citation_view_vector c_views, Query q, String head_vars, String query_condition_str, String group_condition_str, String query_relations, String group_vars, HashMap<Head_strs, Vector<HashSet<String>>> author_lists, HashMap<String, HashMap<String, Vector<Integer>>> citation_query_mapping, HashMap<Integer, Query> all_citation_queries, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	static Vector<String> gen_query_author_block(Covering_set c_views, Query q, String head_vars, String query_condition_str, String group_condition_str, String query_relations, String group_vars, HashMap<Head_strs, Vector<HashSet<String>>> author_lists, HashMap<String, HashMap<String, Vector<Integer>>> citation_query_mapping, HashMap<Integer, Query> all_citation_queries, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
 		
 //		Connection c = null;
@@ -2279,192 +2279,192 @@ public class Query_converter {
     }
 	
 	static String[] get_condition_boolean_value(Query q, HashSet<Conditions> valid_conditions, HashSet<Tuple> viewTuples)
-	{
-		
-		String [] str = new String[2];
-		
-		str[0] = new String();
-		
-		str[1] = new String();
-		
-		int condition_num = 0;
-		
-//		for(int i = 0; i<valid_conditions.size(); i++)
-		int i = 0;
-		
-		for(Iterator iter = valid_conditions.iterator(); iter.hasNext();)
-		{
-			Conditions condition = (Conditions) iter.next();
-			
-			
-			
-			if(condition.get_mapping1 == true && condition.get_mapping2 == true)
-			{
-			  if(condition_num >= 1)
-	            {
-	                str[0] += ",";
-//	              str[1] += ",";
-	            }
-			  
-				if(condition.subgoal2 == null || condition.subgoal2.isEmpty())
-				{
-					String arg2_str = condition.arg2.name;
-					
-					if(arg2_str.length() > 2)
-					{
-						arg2_str = "'" + arg2_str.substring(1, condition.arg2.name.length() - 1).replaceAll("'", "''") + "'";
-					}
-					
-					
-					
-					str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + condition.op + arg2_str + ") as condition" + condition_num;
-				}
-				else
-					str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + condition.op + condition.subgoal2 + "." + condition.arg2 + ") as condition" + condition_num;
-				
-//				str[1] += "condition" + condition_num + " desc";
-				
-				condition_num ++;
+    {
+        
+        String [] str = new String[2];
+        
+        str[0] = new String();
+        
+        str[1] = new String();
+        
+        int condition_num = 0;
+        
+//      for(int i = 0; i<valid_conditions.size(); i++)
+        int i = 0;
+        
+        for(Iterator iter = valid_conditions.iterator(); iter.hasNext();)
+        {
+            Conditions condition = (Conditions) iter.next();
+            
+            
+            
+            if(condition.get_mapping1 == true && condition.get_mapping2 == true)
+            {
+              if(condition_num >= 1)
+                {
+                    str[0] += ",";
+//                str[1] += ",";
+                }
+              
+                if(condition.subgoal2 == null || condition.subgoal2.isEmpty())
+                {
+                    String arg2_str = condition.arg2.name;
+                    
+                    if(arg2_str.length() > 2)
+                    {
+                        arg2_str = "'" + arg2_str.substring(1, condition.arg2.name.length() - 1).replaceAll("'", "''") + "'";
+                    }
+                    
+                    
+                    
+                    str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + condition.op + arg2_str + ") as condition" + condition_num;
+                }
+                else
+                    str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + condition.op + condition.subgoal2 + "." + condition.arg2 + ") as condition" + condition_num;
+                
+//              str[1] += "condition" + condition_num + " desc";
+                
+                condition_num ++;
 
-				i++;
-			}
-//			else
-//			{
-//				if(condition.get_mapping1 == true && condition.get_mapping2 == false)
-//				{
-////					if(condition.subgoal2 == null || condition.subgoal2.isEmpty())
-////					{
-////						String arg2_str = condition.arg2.name;
-////						
-////						if(arg2_str.length() > 2)
-////						{
-////							arg2_str = "'" + arg2_str.substring(1, condition.arg2.name.length() - 1).replaceAll("'", "''") + "'";
-////						}
-////						
-////						
-////						
-////						str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + condition.op + arg2_str + ") as condition" + condition_num;
-////					}
-////					else
-//					if(!condition.arg1.isConst())
-//					{
-//						str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + " in ( select " + condition.arg2 + " from " + condition.subgoal2 + ")) as condition" + condition_num;
-//						
-////						str[1] += "condition" + condition_num + " desc";
-//						
-//						condition_num ++;
+                i++;
+            }
+//          else
+//          {
+//              if(condition.get_mapping1 == true && condition.get_mapping2 == false)
+//              {
+////                    if(condition.subgoal2 == null || condition.subgoal2.isEmpty())
+////                    {
+////                        String arg2_str = condition.arg2.name;
+////                        
+////                        if(arg2_str.length() > 2)
+////                        {
+////                            arg2_str = "'" + arg2_str.substring(1, condition.arg2.name.length() - 1).replaceAll("'", "''") + "'";
+////                        }
+////                        
+////                        
+////                        
+////                        str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + condition.op + arg2_str + ") as condition" + condition_num;
+////                    }
+////                    else
+//                  if(!condition.arg1.isConst())
+//                  {
+//                      str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + " in ( select " + condition.arg2 + " from " + condition.subgoal2 + ")) as condition" + condition_num;
+//                      
+////                        str[1] += "condition" + condition_num + " desc";
+//                      
+//                      condition_num ++;
 //
-//						i++;
-//							
-//						
-//					}
-//					
-//					
-//				}
-//				else
-//				{
-//					if(condition.get_mapping2 == true && condition.get_mapping1 == false)
-//					{
-////						if(condition.subgoal2 == null || condition.subgoal2.isEmpty())
-////						{
-////							String arg2_str = condition.arg2.name;
-////							
-////							if(arg2_str.length() > 2)
-////							{
-////								arg2_str = "'" + arg2_str.substring(1, condition.arg2.name.length() - 1).replaceAll("'", "''") + "'";
-////							}
-////							
-////							
-////							
-////							str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + condition.op + arg2_str + ") as condition" + condition_num;
-////						}
-////						else
-//						
-//						if(!condition.arg2.isConst())
-//						{
-//							str[0] += "(" + condition.subgoal2 + "." + condition.arg2 + " in ( select " + condition.arg1 + " from " + condition.subgoal1 + ")) as condition" + condition_num;
-//							
-////							str[1] += "condition" + condition_num + " desc";
-//							
-//							condition_num ++;
+//                      i++;
+//                          
+//                      
+//                  }
+//                  
+//                  
+//              }
+//              else
+//              {
+//                  if(condition.get_mapping2 == true && condition.get_mapping1 == false)
+//                  {
+////                        if(condition.subgoal2 == null || condition.subgoal2.isEmpty())
+////                        {
+////                            String arg2_str = condition.arg2.name;
+////                            
+////                            if(arg2_str.length() > 2)
+////                            {
+////                                arg2_str = "'" + arg2_str.substring(1, condition.arg2.name.length() - 1).replaceAll("'", "''") + "'";
+////                            }
+////                            
+////                            
+////                            
+////                            str[0] += "(" + condition.subgoal1 + "." + condition.arg1 + condition.op + arg2_str + ") as condition" + condition_num;
+////                        }
+////                        else
+//                      
+//                      if(!condition.arg2.isConst())
+//                      {
+//                          str[0] += "(" + condition.subgoal2 + "." + condition.arg2 + " in ( select " + condition.arg1 + " from " + condition.subgoal1 + ")) as condition" + condition_num;
+//                          
+////                            str[1] += "condition" + condition_num + " desc";
+//                          
+//                          condition_num ++;
 //
-//							i++;
-//						}
-////							str[0] += "(" + condition.subgoal2 + "." + condition.arg2 + " in ( select " + condition.arg2 + " from " + condition.subgoal2 + ")) as condition" + condition_num;
-////						
-////						str[1] += "condition" + condition_num + " desc";
-//					}
-//				}
-//			}
-			
-			
-			
+//                          i++;
+//                      }
+////                            str[0] += "(" + condition.subgoal2 + "." + condition.arg2 + " in ( select " + condition.arg2 + " from " + condition.subgoal2 + ")) as condition" + condition_num;
+////                        
+////                        str[1] += "condition" + condition_num + " desc";
+//                  }
+//              }
+//          }
+            
+            
+            
 
-		}
-		
-		HashMap<String, Integer> with_sub_queries_id_mappings = new HashMap<String, Integer>();
-		
-		String partial_mapping_expression = new String();
-		
-		int partial_mapping_count = 0;
-		
-		for(Tuple tuple: viewTuples)
-		{
-		  
-		  String curr_partial_mapping_expression = new String();//get_partial_mapping_boolean_expressions(tuple, tuple.query, with_sub_queries_id_mappings);
-		  
-		  if(curr_partial_mapping_expression.isEmpty())
-		    continue;
-		  
-		  if(partial_mapping_count >= 1)
-		    partial_mapping_expression += ",";
-		  
-		  partial_mapping_expression += curr_partial_mapping_expression;
-		  
-		  partial_mapping_count ++;
-		  
-//		  System.out.println(tuple.mapSubgoals_str);
-//		  
-//		  System.out.println(partial_mapping_expression);
-		}
-		
-//		System.out.println(with_sub_queries_id_mappings);
-		
-		if(!partial_mapping_expression.isEmpty())
-		{
-		  if(str[0].isEmpty())
-		  {
-		    str[0] += partial_mapping_expression;
-		  }
-		  else
-		  {
-	        str[0] += "," + partial_mapping_expression;
-		  }
-		}
-		
-		
-		Set<String> sub_queries = with_sub_queries_id_mappings.keySet();
-		
-		if(!sub_queries.isEmpty())
-		  str[1] += "with ";
-		
-		int sub_query_count = 0;
-		
-		for(String sub_query: sub_queries)
-		{
-		  if(sub_query_count >= 1)
-		    str[1] += ",";
-		  
-		  int sub_query_id = with_sub_queries_id_mappings.get(sub_query);
-		  
-		  str[1] += "with_sub_query" + sub_query_id + " as (" + sub_query + ")";
-		  
-		  sub_query_count++;
-		}
-		
-		
-		return str;
-	}
+        }
+        
+        HashMap<String, Integer> with_sub_queries_id_mappings = new HashMap<String, Integer>();
+        
+        String partial_mapping_expression = new String();
+        
+        int partial_mapping_count = 0;
+        
+        for(Tuple tuple: viewTuples)
+        {
+          
+          String curr_partial_mapping_expression = new String();//get_partial_mapping_boolean_expressions(tuple, tuple.query, with_sub_queries_id_mappings);
+          
+          if(curr_partial_mapping_expression.isEmpty())
+            continue;
+          
+          if(partial_mapping_count >= 1)
+            partial_mapping_expression += ",";
+          
+          partial_mapping_expression += curr_partial_mapping_expression;
+          
+          partial_mapping_count ++;
+          
+//        System.out.println(tuple.mapSubgoals_str);
+//        
+//        System.out.println(partial_mapping_expression);
+        }
+        
+//      System.out.println(with_sub_queries_id_mappings);
+        
+        if(!partial_mapping_expression.isEmpty())
+        {
+          if(str[0].isEmpty())
+          {
+            str[0] += partial_mapping_expression;
+          }
+          else
+          {
+            str[0] += "," + partial_mapping_expression;
+          }
+        }
+        
+        
+        Set<String> sub_queries = with_sub_queries_id_mappings.keySet();
+        
+        if(!sub_queries.isEmpty())
+          str[1] += "with ";
+        
+        int sub_query_count = 0;
+        
+        for(String sub_query: sub_queries)
+        {
+          if(sub_query_count >= 1)
+            str[1] += ",";
+          
+          int sub_query_id = with_sub_queries_id_mappings.get(sub_query);
+          
+          str[1] += "with_sub_query" + sub_query_id + " as (" + sub_query + ")";
+          
+          sub_query_count++;
+        }
+        
+        
+        return str;
+    }
 	
 	static String get_condition_statistics(Query q, HashSet<Conditions> valid_conditions)
 	{
@@ -3141,7 +3141,7 @@ public class Query_converter {
 		return sql;
 	}
 	
-	public static String datalog2sql_citation_test3(Query query, Vector<Lambda_term> lambda_terms, HashSet<Conditions> valid_conditions, HashSet<Tuple> viewTuples)
+	public static String datalog2sql_citation_test3(Query query, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, HashMap<String, Integer> with_sub_queries_id_mappings, Vector<String> full_mapping_condition_str, Vector<Conditions> valid_conditions, Vector<Lambda_term> lambda_terms, HashSet<Tuple> viewTuples)
     {
                 
 //      String sel_item = new String();
@@ -3155,7 +3155,7 @@ public class Query_converter {
         
         String sel_lambda_terms = get_lambda_str(query, lambda_terms);
         
-        String [] condition_str = get_condition_boolean_value(query, valid_conditions, viewTuples);
+        String [] condition_str = get_condition_boolean_value(query, partial_mapping_strings, partial_mapping_view_mapping_mappings, with_sub_queries_id_mappings, full_mapping_condition_str, valid_conditions, viewTuples);
         
         
         String citation_table = get_relations_without_citation_table(query);
@@ -3355,7 +3355,7 @@ public class Query_converter {
 		
 	}
 	
-	   public static String datalog2sql_citation2_test2(Query query, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, HashMap<String, Integer> with_sub_queries_id_mappings, Vector<String> full_mapping_condition_str, Vector<Conditions> valid_conditions, Vector<Lambda_term> lambda_terms, HashSet<Tuple> viewTuples) throws SQLException, ClassNotFoundException
+	   public static String datalog2sql_citation2_test2(Query query, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, HashMap<String, Integer> with_sub_queries_id_mappings, Vector<String> full_mapping_condition_str, Vector<Conditions> valid_conditions, Vector<Lambda_term> lambda_terms, HashSet<Tuple> viewTuples) throws SQLException
 	    {
 	                
 	        String sel_item = new String();
@@ -3401,7 +3401,7 @@ public class Query_converter {
 	        
 	    }
 	
-	   public static String datalog2sql_citation3(Query query, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, HashMap<String, Integer> with_sub_queries_id_mappings, Vector<String> full_mapping_condition_str, Vector<Conditions> valid_conditions, Vector<Lambda_term> lambda_terms, HashSet<Tuple> viewTuples) throws SQLException, ClassNotFoundException
+	   public static String datalog2sql_citation3(Query query, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, HashMap<String, Integer> with_sub_queries_id_mappings, Vector<String> full_mapping_condition_str, Vector<Conditions> valid_conditions, Vector<Lambda_term> lambda_terms, HashSet<Tuple> viewTuples) throws SQLException
 	    {
 	                
 	        String sel_item = new String();

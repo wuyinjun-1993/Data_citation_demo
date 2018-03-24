@@ -110,7 +110,7 @@ public class schema_reasoning {
 	
 	public static HashSet<String> numberic_type = new HashSet<String>();
 		
-	public static HashSet<citation_view_vector> covering_set_query = new HashSet<citation_view_vector>();
+	public static HashSet<Covering_set> covering_set_query = new HashSet<Covering_set>();
 	
 	public static int tuple_num = 0; 
 	
@@ -268,7 +268,7 @@ public class schema_reasoning {
 				
 		HashSet<String> citations = null;
 		
-		ArrayList<citation_view_vector> all_covering_sets = new ArrayList<citation_view_vector>();
+		ArrayList<Covering_set> all_covering_sets = new ArrayList<Covering_set>();
 		
 		all_covering_sets.addAll(covering_set_query);
 		
@@ -296,7 +296,7 @@ public class schema_reasoning {
 				
 				for(Iterator it = covering_set_query.iterator(); it.hasNext();)
 				{
-					citation_view_vector covering_set = (citation_view_vector) it.next();
+					Covering_set covering_set = (Covering_set) it.next();
 					
 					unique_covering_sets.add(covering_set.toString());
 				}
@@ -307,7 +307,7 @@ public class schema_reasoning {
 		return unique_covering_sets;
 	}
 	
-	public static void update_valid_citation_combination(HashSet<citation_view_vector> insert_c_view, ResultSet rs, int start_pos) throws SQLException
+	public static void update_valid_citation_combination(HashSet<Covering_set> insert_c_view, ResultSet rs, int start_pos) throws SQLException
 	{
 		
 //		HashSet<citation_view_vector2> update_c_views = new HashSet<citation_view_vector2>();
@@ -315,7 +315,7 @@ public class schema_reasoning {
 		for(Iterator iter = insert_c_view.iterator(); iter.hasNext();)
 		{
 			
-			citation_view_vector c_vec = (citation_view_vector) iter.next();
+			Covering_set c_vec = (Covering_set) iter.next();
 			
 			for(citation_view curr_view_mapping:c_vec.c_vec)
 			{
@@ -533,11 +533,11 @@ public class schema_reasoning {
          return args;
 	}
 	
-	public static void gen_citation_all(Vector<Vector<citation_view_vector>> citation_views) throws ClassNotFoundException, SQLException
+	public static void gen_citation_all(Vector<Vector<Covering_set>> citation_views) throws ClassNotFoundException, SQLException
 	{
 		for(int i = 0; i<citation_views.size(); i++)
 		{
-			Vector<citation_view_vector> c_vec = citation_views.get(i);
+			Vector<Covering_set> c_vec = citation_views.get(i);
 			
 			for(int j = 0; j< c_vec.size(); j++)
 			{
@@ -546,11 +546,11 @@ public class schema_reasoning {
 		}
 	}
 	
-	public static void output_sql(Vector<Vector<citation_view_vector>> citation_views) throws ClassNotFoundException, SQLException
+	public static void output_sql(Vector<Vector<Covering_set>> citation_views) throws ClassNotFoundException, SQLException
 	{
 		for(int i = 0; i<citation_views.size(); i++)
 		{
-			Vector<citation_view_vector> c_vec = citation_views.get(i);
+			Vector<Covering_set> c_vec = citation_views.get(i);
 			
 			for(int j = 0; j<c_vec.size(); j++)
 			{
@@ -1211,7 +1211,7 @@ public class schema_reasoning {
 		return new Vector<citation_view>(views.size());
 	}
 	
-	public static void gen_citation(citation_view_vector citation_views) throws ClassNotFoundException, SQLException
+	public static void gen_citation(Covering_set citation_views) throws ClassNotFoundException, SQLException
 	{
 		for(citation_view curr_view_mapping:citation_views.c_vec)
 		{
@@ -1415,11 +1415,11 @@ public class schema_reasoning {
 //		}
 //	}
 //	
-	static HashSet<citation_view_vector> reasoning_schema_level()
+	static HashSet<Covering_set> reasoning_schema_level()
 	{
 		Set<String> relations = head_variable_query_mapping.keySet();
 		
-		HashSet<citation_view_vector> all_covering_sets = new HashSet<citation_view_vector>();
+		HashSet<Covering_set> all_covering_sets = new HashSet<Covering_set>();
 		
 		for(Iterator iter = relations.iterator(); iter.hasNext();)
 		{
@@ -1433,7 +1433,7 @@ public class schema_reasoning {
 			}
 			else
 			{
-				HashSet<citation_view_vector> covering_sets = new HashSet<citation_view_vector>();
+				HashSet<Covering_set> covering_sets = new HashSet<Covering_set>();
 				
 				ArrayList<Argument> q_head_args = head_variable_query_mapping.get(relation);
 				
@@ -2411,7 +2411,7 @@ public class schema_reasoning {
 //		return citations;
 //	}
 
-	static HashSet<String> gen_citation(ArrayList<citation_view_vector> c_views, Connection c, PreparedStatement pst, ArrayList<HashMap<String, Integer>> view_query_mapping) throws ClassNotFoundException, SQLException, JSONException
+	static HashSet<String> gen_citation(ArrayList<Covering_set> c_views, Connection c, PreparedStatement pst, ArrayList<HashMap<String, Integer>> view_query_mapping) throws ClassNotFoundException, SQLException, JSONException
 	{
 		HashSet<String> citations = new HashSet<String>();
 						
@@ -2903,7 +2903,7 @@ public class schema_reasoning {
 //	}
 //	
 	
-	public static void output_vec_com(Vector<citation_view_vector>c_unit_combinaton)
+	public static void output_vec_com(Vector<Covering_set>c_unit_combinaton)
 	{
 		for(int i = 0; i<c_unit_combinaton.size(); i++)
 		{
@@ -3068,7 +3068,7 @@ public class schema_reasoning {
 //		}
 //	}
 	
-	   public static void get_views_parameters(HashSet<Tuple> insert_c_view, ResultSet rs, int start_pos, HashMap<Tuple, HashSet<Head_strs>> values) throws SQLException
+	   public static void get_views_parameters(HashSet<Tuple> insert_c_view, ResultSet rs, int start_pos, HashMap<Tuple, ArrayList<Head_strs>> values) throws SQLException
 	    {
 	        
 //	      HashSet<citation_view_vector2> update_c_views = new HashSet<citation_view_vector2>();
@@ -3106,7 +3106,7 @@ public class schema_reasoning {
 	                    if(values.get(view_mapping) == null)
 	                    {
 	                      
-	                      HashSet<Head_strs> curr_head_values = new HashSet<Head_strs>();
+	                      ArrayList<Head_strs> curr_head_values = new ArrayList<Head_strs>();
 	                      
 	                      curr_head_values.add(head_values);
 	                      

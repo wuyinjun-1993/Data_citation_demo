@@ -32,7 +32,7 @@ import edu.upenn.cis.citation.aggregation.Aggregation5;
 import edu.upenn.cis.citation.aggregation.Aggregation6;
 import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.citation_view;
-import edu.upenn.cis.citation.citation_view.citation_view_vector;
+import edu.upenn.cis.citation.citation_view.Covering_set;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test_opt_copy;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test2_copy;
@@ -177,27 +177,38 @@ public class final_stress_test_partial_mapping_full {
 //      Query query = query_storage.get_query_by_id(1);
         query_generator.init_parameterizable_attributes(c2, pst);
 
-//        view_operation.delete_view_by_name("v3", c2, pst, false);
+//        for(int i = 5; i <= 16; i++)
+//        {
+//          view_operation.delete_view_by_name("v2", c2, pst, false);
+//        }
+        
 //      for(int k = 3; k<=query_num; k++)
         {
             if(new_query)
             {
                 System.out.println("new query");
                 
-                reset(c1, pst);
+//                reset(c1, pst);
                 
-                reset(c2, pst);
+//                reset(c2, pst);
+                
+                reset(c3, pst);
             }
                         
             Query query = null;
             
             try{
-                query = query_storage.get_query_by_id(1, c2, pst);
+                query = query_storage.get_query_by_id(1, c3, pst);
             }
             catch(Exception e)
             {
-                query = query_generator.gen_query(k, c2, pst);
-                query_storage.store_query(query, new Vector<Integer>(), c2, pst);
+                Query[] queries = query_generator.gen_query_for_provenance(k, c2, pst);
+                
+                query = queries[0];
+                
+//                query_storage.store_user_query(queries[0], "v1", c2, pst);
+                
+                query_storage.store_user_query(queries[1], "v1", true, c3, pst);
                 System.out.println(query);
             }
             
@@ -272,7 +283,7 @@ public class final_stress_test_partial_mapping_full {
                         
             System.out.println("start_test");
             
-            stress_test(query, views, tuple_level, schema_level, agg_intersection);
+//            stress_test(query, views, tuple_level, schema_level, agg_intersection);
 
             
             Vector<Query> user_query = new Vector<Query>();
@@ -347,11 +358,11 @@ public class final_stress_test_partial_mapping_full {
         
         String f_name = new String();
         
-        HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map1 = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
+        HashMap<Head_strs, Vector<Vector<Covering_set>>> citation_view_map1 = new HashMap<Head_strs, Vector<Vector<Covering_set>>>();
 
-        HashMap<Head_strs, Vector<Vector<citation_view_vector>>> citation_view_map2 = new HashMap<Head_strs, Vector<Vector<citation_view_vector>>>();
+        HashMap<Head_strs, Vector<Vector<Covering_set>>> citation_view_map2 = new HashMap<Head_strs, Vector<Vector<Covering_set>>>();
         
-        Vector<Vector<citation_view_vector>> citation_view2 = new Vector<Vector<citation_view_vector>>();
+        Vector<Vector<Covering_set>> citation_view2 = new Vector<Vector<Covering_set>>();
 
         
 //      while(views.size() < view_max_size)
@@ -976,7 +987,7 @@ public class final_stress_test_partial_mapping_full {
         }
     }
     
-    public static void write2file_covering_set(String file_name, HashMap<String, HashSet<citation_view_vector>> views) throws IOException
+    public static void write2file_covering_set(String file_name, HashMap<String, HashSet<Covering_set>> views) throws IOException
     {
       File fout = new File(file_name);
       FileOutputStream fos = new FileOutputStream(fout);
@@ -992,13 +1003,13 @@ public class final_stress_test_partial_mapping_full {
         bw.write("group " + num);
         bw.newLine();
         
-        HashSet<citation_view_vector> covering_sets = views.get(label);
+        HashSet<Covering_set> covering_sets = views.get(label);
         
         String [] covering_set_string = new String [covering_sets.size()];
         
         int id = 0;
         
-        for(citation_view_vector covering_set: covering_sets)
+        for(Covering_set covering_set: covering_sets)
         {
           covering_set_string[id ++] = covering_set.toString(); 
         }
@@ -1056,6 +1067,12 @@ public class final_stress_test_partial_mapping_full {
         
         pst.execute();
         
+        query = "delete from user_query2head_var";
+        
+        pst = c.prepareStatement(query);
+        
+        pst.execute();
+        
         query = "delete from user_query2subgoals";
         
         pst = c.prepareStatement(query);
@@ -1073,7 +1090,6 @@ public class final_stress_test_partial_mapping_full {
         pst = c.prepareStatement(query);
         
         pst.execute();
-        
         
     }
 

@@ -36,10 +36,10 @@ import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test2;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_test;
-import edu.upenn.cis.citation.reasoning1.schema_reasoning;
-import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_full_min_test;
+import edu.upenn.cis.citation.reasoning1.Schema_level_approach;
+import edu.upenn.cis.citation.reasoning2.Tuple_level_approach_min;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_min_test;
-import edu.upenn.cis.citation.reasoning2.Tuple_reasoning2_full_min_test;
+import edu.upenn.cis.citation.reasoning2.Semi_schema_level_approach_min;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning2_min_test;
 import edu.upenn.cis.citation.stress_test.query_generator;
 import edu.upenn.cis.citation.stress_test.view_generator;
@@ -707,9 +707,9 @@ public class final_real_test_full2 {
 			    c = DriverManager
 			        .getConnection(populate_db.dblp_url2, populate_db.usr_name , populate_db.passwd);
 				
-			    schema_reasoning.prepare_info = false;
+			    Schema_level_approach.prepare_info = false;
 			    
-			    schema_reasoning.test_case = false;
+			    Schema_level_approach.test_case = false;
 			    			    
 			    double end_time = 0;
 
@@ -723,17 +723,17 @@ public class final_real_test_full2 {
 							
 				start_time = System.nanoTime();
 				
-				schema_reasoning.tuple_reasoning(query, c, pst);
+				Schema_level_approach.tuple_reasoning(query, c, pst);
 				
 				inter_time = System.nanoTime();
 								
-				schema_reasoning.execute_query(query, c, pst);
+				Schema_level_approach.execute_query(query, c, pst);
 				
 				middle_time = System.nanoTime();
 				
-				schema_reasoning.prepare_citation_information(c, pst);
+				Schema_level_approach.prepare_citation_information(c, pst);
 				
-				agg_citations = schema_reasoning.tuple_gen_agg_citations(query, c, pst);
+				agg_citations = Schema_level_approach.tuple_gen_agg_citations(query, c, pst);
 														
 				end_time = System.nanoTime();
 				
@@ -747,7 +747,7 @@ public class final_real_test_full2 {
 				
 				double query_time = (middle_time - inter_time) * 1.0/1000000000;
 							
-				System.out.print(schema_reasoning.tuple_num + "	");
+				System.out.print(Schema_level_approach.tuple_num + "	");
 				
 				System.out.print(time + "s	");
 				
@@ -759,7 +759,7 @@ public class final_real_test_full2 {
 				
 //				System.out.print("covering_sets::" + schema_reasoning.covering_set_query + "	");
 				
-				System.out.print("covering_set_size::" + schema_reasoning.covering_set_query.size() + "	");
+				System.out.print("covering_set_size::" + Schema_level_approach.covering_set_query.size() + "	");
 				
 				int distinct_view_size = Aggregation5.cal_distinct_views();
 				
@@ -831,7 +831,7 @@ public class final_real_test_full2 {
 //				
 				
 								
-				System.out.print("pre_processing::" + schema_reasoning.pre_processing_time + "	");
+				System.out.print("pre_processing::" + Schema_level_approach.pre_processing_time + "	");
 				
 				System.out.print("query::" + query_time + "	");
 												

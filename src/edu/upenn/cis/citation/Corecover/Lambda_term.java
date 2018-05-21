@@ -1,35 +1,40 @@
 package edu.upenn.cis.citation.Corecover;
 
 import java.util.Vector;
-
 import edu.upenn.cis.citation.Pre_processing.populate_db;
+
 
 public class Lambda_term {
 	
-	public String name;
+	public String arg_name;
 	
 	public String table_name;
 	
-	public String table_name_alias;
-	
-	public int id;
-	
-	public int table_index;
+	public Argument arg;
 	
 	@Override
 	public String toString()
 	{
-		return name;
+		return arg_name;
+	}
+	
+	public Lambda_term(Argument arg)
+	{
+	  this.arg = arg;
+	  
+	  arg_name = arg.name;
+	  
+	  table_name = arg.name.substring(arg.name.indexOf(populate_db.separator) + 1, arg.name.length());
 	}
 	
 	public Lambda_term(String name)
 	{
-		this.name = name;
+		this.arg_name = name;
 	}
 	
 	public Lambda_term(String name, String table_name)
 	{
-		this.name = name;
+		this.arg_name = name;
 		
 		this.table_name = table_name;
 	}
@@ -38,19 +43,19 @@ public class Lambda_term {
 	{
 		table_name = new_table_name;
 		
-		name = table_name + populate_db.separator + name.substring(name.indexOf(populate_db.separator) + 1, name.length());
+		arg_name = table_name + populate_db.separator + arg_name.substring(arg_name.indexOf(populate_db.separator) + 1, arg_name.length());
 	}
 
 	@Override
 	public Object clone()
 	{
-		return new Lambda_term(this.name, this.table_name);
+		return new Lambda_term(this.arg_name, this.table_name);
 	}
 	
 	@Override
 	public int hashCode()
 	{
-		return name.hashCode();
+		return arg_name.hashCode();
 	}
 	
 	@Override
@@ -58,7 +63,7 @@ public class Lambda_term {
 	{
 		Lambda_term l = (Lambda_term) obj;
 		
-		return (l.name.equals(this.name));
+		return (l.arg_name.equals(this.arg_name));
 		
 	}
 }

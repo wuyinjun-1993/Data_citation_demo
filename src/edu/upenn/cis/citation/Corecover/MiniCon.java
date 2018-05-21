@@ -71,7 +71,7 @@ class MiniCon {
 
 
   // generates all MCDs for a query and views
-  static HashSet formMCDs(Query query, Vector views) {
+  static HashSet formMCDs(Query query, Vector<Query> views) {
     UserLib.myprintln("calling formMCDs()...");
     HashSet mcds = new HashSet();
 
@@ -110,7 +110,7 @@ class MiniCon {
 	  continue;
 
 	// we should rename the view and adjust the PhiHH
-	Query renamedView = view.rename();
+	Query renamedView = view;
 	//System.out.println("after renaming, view = " + renamedView);
 	HashSet newMCDs = extend(query, querySubgoalSubset, renamedView);
 	// it IS extendable.  finally, we got some mcds

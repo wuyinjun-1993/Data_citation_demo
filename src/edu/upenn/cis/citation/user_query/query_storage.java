@@ -29,133 +29,12 @@ public class query_storage {
 	
 	public static void main(String [] args) throws ClassNotFoundException, SQLException
 	{
-		Query q = gen_query();
 		
 		Vector<Integer> int_list = new Vector<Integer>();
 		
 		int_list.add(1);
 		
 //		store_query(q, int_list);
-	}
-	
-	static Query gen_query() throws SQLException, ClassNotFoundException
-	{
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-		
-        PreparedStatement pst = null;
-        
-		Vector<Argument> head_args = new Vector<Argument>();
-		
-		head_args.add(new Argument("family_family_id", "family"));
-				
-		
-//		head_args.add(new Argument("family1_family_id", "family1"));
-//		
-//		head_args.add(new Argument("family2_family_id", "family2"));
-				
-		
-//		head_args.add(new Argument("family3_family_id", "family3"));
-		
-		head_args.add(new Argument("introduction_family_id", "introduction"));
-
-		
-//		head_args.add(new Argument("introduction1_family_id", "introduction1"));
-//				
-//		head_args.add(new Argument("introduction2_family_id", "introduction2"));
-		
-//		head_args.add(new Argument("introduction3_family_id", "introduction3"));
-		
-		Subgoal head = new Subgoal("q", head_args);
-		
-		Vector<Subgoal> subgoals = new Vector<Subgoal>();
-		
-		Vector<Argument> args1 = view_operation.get_full_schema("family", "family", c, pst);
-		
-//		Vector<Argument> args2 = view_operation.get_full_schema("family1", "family", c, pst);
-		
-		
-//		Vector<Argument> args6 = view_operation.get_full_schema("family2", "family", c, pst);
-		
-//		Vector<Argument> args7 = view_operation.get_full_schema("family3", "family", c, pst);
-		
-		Vector<Argument> args3 = view_operation.get_full_schema("introduction", "introduction", c, pst);
-		
-//		Vector<Argument> args4 = view_operation.get_full_schema("introduction1", "introduction", c, pst);
-//		
-//		Vector<Argument> args5 = view_operation.get_full_schema("introduction2", "introduction", c, pst);
-		
-//		Vector<Argument> args8 = view_operation.get_full_schema("introduction3", "introduction", c, pst);
-
-		
-		subgoals.add(new Subgoal("family", args1));
-		
-//		subgoals.add(new Subgoal("family1", args2));
-//		
-//		subgoals.add(new Subgoal("family2", args6));
-		
-//		subgoals.add(new Subgoal("family3", args7));
-				
-		subgoals.add(new Subgoal("introduction", args3));
-		
-//		subgoals.add(new Subgoal("introduction1", args4));
-//		
-//		subgoals.add(new Subgoal("introduction2", args5));
-		
-//		subgoals.add(new Subgoal("introduction3", args8));
-		
-		Vector<Conditions> conditions = new Vector<Conditions>();
-		
-		conditions.add(new Conditions(new Argument("family_id", "family"), "family", new op_less_equal(), new Argument("2"), new String()));
-//		
-//		conditions.add(new Conditions(new Argument("family_id", "family1"), "family1", new op_less_equal(), new Argument("2"), new String()));
-//		
-//		conditions.add(new Conditions(new Argument("family_id", "family2"), "family2", new op_less_equal(), new Argument("2"), new String()));
-		
-//		conditions.add(new Conditions(new Argument("family_id", "family3"), "family3", new op_less_equal(), new Argument("2"), new String()));
-//		
-		conditions.add(new Conditions(new Argument("family_id", "introduction"), "introduction", new op_less_equal(), new Argument("2"), new String()));
-		
-//		conditions.add(new Conditions(new Argument("family_id", "introduction1"), "introduction1", new op_less_equal(), new Argument("2"), new String()));
-//		
-//		conditions.add(new Conditions(new Argument("family_id", "introduction2"), "introduction2", new op_less_equal(), new Argument("2"), new String()));
-
-//		conditions.add(new Conditions(new Argument("family_id", "introduction3"), "introduction3", new op_less_equal(), new Argument("2"), new String()));
-
-		
-//		conditions.add(new Conditions(new Argument("in_gtip", "object"), "object", new op_equal(), new Argument("'true'"), new String()));
-		
-		HashMap<String, String> subgoal_name_mapping = new HashMap<String, String>();
-		
-		subgoal_name_mapping.put("family", "family");
-		
-//		subgoal_name_mapping.put("family1", "family");
-//		
-//		subgoal_name_mapping.put("family2", "family");
-		
-//		subgoal_name_mapping.put("family3", "family");
-				
-		subgoal_name_mapping.put("introduction", "introduction");
-		
-//		subgoal_name_mapping.put("introduction1", "introduction");
-//
-//		subgoal_name_mapping.put("introduction2", "introduction");
-		
-//		subgoal_name_mapping.put("introduction3", "introduction");
-
-
-		
-		Query q = new Query("q", head, subgoals, new Vector<Lambda_term>(), conditions, subgoal_name_mapping);
-		
-		System.out.println(q);
-		
-		c.close();
-		
-		return q;
-		
-		
 	}
 	
 	public static Query get_query_by_id(int id, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
@@ -165,13 +44,17 @@ public class query_storage {
         
 //        String id = get_id_head_vars(name, head_var, c, pst);
 
+        HashMap<String, String> subgoal_name_mapping = new HashMap<String, String> ();
+        
+        HashMap<String, Argument> subgoal_arg_name_mapping = new HashMap<String, Argument>();
+        
+        Vector<Subgoal> subgoals = get_query_subgoals(id, subgoal_name_mapping, subgoal_arg_name_mapping, c, pst);
+        
         head_var = get_head_vars(id, c, pst);
         
-        HashMap<String, String> subgoal_name_mapping = new HashMap<String, String> ();
         
         Vector<Conditions> conditions = get_query_conditions(id, c, pst);
         
-        Vector<Subgoal> subgoals = get_query_subgoals(id, subgoal_name_mapping, c, pst);
         
 //        String predicate = get_query_predicate(id, c, pst);
         
@@ -195,17 +78,19 @@ public class query_storage {
         
         PreparedStatement pst = null;
         
+        HashMap<String, String> subgoal_name_mapping = new HashMap<String, String> ();
+        
+        HashMap<String, Argument> subgoal_arg_name_mapping = new HashMap<String, Argument>(); 
+        
+        Vector<Subgoal> subgoals = get_query_subgoals(id, subgoal_name_mapping, subgoal_arg_name_mapping, c, pst);
+        
         Vector<Argument> head_var = new Vector<Argument>();
         
 //        String id = get_id_head_vars(name, head_var, c, pst);
 
         head_var = get_head_vars(id, c, pst);
         
-        HashMap<String, String> subgoal_name_mapping = new HashMap<String, String> ();
-        
         Vector<Conditions> conditions = get_query_conditions(id, c, pst);
-        
-        Vector<Subgoal> subgoals = get_query_subgoals(id, subgoal_name_mapping, c, pst);
         
 //        String predicate = get_query_predicate(id, c, pst);
         
@@ -280,7 +165,7 @@ public class query_storage {
 //        String id = get_id_head_vars(name, head_var, c, pst)
 	}
 	
-	static Vector<Subgoal> get_query_subgoals(int name, HashMap<String, String> subgoal_name_mapping, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	static Vector<Subgoal> get_query_subgoals(int name, HashMap<String, String> subgoal_name_mapping, HashMap<String, Argument> subgoal_arg_name_mapping, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
 		String q_subgoals = "select subgoal_name, subgoal_origin_name from user_query2subgoals where query_id = '" + name + "'";
 		
@@ -300,7 +185,7 @@ public class query_storage {
 			
 			subgoal_name_mapping.put(subgoal_name, subgoal_origin_name);
 			
-			Vector<Argument> args = view_operation.get_full_schema(subgoal_name, subgoal_origin_name, c, pst);
+			Vector<Argument> args = view_operation.get_full_schema(subgoal_name, subgoal_origin_name, subgoal_arg_name_mapping, c, pst);
 			
 //			for(int k = 0; k<arg_strs.size(); k++)
 //			{
@@ -620,7 +505,7 @@ public class query_storage {
 		
 	}
 	
-	static void store_query_predicates(Query query, int id, Connection c, PreparedStatement pst) throws SQLException
+	public static void store_query_predicates(Query query, int id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String sql = "insert into user_query_conditions values ('" + id + "','" + query.lambda_term.get(0) + "')";
 		

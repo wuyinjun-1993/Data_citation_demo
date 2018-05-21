@@ -42,7 +42,7 @@ import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test2;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_test;
-import edu.upenn.cis.citation.reasoning1.schema_reasoning;
+import edu.upenn.cis.citation.reasoning1.Schema_level_approach;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_min_test;
 
 public class Aggregation5 {
@@ -722,7 +722,7 @@ public class Aggregation5 {
 			}
 			else
 			{
-				tuple_num = schema_reasoning.tuple_num;
+				tuple_num = Schema_level_approach.tuple_num;
 			}
 		}
 		
@@ -737,7 +737,7 @@ public class Aggregation5 {
 				if(!schema_level)
 					Tuple_reasoning2_full_test2.get_views_parameters(single_views, rs, start_pos, lambda_values);
 				else
-					schema_reasoning.get_views_parameters(single_views, rs, start_pos, lambda_values);
+					Schema_level_approach.get_views_parameters(single_views, rs, start_pos, lambda_values);
 			}
 			
 //			convert_covering_set2citation(i, curr_res, author_lists, view_query_mapping, query_lambda_str, author_mapping, max_num, query_ids, view_list, c, pst, tuple_level);
@@ -791,7 +791,7 @@ public class Aggregation5 {
                 if(!schema_level)
                     Tuple_reasoning2_full_test2.get_views_parameters(single_views, rs, start_pos, lambda_values);
                 else
-                    schema_reasoning.get_views_parameters(single_views, rs, start_pos, lambda_values);
+                    Schema_level_approach.get_views_parameters(single_views, rs, start_pos, lambda_values);
             }
             
 //          convert_covering_set2citation(i, curr_res, author_lists, view_query_mapping, query_lambda_str, author_mapping, max_num, query_ids, view_list, c, pst, tuple_level);
@@ -1427,11 +1427,11 @@ public class Aggregation5 {
 			}
 			else
 			{
-				citation_queries_ids = schema_reasoning.get_citation_queries(single_view.get_name());
+				citation_queries_ids = Schema_level_approach.get_citation_queries(single_view.get_name());
 				
-				citation_queries = schema_reasoning.citation_queries;
+				citation_queries = Schema_level_approach.citation_queries;
 				
-				query_ids = schema_reasoning.query_ids;
+				query_ids = Schema_level_approach.query_ids;
 			}
 			
 		}

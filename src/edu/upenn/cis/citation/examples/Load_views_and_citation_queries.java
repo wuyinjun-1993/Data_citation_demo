@@ -25,6 +25,8 @@ public class Load_views_and_citation_queries {
 	
 	static String split1 = "|";
 	
+	static String split2 = "#";
+	
 	static int col_nums = 4;
 	
 	public static void main(String [] args) throws ClassNotFoundException, SQLException
@@ -70,38 +72,138 @@ public class Load_views_and_citation_queries {
 		return queries;
 	}
 	
-	static Query get_view(String line, Connection c, PreparedStatement pst) throws SQLException
-	{
-//		System.out.println(line);
-		
-		String [] strs = line.split("\\" + split1);
-		
-		String view_name = strs[0];
-		
-		String heads = strs[1];
-		
-		String body = strs[2];
-		
-		String predicates = strs[3];
-		
-		String lambda_term_str = strs[4];
-		
-		String relation_mapping_str = strs[5];
-		
-		Subgoal head_subgoal = new Subgoal(view_name, split_head(heads));
-		
-		HashMap<String, String> relation_mapping = get_relation_mapping(relation_mapping_str);
-		
-		Vector<Subgoal> relational_subgoals = split_bodies(body, relation_mapping, c ,pst); 
-		
-		Vector<Conditions> predicate_subgoal = split_predicates(predicates);
-		
-		Vector<Lambda_term> l_terms = split_lambda_terms(lambda_term_str);
-		
-		return new Query(view_name, head_subgoal, relational_subgoals, l_terms, predicate_subgoal, relation_mapping);
-		
-	}
+    static Query get_view(String line, Connection c, PreparedStatement pst) throws SQLException
+    {
+//      System.out.println(line);
+        
+        String [] strs = line.split("\\" + split1);
+        
+        String view_name = strs[0];
+        
+        String heads = strs[1];
+        
+        String body = strs[2];
+        
+        String predicates = strs[3];
+        
+        String lambda_term_str = strs[4];
+        
+        String relation_mapping_str = strs[5];
+        
+        HashMap<String, Argument> name_arg_mappings = new HashMap<String, Argument>();
+        
+        HashMap<String, String> relation_mapping = get_relation_mapping(relation_mapping_str);
+        
+        Vector<Subgoal> relational_subgoals = split_bodies(body, relation_mapping, name_arg_mappings, c ,pst);
+        
+        Subgoal head_subgoal = split_head(view_name, heads, name_arg_mappings);
+                
+        Vector<Conditions> predicate_subgoal = split_predicates(predicates, name_arg_mappings);
+        
+        Vector<Lambda_term> l_terms = split_lambda_terms(lambda_term_str);
+        
+        return new Query(view_name, head_subgoal, relational_subgoals, l_terms, predicate_subgoal, relation_mapping);
+        
+    }
 	
+	   static String[] get_agg_function_string(String arg_with_agg_function)
+	    {
+	      arg_with_agg_function = arg_with_agg_function.trim();
+	      
+	      String [] arg_with_agg_function_strings = null;
+	      
+	      if(arg_with_agg_function.contains("("))
+	      {
+	        arg_with_agg_function_strings = new String[2];
+	        
+	        arg_with_agg_function_strings[0] = arg_with_agg_function.substring(0, arg_with_agg_function.indexOf("("));
+	        
+	        arg_with_agg_function_strings[1] = arg_with_agg_function.substring(arg_with_agg_function.indexOf("(") + 1, arg_with_agg_function.indexOf(")"));
+	        
+	      }
+	      
+	      return arg_with_agg_function_strings;
+	    }
+	
+	   static Subgoal split_head(String name, String head, HashMap<String, Argument> name_arg_mappings)
+	    {       
+	        String [] head_arg_strs = head.split(",");
+	        
+	        Vector<Argument> head_args = new Vector<Argument>();
+	        
+	        Vector<Vector<Argument>> head_agg_args = null;
+	        
+	        Vector<String> head_agg_functions = null; 
+	        
+	        boolean has_agg = false;
+	        
+	        for(int i = 0; i<head_arg_strs.length; i++)
+	        {
+	          
+	          String[] arg_with_agg_function_strings = get_agg_function_string(head_arg_strs[i]);
+	            
+	          String head_var = null;
+	          
+	          String agg_function = null;
+	          
+	          if(arg_with_agg_function_strings != null)
+	          {
+	            head_var = arg_with_agg_function_strings[1];
+	            
+	            if(head_agg_args == null)
+	            {
+	              head_agg_args = new Vector<Vector<Argument>>();
+	                
+	              head_agg_functions = new Vector<String>();
+	            }
+	            
+	            String[] all_head_vars = head_var.split(split2);
+	            
+	            Vector<Argument> curr_head_agg_args = new Vector<Argument>();
+	            
+	            for(int k = 0; k<all_head_vars.length; k++)
+	            {
+	              String[] relation_arg = all_head_vars[k].trim().split("\\" + ".");
+	              
+	              String relation = relation_arg[0].trim();
+	                
+	              String arg = relation_arg[1].trim();
+	                
+	              Argument Arg = name_arg_mappings.get(relation + populate_db.separator + arg);
+	              
+	              curr_head_agg_args.add(Arg);
+	            }
+	            
+	            agg_function = arg_with_agg_function_strings[0].toLowerCase();
+	            
+	            head_agg_functions.add(agg_function);
+	            
+	            head_agg_args.add(curr_head_agg_args);
+	          }
+	          else
+	          {
+	            head_var = head_arg_strs[i];
+	            
+	            String [] relation_arg = head_var.trim().split("\\" + ".");
+	            
+	            String relation = relation_arg[0].trim();
+	            
+	            String arg = relation_arg[1].trim();
+	            
+	            Argument Arg = name_arg_mappings.get(relation + populate_db.separator + arg);
+	            
+	            head_args.add(Arg);
+	          }
+	          
+	        }
+	        
+	        if(head_agg_args != null)
+	          has_agg = true;
+	        
+	        return new Subgoal(name, head_args, head_agg_args, head_agg_functions, has_agg);
+	    }
+	    
+	   
 	static String Convert_query2string(Query query)
 	{
 	  String string = new String();
@@ -206,7 +308,7 @@ public class Load_views_and_citation_queries {
 	    if(i >= 1)
 	      string += ",";
 	    
-	    String l_term = lambda_terms.get(i).name;
+	    String l_term = lambda_terms.get(i).arg_name;
 	    
 	    l_term = l_term.replace(populate_db.separator, ".");
 	    
@@ -239,26 +341,26 @@ public class Load_views_and_citation_queries {
 		return l_terms;
 	}
 	
-	static Vector<Conditions> split_predicates(String predicates_str)
-	{
-		if(predicates_str.isEmpty())
-			return new Vector<Conditions>();
-		
-		String [] predicates = predicates_str.split(",");
-		
-		Vector<Conditions> conditions = new Vector<Conditions>();
-		
-		for(int i = 0; i<predicates.length; i++)
-		{
-			String predicate = predicates[i].trim();
-						
-			Conditions condition = view_operation.parse_conditions(predicate, ".");
-			
-			conditions.add(condition);
-		}
-		
-		return conditions;
-	}
+    static Vector<Conditions> split_predicates(String predicates_str, HashMap<String, Argument> name_arg_mappings)
+    {
+        if(predicates_str.isEmpty())
+            return new Vector<Conditions>();
+        
+        String [] predicates = predicates_str.split(",");
+        
+        Vector<Conditions> conditions = new Vector<Conditions>();
+        
+        for(int i = 0; i<predicates.length; i++)
+        {
+            String predicate = predicates[i].trim();
+                        
+            Conditions condition = view_operation.parse_conditions(predicate, name_arg_mappings, ".");
+            
+            conditions.add(condition);
+        }
+        
+        return conditions;
+    }
 	
 	static HashMap<String, String> get_relation_mapping(String relation_mapping_str)
 	{
@@ -279,25 +381,25 @@ public class Load_views_and_citation_queries {
 	
 	
 	
-	static Vector<Subgoal> split_bodies(String body_str, HashMap<String, String> relation_mapping, Connection c, PreparedStatement pst) throws SQLException
-	{
-		String [] relations = body_str.split(",");
-		
+    static Vector<Subgoal> split_bodies(String body_str, HashMap<String, String> relation_mapping, HashMap<String, Argument> name_arg_mappings, Connection c, PreparedStatement pst) throws SQLException
+    {
+        String [] relations = body_str.split(",");
+        
         Vector<Subgoal> subgoals = new Vector<Subgoal>();
         
-		for(int i = 0; i<relations.length; i++)
-		{
-			String relation = relations[i].trim();
-			
-			Vector<Argument> args = view_operation.get_full_schema(relation, relation_mapping.get(relation), c, pst);
-			
-			Subgoal subgoal = new Subgoal(relation, args);
-			
-			subgoals.add(subgoal);
-		}
-				
-		return subgoals;
-	}
+        for(int i = 0; i<relations.length; i++)
+        {
+            String relation = relations[i].trim();
+            
+            Vector<Argument> args = view_operation.get_full_schema(relation, relation_mapping.get(relation), name_arg_mappings, c, pst);
+            
+            Subgoal subgoal = new Subgoal(relation, args);
+            
+            subgoals.add(subgoal);
+        }
+                
+        return subgoals;
+    }
 	
 	static Vector<Argument> split_head(String head)
 	{		

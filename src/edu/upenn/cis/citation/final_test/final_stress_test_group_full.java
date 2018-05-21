@@ -27,9 +27,9 @@ import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.citation_view;
 import edu.upenn.cis.citation.citation_view.Covering_set;
 import edu.upenn.cis.citation.datalog.Query_converter;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test_opt_copy;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test2_copy;
-import edu.upenn.cis.citation.reasoning1.schema_reasoning;
+import edu.upenn.cis.citation.reasoning1.Tuple_level_approach;
+import edu.upenn.cis.citation.reasoning1.Semi_schema_level_approach;
+import edu.upenn.cis.citation.reasoning1.Schema_level_approach;
 import edu.upenn.cis.citation.stress_test.query_generator;
 import edu.upenn.cis.citation.stress_test.view_generator;
 import edu.upenn.cis.citation.user_query.query_storage;
@@ -195,7 +195,7 @@ public class final_stress_test_group_full {
 			catch(Exception e)
 			{
 				query = query_generator.gen_query(k, c2, pst);
-				query_storage.store_query(query, new Vector<Integer>(), c2, pst);
+                query_storage.store_user_query(query, "1", c2, pst);
 				System.out.println(query);
 			}
 			
@@ -330,9 +330,9 @@ public class final_stress_test_group_full {
 		    c = DriverManager
 		        .getConnection(populate_db.db_url1, populate_db.usr_name , populate_db.passwd);
 			
-		    Tuple_reasoning1_full_test_opt_copy.prepare_info = false;
+		    Tuple_level_approach.prepare_info = false;
 		
-		    Tuple_reasoning1_full_test_opt_copy.agg_intersection = agg_intersection;
+		    Tuple_level_approach.agg_intersection = agg_intersection;
 		    
 		    double end_time = 0;
 
@@ -346,15 +346,15 @@ public class final_stress_test_group_full {
 						
 			start_time = System.nanoTime();
 			
-			Tuple_reasoning1_full_test_opt_copy.tuple_reasoning(query, c, pst);
+			Tuple_level_approach.tuple_reasoning(query, c, pst);
 			
 			time1 = System.nanoTime();
 			
 			middle_time = System.nanoTime();
 			
-			Tuple_reasoning1_full_test_opt_copy.prepare_citation_information(c, pst);
+			Tuple_level_approach.prepare_citation_information(c, pst);
 			
-			agg_citations = Tuple_reasoning1_full_test_opt_copy.gen_citation_schema_level(c, pst);
+			agg_citations = Tuple_level_approach.gen_citation_schema_level(c, pst);
 			
 //			 Tuple_reasoning1_full_test_opt.tuple_gen_agg_citations(query, c, pst);
 													
@@ -370,9 +370,9 @@ public class final_stress_test_group_full {
 			
 			time = time /(times * 1000000000);
 						
-			System.out.print(Tuple_reasoning1_full_test_opt_copy.group_num + "	");
+			System.out.print(Tuple_level_approach.group_num + "	");
 			
-			System.out.print(Tuple_reasoning1_full_test_opt_copy.tuple_num + "	");
+			System.out.print(Tuple_level_approach.tuple_num + "	");
 			
 			System.out.print(time + "s	");
 			
@@ -386,7 +386,7 @@ public class final_stress_test_group_full {
 			
 			System.out.print("covering_sets::" + Aggregation5.curr_res + "	");
 			
-			System.out.print("covering_set_size::" + Tuple_reasoning1_full_test_opt_copy.covering_set_schema_level.size() + "	");
+			System.out.print("covering_set_size::" + Tuple_level_approach.covering_set_schema_level.size() + "	");
 			
 			int distinct_view_size = Aggregation6.cal_distinct_views();
 			
@@ -458,15 +458,15 @@ public class final_stress_test_group_full {
 //			
 			
 			
-			System.out.print(Tuple_reasoning1_full_test_opt_copy.covering_set_num * 1.0/Tuple_reasoning1_full_test_opt_copy.tuple_num + "	");
+			System.out.print(Tuple_level_approach.covering_set_num * 1.0/Tuple_level_approach.tuple_num + "	");
 			
-			System.out.print("pre_processing::" + Tuple_reasoning1_full_test_opt_copy.pre_processing_time + "	");
+			System.out.print("pre_processing::" + Tuple_level_approach.pre_processing_time + "	");
 			
-			System.out.print("query::" + Tuple_reasoning1_full_test_opt_copy.query_time + "	");
+			System.out.print("query::" + Tuple_level_approach.query_time + "	");
 			
-			System.out.print("reasoning::" + Tuple_reasoning1_full_test_opt_copy.reasoning_time + "	");
+			System.out.print("reasoning::" + Tuple_level_approach.reasoning_time + "	");
 			
-			System.out.print("population::" + Tuple_reasoning1_full_test_opt_copy.population_time + "	");
+			System.out.print("population::" + Tuple_level_approach.population_time + "	");
 			
 			
 			
@@ -574,9 +574,9 @@ public class final_stress_test_group_full {
 			    c = DriverManager
 			        .getConnection(populate_db.db_url2, populate_db.usr_name , populate_db.passwd);
 				
-			    Tuple_reasoning2_full_test2_copy.prepare_info = false;
+			    Semi_schema_level_approach.prepare_info = false;
 			    
-			    Tuple_reasoning2_full_test2_copy.agg_intersection = agg_intersection;
+			    Semi_schema_level_approach.agg_intersection = agg_intersection;
 			    
 			    double end_time = 0;
 
@@ -590,15 +590,15 @@ public class final_stress_test_group_full {
 							
 				start_time = System.nanoTime();
 				
-				Tuple_reasoning2_full_test2_copy.tuple_reasoning(query, c, pst);
+				Semi_schema_level_approach.tuple_reasoning(query, c, pst);
 				
 				time1 = System.nanoTime();
 				
 				middle_time = System.nanoTime();
 				
-				Tuple_reasoning2_full_test2_copy.prepare_citation_information(c, pst);
+				Semi_schema_level_approach.prepare_citation_information(c, pst);
 				
-				Tuple_reasoning2_full_test2_copy.gen_citation_schema_level(c, pst);
+				Semi_schema_level_approach.gen_citation_schema_level(c, pst);
 				
 //				agg_citations = Tuple_reasoning2_full_test2.tuple_gen_agg_citations(query, c, pst);
 														
@@ -614,9 +614,9 @@ public class final_stress_test_group_full {
 				
 				time = time /(times * 1000000000);
 							
-				System.out.print(Tuple_reasoning2_full_test2_copy.group_num + "	");
+				System.out.print(Semi_schema_level_approach.group_num + "	");
 				
-				System.out.print(Tuple_reasoning2_full_test2_copy.tuple_num + "	");
+				System.out.print(Semi_schema_level_approach.tuple_num + "	");
 				
 				System.out.print(time + "s	");
 				
@@ -630,7 +630,7 @@ public class final_stress_test_group_full {
 
 //				System.out.print("covering_sets::" + Aggregation5.curr_res + "	");
 				
-				System.out.print("covering_set_size::" + Tuple_reasoning2_full_test2_copy.covering_set_schema_level.size() + "	");
+				System.out.print("covering_set_size::" + Semi_schema_level_approach.covering_set_schema_level.size() + "	");
 				
 				int distinct_view_size = Aggregation6.cal_distinct_views();
 				
@@ -702,15 +702,15 @@ public class final_stress_test_group_full {
 //				
 				
 				
-				System.out.print(Tuple_reasoning2_full_test2_copy.covering_set_num * 1.0/Tuple_reasoning2_full_test2_copy.tuple_num + "	");
+				System.out.print(Semi_schema_level_approach.covering_set_num * 1.0/Semi_schema_level_approach.tuple_num + "	");
 				
-				System.out.print("pre_processing::" + Tuple_reasoning2_full_test2_copy.pre_processing_time + "	");
+				System.out.print("pre_processing::" + Semi_schema_level_approach.pre_processing_time + "	");
 				
-				System.out.print("query::" + Tuple_reasoning2_full_test2_copy.query_time + "	");
+				System.out.print("query::" + Semi_schema_level_approach.query_time + "	");
 				
-				System.out.print("reasoning::" + Tuple_reasoning2_full_test2_copy.reasoning_time + "	");
+				System.out.print("reasoning::" + Semi_schema_level_approach.reasoning_time + "	");
 				
-				System.out.print("population::" + Tuple_reasoning2_full_test2_copy.population_time + "	");
+				System.out.print("population::" + Semi_schema_level_approach.population_time + "	");
 				
 				System.out.println();
 				
@@ -746,7 +746,7 @@ public class final_stress_test_group_full {
 			    c = DriverManager
 			        .getConnection(populate_db.db_url2, populate_db.usr_name , populate_db.passwd);
 				
-			    schema_reasoning.prepare_info = false;
+			    Schema_level_approach.prepare_info = false;
 			    			    
 			    double end_time = 0;
 
@@ -760,15 +760,15 @@ public class final_stress_test_group_full {
 							
 				start_time = System.nanoTime();
 				
-				schema_reasoning.tuple_reasoning(query, c, pst);
+				Schema_level_approach.tuple_reasoning(query, c, pst);
 				
 				inter_time = System.nanoTime();
 								
-				schema_reasoning.execute_query(query, c, pst);
+				Schema_level_approach.execute_query(query, c, pst);
 				
 				middle_time = System.nanoTime();
 				
-				schema_reasoning.prepare_citation_information(c, pst);
+				Schema_level_approach.prepare_citation_information(c, pst);
 				
 //				agg_citations = schema_reasoning.tuple_gen_agg_citations(query, c, pst);
 														
@@ -784,7 +784,7 @@ public class final_stress_test_group_full {
 				
 				double query_time = (middle_time - inter_time) * 1.0/1000000000;
 							
-				System.out.print(schema_reasoning.tuple_num + "	");
+				System.out.print(Schema_level_approach.tuple_num + "	");
 				
 				System.out.print(time + "s	");
 				
@@ -796,7 +796,7 @@ public class final_stress_test_group_full {
 				
 //				System.out.print("covering_sets::" + schema_reasoning.covering_set_query + "	");
 				
-				System.out.print("covering_set_size::" + schema_reasoning.covering_set_query.size() + "	");
+				System.out.print("covering_set_size::" + Schema_level_approach.covering_set_query.size() + "	");
 				
 				int distinct_view_size = Aggregation5.cal_distinct_views();
 				
@@ -868,7 +868,7 @@ public class final_stress_test_group_full {
 //				
 				
 								
-				System.out.print("pre_processing::" + schema_reasoning.pre_processing_time + "	");
+				System.out.print("pre_processing::" + Schema_level_approach.pre_processing_time + "	");
 				
 				System.out.print("query::" + query_time + "	");
 												

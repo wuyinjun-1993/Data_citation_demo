@@ -28,6 +28,7 @@ import edu.upenn.cis.citation.Operation.op_not_equal;
 import edu.upenn.cis.citation.citation_view.*;
 import edu.upenn.cis.citation.datalog.Parse_datalog;
 import edu.upenn.cis.citation.datalog.Query_converter;
+import edu.upenn.cis.citation.examples.Load_views_and_citation_queries;
 
 public class populate_db {
 	
@@ -55,6 +56,7 @@ public class populate_db {
 	public static String prov_url = "jdbc:postgresql://localhost:5432/provenance";
 
 
+	public static String view_file = "test_example/views";
 	
 //	public static String db_url = "jdbc:postgresql://localhost:5432/example";
 
@@ -88,7 +90,7 @@ public class populate_db {
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");
 	    c = DriverManager
-	        .getConnection(db_url2, usr_name , passwd);
+	        .getConnection(db_url1, usr_name , passwd);
 //		
 //		
 //		delete_view_single_table("v2", "family_c", c, pst);
@@ -96,9 +98,14 @@ public class populate_db {
 //	    delete_views(c, pst);
 	    drop_citation_view_cols(c, pst);
 		
-//		initial();
+		initial(c, pst);
 		
 		
+	}
+	
+	public static void set_test_file_name(String file_name)
+	{
+	  view_file = file_name;
 	}
 	
 	public static HashMap<String, String> get_primary_key_type(String table_name, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
@@ -489,7 +496,7 @@ public class populate_db {
 			
 			if(check_exist_table(relation_names.get(i) + suffix, c, pst))
 			{
-				query = "drop table " + relation_names.get(i) + suffix + " cascade";
+				query = "drop table IF EXISTS " + relation_names.get(i) + suffix + " cascade";
 				
 				pst = c.prepareStatement(query);
 				
@@ -502,7 +509,7 @@ public class populate_db {
 			
 			if(all_attributes.contains("citation_view"))
 			{
-				query = "alter table "+ relation_names.get(i) + " drop column citation_view";
+				query = "alter table "+ relation_names.get(i) + " drop column IF EXISTS citation_view";
 				
 				pst = c.prepareStatement(query);
 				
@@ -658,18 +665,18 @@ public class populate_db {
 		pst.execute();
 	}
 	
-	public static void initial() throws SQLException, ClassNotFoundException
+	public static void initial(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
-		Connection c = null;
-	      PreparedStatement pst = null;
-		Class.forName("org.postgresql.Driver");
-	    c = DriverManager
-	        .getConnection(db_url, usr_name , passwd);
+//		Connection c = null;
+//	      PreparedStatement pst = null;
+//		Class.forName("org.postgresql.Driver");
+//	    c = DriverManager
+//	        .getConnection(db_url, usr_name , passwd);
 //		add_column(c,pst);
 	    renew_table2(c, pst);
 	    
 		populate_db2(c, pst);
-		c.close();
+//		c.close();
 	}
 	
 	public static void update(Query view) throws ClassNotFoundException, SQLException
@@ -1058,7 +1065,8 @@ public class populate_db {
 	
 	public static void populate_db2(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
-	 	Vector<Query> views = get_views_schema(c, pst);
+//	 	Vector<Query> views = get_views_schema(c, pst);
+	  Vector<Query> views = Load_views_and_citation_queries.get_views(view_file, c, pst);
 	 	
  		HashMap<String, String> table_name_view = new HashMap<String, String>();
 

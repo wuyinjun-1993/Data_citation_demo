@@ -15,11 +15,29 @@ public class Argument {
   public int    type;  // VAR or CONST
   public String name;
   
+  public String data_type = new String();
+  
+  public String value = null;
+  
   public String origin_name = null;
   
   public String relation_name = null; //not the original name
   
 //  public String origin_relation_name = null;
+  
+  public static void main(String [] args)
+  {
+    Argument arg1 = new Argument("family|family_id", "family");
+       
+    Argument arg2 = new Argument("family|family_id", "family");
+    
+    arg1.set_value("1");
+    
+    System.out.println(arg1.equals(arg2));
+    
+    System.out.println(arg2.value);
+    
+  }
   
   Argument(String name, String relation_name, boolean isConstant) {
     if (name == null) {
@@ -39,7 +57,7 @@ public class Argument {
     
     this.relation_name = relation_name;
   }
-
+  
   public Argument(String name, String relation_name) {
       this(name, relation_name, false);
   }
@@ -55,6 +73,16 @@ public class Argument {
       this.origin_name = lambda_term;
   }
 
+  public void set_value(String value)
+  {
+    this.value = value;
+  }
+  
+  public void set_data_type(String data_type)
+  {
+    this.data_type = data_type;
+  }
+  
   /**
    * Given a partial mapping phi, an HH, and a set of distinguished
    * variables, checks whether this argument can be 
@@ -141,7 +169,7 @@ public class Argument {
    * HashSet collection, called when HashSet.equals() is called.
    */
   public int hashCode() {
-    return (type * 10000 + name.hashCode());
+    return toString().hashCode();
   }
 
   public String toString() {

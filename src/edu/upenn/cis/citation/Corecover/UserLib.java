@@ -48,7 +48,7 @@ public class UserLib {
    * possible mapping targets of B, and so on.  
    */
   public static Vector genAllMappings(Vector srcArgs, Vector dstArgs) {
-    Map partialMap  = new HashMap();
+    HashMap partialMap  = new HashMap();
     Vector mappings = new Vector();
     buildHeadHomos(mappings, srcArgs, dstArgs, partialMap, 0); 
     return mappings;
@@ -59,11 +59,11 @@ public class UserLib {
    */
   private static void buildHeadHomos(Vector headHomos, 
 				     Vector srcArgs, Vector dstArgs,
-				     Map partialMap, int srcArgIndex) {
+				     HashMap partialMap, int srcArgIndex) {
     
     if (srcArgIndex == srcArgs.size()) { // we reach the last arg
       // we need to clone one so that we can operate on the partial one later
-      Map completeMap = (Map) ((HashMap) partialMap).clone(); 
+      HashMap completeMap = (HashMap) (partialMap.clone()); 
       headHomos.add(new Mapping(completeMap));
       return;
     }
@@ -117,7 +117,7 @@ public class UserLib {
 	}
       }
       
-      mappings.add(new Mapping(map));
+      mappings.add(new HashMap(map));
     }
     
     return mappings;

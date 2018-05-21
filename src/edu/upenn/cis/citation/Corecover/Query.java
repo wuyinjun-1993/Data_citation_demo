@@ -22,31 +22,18 @@ public class Query {
   int     queryType = GoodPlan.randomQuery;
   
   public HashMap<String, String> subgoal_name_mapping;
-  
-  public HashMap<String, Integer> subgoal_id_mappings;
 
   int     count = 0; // number of equivalent views in the same class
 
   public Vector<Lambda_term> lambda_term = new Vector<Lambda_term>();
 
   public Vector<Conditions> conditions = null;
+
+  public HashMap<String, Integer> subgoal_id_mappings;
   
   Vector<Lambda_term> get_lambda_term()
   {
 	  return lambda_term;
-  }
-  
-  
-  public HashSet<Conditions> get_all_negated_conditions()
-  {
-    HashSet<Conditions> negated_conditions = new HashSet<Conditions>();
-    
-    for(Conditions condition: conditions)
-    {
-      negated_conditions.add(Conditions.negation(condition));
-    }
-    
-    return negated_conditions;
   }
   /**
    * Creates a query given an id.
@@ -530,13 +517,26 @@ public class Query {
     StringBuffer result = new StringBuffer(name);
     result.append("(");
     Vector<Argument> head_args = head.args;
-    for (int i = 0; i < head.size(); i ++) {
+    for (int i = 0; i < head.args.size(); i ++) {
     	
     	
       result.append(head.getArgs().elementAt(i).toString());
       if ( i < head.size() - 1)
 	result.append(",");
     }
+    
+    if(head.agg_args != null)
+    {
+      for(int i = 0; i<head.agg_args.size(); i++)
+      {
+        if(head.args.size() > 0 || (head.args.size() == 0 && i >= 1))
+          result.append(",");
+        
+        result.append(head.agg_function.get(i) + "(" + head.agg_args.get(i) + ")");      
+        
+      }
+    }
+    
     result.append(") :- ");
 
     // body
@@ -720,34 +720,34 @@ public class Query {
      test2(1, m, n, args[2], args[4], args[3]);
      //test2(20, m, n, args[2], args[4], args[3]);
   }
-  static void test1() {
-    // generates a conjunctive query
-    Vector relations = GoodPlan.genRelations();
-    Query query = new Query("testQuery", relations,
-			    GoodPlan.chainQuery, GoodPlan.querySubgoalNum);
-    System.out.println("Query is:\n" + query.toString());
-
-    Vector headHomos = query.getHeadHomos();
-    System.out.println("There are " + headHomos.size() + " HHs.");
-    for (int i = 0; i < headHomos.size(); i ++) {
-      Mapping headHomo = (Mapping) headHomos.elementAt(i);
-      System.out.println(headHomo.toString());
-
-      // tests "apply()"
-      Query newQuery = headHomo.apply(query);
-      if (newQuery == null) {
-	System.out.println("Query test failed: newQuery shouldn't be null.");
-	System.exit(1);
-      }
-      System.out.println("Under this HH, the new query is:");
-      System.out.println(newQuery.toString() + "\n");
-
-      // rename
-      newQuery.rename();
-      System.out.println("After renaming, the new query is:");
-      System.out.println(newQuery.toString() + "\n");
-    }
-  }
+//  static void test1() {
+//    // generates a conjunctive query
+//    Vector relations = GoodPlan.genRelations();
+//    Query query = new Query("testQuery", relations,
+//			    GoodPlan.chainQuery, GoodPlan.querySubgoalNum);
+//    System.out.println("Query is:\n" + query.toString());
+//
+//    Vector headHomos = query.getHeadHomos();
+//    System.out.println("There are " + headHomos.size() + " HHs.");
+//    for (int i = 0; i < headHomos.size(); i ++) {
+//      Mapping headHomo = (Mapping) headHomos.elementAt(i);
+//      System.out.println(headHomo.toString());
+//
+//      // tests "apply()"
+//      Query newQuery = headHomo.apply(query);
+//      if (newQuery == null) {
+//	System.out.println("Query test failed: newQuery shouldn't be null.");
+//	System.exit(1);
+//      }
+//      System.out.println("Under this HH, the new query is:");
+//      System.out.println(newQuery.toString() + "\n");
+//
+//      // rename
+//      newQuery.rename();
+//      System.out.println("After renaming, the new query is:");
+//      System.out.println(newQuery.toString() + "\n");
+//    }
+//  }
 
 
 
@@ -932,5 +932,16 @@ public class Query {
                 System.err.println ("Error writing to file" + filename);
             }
     }
+    public HashSet<Conditions> get_all_negated_conditions()
+  {
+    HashSet<Conditions> negated_conditions = new HashSet<Conditions>();
+    
+    for(Conditions condition: conditions)
+    {
+      negated_conditions.add(Conditions.negation(condition));
+    }
+    
+    return negated_conditions;
+  }
 
 }

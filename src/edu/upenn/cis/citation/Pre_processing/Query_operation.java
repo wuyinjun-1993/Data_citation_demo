@@ -106,7 +106,7 @@ public class Query_operation {
 			
 			Lambda_term l_term = q.lambda_term.get(i);
 			
-			String l_term_str = l_term.name.replaceFirst("\\" + populate_db.separator, ".");
+			String l_term_str = l_term.arg_name.replaceFirst("\\" + populate_db.separator, ".");
 			
 			if(i >= 1)
 				str += l_term_str;
@@ -232,6 +232,20 @@ public class Query_operation {
         }
         
 	}
+	
+	public static void add_connection_citation_with_query_by_view_name(String vname, Vector<String[]> qname_block, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+    {
+        
+        int cid = citation_view_operation.get_citation_id_by_view_name(vname, c, pst);
+        
+        for(int i = 0; i<qname_block.size(); i++)
+        {
+            int qid = get_query_id(qname_block.get(i)[0], c, pst);
+            
+            insert_citation_query_connection(cid, qid, qname_block.get(i)[1], c, pst);
+        }
+        
+    }
 	
 	public static void add_connection_citation_with_query(String cname, String qname, String block, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
@@ -585,79 +599,79 @@ public class Query_operation {
 	}
 	
 	
-	static Query gen_sample_view() throws ClassNotFoundException, SQLException
-	{
-//		Vector<Argument> head_args = new Vector<Argument>();
+//	static Query gen_sample_view() throws ClassNotFoundException, SQLException
+//	{
+////		Vector<Argument> head_args = new Vector<Argument>();
+//////		
+////		head_args.add(new Argument("family_type", "family"));
 ////		
-//		head_args.add(new Argument("family_type", "family"));
+////		Subgoal head = new Subgoal("q", head_args);
 //		
-//		Subgoal head = new Subgoal("q", head_args);
-		
-		Vector<Subgoal> subgoals = new Vector<Subgoal>();
-		
-//		Vector<Argument> args1 = view_operation.get_full_schema("family", "family", c, pst);
+//		Vector<Subgoal> subgoals = new Vector<Subgoal>();
 //		
-//		Vector<Argument> args2 = view_operation.get_full_schema("family1", "family", c, pst);
+////		Vector<Argument> args1 = view_operation.get_full_schema("family", "family", c, pst);
+////		
+////		Vector<Argument> args2 = view_operation.get_full_schema("family1", "family", c, pst);
+////		
+//		Vector<Argument> args3 = new Vector<Argument> ();//view_operation.get_full_schema("introduction", "introduction", c, pst);
 //		
-		Vector<Argument> args3 = new Vector<Argument> ();//view_operation.get_full_schema("introduction", "introduction", c, pst);
-		
-//		subgoals.add(new Subgoal("family", args1));
-		
-//		subgoals.add(new Subgoal("family1", args2));
-				
-//		subgoals.add(new Subgoal("introduction", args3));
+////		subgoals.add(new Subgoal("family", args1));
 //		
-//		Vector<Conditions> conditions = new Vector<Conditions>();
-		
-//		conditions.add(new Conditions(new Argument("family_id", "family"), "family", new op_less_equal(), new Argument("5"), new String()));
+////		subgoals.add(new Subgoal("family1", args2));
+//				
+////		subgoals.add(new Subgoal("introduction", args3));
+////		
+////		Vector<Conditions> conditions = new Vector<Conditions>();
 //		
-//		conditions.add(new Conditions(new Argument("family_id", "family1"), "family1", new op_less_equal(), new Argument("5"), new String()));
+////		conditions.add(new Conditions(new Argument("family_id", "family"), "family", new op_less_equal(), new Argument("5"), new String()));
+////		
+////		conditions.add(new Conditions(new Argument("family_id", "family1"), "family1", new op_less_equal(), new Argument("5"), new String()));
+////		
+////		conditions.add(new Conditions(new Argument("family_id", "introduction"), "introduction", new op_less_equal(), new Argument("5"), new String()));
 //		
-//		conditions.add(new Conditions(new Argument("family_id", "introduction"), "introduction", new op_less_equal(), new Argument("5"), new String()));
-		
-//		conditions.add(new Conditions(new Argument("in_gtip", "object"), "object", new op_equal(), new Argument("'true'"), new String()));
-		
-		HashMap<String, String> subgoal_name_mapping = new HashMap<String, String>();
-				
-		subgoal_name_mapping.put("contributor", "contributor");
-		
-		subgoal_name_mapping.put("contributor2intro", "contributor2intro");
-		
-		subgoal_name_mapping.put("introduction", "introduction");
-
-		Vector<String []> head_vars = new Vector<String []>();
-		
-		String [] head_v1 = {"first_names", "contributor"};
-		
-		String [] head_v2 = {"surname", "contributor"};
-		
-		head_vars.add(head_v1);
-		
-		head_vars.add(head_v2);
-		
-		Vector<String []> condition_str = new Vector<String []>();
-		
-		Vector<String []> lambda_term_str = new Vector<String []>();
-		
-		String [] l_str = {"family_id", "introduction"};
-		
-		lambda_term_str.add(l_str);
-		
-		String [] c_str1 = {"contributor_id", "contributor2intro", "=", "contributor_id", "contributor"};
-		
-		String [] c_str2 = {"family_id", "contributor2intro", "=", "family_id", "introduction"};
-		
-		condition_str.add(c_str1);
-		
-		condition_str.add(c_str2);
-		
-//		Query q = new Query("q", head, subgoals, new Vector<Lambda_term>(), conditions, subgoal_name_mapping);
+////		conditions.add(new Conditions(new Argument("in_gtip", "object"), "object", new op_equal(), new Argument("'true'"), new String()));
 //		
-//		System.out.println(q);
-						
-		return Gen_query.gen_query("q10", subgoal_name_mapping, head_vars, condition_str, lambda_term_str);
-	}
-	
+//		HashMap<String, String> subgoal_name_mapping = new HashMap<String, String>();
+//				
+//		subgoal_name_mapping.put("contributor", "contributor");
+//		
+//		subgoal_name_mapping.put("contributor2intro", "contributor2intro");
+//		
+//		subgoal_name_mapping.put("introduction", "introduction");
+//
+//		Vector<String []> head_vars = new Vector<String []>();
+//		
+//		String [] head_v1 = {"first_names", "contributor"};
+//		
+//		String [] head_v2 = {"surname", "contributor"};
+//		
+//		head_vars.add(head_v1);
+//		
+//		head_vars.add(head_v2);
+//		
+//		Vector<String []> condition_str = new Vector<String []>();
+//		
+//		Vector<String []> lambda_term_str = new Vector<String []>();
+//		
+//		String [] l_str = {"family_id", "introduction"};
+//		
+//		lambda_term_str.add(l_str);
+//		
+//		String [] c_str1 = {"contributor_id", "contributor2intro", "=", "contributor_id", "contributor"};
+//		
+//		String [] c_str2 = {"family_id", "contributor2intro", "=", "family_id", "introduction"};
+//		
+//		condition_str.add(c_str1);
+//		
+//		condition_str.add(c_str2);
+//		
+////		Query q = new Query("q", head, subgoals, new Vector<Lambda_term>(), conditions, subgoal_name_mapping);
+////		
+////		System.out.println(q);
+//						
+//		return Gen_query.gen_query("q10", subgoal_name_mapping, head_vars, condition_str, lambda_term_str);
+//	}
+//	
 	public static void add(Query v, String name, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
 		insert_query(v, name, c, pst);

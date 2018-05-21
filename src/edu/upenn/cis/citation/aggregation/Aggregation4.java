@@ -35,9 +35,9 @@ import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test2;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_test;
-import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_full_min_test;
+import edu.upenn.cis.citation.reasoning2.Tuple_level_approach_min;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_min_test;
-import edu.upenn.cis.citation.reasoning2.Tuple_reasoning2_full_min_test;
+import edu.upenn.cis.citation.reasoning2.Semi_schema_level_approach_min;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning2_min_test;
 
 public class Aggregation4 {
@@ -46,7 +46,7 @@ public class Aggregation4 {
 	
 	public static HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping = new HashMap<String, HashMap<String, HashSet<String>>>();
 	
-	public static void do_aggregate(ArrayList<Covering_set> curr_res, ArrayList<Covering_set> c_views, int seq, ArrayList<HashMap<String, HashSet<String>> > author_list, ArrayList<HashMap<String, Integer>> view_query_mapping, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, StringList view_list, HashMap<String, Boolean> full_flag, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	public static void do_aggregate(ArrayList<Covering_set> curr_res, ArrayList<Covering_set> c_views, int seq, ArrayList<HashMap<String, HashSet<String>> > author_list, ArrayList<HashMap<String, Integer>> view_query_mapping, HashMap<String, ArrayList<ArrayList<String>>> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, StringList view_list, HashMap<String, Boolean> full_flag, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
 		
 		if(seq == 0)
@@ -169,7 +169,7 @@ public class Aggregation4 {
 		
 	}
 	
-	public static void do_aggregate(ArrayList<Covering_set> curr_res, ArrayList<Covering_set> c_views, int seq, ArrayList<HashMap<String, HashSet<String>> > author_list, ArrayList<HashMap<String, Integer>> view_query_mapping, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, StringList view_list, HashMap<String, Boolean> full_flag, HashMap<String, String> view_citation_mapping, boolean tuple_level, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	public static void do_aggregate(ArrayList<Covering_set> curr_res, ArrayList<Covering_set> c_views, int seq, ArrayList<HashMap<String, HashSet<String>> > author_list, ArrayList<HashMap<String, Integer>> view_query_mapping, HashMap<String, ArrayList<ArrayList<String>>> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, StringList view_list, HashMap<String, Boolean> full_flag, HashMap<String, String> view_citation_mapping, boolean tuple_level, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
 		
 	
@@ -270,7 +270,7 @@ public class Aggregation4 {
 		
 	}
 	
-	public static void do_aggregate_min(Covering_set c_views, int seq, HashMap<String, HashSet<String>> author_list, ArrayList<HashMap<String, Integer>> view_query_mapping, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, StringList view_list, HashMap<String, Boolean> full_flag, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	public static void do_aggregate_min(Covering_set c_views, int seq, HashMap<String, HashSet<String>> author_list, ArrayList<HashMap<String, Integer>> view_query_mapping, HashMap<String, ArrayList<ArrayList<String>>> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, StringList view_list, HashMap<String, Boolean> full_flag, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
 		
 	
@@ -554,7 +554,7 @@ public class Aggregation4 {
 	
 	
 	
-	public static HashSet<String> do_agg_intersection_min(ResultSet rs, Covering_set c_views, int[] intervals, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, ClassNotFoundException, JSONException
+	public static HashSet<String> do_agg_intersection_min(ResultSet rs, Covering_set c_views, int[] intervals, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, ArrayList<ArrayList<String>>> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, ClassNotFoundException, JSONException
 	{
 		
 		HashMap<String, Boolean> full_flag = new HashMap<String, Boolean>();
@@ -580,16 +580,16 @@ public class Aggregation4 {
 		
 		ArrayList<HashSet<Head_strs>> lambda_values = new ArrayList<HashSet<Head_strs>>();
 		
-		int tuple_num = (tuple_level) ? Tuple_reasoning1_full_min_test.tuple_num : Tuple_reasoning2_full_min_test.tuple_num;
+		int tuple_num = (tuple_level) ? Tuple_level_approach_min.tuple_num : Semi_schema_level_approach_min.tuple_num;
 		
 		for(int i = 0; i<tuple_num; i++)
 		{
 			rs.absolute(i + 1);
 			
 			if(tuple_level)
-				Tuple_reasoning1_full_min_test.get_views_parameters(single_views, rs, start_pos, lambda_values);
+				Tuple_level_approach_min.get_views_parameters(single_views, rs, start_pos, lambda_values);
 			else
-				Tuple_reasoning2_full_min_test.get_views_parameters(single_views, rs, start_pos, lambda_values);
+				Semi_schema_level_approach_min.get_views_parameters(single_views, rs, start_pos, lambda_values);
 			
 //			convert_covering_set2citation(i, curr_res, author_lists, view_query_mapping, query_lambda_str, author_mapping, max_num, query_ids, view_list, c, pst, tuple_level);
 			
@@ -779,19 +779,19 @@ public class Aggregation4 {
 		
 		if(tuple_level)
 		{
-			citation_queries_ids = Tuple_reasoning1_full_min_test.get_citation_queries(single_view.get_name());
+			citation_queries_ids = Tuple_level_approach_min.get_citation_queries(single_view.get_name());
 			
-			citation_queries = Tuple_reasoning1_full_min_test.citation_queries;
+			citation_queries = Tuple_level_approach_min.citation_queries;
 			
-			query_ids = Tuple_reasoning1_full_min_test.query_ids;
+			query_ids = Tuple_level_approach_min.query_ids;
 		}
 		else
 		{
-			citation_queries_ids = Tuple_reasoning2_full_min_test.get_citation_queries(single_view.get_name());
+			citation_queries_ids = Semi_schema_level_approach_min.get_citation_queries(single_view.get_name());
 			
-			citation_queries = Tuple_reasoning2_full_min_test.citation_queries;
+			citation_queries = Semi_schema_level_approach_min.citation_queries;
 			
-			query_ids = Tuple_reasoning2_full_min_test.query_ids;
+			query_ids = Semi_schema_level_approach_min.query_ids;
 		}
 		
 		Set<String> keys = citation_queries_ids.keySet();
@@ -900,7 +900,7 @@ public class Aggregation4 {
 			if(k >= 1)
 				query += ",";
 			
-			String l_name = q.lambda_term.get(k).name;
+			String l_name = q.lambda_term.get(k).arg_name;
 			
 			String table_name = l_name.substring(0, l_name.indexOf(populate_db.separator));
 			
@@ -1008,7 +1008,7 @@ public class Aggregation4 {
 		return selected_covering_set;
 	}
 	
-	public static HashSet<String> do_agg_intersection_min(ResultSet rs, HashMap<int[], Covering_set > c_view_map, Covering_set c_views, int start_pos, ArrayList<Head_strs> heads, HashMap<Head_strs, ArrayList<Integer>> head_strs_rows_mapping, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, ClassNotFoundException, JSONException
+	public static HashSet<String> do_agg_intersection_min(ResultSet rs, HashMap<int[], Covering_set > c_view_map, Covering_set c_views, int start_pos, ArrayList<Head_strs> heads, HashMap<Head_strs, ArrayList<Integer>> head_strs_rows_mapping, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, ArrayList<ArrayList<String>>> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, ClassNotFoundException, JSONException
 	{
 		
 		HashMap<String, Boolean> full_flag = new HashMap<String, Boolean>();

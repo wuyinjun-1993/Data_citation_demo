@@ -39,7 +39,7 @@ import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test2;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_test;
-import edu.upenn.cis.citation.reasoning1.schema_reasoning;
+import edu.upenn.cis.citation.reasoning1.Schema_level_approach;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_min_test;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning2_min_test;
 import edu.upenn.cis.citation.stress_test.query_generator;
@@ -322,7 +322,7 @@ public class test_opt_equality {
 		    c = DriverManager
 		        .getConnection(populate_db.db_url2, populate_db.usr_name , populate_db.passwd);
 			
-		    schema_reasoning.prepare_info = false;
+		    Schema_level_approach.prepare_info = false;
 		    
 			HashSet<String> agg_citations = null;
 			
@@ -333,11 +333,11 @@ public class test_opt_equality {
 			
 			start_time = System.nanoTime();
 			
-			schema_reasoning.tuple_reasoning(query, c, pst);
+			Schema_level_approach.tuple_reasoning(query, c, pst);
 			
 			end_time = System.nanoTime();
 			
-			schema_reasoning.tuple_gen_agg_citations(query, c, pst);
+			Schema_level_approach.tuple_gen_agg_citations(query, c, pst);
 												
 //			Set<int[]> keys = schema_reasoning.c_view_map.keySet();
 //			
@@ -426,11 +426,11 @@ public class test_opt_equality {
 //			System.out.print("Aggregation::" + Tuple_reasoning1_full_test.aggregation_time + "	");
 					
 			
-			System.out.print(schema_reasoning.covering_set_query.toString() + "	");
+			System.out.print(Schema_level_approach.covering_set_query.toString() + "	");
 			
 			Vector<String> agg_results = new Vector<String>();
 			
-			for(Iterator iter = schema_reasoning.covering_set_query.iterator(); iter.hasNext();)
+			for(Iterator iter = Schema_level_approach.covering_set_query.iterator(); iter.hasNext();)
 			{
 				Covering_set covering_set = (Covering_set) iter.next();
 				 
@@ -479,9 +479,9 @@ public class test_opt_equality {
 				covering_sets2 = Tuple_reasoning1_full_test_opt.c_view_map.get(key);
 			}
 			
-			schema_reasoning.tuple_reasoning(query, c, pst);
+			Schema_level_approach.tuple_reasoning(query, c, pst);
 			
-			HashSet<Covering_set> minus = schema_reasoning.covering_set_query;
+			HashSet<Covering_set> minus = Schema_level_approach.covering_set_query;
 			
 			System.out.println(covering_sets2.size());
 			

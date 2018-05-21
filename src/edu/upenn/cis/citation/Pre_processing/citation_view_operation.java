@@ -213,7 +213,7 @@ public class citation_view_operation {
 	        
 	        return id;
 	    }
-	
+	   
 	static void insert_citation2view(int view_id, int citation_id, Connection c, PreparedStatement pst) throws SQLException
 	{
 		String query = "insert into citation2view values ('" + citation_id + "','" + view_id + "')";

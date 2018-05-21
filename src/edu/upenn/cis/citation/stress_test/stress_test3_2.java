@@ -32,8 +32,8 @@ import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test2;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_test;
-import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_full_min_test;
-import edu.upenn.cis.citation.reasoning2.Tuple_reasoning2_full_min_test;
+import edu.upenn.cis.citation.reasoning2.Tuple_level_approach_min;
+import edu.upenn.cis.citation.reasoning2.Semi_schema_level_approach_min;
 import edu.upenn.cis.citation.user_query.query_storage;
 import junit.framework.Assert;
 

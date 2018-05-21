@@ -43,7 +43,7 @@ import edu.upenn.cis.citation.gen_citation.gen_citation1;
 import edu.upenn.cis.citation.output.output2excel;
 import sun.util.resources.cldr.ur.CurrencyNames_ur;
 
-public class Tuple_reasoning2_full_test2_copy {
+public class Semi_schema_level_approach {
 	
 	
 	static HashMap<String, Query> view_mapping = new HashMap<String, Query>();
@@ -66,13 +66,13 @@ public class Tuple_reasoning2_full_test2_copy {
 	
 	static HashSet<String> str_set = new HashSet<String>();
 	
-	static ArrayList<HashMap<String, Integer>> view_query_mapping = null;
+	public static ArrayList<HashMap<String, Integer>> view_query_mapping = null;
 	
 	static HashMap<String, HashSet<Argument>> relation_arg_mapping = new HashMap<String, HashSet<Argument>>();
 	
 	static ArrayList<Lambda_term[]> query_lambda_str = new ArrayList<Lambda_term[]>();
 	
-	static HashMap<String, Unique_StringList> author_mapping = new HashMap<String, Unique_StringList>(); 
+	public static HashMap<String, ArrayList<ArrayList<String>>> author_mapping = new HashMap<String, ArrayList<ArrayList<String>>>(); 
 	
 	public static HashMap<String, HashSet<Covering_set> > c_view_map = new HashMap<String, HashSet<Covering_set>>();
 	
@@ -106,7 +106,7 @@ public class Tuple_reasoning2_full_test2_copy {
 	
 	public static IntList query_ids = new IntList();
 	
-	static StringList view_list = new StringList();
+	public static StringList view_list = new StringList();
 	
 	static int Resultset_prefix_col_num = 0;
 	
@@ -248,92 +248,6 @@ public class Tuple_reasoning2_full_test2_copy {
 ////		Vector<String> subset_agg_citations = Tuple_reasoning2_test.tuple_gen_agg_citations(c_views, ids);
 //
 //		c.close();
-	}
-	
-	static Query gen_query() throws SQLException, ClassNotFoundException
-	{
-		Class.forName("org.postgresql.Driver");
-        Connection c = DriverManager
-           .getConnection(populate_db.db_url,
-       	        populate_db.usr_name,populate_db.passwd);
-		
-        PreparedStatement pst = null;
-        
-		Vector<Argument> head_args = new Vector<Argument>();
-		
-		head_args.add(new Argument("family" + populate_db.separator + "family_id", "family"));
-				
-		
-//		head_args.add(new Argument("family1" + populate_db.separator + "family_id", "family1"));
-		
-		head_args.add(new Argument("introduction" + populate_db.separator + "family_id", "introduction"));
-
-		
-//		head_args.add(new Argument("introduction1" + populate_db.separator + "family_id", "introduction1"));
-				
-//		head_args.add(new Argument("introduction2" + populate_db.separator + "family_id", "introduction2"));
-		
-		Subgoal head = new Subgoal("q", head_args);
-		
-		Vector<Subgoal> subgoals = new Vector<Subgoal>();
-		
-		Vector<Argument> args1 = view_operation.get_full_schema("family", "family", c, pst);
-		
-//		Vector<Argument> args2 = view_operation.get_full_schema("family1", "family", c, pst);
-		
-		Vector<Argument> args3 = view_operation.get_full_schema("introduction", "introduction", c, pst);
-		
-//		Vector<Argument> args4 = view_operation.get_full_schema("introduction1", "introduction", c, pst);
-		
-//		Vector<Argument> args5 = view_operation.get_full_schema("introduction2", "introduction", c, pst);
-		
-		subgoals.add(new Subgoal("family", args1));
-		
-//		subgoals.add(new Subgoal("family1", args2));
-				
-		subgoals.add(new Subgoal("introduction", args3));
-		
-//		subgoals.add(new Subgoal("introduction1", args4));
-		
-//		subgoals.add(new Subgoal("introduction2", args5));
-		
-		Vector<Conditions> conditions = new Vector<Conditions>();
-		
-		conditions.add(new Conditions(new Argument("family_id", "family"), "family", new op_equal(), new Argument("family_id", "introduction"), "introduction"));
-//		
-//		conditions.add(new Conditions(new Argument("family_id", "family1"), "family1", new op_less_equal(), new Argument("2"), new String()));
-//		
-//		conditions.add(new Conditions(new Argument("family_id", "introduction"), "introduction", new op_less_equal(), new Argument("2"), new String()));
-		
-//		conditions.add(new Conditions(new Argument("family_id", "introduction1"), "introduction1", new op_less_equal(), new Argument("2"), new String()));
-		
-//		conditions.add(new Conditions(new Argument("family_id", "introduction2"), "introduction2", new op_less_equal(), new Argument("2"), new String()));
-
-		
-//		conditions.add(new Conditions(new Argument("in_gtip", "object"), "object", new op_equal(), new Argument("'true'"), new String()));
-		
-		HashMap<String, String> subgoal_name_mapping = new HashMap<String, String>();
-		
-		subgoal_name_mapping.put("family", "family");
-		
-//		subgoal_name_mapping.put("family1", "family");
-				
-		subgoal_name_mapping.put("introduction", "introduction");
-		
-//		subgoal_name_mapping.put("introduction1", "introduction");
-
-//		subgoal_name_mapping.put("introduction2", "introduction");
-
-		
-		Query q = new Query("q", head, subgoals, new Vector<Lambda_term>(), conditions, subgoal_name_mapping);
-		
-		System.out.println(q);
-		
-		c.close();
-		
-		return q;
-		
-		
 	}
 	
 //	public static HashSet<String> tuple_gen_agg_citations(Query query, ArrayList<Head_strs> heads) throws ClassNotFoundException, SQLException, JSONException
@@ -2669,23 +2583,23 @@ public class Tuple_reasoning2_full_test2_copy {
 //		return citations;
 //	}
 
-	static HashSet<String> gen_citation(ArrayList<Covering_set> c_views, Connection c, PreparedStatement pst, ArrayList<HashMap<String, Integer>> view_query_mapping) throws ClassNotFoundException, SQLException, JSONException
-	{
-		HashSet<String> citations = new HashSet<String>();
-						
-		JSONObject json_obj = new JSONObject();
-		
-		HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping = new HashMap<String, HashMap<String, HashSet<String>>>();
-		
-		for(int p =0; p<c_views.size(); p++)
-		{								
-			HashSet<String> str = gen_citation1.get_citations3(c_views.get(p), c, pst, view_list, view_query_mapping, author_mapping, max_author_num, query_ids, query_lambda_str, view_author_mapping, populate_db.star_op);
-			
-			citations.addAll(str);
-		}
-	
-		return citations;
-	}
+//	static HashSet<String> gen_citation(ArrayList<Covering_set> c_views, Connection c, PreparedStatement pst, ArrayList<HashMap<String, Integer>> view_query_mapping) throws ClassNotFoundException, SQLException, JSONException
+//	{
+//		HashSet<String> citations = new HashSet<String>();
+//						
+//		JSONObject json_obj = new JSONObject();
+//		
+//		HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping = new HashMap<String, HashMap<String, HashSet<String>>>();
+//		
+//		for(int p =0; p<c_views.size(); p++)
+//		{								
+//			HashSet<String> str = gen_citation1.get_citations3(c_views.get(p), c, pst, view_list, view_query_mapping, author_mapping, max_author_num, query_ids, query_lambda_str, view_author_mapping, populate_db.star_op);
+//			
+//			citations.addAll(str);
+//		}
+//	
+//		return citations;
+//	}
 
 	
 	

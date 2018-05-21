@@ -180,7 +180,7 @@ public class final_stress_test_group_min3 {
 			catch(Exception e)
 			{
 				query = query_generator.gen_query(k, c2, pst);
-				query_storage.store_query(query, new Vector<Integer>(), c2, pst);
+				query_storage.store_user_query(query, "1", c2, pst);
 				System.out.println(query);
 			}
 			

@@ -28,8 +28,8 @@ import edu.upenn.cis.citation.citation_view.Head_strs2;
 import edu.upenn.cis.citation.citation_view.citation_view;
 import edu.upenn.cis.citation.citation_view.Covering_set;
 import edu.upenn.cis.citation.datalog.Query_converter;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test_opt_copy;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test2_copy;
+import edu.upenn.cis.citation.reasoning1.Tuple_level_approach;
+import edu.upenn.cis.citation.reasoning1.Semi_schema_level_approach;
 import edu.upenn.cis.citation.stress_test.query_generator;
 import edu.upenn.cis.citation.stress_test.view_generator;
 import edu.upenn.cis.citation.user_query.query_storage;
@@ -492,13 +492,13 @@ public class test_new_group_reasoning_correct {
 		    Connection c2 = DriverManager
                 .getConnection(populate_db.db_url2, populate_db.usr_name , populate_db.passwd);
 			
-		    Tuple_reasoning2_full_test2_copy.prepare_info = false;
+		    Semi_schema_level_approach.prepare_info = false;
 		
-		    Tuple_reasoning2_full_test2_copy.agg_intersection = agg_intersection;
+		    Semi_schema_level_approach.agg_intersection = agg_intersection;
 		    
-          Tuple_reasoning1_full_test_opt_copy.prepare_info = false;
+          Tuple_level_approach.prepare_info = false;
       
-          Tuple_reasoning1_full_test_opt_copy.agg_intersection = agg_intersection;
+          Tuple_level_approach.agg_intersection = agg_intersection;
 		    
 		    double end_time = 0;
 
@@ -512,25 +512,25 @@ public class test_new_group_reasoning_correct {
 						
 			start_time = System.nanoTime();
 			
-			Tuple_reasoning2_full_test2_copy.tuple_reasoning(query, c2, pst);
+			Semi_schema_level_approach.tuple_reasoning(query, c2, pst);
 			
-			ArrayList<HashSet<citation_view>> views_per_group = Tuple_reasoning2_full_test2_copy.cal_covering_sets_schema_level(query, c2, pst);
+			ArrayList<HashSet<citation_view>> views_per_group = Semi_schema_level_approach.cal_covering_sets_schema_level(query, c2, pst);
 
             ArrayList<Covering_set> covering_sets_schema_level = new ArrayList<Covering_set>();
             
             covering_sets_schema_level.addAll(Aggregation6.curr_res);
             
-            Tuple_reasoning2_full_test2_copy.prepare_citation_information(c2, pst);
+            Semi_schema_level_approach.prepare_citation_information(c2, pst);
             
-            agg_citations = Tuple_reasoning2_full_test2_copy.gen_citation_schema_level(views_per_group, c2, pst);
+            agg_citations = Semi_schema_level_approach.gen_citation_schema_level(views_per_group, c2, pst);
 			
 			end_time = System.nanoTime();
 			
 			start_time = System.nanoTime();
             
-            Tuple_reasoning1_full_test_opt_copy.tuple_reasoning(query, c1, pst);
+            Tuple_level_approach.tuple_reasoning(query, c1, pst);
             
-            Tuple_reasoning1_full_test_opt_copy.prepare_citation_information(c1, pst);
+            Tuple_level_approach.prepare_citation_information(c1, pst);
 
             
             end_time = System.nanoTime();
@@ -541,7 +541,7 @@ public class test_new_group_reasoning_correct {
 			
 			
 			
-			ArrayList<HashSet<citation_view>> views_per_group2 = Tuple_reasoning1_full_test_opt_copy.cal_covering_sets_schema_level(query, c1, pst);
+			ArrayList<HashSet<citation_view>> views_per_group2 = Tuple_level_approach.cal_covering_sets_schema_level(query, c1, pst);
 			
 			ArrayList<Covering_set> covering_sets_schema_level2 = new ArrayList<Covering_set>();
 			
@@ -551,7 +551,7 @@ public class test_new_group_reasoning_correct {
 //			
 			
 			
-			HashSet<String> agg_citations2 = Tuple_reasoning1_full_test_opt_copy.gen_citation_schema_level(views_per_group2, c1, pst);
+			HashSet<String> agg_citations2 = Tuple_level_approach.gen_citation_schema_level(views_per_group2, c1, pst);
 
 			System.out.println(covering_sets_schema_level);
 			
@@ -561,7 +561,7 @@ public class test_new_group_reasoning_correct {
 			
 			System.out.println(agg_citations2);
 			
-	        System.out.println(test_covering_set_equality2(Tuple_reasoning2_full_test2_copy.c_view_map, Tuple_reasoning1_full_test_opt_copy.c_view_map));
+	        System.out.println(test_covering_set_equality2(Semi_schema_level_approach.c_view_map, Tuple_level_approach.c_view_map));
 			
 			System.out.println(agg_citations.equals(agg_citations2));
 			
@@ -582,9 +582,9 @@ public class test_new_group_reasoning_correct {
 //			
 //			time = time /(times * 1000000000);
 //						
-			System.out.print(Tuple_reasoning2_full_test2_copy.group_num + "	");
+			System.out.print(Semi_schema_level_approach.group_num + "	");
 			
-			System.out.print(Tuple_reasoning1_full_test_opt_copy.group_num + "  ");
+			System.out.print(Tuple_level_approach.group_num + "  ");
 //			
 //			System.out.print(Tuple_reasoning1_full_test_opt.tuple_num + "	");
 //			

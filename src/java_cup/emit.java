@@ -49,7 +49,7 @@ import java.util.Date;
  *
  * This class is "static" (contains only static data and methods).<p> 
  *
- * @see schema_reasoning.Gen_citation1
+ * @see Schema_level_approach.Gen_citation1
  * @version last update: 11/25/95
  * @author Scott Hudson
  */

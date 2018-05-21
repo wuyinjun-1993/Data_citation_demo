@@ -10,6 +10,7 @@ package edu.upenn.cis.citation.Corecover;
  */
 
 import java.util.*;
+import edu.upenn.cis.citation.Operation.Conditions;
 
 public class Mapping {
   public HashMap    map = null;  // recording the map
@@ -35,8 +36,8 @@ public class Mapping {
     Set entrySet = map.entrySet();
     for (Iterator iter = entrySet.iterator(); iter.hasNext();) {
       Map.Entry mapEntry = (Map.Entry) iter.next();
-      Argument srcArg = (Argument) mapEntry.getKey();
-      Argument dstArg = (Argument) mapEntry.getValue();
+      Object srcArg = mapEntry.getKey();
+      Object dstArg = mapEntry.getValue();
       newMap.put(srcArg, dstArg);
     }
 
@@ -83,6 +84,14 @@ public class Mapping {
       UserLib.myerror("Mapping.put(), srcArg already exists.");
 
     map.put(srcArg, dstArg);
+  }
+  
+  public void put(Conditions srcCondition, Conditions desCondition)
+  {
+    if (map.get(srcCondition) != null)
+      UserLib.myerror("Mapping.put(), srcArg already exists.");
+
+    map.put(srcCondition, desCondition);
   }
   
   public void put(String srcArg, String dstArg)
@@ -136,6 +145,11 @@ public class Mapping {
    */
   public Argument apply(Argument srcArg) {
     Argument dst = (Argument) map.get(srcArg);
+    return dst;
+  }
+  
+  public Conditions apply(Conditions srcArg) {
+    Conditions dst = (Conditions) map.get(srcArg);
     return dst;
   }
   

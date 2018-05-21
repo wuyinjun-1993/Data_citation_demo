@@ -37,7 +37,7 @@ import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test2;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_test;
-import edu.upenn.cis.citation.reasoning1.schema_reasoning;
+import edu.upenn.cis.citation.reasoning1.Schema_level_approach;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_min_test;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning2_min_test;
 import edu.upenn.cis.citation.stress_test.query_generator;

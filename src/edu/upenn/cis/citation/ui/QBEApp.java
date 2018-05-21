@@ -1305,7 +1305,8 @@ private Object String;
 				new java.lang.String("Contributor"),
 				new java.lang.String("Title"),
 				new java.lang.String("Family_id"),
-				new java.lang.String("FamilyIntro_id"));
+				new java.lang.String("FamilyIntro_id"),
+				new java.lang.String("Reference"));
 //		blockCol.setCellFactory(ComboBoxTableCell.forTableColumn(blockList));
 		blockCol.setCellFactory(new Callback<TableColumn<CQuery,String>, TableCell<CQuery,String>>() {
 			public TableCell<CQuery, String> call(TableColumn<CQuery,String> tc) {
@@ -1423,7 +1424,7 @@ private Object String;
 			  
 				Query_operation.delete_connection_citation_with_query(dv, conn, st);
 				System.out.println("[name+block] " + qname_block);
-				Query_operation.add_connection_citation_with_query(dv, qname_block, conn, st);
+				Query_operation.add_connection_citation_with_query_by_view_name(dv, qname_block, conn, st);
 				
 			  conn.close();
 			} catch (Exception e1) {

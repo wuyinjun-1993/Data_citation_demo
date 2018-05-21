@@ -12,8 +12,16 @@ import edu.upenn.cis.citation.Operation.Conditions;
 public class Tuple {
   public String name = null;
   public Vector args = null;  // a list of arguments
+  public Vector<Vector<Argument>> agg_args = null;
+  public Vector agg_functions = null;
   public Mapping phi = null;  // mapping from query args to the database deriving
 		       // the tuple
+  public boolean is_strictly_finer = false;
+  public Mapping reverse_phi = null;
+  
+  public Vector<Vector<Argument>> target_agg_args = null;
+  public Vector target_agg_functions = null;
+  public Vector target_agg_ids = null;
   
   public Mapping phi_str = null;
   public Subgoal subgoal = null; // the subgoal that produces this tuple in canDb.
@@ -51,7 +59,7 @@ public class Tuple {
 		  
 		  Vector temp = lambda_terms;
 		  
-		  for(int i=0;i<query.head.args.size();i++)
+		  for(int i=0;i<query.head.size();i++)
 		  {
 			  Argument arg = (Argument) query.head.args.get(i);
 			  			  
@@ -71,48 +79,112 @@ public class Tuple {
 	  this.cost = cost;
   }
   
+  String get_head_string()
+  {
+    String head_string = new String();
+    
+    for(int i = 0; i<args.size(); i++)
+    {
+      if(i >= 1)
+        head_string += ",";
+      
+      Argument arg = (Argument) args.get(i);
+      
+      head_string += arg.toString();
+    }
+    
+    if(agg_args != null)
+    for(int i = 0; i<agg_args.size(); i++)
+    {
+      String agg_arg_string = new String();
+      for(int k = 0; k<agg_args.get(i).size(); k++)
+      {
+        Argument arg = (Argument) agg_args.get(i).get(k);
+        
+        if(k >= 1)
+          agg_arg_string += ",";
+          
+        agg_arg_string += arg.toString();
+        
+      }
+      
+      
+      
+      head_string += "," + agg_functions.get(i) + "(" + agg_arg_string + ")";
+      
+    }
+    
+    return "(" + head_string + ")";
+    
+  }
   
-  Tuple(Subgoal subgoal, HashMap<String, String> subgoal_mappings) {
+  
+  Tuple(Subgoal subgoal,HashMap<String, String> subgoal_mappings) {
     this.subgoal = subgoal;
     this.name = subgoal.getName();
     this.args = (Vector) subgoal.getArgs().clone();
     
-    mapSubgoals_str = new HashMap<>();
+    this.mapSubgoals_str = new HashMap<>();
     
     mapSubgoals_str.put(subgoal.name, subgoal_mappings.get(subgoal.name));
     
     String sorted_mapping_string = get_sorted_mapping_string(mapSubgoals_str);
     
-    this.hash_string = name + "|" + sorted_mapping_string;
+    this.hash_string = name + get_head_string() + "|" + sorted_mapping_string;
   }
 
-  Tuple(String name, Vector args, Mapping phi, HashMap mapSubgoals) {
+  Tuple(String name, Vector args, Mapping phi, Mapping reverse_phi, HashMap mapSubgoals) {
     this.name = name;
     this.args = args;
     this.phi  = phi;
+    this.reverse_phi = reverse_phi;
     this.mapSubgoals = mapSubgoals;
     this.mapSubgoals_str = new HashMap<>();
     set_map_subgoal_str(mapSubgoals);
-    
+
     String sorted_mapping_string = get_sorted_mapping_string(mapSubgoals_str);
     
-    this.hash_string = name + "|" + sorted_mapping_string;
+    this.hash_string = name + get_head_string() + "|" + sorted_mapping_string;
   }
 
-  Tuple(String name, Vector args, Mapping phi, Mapping phi_str, HashMap mapSubgoals) {
+  Tuple(String name, Vector args, Vector agg_args, Vector agg_functions, Mapping phi, Mapping phi_str, Mapping reverse_phi, HashMap mapSubgoals) {
 	    this.name = name;
 	    this.args = args;
+	    this.agg_args = agg_args;
+	    this.agg_functions = agg_functions;
 	    this.phi  = phi;
 	    this.phi_str = phi_str;
+	    this.reverse_phi = reverse_phi;
 	    this.mapSubgoals = mapSubgoals;
 	    this.mapSubgoals_str = new HashMap<>();
 	    set_map_subgoal_str(mapSubgoals);
 	    
 	    String sorted_mapping_string = get_sorted_mapping_string(mapSubgoals_str);
 	    
-	    this.hash_string = name + "|" + sorted_mapping_string;
-	    
+	    this.hash_string = name + get_head_string() + "|" + sorted_mapping_string;
 	  }
+  
+  public void cal_hash_string()
+  {
+    String sorted_mapping_string = get_sorted_mapping_string(mapSubgoals_str);
+    
+    this.hash_string = name + get_head_string() + "|" + sorted_mapping_string;
+  }
+  
+  Tuple(String name, Vector args, Mapping phi, Mapping phi_str, Mapping reverse_phi, HashMap mapSubgoals) {
+    this.name = name;
+    this.args = args;
+    this.phi  = phi;
+    this.phi_str = phi_str;
+    this.reverse_phi = reverse_phi;
+    this.mapSubgoals = mapSubgoals;
+    this.mapSubgoals_str = new HashMap<>();
+    set_map_subgoal_str(mapSubgoals);
+    
+    String sorted_mapping_string = get_sorted_mapping_string(mapSubgoals_str);
+    
+    this.hash_string = name + get_head_string() + "|" + sorted_mapping_string;
+  }
   
   void set_map_subgoal_str(HashMap mapSubgoals)
   {
@@ -140,6 +212,10 @@ public class Tuple {
     return phi;
   }
   
+  public Mapping get_Reverse_Mapping() {
+    return reverse_phi;
+  }
+  
   public Mapping getMapping_str() {
 	    return phi_str;
 	  }
@@ -159,7 +235,7 @@ public class Tuple {
   // set the query of the tuple, and compute the head of each tuple
   public void setQuery(Query query) {
     this.query = query;
-    this.name = query.getName();
+    this.name = query.name;
 
     // compute the new head under the phi
     
@@ -224,6 +300,19 @@ public class Tuple {
     for (Iterator iter = entrySet.iterator(); iter.hasNext();) {
       Map.Entry mapEntry = (Map.Entry) iter.next();
       Subgoal querySubgoal = (Subgoal) mapEntry.getValue();
+      result.add(querySubgoal);
+    }
+
+    return result;
+  }
+  
+  public HashSet<String> getTargetSubgoal_strs() {
+    HashSet result = new HashSet();
+
+    Set entrySet = mapSubgoals_str.entrySet();
+    for (Iterator iter = entrySet.iterator(); iter.hasNext();) {
+      Map.Entry mapEntry = (Map.Entry) iter.next();
+      String querySubgoal = (String) mapEntry.getValue();
       result.add(querySubgoal);
     }
 
@@ -306,11 +395,7 @@ public class Tuple {
 //	    return hash_string.hashCode();
 //	  }
 //	  
-//	  
-//	  
-//	  
-//	  
-//	  String hash_string = this.getName() + "|" + get_sorted_mapping_string(this.mapSubgoals_str);
+//	  String hash_string = this.getName() + this.mapSubgoals_str.toString();
 	  
 	  
 
@@ -350,7 +435,6 @@ public class Tuple {
     return strings;
   }
   
-  
   @Override
   public boolean equals(Object obj)
   {
@@ -365,6 +449,7 @@ public class Tuple {
 //      result.append(name);
 //    result.append(args.toString());
 //
+//    result.append(mapSubgoals_str.toString());
 //    /*if (phi != null)
 //      result.append("; " + phi.toString());*/
 //    return (result.toString());
@@ -379,8 +464,23 @@ public class Tuple {
 	  String name = this.name;
 	  
 	  Vector<Argument> args = (Vector<Argument>) this.args.clone();
+	  
+	  Vector<Argument> agg_args = null;
+	  
+	  Vector<String> agg_functions = null;
+	  
+	  if(this.agg_args != null)
+	  {
+	    agg_args = (Vector<Argument>) this.agg_args.clone(); 
+	    
+	    agg_functions = (Vector<String>) this.agg_functions.clone();
+	  }
+	  
+	  
 	    Mapping phi  = (Mapping) this.phi.clone();
 	    Mapping phi_str = new Mapping();
+	    Mapping reverse_phi = (Mapping) this.reverse_phi.clone(); 
+	    
 	    
 	    phi_str.map.putAll(this.phi_str.map);
 	    
@@ -389,7 +489,7 @@ public class Tuple {
 	  
 	    
 	    
-	  Tuple tuple = new Tuple(name, args, phi, phi_str, mapSubgoals);
+	  Tuple tuple = new Tuple(name, args, agg_args, agg_functions, phi, phi_str, reverse_phi, mapSubgoals);
 	  
 	  tuple.lambda_terms.addAll(this.lambda_terms);
 	  

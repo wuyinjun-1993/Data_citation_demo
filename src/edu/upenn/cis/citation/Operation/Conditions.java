@@ -9,11 +9,18 @@ import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Corecover.Subgoal;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.citation_view.Head_strs;
-import edu.upenn.cis.citation.reasoning1.schema_reasoning;
+import edu.upenn.cis.citation.reasoning1.Schema_level_approach;
 
 public class Conditions {
 	
 	
+  public String agg_function1 = null;
+  
+  public String agg_function2 = null;
+  
+  public String unique_string = new String();
+
+  
 	public String subgoal1;
 		
 	public Argument arg1;
@@ -89,7 +96,72 @@ public class Conditions {
 		this.subgoal2 = subgoal2;
 	}
 	
-	public static Conditions parse(String constraint, Vector<Subgoal> subgoals, HashMap<String, String> origin_names)
+    public Conditions(Argument arg1, String subgoal1, Operation op, Argument arg2, String subgoal2, String agg_function1, String agg_function2)
+    {
+        this.arg1 = arg1;
+        
+        this.op = op;
+        
+        this.arg2 = arg2;
+        
+        this.subgoal1 = subgoal1;
+        
+        this.subgoal2 = subgoal2;
+        
+        this.agg_function1 = agg_function1;
+        
+        this.agg_function2 = agg_function2;
+        
+        this.unique_string = cal_unique_string();
+    }
+    
+    static String cal_reverse_condition_string(Conditions condition)
+    {
+      String string = new String();
+      
+      if(condition.agg_function1 != null)
+      {
+        string += condition.agg_function1 + "(" + condition.arg1 + ")";
+      }
+      else
+      {
+        string += condition.arg1;
+      }
+      
+      string += condition.op.counter_direction();
+      
+      if(condition.agg_function2 != null)
+      {
+        string += condition.agg_function2 + "(" + condition.arg2 + ")";
+      }
+      else
+      {
+        string += condition.arg2;
+      }
+      
+      return string;
+      
+    }
+    
+    public String cal_unique_string()
+    {
+      String rev_condition_string = cal_reverse_condition_string(this);
+      
+      if(rev_condition_string.compareTo(this.toString()) >= 0)
+      {
+        String string = rev_condition_string + "|" + this.toString();
+        
+        return string;
+      }
+      else
+      {
+        String string = this.toString() + "|" + rev_condition_string;
+        
+        return string;
+      }
+    }
+
+  public static Conditions parse(String constraint, Vector<Subgoal> subgoals, HashMap<String, String> origin_names)
 	{
 		int i = 0;
 		
@@ -433,7 +505,7 @@ public class Conditions {
 			
 			String type = attr_type_mapping.get(head);
 			
-			if(schema_reasoning.numberic_type.contains(type))
+			if(Schema_level_approach.numberic_type.contains(type))
 			{
 				double value1 = Double.valueOf(string1);
 				
@@ -510,5 +582,35 @@ public class Conditions {
 			return false;
 		}
 	}
+
+  public void swap_args()
+    {
+      Argument arg_temp = arg1;
+      
+      arg1 = arg2;
+      
+      arg2 = arg_temp;
+      
+      String str_temp = subgoal1;
+      
+      subgoal1 = subgoal2;
+      
+      subgoal2 = str_temp;
+      
+      op = op.counter_direction();
+      
+      boolean get_mapping_temp = get_mapping1;
+      
+      get_mapping1 = get_mapping2;
+      
+      get_mapping2 = get_mapping_temp;
+      
+      String agg_function_temp = agg_function1;
+      
+      agg_function1 = agg_function2;
+      
+      agg_function2 = agg_function_temp;
+      
+    }
 	
 }

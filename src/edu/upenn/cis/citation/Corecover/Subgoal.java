@@ -10,11 +10,24 @@ import java.util.*;
 public class Subgoal {
   public String name = null;  // subgoal name
   public Vector args = null;  // a list of arguments
+  public Vector<Vector<Argument>> agg_args = null;
+  public Vector agg_function = null;
+  public boolean has_agg = false;
 //  public String origin_name = null;
 
   public Subgoal(String name, Vector args) {
     this.name = name;
     this.args = args;
+  }
+  
+  public Subgoal(String name, Vector args, Vector<Vector<Argument>> agg_args, Vector agg_function, boolean has_agg) {
+    this.name = name;
+    this.args = args;
+    this.agg_args = agg_args;
+    
+    this.agg_function = agg_function;
+    
+    this.has_agg = has_agg;
   }
   
 //  public Subgoal(String name, Vector args) {
@@ -143,6 +156,19 @@ public class Subgoal {
       if ( i < args.size() - 1)
 	result.append(",");
     }
+    
+    
+    if(agg_args != null)
+    {
+      for(int i = 0; i<agg_args.size(); i++)
+      {
+        if(args.size() > 0 || (args.size() == 0 && i >= 1))
+          result.append(",");
+        
+        result.append(agg_function.get(i) + "(" + agg_args.get(i).toString() + ")");
+      }
+    }
+    
     result.append(")");
     
     return result.toString();

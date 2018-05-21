@@ -416,7 +416,7 @@ public class Query_converter {
 				
 				String mapped_subgoal = (String) c_view_p.view_tuple.mapSubgoals_str.get(subgoal);
 				
-				String var_name = citation_query.lambda_term.get(i).name;
+				String var_name = citation_query.lambda_term.get(i).arg_name;
 				
 				String variable = var_name.substring(citation_query.lambda_term.get(i).table_name.length() + 1, var_name.length());
 				
@@ -1526,7 +1526,7 @@ public class Query_converter {
 			if(i >= 1)
 				str += ",";
 			
-			str += "(" + arg.table_name + "." + arg.name.substring(arg.name.indexOf(populate_db.separator) + 1, arg.name.length()) + ")";
+			str += "(" + arg.table_name + "." + arg.arg_name.substring(arg.arg_name.indexOf(populate_db.separator) + 1, arg.arg_name.length()) + ")";
 			
 		}
 		return str;
@@ -2015,7 +2015,9 @@ public class Query_converter {
 	{
 		String str = new String();
 		
-		str += condition.subgoal1 + "." + condition.arg1 + condition.op;
+		String arg_name1 = condition.arg1.name.substring(condition.arg1.name.indexOf(populate_db.separator) + 1, condition.arg1.name.length());
+		
+		str += condition.subgoal1 + "." + arg_name1 + condition.op;
 		
 		if(condition.arg2.isConst())
 		{
@@ -2038,7 +2040,9 @@ public class Query_converter {
 		}
 		else
 		{
-			str += condition.subgoal2 + "." + condition.arg2;
+		  String arg_name2 = condition.arg2.name.substring(condition.arg2.name.indexOf(populate_db.separator) + 1, condition.arg2.name.length());
+		  
+			str += condition.subgoal2 + "." + arg_name2;
 		}
 		
 		return str;
@@ -2062,31 +2066,40 @@ public class Query_converter {
 		return str;
 	}
 	
-	public static String get_condition(Query q)
-	{
-		String str = new String();
-		
-		for(int i = 0; i<q.conditions.size(); i++)
-		{
-			if(i >= 1)
-				str += " and ";
-			
-//			str += q.conditions.get(i).subgoal1 + "." + q.conditions.get(i).arg1 + q.conditions.get(i).op;
-//			
-//			if(q.conditions.get(i).subgoal2 == null || q.conditions.get(i).subgoal2.isEmpty())
-//			{
-//				str += q.conditions.get(i).arg2;
-//			}
-//			else
-//			{
-//				str += q.conditions.get(i).subgoal2 + "." + q.conditions.get(i).arg2;
-//			}
-			
-			str += get_single_condition_str(q.conditions.get(i));
-		}
-		
-		return str;
-	}
+	  public static String get_condition(Query q)
+	  {
+	      String str = new String();
+	      
+	      int count = 0;
+	      
+	      for(int i = 0; i<q.conditions.size(); i++)
+	      {
+	          
+	          
+//	        str += q.conditions.get(i).subgoal1 + "." + q.conditions.get(i).arg1 + q.conditions.get(i).op;
+//	        
+//	        if(q.conditions.get(i).subgoal2 == null || q.conditions.get(i).subgoal2.isEmpty())
+//	        {
+//	            str += q.conditions.get(i).arg2;
+//	        }
+//	        else
+//	        {
+//	            str += q.conditions.get(i).subgoal2 + "." + q.conditions.get(i).arg2;
+//	        }
+	          if(q.conditions.get(i).agg_function1 == null && q.conditions.get(i).agg_function2 == null)
+	          {
+	            if(count >= 1)
+	              str += " and ";
+	            
+	            str += get_single_condition_str(q.conditions.get(i));
+	            
+	            count ++;
+	            
+	          }
+	      }
+	      
+	      return str;
+	  }
 	
 	public static String get_group_conditions(HashSet<Conditions> conditions, String curr_str)
 	{
@@ -2527,7 +2540,7 @@ public class Query_converter {
 			if(i >= 1)
 				str += ",";
 			
-			String name = lambda_terms.get(i).name;
+			String name = lambda_terms.get(i).arg_name;
 			
 			str += "(" + lambda_terms.get(i).table_name + "." + name.substring(name.indexOf(populate_db.separator) + 1, name.length()) + ")";
 		}
@@ -2548,7 +2561,7 @@ public class Query_converter {
 			
 			Lambda_term l_term = (Lambda_term) iter.next();
 			
-			String name = l_term.name;
+			String name = l_term.arg_name;
 			
 			str += "(" + l_term.table_name + "." + name.substring(name.indexOf(populate_db.separator) + 1, name.length()) + ")";
 		}
@@ -3003,11 +3016,11 @@ public class Query_converter {
 		{
 			if(condition.isEmpty())
 			{
-				condition = query.lambda_term.get(0).name;
+				condition = query.lambda_term.get(0).arg_name;
 			}
 			else
 			{
-				condition += " and " + query.lambda_term.get(0).name;
+				condition += " and " + query.lambda_term.get(0).arg_name;
 			}
 			
 		}
@@ -3109,7 +3122,7 @@ public class Query_converter {
 		String condition = new String ();
 		
 		if(query.lambda_term.size() > 0)
-			condition = query.lambda_term.get(0).name;
+			condition = query.lambda_term.get(0).arg_name;
 		
 //		String citation_condition = get_citation_condition(query, c, pst);
 		
@@ -3163,7 +3176,7 @@ public class Query_converter {
         String condition = new String ();
         
         if(query.lambda_term.size() > 0)
-            condition = query.lambda_term.get(0).name;
+            condition = query.lambda_term.get(0).arg_name;
         
 //      String citation_condition = get_citation_condition(query, c, pst);
         
@@ -3296,7 +3309,7 @@ public class Query_converter {
 		
 		String condition = get_condition(query);
 		
-		String condition2 = query.lambda_term.get(0).name;
+		String condition2 = query.lambda_term.get(0).arg_name;
 				
 		sql = "select " + sel_item;
 		
@@ -3327,7 +3340,7 @@ public class Query_converter {
 		
 		String citation_table = get_relations_without_citation_table(query);
 		
-		String condition = query.lambda_term.get(0).name;
+		String condition = query.lambda_term.get(0).arg_name;
 		
 //		String citation_condition = get_citation_condition(query, c, pst);
 		
@@ -3373,7 +3386,7 @@ public class Query_converter {
 	        
 	        String citation_table = get_relations_without_citation_table(query);
 	        
-	        String condition = query.lambda_term.get(0).name;
+	        String condition = query.lambda_term.get(0).arg_name;
 	        
 //	      String citation_condition = get_citation_condition(query, c, pst);
 	        
@@ -3400,6 +3413,155 @@ public class Query_converter {
 	        
 	        
 	    }
+	   
+	   static String get_agg_attr_string(Vector<Argument> agg_attributes)
+	   {
+	     String string = new String();
+	     
+	     for(int i = 0; i<agg_attributes.size(); i++)
+	     {
+	       if(i >= 1)
+	         string += "||";
+	       
+	       Argument arg = (Argument) agg_attributes.get(i);
+	       
+	       String attr_name = arg.name.substring(arg.name.indexOf(populate_db.separator) + 1, arg.name.length());
+	       
+	         string += arg.relation_name + "." + attr_name;
+	     }
+	     return string;
+	   }
+	   
+	   static String get_agg_item_in_select_clause(Query q)
+	   {
+	     String string = new String();
+	     
+	     for(int i = 0; i < q.head.agg_args.size(); i++)
+	     {
+	       if(i >= 1)
+	         string += ",";
+	       
+	       String agg_attr_string = get_agg_attr_string(q.head.agg_args.get(i));
+	       
+	       String agg_function = (String) q.head.agg_function.get(i);
+	       
+	       string += agg_function + "(" + agg_attr_string + ")"; 
+	       
+//	       Argument arg = (Argument) q.head.agg_args.get(i);
+//	       
+//	       String attr_name = arg.name.substring(arg.name.indexOf(init.separator) + 1, arg.name.length());
+//	       
+//	       String agg_function = (String) q.head.agg_function.get(i);
+//	       
+//	       if(isProv_query)
+//	         string += agg_function + "(" + "\"" + arg.relation_name + "\".\"" + attr_name + "\"" + ")";
+//	       else
+//	         string += agg_function + "(" + arg.relation_name + "." + attr_name + ")";
+	     }
+	     
+	     return string;
+	     
+	     
+	   }
+	   
+	   
+	   static String get_having_clauses(Query query)
+	   {
+	     String string = new String();
+	     
+	     int count = 0;
+	     
+	     for(int i = 0; i<query.conditions.size(); i++)
+	     {
+	       if(query.conditions.get(i).agg_function1 != null || query.conditions.get(i).agg_function2 != null)
+	       {
+	         if(count >= 1)
+	           string += " and ";
+	         
+	         string += get_single_having_condition_str(query.conditions.get(i));
+	         
+	         count ++;
+	         
+	       }
+	     }
+	     
+	     return string;
+	   }
+	   
+	   public static String get_single_having_condition_str(Conditions condition)
+	   {
+	       String str = new String();
+	       
+	       String arg1 = null;
+	       
+//	       if(isPro_query)
+//	       {
+//	         String [] rel_arg_pairs = condition.arg1.name.split("\\|");
+//	         
+//	         arg1 = "\"" + rel_arg_pairs[0] + "\".\"" + rel_arg_pairs[1] + "\"";
+//	       }
+//	       else
+	         arg1 = condition.arg1.name.replace("|", ".");
+	       
+	       if(condition.agg_function1 != null)
+	         arg1 = condition.agg_function1 + "(" + arg1 + ")";
+	       
+	       str += arg1 + condition.op;
+	       
+	       if(condition.arg2.isConst())
+	       {
+	           
+	           String arg2 = condition.arg2.toString();
+	           
+	           if(arg2.length() > 2)
+	           {
+	               arg2 = arg2.substring(1, arg2.length() - 1).replaceAll("'", "''");
+	               str += "'" + arg2 + "'";
+	           }
+	           else
+	           {
+	               str += arg2;
+	           }
+	                       
+	           
+	           
+	           
+	       }
+	       else
+	       {
+	         
+	         String arg2 = null;
+	         
+//	         if(isPro_query)
+//	         {
+//	           String [] rel_arg_pairs = condition.arg2.name.split("\\|");
+//	           arg2 = "\"" + rel_arg_pairs[0] + "\".\"" + rel_arg_pairs[1] + "\"";
+//	         }
+//	         else
+	           arg2 = condition.arg2.name.replace("|", ".");
+	         
+	         if(condition.agg_function2 != null)
+	           arg2 = condition.agg_function2 + "(" + arg2 + ")";
+	              
+	           str += arg2;
+	       }
+	       
+	       return str;
+	   }
+	   
+	   static String get_citation_view_agg(Query query)
+	   {
+	     String string = new String();
+	     for(int i = 0; i<query.body.size(); i++)
+	     {
+	       if(i >= 1)
+	         string += ",";
+	       Subgoal subgoal = (Subgoal) query.body.get(i);
+	       
+	       string += "array_agg(" + subgoal.name + ".citation_view)";
+	     }
+	     return string;
+	   }
 	
 	   public static String datalog2sql_citation3(Query query, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, HashMap<String, Integer> with_sub_queries_id_mappings, Vector<String> full_mapping_condition_str, Vector<Conditions> valid_conditions, Vector<Lambda_term> lambda_terms, HashSet<Tuple> viewTuples) throws SQLException
 	    {
@@ -3412,14 +3574,27 @@ public class Query_converter {
 	        
 	        String sel_lambda_terms = get_lambda_str(query, lambda_terms);
 	        
+	        String sel_agg_items = get_agg_item_in_select_clause(query);
+	        
 	        String [] condition_str = get_condition_boolean_value(query, partial_mapping_strings, partial_mapping_view_mapping_mappings, with_sub_queries_id_mappings, full_mapping_condition_str, valid_conditions, viewTuples);
 	        
 	        
 	        String citation_table = get_relations_without_citation_table(query);
 	        
+	        String citation_view_agg = get_citation_view_agg(query);
+	        
 	        String condition = get_condition(query);
 	        
-	        sql = "select " + sel_item;
+	        sql = "select ";
+	        
+	        if(!sel_item.isEmpty())
+	        {
+	          sql += sel_item + "," + citation_view_agg;
+	          if(!sel_agg_items.isEmpty())
+	            sql += "," + sel_agg_items;
+	        }
+	        else
+	          sql += sel_agg_items;
 	        
 	        if(sel_lambda_terms != null && !sel_lambda_terms.isEmpty())
 	            sql += "," + sel_lambda_terms;
@@ -3431,6 +3606,14 @@ public class Query_converter {
 	        
 	        if(condition != null && !condition.isEmpty())
 	            sql += " where " + condition;
+	        
+	        if(!sel_item.isEmpty())
+	          sql += " group by " + sel_item;
+	        
+	        String having_clause = get_having_clauses(query);
+	        
+	        if(!having_clause.isEmpty())
+	          sql += " having " + having_clause;
 	        
 //	        if(condition_str[1] != null && !condition_str[1].isEmpty())
 //	            sql += " order by " + condition_str[1]; 

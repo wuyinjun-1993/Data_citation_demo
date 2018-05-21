@@ -30,15 +30,15 @@ import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test_opt;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test_opt_copy;
+import edu.upenn.cis.citation.reasoning1.Tuple_level_approach;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_full_test2;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_test;
-import edu.upenn.cis.citation.reasoning1.schema_reasoning;
-import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_full_min_test;
+import edu.upenn.cis.citation.reasoning1.Schema_level_approach;
+import edu.upenn.cis.citation.reasoning2.Tuple_level_approach_min;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_min_test;
-import edu.upenn.cis.citation.reasoning2.Tuple_reasoning2_full_min_test;
+import edu.upenn.cis.citation.reasoning2.Semi_schema_level_approach_min;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning2_min_test;
 import edu.upenn.cis.citation.stress_test.query_generator;
 import edu.upenn.cis.citation.stress_test.view_generator;
@@ -422,9 +422,9 @@ public class test_new_group_reasoning {
 		
 		    Tuple_reasoning1_full_test_opt.agg_intersection = agg_intersection;
 		    
-          Tuple_reasoning1_full_test_opt_copy.prepare_info = false;
+          Tuple_level_approach.prepare_info = false;
       
-          Tuple_reasoning1_full_test_opt_copy.agg_intersection = agg_intersection;
+          Tuple_level_approach.agg_intersection = agg_intersection;
 		    
 		    double end_time = 0;
 
@@ -611,9 +611,9 @@ public class test_new_group_reasoning {
       
           Tuple_reasoning1_full_test_opt.agg_intersection = agg_intersection;
           
-        Tuple_reasoning1_full_test_opt_copy.prepare_info = false;
+        Tuple_level_approach.prepare_info = false;
     
-        Tuple_reasoning1_full_test_opt_copy.agg_intersection = agg_intersection;
+        Tuple_level_approach.agg_intersection = agg_intersection;
           
           double end_time = 0;
 
@@ -628,7 +628,7 @@ public class test_new_group_reasoning {
           
           start_time = System.nanoTime();
           
-          Tuple_reasoning1_full_test_opt_copy.tuple_reasoning(query, c1, pst);
+          Tuple_level_approach.tuple_reasoning(query, c1, pst);
           
           
           end_time = System.nanoTime();
@@ -638,7 +638,7 @@ public class test_new_group_reasoning {
           
           System.out.println("time2::" + time2);
           
-          System.out.print(Tuple_reasoning1_full_test_opt_copy.group_num + "   ");
+          System.out.print(Tuple_level_approach.group_num + "   ");
           
           System.out.println();
           

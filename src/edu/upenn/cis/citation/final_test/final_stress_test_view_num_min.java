@@ -31,9 +31,9 @@ import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning2_test;
-import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_full_min_test;
+import edu.upenn.cis.citation.reasoning2.Tuple_level_approach_min;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_min_test;
-import edu.upenn.cis.citation.reasoning2.Tuple_reasoning2_full_min_test;
+import edu.upenn.cis.citation.reasoning2.Semi_schema_level_approach_min;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning2_min_test;
 import edu.upenn.cis.citation.stress_test.query_generator;
 import edu.upenn.cis.citation.stress_test.view_generator;
@@ -219,7 +219,7 @@ public class final_stress_test_view_num_min {
 			catch(Exception e)
 			{
 				query = query_generator.gen_query(k, c2, pst);
-				query_storage.store_query(query, new Vector<Integer>(), c2, pst);
+                query_storage.store_user_query(query, "1", c2, pst);
 				System.out.println(query);
 			}
 			
@@ -351,9 +351,9 @@ public class final_stress_test_view_num_min {
 		    c = DriverManager
 		        .getConnection(populate_db.db_url1, populate_db.usr_name , populate_db.passwd);
 			
-		    Tuple_reasoning1_full_min_test.prepare_info = false;
+		    Tuple_level_approach_min.prepare_info = false;
 		    
-		    Tuple_reasoning1_full_min_test.test_case = true;
+		    Tuple_level_approach_min.test_case = true;
 		
 			double end_time = 0;
 
@@ -366,13 +366,13 @@ public class final_stress_test_view_num_min {
 			
 			start_time = System.nanoTime();
 						
-			Tuple_reasoning1_full_min_test.tuple_reasoning(query, c, pst);
+			Tuple_level_approach_min.tuple_reasoning(query, c, pst);
 			
 			middle_time = System.nanoTime();
 			
-			Tuple_reasoning1_full_min_test.prepare_citation_information(c, pst);
+			Tuple_level_approach_min.prepare_citation_information(c, pst);
 			
-			agg_citations = Tuple_reasoning1_full_min_test.tuple_gen_agg_citations(query, c, pst);
+			agg_citations = Tuple_level_approach_min.tuple_gen_agg_citations(query, c, pst);
 													
 			end_time = System.nanoTime();
 			
@@ -384,9 +384,9 @@ public class final_stress_test_view_num_min {
 			
 			time = time /(times * 1000000000);
 						
-			System.out.print(Tuple_reasoning1_full_min_test.group_num + "	");
+			System.out.print(Tuple_level_approach_min.group_num + "	");
 			
-			System.out.print(Tuple_reasoning1_full_min_test.tuple_num + "	");
+			System.out.print(Tuple_level_approach_min.tuple_num + "	");
 			
 			System.out.print(time + "s	");
 			
@@ -396,13 +396,13 @@ public class final_stress_test_view_num_min {
 			
 			System.out.print("aggregation_time::" + agg_time + "	");
 			
-			System.out.print("covering set::" + Tuple_reasoning1_full_min_test.covering_sets_query + "	");
+			System.out.print("covering set::" + Tuple_level_approach_min.covering_sets_query + "	");
 			
-			System.out.print("citation_size::" + Tuple_reasoning1_full_min_test.covering_sets_query.c_vec.size() + "	");
+			System.out.print("citation_size::" + Tuple_level_approach_min.covering_sets_query.c_vec.size() + "	");
 			
 			HashMap<String, HashSet<String>> view_strs = new HashMap<String, HashSet<String>>();
 			
-			int covering_set_size = Tuple_reasoning1_full_min_test.compute_distinct_num_covering_sets(view_strs);
+			int covering_set_size = Tuple_level_approach_min.compute_distinct_num_covering_sets(view_strs);
 			
 			System.out.print("distinct_covering_set_size::" + covering_set_size + "	");
 			
@@ -487,15 +487,15 @@ public class final_stress_test_view_num_min {
 //			
 			
 			
-			System.out.print(Tuple_reasoning1_full_min_test.covering_set_num * 1.0/Tuple_reasoning1_full_min_test.tuple_num + "	");
+			System.out.print(Tuple_level_approach_min.covering_set_num * 1.0/Tuple_level_approach_min.tuple_num + "	");
 			
-			System.out.print("pre_processing::" + Tuple_reasoning1_full_min_test.pre_processing_time + "	");
+			System.out.print("pre_processing::" + Tuple_level_approach_min.pre_processing_time + "	");
 			
-			System.out.print("query::" + Tuple_reasoning1_full_min_test.query_time + "	");
+			System.out.print("query::" + Tuple_level_approach_min.query_time + "	");
 			
-			System.out.print("reasoning::" + Tuple_reasoning1_full_min_test.reasoning_time + "	");
+			System.out.print("reasoning::" + Tuple_level_approach_min.reasoning_time + "	");
 			
-			System.out.print("population::" + Tuple_reasoning1_full_min_test.population_time + "	");
+			System.out.print("population::" + Tuple_level_approach_min.population_time + "	");
 			
 			
 			
@@ -519,7 +519,7 @@ public class final_stress_test_view_num_min {
 			
 			Vector<String> agg_results = new Vector<String>();
 			
-			agg_results.add(Tuple_reasoning1_full_min_test.covering_sets_query.toString());
+			agg_results.add(Tuple_level_approach_min.covering_sets_query.toString());
 			
 			Query_operation.write2file(path + "covering_sets", agg_results);
 
@@ -599,9 +599,9 @@ public class final_stress_test_view_num_min {
 		    c = DriverManager
 		        .getConnection(populate_db.db_url2, populate_db.usr_name , populate_db.passwd);
 			
-		    Tuple_reasoning2_full_min_test.prepare_info = false;
+		    Semi_schema_level_approach_min.prepare_info = false;
 		    
-		    Tuple_reasoning2_full_min_test.test_case = true;
+		    Semi_schema_level_approach_min.test_case = true;
 		    
 			double end_time = 0;
 
@@ -614,13 +614,13 @@ public class final_stress_test_view_num_min {
 			
 			start_time = System.nanoTime();
 			
-			Tuple_reasoning2_full_min_test.tuple_reasoning(query, c, pst);
+			Semi_schema_level_approach_min.tuple_reasoning(query, c, pst);
 			
 			middle_time = System.nanoTime();
 			
-			Tuple_reasoning2_full_min_test.prepare_citation_information(c, pst);
+			Semi_schema_level_approach_min.prepare_citation_information(c, pst);
 			
-			agg_citations = Tuple_reasoning2_full_min_test.tuple_gen_agg_citations(query, c, pst);
+			agg_citations = Semi_schema_level_approach_min.tuple_gen_agg_citations(query, c, pst);
 													
 			end_time = System.nanoTime();
 			
@@ -632,9 +632,9 @@ public class final_stress_test_view_num_min {
 			
 			time = time /(times * 1000000000);
 						
-			System.out.print(Tuple_reasoning2_full_min_test.group_num + "	");
+			System.out.print(Semi_schema_level_approach_min.group_num + "	");
 			
-			System.out.print(Tuple_reasoning2_full_min_test.tuple_num + "	");
+			System.out.print(Semi_schema_level_approach_min.tuple_num + "	");
 			
 			System.out.print(time + "s	");
 			
@@ -644,13 +644,13 @@ public class final_stress_test_view_num_min {
 			
 			System.out.print("aggregation_time::" + agg_time + "	");
 			
-			System.out.print("covering set::" + Tuple_reasoning2_full_min_test.covering_sets_query + "	");
+			System.out.print("covering set::" + Semi_schema_level_approach_min.covering_sets_query + "	");
 			
-			System.out.print("citation_size::" + Tuple_reasoning2_full_min_test.covering_sets_query.c_vec.size() + "	");
+			System.out.print("citation_size::" + Semi_schema_level_approach_min.covering_sets_query.c_vec.size() + "	");
 			
 			HashMap<String, HashSet<String>> view_strs = new HashMap<String, HashSet<String>>();
 			
-			int covering_set_size = Tuple_reasoning2_full_min_test.compute_distinct_num_covering_sets(view_strs);
+			int covering_set_size = Semi_schema_level_approach_min.compute_distinct_num_covering_sets(view_strs);
 			
 			System.out.print("distinct_covering_set_size::" + covering_set_size + "	");
 			
@@ -735,21 +735,21 @@ public class final_stress_test_view_num_min {
 //			
 			
 			
-			System.out.print(Tuple_reasoning2_full_min_test.covering_set_num * 1.0/Tuple_reasoning2_full_min_test.tuple_num + "	");
+			System.out.print(Semi_schema_level_approach_min.covering_set_num * 1.0/Semi_schema_level_approach_min.tuple_num + "	");
 			
-			System.out.print("pre_processing::" + Tuple_reasoning2_full_min_test.pre_processing_time + "	");
+			System.out.print("pre_processing::" + Semi_schema_level_approach_min.pre_processing_time + "	");
 			
-			System.out.print("query::" + Tuple_reasoning2_full_min_test.query_time + "	");
+			System.out.print("query::" + Semi_schema_level_approach_min.query_time + "	");
 			
-			System.out.print("reasoning::" + Tuple_reasoning2_full_min_test.reasoning_time + "	");
+			System.out.print("reasoning::" + Semi_schema_level_approach_min.reasoning_time + "	");
 			
-			System.out.print("population::" + Tuple_reasoning2_full_min_test.population_time + "	");
+			System.out.print("population::" + Semi_schema_level_approach_min.population_time + "	");
 			
 			System.out.println();
 			
 			Vector<String> agg_results = new Vector<String>();
 			
-			agg_results.add(Tuple_reasoning2_full_min_test.covering_sets_query.toString());
+			agg_results.add(Semi_schema_level_approach_min.covering_sets_query.toString());
 			
 			Query_operation.write2file(path + "covering_sets", agg_results);
 

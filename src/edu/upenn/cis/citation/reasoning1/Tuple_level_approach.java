@@ -39,6 +39,9 @@ import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.Pre_processing.view_operation;
 import edu.upenn.cis.citation.aggregation.Aggregation6;
 import edu.upenn.cis.citation.citation_view.*;
+import edu.upenn.cis.citation.covering_sets_calculation.Covering_sets_clustering_by_relation;
+import edu.upenn.cis.citation.covering_sets_calculation.Covering_sets_no_clustering;
+import edu.upenn.cis.citation.covering_sets_calculation.Join_covering_sets;
 import edu.upenn.cis.citation.data_structure.IntList;
 import edu.upenn.cis.citation.data_structure.Query_lm_authors;
 import edu.upenn.cis.citation.data_structure.StringList;
@@ -55,7 +58,7 @@ public class Tuple_level_approach {
 		
 	static HashMap<String, Integer> max_author_num = new HashMap<String, Integer>();
 			
-	static HashMap<String, Query> view_mapping = new HashMap<String, Query>();
+//	static HashMap<String, Query> view_mapping = new HashMap<String, Query>();
 	
 	static Vector<Conditions> valid_conditions = new Vector<Conditions> ();
 	
@@ -69,7 +72,7 @@ public class Tuple_level_approach {
 	
 	static HashMap<String, ArrayList<String>> lambda_terms_map = new HashMap<String, ArrayList<String>>();
 	
-	static HashMap<String, HashSet<Argument>> relation_arg_mapping = new HashMap<String, HashSet<Argument>>();
+	static HashMap<String, HashSet<Integer>> relation_arg_mapping = new HashMap<String, HashSet<Integer>>();
 //	static HashMap<String, ArrayList<Tuple>> tuple_mapping = new HashMap<String, ArrayList<Tuple>>();
 							
 	static String file_name = "tuple_level.xlsx";
@@ -78,9 +81,9 @@ public class Tuple_level_approach {
 	
 	static ArrayList<Lambda_term[]> query_lambda_str = new ArrayList<Lambda_term[]>();
 	
-	static StringList view_list = new StringList();
+//	static StringList view_list = new StringList();
 	
-	static ArrayList<HashMap<String, Integer>> view_query_mapping = null;
+	static HashMap<String, HashMap<String, Integer>> view_query_mapping = new HashMap<String, HashMap<String, Integer>>();
 	
 	public static IntList query_ids = new IntList();
 		
@@ -124,13 +127,13 @@ public class Tuple_level_approach {
 	
 	static HashMap<String, ArrayList<Tuple>> view_tuple_mapping = new HashMap<String, ArrayList<Tuple>>();
 	
-	static HashMap<Argument, ArrayList<Tuple>> head_variable_view_mapping = new HashMap<Argument, ArrayList<Tuple>>();
+	static ArrayList<Tuple>[] head_variable_view_mapping = null;
 	
-	static HashMap<String, ArrayList<Argument>> head_variable_query_mapping = new HashMap<String, ArrayList<Argument>>();
+	static HashMap<String, ArrayList<Integer>> head_variable_query_mapping = new HashMap<String, ArrayList<Integer>>();
 	
 //	static HashMap<String, ArrayList<String>> 
 	
-	public static HashMap<String, ArrayList<Tuple>> tuple_mapping = new HashMap<String, ArrayList<Tuple>>(); 
+//	public static HashMap<String, ArrayList<Tuple>> tuple_mapping = new HashMap<String, ArrayList<Tuple>>(); 
 	
 	public static int tuple_num = 0;
 	
@@ -142,9 +145,7 @@ public class Tuple_level_approach {
 	
 	public static boolean agg_intersection = true;
 	
-	public static boolean test_case = true;
-	
-	public static int unique_tuple_num = 0;
+	public static boolean test_case = false;
 	
 	public static HashSet<Tuple> viewTuples = new HashSet<Tuple>();
 	
@@ -195,31 +196,29 @@ public class Tuple_level_approach {
 	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException, IOException, InterruptedException, JSONException
 	{
-		HashSet<String> sets = new HashSet<String>();
-		
-		sets.add("s1");
-		
-		sets.add("s2");
-		
-		sets.add("s3");
-		
-		sets.add("s4");
-						
-		System.out.println(sets);
-		
-		for(Iterator iter = sets.iterator(); iter.hasNext();)
-		{
-			String string = (String) iter.next();
-			
-			if(string.equals("s4"))
-			{
-				iter.remove();
-								
-				continue;
-			}
-		}
-		
-		System.out.println(sets);
+      Connection c = null;
+      PreparedStatement pst = null;
+    Class.forName("org.postgresql.Driver");
+    c = DriverManager
+        .getConnection(populate_db.db_url1, populate_db.usr_name , populate_db.passwd);
+      
+    String view_file = args[0];
+    
+    String query_file = args[1];
+    
+    populate_db.set_test_file_name(view_file);
+    
+    populate_db.initial(c, pst);
+    
+      Vector<Query> queries = Load_views_and_citation_queries.get_views(query_file, c, pst);
+      
+      Query query = queries.get(0);
+      
+      tuple_reasoning(query, c, pst);
+      
+      System.out.println(valid_view_mapping_schema_level);
+      
+      c.close();
 	}
 	
 	public static void compare_authors(HashMap<Head_strs, Vector<HashSet<String>>> authors1, HashMap<Head_strs, Vector<HashSet<String>>> authors2)
@@ -768,13 +767,13 @@ public class Tuple_level_approach {
 	{
 		if(agg_intersection)
 		{
-			HashSet<String>	citations = Aggregation6.do_agg_intersection2(covering_set_schema_level, valid_view_mapping_schema_level, rs, c_view_map, Resultset_prefix_col_num, view_query_mapping, query_lambda_str, author_mapping, max_author_num, query_ids, view_list, c, pst, true);
+			HashSet<String>	citations = Aggregation6.do_agg_intersection2(covering_set_schema_level, valid_view_mapping_schema_level, rs, c_view_map, Resultset_prefix_col_num, query_lambda_str, author_mapping, max_author_num, query_ids, c, pst, true);
 			
 			return citations;
 		}
 		else
 		{
-			HashSet<String> citations = Aggregation6.do_agg_union(covering_set_schema_level, valid_view_mapping_schema_level, signiture_view_mappings_mappings, signiture_rid_mappings, rs, c_view_map, signiture_rid_mappings, Resultset_prefix_col_num, view_query_mapping, query_lambda_str, author_mapping, max_author_num, query_ids, view_list, c, pst, true);
+			HashSet<String> citations = Aggregation6.do_agg_union(covering_set_schema_level, valid_view_mapping_schema_level, signiture_view_mappings_mappings, signiture_rid_mappings, rs, c_view_map, signiture_rid_mappings, Resultset_prefix_col_num, query_lambda_str, author_mapping, max_author_num, query_ids, c, pst, true);
 			
 			return citations;
 		}
@@ -874,8 +873,6 @@ public class Tuple_level_approach {
 	
 	public static void reset() throws SQLException
 	{
-		view_mapping.clear();
-		
 		valid_conditions.clear();
 		
 		valid_lambda_terms.clear();
@@ -888,7 +885,7 @@ public class Tuple_level_approach {
 		
 		lambda_terms_map.clear();
 		
-		tuple_mapping.clear();
+//		tuple_mapping.clear();
 										
 		authors.clear();
 		
@@ -1353,28 +1350,33 @@ public class Tuple_level_approach {
 		}
 	}
 	
-	static void build_head_variable_mapping(Query view, Tuple tuple)
+	static void build_head_variable_mapping(Query query, Tuple tuple)
     {
         for(int i = 0; i<tuple.getArgs().size(); i++)
         {
                         
             Argument target_attr_name = (Argument) tuple.getArgs().get(i);
             
-            ArrayList<Tuple> tuples = head_variable_view_mapping.get(target_attr_name);
+            int target_arg_id = query.head.args.indexOf(target_attr_name);
+            
+            if(target_arg_id < 0)
+              continue;
+            
+            ArrayList<Tuple> tuples = head_variable_view_mapping[target_arg_id];
             
             String relation_name = target_attr_name.relation_name;
             
             if(relation_arg_mapping.get(relation_name) == null)
             {
-                HashSet<Argument> args = new HashSet<Argument>();
+                HashSet<Integer> args = new HashSet<Integer>();
                 
-                args.add(target_attr_name);
+                args.add(target_arg_id);
                 
                 relation_arg_mapping.put(relation_name, args);
             }
             else
             {
-                relation_arg_mapping.get(relation_name).add(target_attr_name);
+                relation_arg_mapping.get(relation_name).add(target_arg_id);
             }   
             
             if(tuples == null)
@@ -1386,7 +1388,7 @@ public class Tuple_level_approach {
             else
                 tuples.add(tuple);
             
-            head_variable_view_mapping.put(target_attr_name, tuples);
+            head_variable_view_mapping[target_arg_id] = tuples;
         }
     }
 	
@@ -1426,14 +1428,14 @@ public class Tuple_level_approach {
 			
 			String relation_name = head_arg_str.substring(0, partition_id);
 			
-			ArrayList<Argument> head_variable_strs = head_variable_query_mapping.get(relation_name);
+			ArrayList<Integer> head_variable_strs = head_variable_query_mapping.get(relation_name);
 			
 			if(head_variable_strs == null)
 			{
-				head_variable_strs = new ArrayList<Argument>();
+				head_variable_strs = new ArrayList<Integer>();
 			}
 			
-			head_variable_strs.add(head_arg);
+			head_variable_strs.add(i);
 			
 			head_variable_query_mapping.put(relation_name, head_variable_strs);
 		}
@@ -1454,12 +1456,10 @@ public class Tuple_level_approach {
 	        
 	        build_query_head_variable_mapping(q);
 	        
-	        for(int k = 0; k<views.size(); k++)
-	        {
-	            view_list.add(views.get(k).name);
-	            
-	            view_mapping.put(views.get(k).name, views.get(k));
-	        }
+//	        for(int k = 0; k<views.size(); k++)
+//	        {
+//	            view_list.add(views.get(k).name);
+//	        }
 
 	        HashSet<Conditions> query_negated_conditions = q.get_all_negated_conditions();
 
@@ -1475,7 +1475,7 @@ public class Tuple_level_approach {
 	        
 	        viewTuples = check_distinguished_variables(viewTuples, q);
 	                        
-	        unique_tuple_num = viewTuples.size();
+	        head_variable_view_mapping = new ArrayList[q.head.args.size()];
 	        
 	        for(Iterator iter = viewTuples.iterator();iter.hasNext();)
 	        {
@@ -1616,24 +1616,24 @@ public class Tuple_level_approach {
 	              
 	            }
 	            
-	            build_head_variable_mapping(tuple.query, tuple);
+	            build_head_variable_mapping(q, tuple);
 	            
-	            if(tuple_mapping.get(tuple.name) == null)
-	            {
-	                ArrayList<Tuple> tuples = new ArrayList<Tuple>();
-	                
-	                tuples.add(tuple);
-	                
-	                tuple_mapping.put(tuple.name, tuples);
-	            }
-	            else
-	            {
-	                ArrayList<Tuple> tuples = tuple_mapping.get(tuple.name);
-	                
-	                tuples.add(tuple);
-	                
-	                tuple_mapping.put(tuple.name, tuples);
-	            }
+//	            if(tuple_mapping.get(tuple.name) == null)
+//	            {
+//	                ArrayList<Tuple> tuples = new ArrayList<Tuple>();
+//	                
+//	                tuples.add(tuple);
+//	                
+//	                tuple_mapping.put(tuple.name, tuples);
+//	            }
+//	            else
+//	            {
+//	                ArrayList<Tuple> tuples = tuple_mapping.get(tuple.name);
+//	                
+//	                tuples.add(tuple);
+//	                
+//	                tuple_mapping.put(tuple.name, tuples);
+//	            }
 	            
 	            
 	            
@@ -1654,7 +1654,7 @@ public class Tuple_level_approach {
 	        }
 
 	        if(prepare_info)
-	            prepare_citation_information(c, pst);
+	            prepare_citation_information(views, c, pst);
 	                
 	        
 //	      System.out.println("partial_mapping_conditions:::" + partial_mapping_strings);
@@ -1778,27 +1778,27 @@ public class Tuple_level_approach {
 //	    
 //	}
 	
-	public static void prepare_citation_information(Connection c, PreparedStatement pst) throws SQLException
+	public static void prepare_citation_information(Vector<Query> views, Connection c, PreparedStatement pst) throws SQLException
 	{
 		gen_citation1.get_all_query_ids(query_ids, c, pst);
 	    
-	    view_query_mapping = new ArrayList<HashMap<String, Integer>>(view_list.size);
+//	    view_query_mapping = new ArrayList<HashMap<String, Integer>>(views.size());
 	    		
 		for(int i = 0; i<query_ids.size; i++)
 		{
 			query_lambda_str.add(null);
 		}
 	    	    
-	    gen_citation1.init_author_mapping(view_list, view_query_mapping, query_ids, author_mapping, max_author_num, c, pst, query_lambda_str, citation_queries);
+	    gen_citation1.init_author_mapping(views, view_query_mapping, query_ids, author_mapping, max_author_num, c, pst, query_lambda_str, citation_queries);
 
 	}
 	
-	public static HashMap<String, Integer> get_citation_queries(String view_name)
-	{
-		int view_id = view_list.find(view_name);
-		
-		return view_query_mapping.get(view_id);
-	}
+//	public static HashMap<String, Integer> get_citation_queries(String view_name)
+//	{
+//		int view_id = view_list.find(view_name);
+//		
+//		return view_query_mapping.get(view_id);
+//	}
 		
 	public static void tuple_reasoning(Query q, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
 	{
@@ -1809,7 +1809,9 @@ public class Tuple_level_approach {
 				
 		reset();
 		
-		Vector<Query> views = populate_db.get_views_schema(c, pst);
+//		Vector<Query> views = populate_db.get_views_schema(c, pst);
+		
+		Vector<Query> views = Load_views_and_citation_queries.get_views(populate_db.view_file, c, pst);
 		
 		start = System.nanoTime();
 		
@@ -1828,7 +1830,7 @@ public class Tuple_level_approach {
         String sql = null;
         
         if(!test_case)
-            sql = Query_converter.datalog2sql_citation3(q, partial_mapping_strings, partial_mapping_view_mapping_mappings, with_sub_queries_id_mappings, full_mapping_condition_str, valid_conditions, valid_lambda_terms, view_tuples);
+            sql = Query_converter.datalog2sql_citation_agg(true, q, partial_mapping_strings, partial_mapping_view_mapping_mappings, with_sub_queries_id_mappings, full_mapping_condition_str, valid_conditions, valid_lambda_terms, view_tuples);
         else
             sql = Query_converter.datalog2sql_citation_test3(q, partial_mapping_strings, partial_mapping_view_mapping_mappings, with_sub_queries_id_mappings, full_mapping_condition_str, valid_conditions, valid_lambda_terms, view_tuples);
         
@@ -2088,60 +2090,60 @@ public class Tuple_level_approach {
 //	}
 //	
 	
-	static HashMap<String, ArrayList<Tuple>> get_valid_view_mapping(int pos1) throws SQLException
-	{
-		HashMap<String, ArrayList<Tuple>> curr_tuple_mapping = new HashMap<String, ArrayList<Tuple>>();
-		
-		int i = pos1;
-		
-		curr_tuple_mapping.putAll(tuple_mapping);
-		
-		if(valid_conditions.isEmpty())
-		{
-			
-			
-			return curr_tuple_mapping;
-		}
-		
-		for(Iterator iter = valid_conditions.iterator(); iter.hasNext();)
-		{
-			boolean condition = rs.getBoolean(i + 1);
-			
-			Conditions curr_condition = (Conditions) iter.next();
-			
-			if(!condition)
-			{							
-				String condition_str = curr_condition.toString();
-				
-				ArrayList<Tuple> invalid_views = conditions_map.get(condition_str);
-				
-				for(int k = 0; k<invalid_views.size(); k++)
-				{
-					Tuple tuple = invalid_views.get(k);
-					
-					ArrayList<Tuple> curr_tuples = curr_tuple_mapping.get(tuple.name);//new ArrayList<Tuple>();
-					
-					if(curr_tuples == null)
-					{
-						curr_tuples = new ArrayList<Tuple>();
-						
-						curr_tuples.addAll(tuple_mapping.get(tuple.name));
-					}
-					
-					
-					curr_tuples.remove(tuple);
-					
-					curr_tuple_mapping.put(tuple.name, curr_tuples);
-				}							
-			}
-			i++;
-		}	
-		
-		return curr_tuple_mapping;
-	}
+//	static HashMap<String, ArrayList<Tuple>> get_valid_view_mapping(int pos1) throws SQLException
+//	{
+//		HashMap<String, ArrayList<Tuple>> curr_tuple_mapping = new HashMap<String, ArrayList<Tuple>>();
+//		
+//		int i = pos1;
+//		
+//		curr_tuple_mapping.putAll(tuple_mapping);
+//		
+//		if(valid_conditions.isEmpty())
+//		{
+//			
+//			
+//			return curr_tuple_mapping;
+//		}
+//		
+//		for(Iterator iter = valid_conditions.iterator(); iter.hasNext();)
+//		{
+//			boolean condition = rs.getBoolean(i + 1);
+//			
+//			Conditions curr_condition = (Conditions) iter.next();
+//			
+//			if(!condition)
+//			{							
+//				String condition_str = curr_condition.toString();
+//				
+//				ArrayList<Tuple> invalid_views = conditions_map.get(condition_str);
+//				
+//				for(int k = 0; k<invalid_views.size(); k++)
+//				{
+//					Tuple tuple = invalid_views.get(k);
+//					
+//					ArrayList<Tuple> curr_tuples = curr_tuple_mapping.get(tuple.name);//new ArrayList<Tuple>();
+//					
+//					if(curr_tuples == null)
+//					{
+//						curr_tuples = new ArrayList<Tuple>();
+//						
+//						curr_tuples.addAll(tuple_mapping.get(tuple.name));
+//					}
+//					
+//					
+//					curr_tuples.remove(tuple);
+//					
+//					curr_tuple_mapping.put(tuple.name, curr_tuples);
+//				}							
+//			}
+//			i++;
+//		}	
+//		
+//		return curr_tuple_mapping;
+//	}
+//	
 	
-	
-	public static void reasoning(Query query, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, Connection c, PreparedStatement pst, String sql, HashSet<Tuple> viewTuples) throws SQLException, ClassNotFoundException, IOException, InterruptedException, JSONException
+	public static void reasoning(Query query, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, Connection c, PreparedStatement pst, String sql, HashSet<Tuple> viewTuples) throws SQLException, IOException, InterruptedException, JSONException
 	{
 		start = System.nanoTime();
 		
@@ -2302,9 +2304,9 @@ public class Tuple_level_approach {
                   double start = System.nanoTime();
                   
                   if(isclustering)
-                    reasoning_single_tuple(c_unit_vec, query, rs, c_view_template, all_head_vars);
+                    Covering_sets_clustering_by_relation.reasoning_single_tuple(head_variable_query_mapping, head_variable_view_mapping, relation_arg_mapping, c_unit_vec, query, rs, c_view_template, all_head_vars);
                   else
-                    reasoning_single_tuple_no_clustering(c_unit_vec, query, rs, c_view_template, all_head_vars);
+                    Covering_sets_no_clustering.reasoning_single_tuple(head_variable_query_mapping, head_variable_view_mapping, relation_arg_mapping, c_unit_vec, query, rs, c_view_template, all_head_vars);
 
 //                  if(isclustering)
 //                    get_valid_citation_combination(c_view_template, c_unit_vec,query, all_head_vars);
@@ -2430,9 +2432,9 @@ public class Tuple_level_approach {
         if(!matched)
         {
           if(isclustering)
-            reasoning_single_tuple(valid_view_mapping_schema_level, query, rs, covering_set_schema_level, get_all_head_variables(valid_view_mapping_schema_level, query));
+            Covering_sets_clustering_by_relation.reasoning_single_tuple(head_variable_query_mapping, head_variable_view_mapping, relation_arg_mapping, valid_view_mapping_schema_level, query, rs, covering_set_schema_level, get_all_head_variables(valid_view_mapping_schema_level, query));
           else
-            reasoning_single_tuple_no_clustering(valid_view_mapping_schema_level, query, rs, covering_set_schema_level, get_all_head_variables(valid_view_mapping_schema_level, query));
+            Covering_sets_no_clustering.reasoning_single_tuple(head_variable_query_mapping, head_variable_view_mapping, relation_arg_mapping, valid_view_mapping_schema_level, query, rs, covering_set_schema_level, get_all_head_variables(valid_view_mapping_schema_level, query));
 
         }
 		
@@ -2466,135 +2468,135 @@ public class Tuple_level_approach {
 	        return head_args;
 	    }
 	
-	static void reasoning_single_tuple(HashSet views, Query query, ResultSet rs, HashSet<Covering_set> c_view_template, HashSet<Argument> curr_head_vars) throws ClassNotFoundException, SQLException
-    {
-        
-//      ArrayList<citation_view_vector> view_com = new ArrayList<citation_view_vector>();
-        
-        HashSet<Covering_set> all_covering_sets = new HashSet<Covering_set>();
-        
-        Set<String> relations = head_variable_query_mapping.keySet();
-        
-        for(Iterator iter = relations.iterator(); iter.hasNext();)
-        {
-            String relation = (String) iter.next();
-            
-            HashSet<Argument> view_head_args = relation_arg_mapping.get(relation);
-            
-            if(view_head_args == null)
-            {
-                continue;
-            }
-            else
-            {
-                HashSet<Argument> view_head_args_copy = (HashSet<Argument>) view_head_args.clone();
-                
-//              HashSet<citation_view_vector> covering_sets = new HashSet<citation_view_vector>();
-                
-                ArrayList<Argument> q_head_args = head_variable_query_mapping.get(relation);
-                
-                view_head_args_copy.retainAll(q_head_args);
-                
-                for(Iterator it = view_head_args_copy.iterator(); it.hasNext();)
-                {
-                    Argument arg = (Argument) it.next();
-                    
-                    ArrayList<Tuple> curr_tuples = (ArrayList<Tuple>) head_variable_view_mapping.get(arg).clone();
-                    
-                    curr_tuples.retainAll(views);
-                    
-//                  System.out.println("tuples");
-//                  
-//                  for(Tuple tuple: curr_tuples)
-//                  {
-//                    System.out.print(tuple.name + ",");
-//                  }
-//                  
-//                  System.out.println();
-                    
-                    all_covering_sets = Tuple_reasoning1_full_test_opt.join_views_curr_relation(curr_tuples, all_covering_sets, query.head.args, view_mapping);
-                    
-//                  System.out.println(all_covering_sets);
-                }
-                
-//              all_covering_sets = Tuple_reasoning1_full_test_opt.join_operation(all_covering_sets, covering_sets, all_covering_sets.size());
-            }
-            
-            
-            
-        }
-                
-        c_view_template.addAll(all_covering_sets);
-        
-        all_covering_sets.clear();
-        
-    }
+//	static void reasoning_single_tuple(HashSet views, Query query, ResultSet rs, HashSet<Covering_set> c_view_template, HashSet<Argument> curr_head_vars) throws ClassNotFoundException, SQLException
+//    {
+//        
+////      ArrayList<citation_view_vector> view_com = new ArrayList<citation_view_vector>();
+//        
+//        HashSet<Covering_set> all_covering_sets = new HashSet<Covering_set>();
+//        
+//        Set<String> relations = head_variable_query_mapping.keySet();
+//        
+//        for(Iterator iter = relations.iterator(); iter.hasNext();)
+//        {
+//            String relation = (String) iter.next();
+//            
+//            HashSet<Argument> view_head_args = relation_arg_mapping.get(relation);
+//            
+//            if(view_head_args == null)
+//            {
+//                continue;
+//            }
+//            else
+//            {
+//                HashSet<Argument> view_head_args_copy = (HashSet<Argument>) view_head_args.clone();
+//                
+////              HashSet<citation_view_vector> covering_sets = new HashSet<citation_view_vector>();
+//                
+//                ArrayList<Argument> q_head_args = head_variable_query_mapping.get(relation);
+//                
+//                view_head_args_copy.retainAll(q_head_args);
+//                
+//                for(Iterator it = view_head_args_copy.iterator(); it.hasNext();)
+//                {
+//                    Argument arg = (Argument) it.next();
+//                    
+//                    ArrayList<Tuple> curr_tuples = (ArrayList<Tuple>) head_variable_view_mapping.get(arg).clone();
+//                    
+//                    curr_tuples.retainAll(views);
+//                    
+////                  System.out.println("tuples");
+////                  
+////                  for(Tuple tuple: curr_tuples)
+////                  {
+////                    System.out.print(tuple.name + ",");
+////                  }
+////                  
+////                  System.out.println();
+//                    
+//                    all_covering_sets = Tuple_reasoning1_full_test_opt.join_views_curr_relation(curr_tuples, all_covering_sets, query.head.args, view_mapping);
+//                    
+////                  System.out.println(all_covering_sets);
+//                }
+//                
+////              all_covering_sets = Tuple_reasoning1_full_test_opt.join_operation(all_covering_sets, covering_sets, all_covering_sets.size());
+//            }
+//            
+//            
+//            
+//        }
+//                
+//        c_view_template.addAll(all_covering_sets);
+//        
+//        all_covering_sets.clear();
+//        
+//    }
     
-       static void reasoning_single_tuple_no_clustering(HashSet views, Query query, ResultSet rs, HashSet<Covering_set> c_view_template, HashSet<Argument> curr_head_vars) throws ClassNotFoundException, SQLException
-        {
-            
-//        ArrayList<citation_view_vector> view_com = new ArrayList<citation_view_vector>();
-            
-            HashSet<Covering_set> all_covering_sets = new HashSet<Covering_set>();
-            
-            Set<Argument> args = head_variable_view_mapping.keySet();
-            
-            for(Argument arg: args)
-            {
-              ArrayList<Tuple> curr_tuples = (ArrayList<Tuple>) head_variable_view_mapping.get(arg).clone();
-              
-              curr_tuples.retainAll(views);
-              
-              all_covering_sets = Tuple_reasoning1_full_test_opt.join_views_curr_relation(curr_tuples, all_covering_sets, query.head.args, view_mapping);
-
-            }
-            
-//          Set<String> relations = head_variable_query_mapping.keySet();
-//          
-//          for(Iterator iter = relations.iterator(); iter.hasNext();)
-//          {
-//              String relation = (String) iter.next();
+//       static void reasoning_single_tuple_no_clustering(HashSet views, Query query, ResultSet rs, HashSet<Covering_set> c_view_template, HashSet<Argument> curr_head_vars) throws ClassNotFoundException, SQLException
+//        {
+//            
+////        ArrayList<citation_view_vector> view_com = new ArrayList<citation_view_vector>();
+//            
+//            HashSet<Covering_set> all_covering_sets = new HashSet<Covering_set>();
+//            
+//            Set<Argument> args = head_variable_view_mapping.keySet();
+//            
+//            for(Argument arg: args)
+//            {
+//              ArrayList<Tuple> curr_tuples = (ArrayList<Tuple>) head_variable_view_mapping.get(arg).clone();
 //              
-//              HashSet<Argument> view_head_args = relation_arg_mapping.get(relation);
+//              curr_tuples.retainAll(views);
 //              
-//              if(view_head_args == null)
-//              {
-//                  continue;
-//              }
-//              else
-//              {
-//                  HashSet<Argument> view_head_args_copy = (HashSet<Argument>) view_head_args.clone();
-//                  
-////                  HashSet<citation_view_vector> covering_sets = new HashSet<citation_view_vector>();
-//                  
-//                  ArrayList<Argument> q_head_args = head_variable_query_mapping.get(relation);
-//                  
-//                  view_head_args_copy.retainAll(q_head_args);
-//                  
-//                  for(Iterator it = view_head_args_copy.iterator(); it.hasNext();)
-//                  {
-//                      Argument arg = (Argument) it.next();
-//                      
-//                      ArrayList<Tuple> curr_tuples = (ArrayList<Tuple>) head_variable_view_mapping.get(arg).clone();
-//                      
-//                      curr_tuples.retainAll(views);
-//                      
-//                      all_covering_sets = Tuple_reasoning1_full_test_opt.join_views_curr_relation(curr_tuples, all_covering_sets, query.head.args, view_mapping);
-//                  }
-//                  
-////                  all_covering_sets = Tuple_reasoning1_full_test_opt.join_operation(all_covering_sets, covering_sets, all_covering_sets.size());
-//              }
-//              
-//              
-//              
-//          }
-                    
-            c_view_template.addAll(all_covering_sets);
-            
-            all_covering_sets.clear();
-            
-        }
-    
+//              all_covering_sets = Tuple_reasoning1_full_test_opt.join_views_curr_relation(curr_tuples, all_covering_sets, query.head.args, view_mapping);
+//
+//            }
+//            
+////          Set<String> relations = head_variable_query_mapping.keySet();
+////          
+////          for(Iterator iter = relations.iterator(); iter.hasNext();)
+////          {
+////              String relation = (String) iter.next();
+////              
+////              HashSet<Argument> view_head_args = relation_arg_mapping.get(relation);
+////              
+////              if(view_head_args == null)
+////              {
+////                  continue;
+////              }
+////              else
+////              {
+////                  HashSet<Argument> view_head_args_copy = (HashSet<Argument>) view_head_args.clone();
+////                  
+//////                  HashSet<citation_view_vector> covering_sets = new HashSet<citation_view_vector>();
+////                  
+////                  ArrayList<Argument> q_head_args = head_variable_query_mapping.get(relation);
+////                  
+////                  view_head_args_copy.retainAll(q_head_args);
+////                  
+////                  for(Iterator it = view_head_args_copy.iterator(); it.hasNext();)
+////                  {
+////                      Argument arg = (Argument) it.next();
+////                      
+////                      ArrayList<Tuple> curr_tuples = (ArrayList<Tuple>) head_variable_view_mapping.get(arg).clone();
+////                      
+////                      curr_tuples.retainAll(views);
+////                      
+////                      all_covering_sets = Tuple_reasoning1_full_test_opt.join_views_curr_relation(curr_tuples, all_covering_sets, query.head.args, view_mapping);
+////                  }
+////                  
+//////                  all_covering_sets = Tuple_reasoning1_full_test_opt.join_operation(all_covering_sets, covering_sets, all_covering_sets.size());
+////              }
+////              
+////              
+////              
+////          }
+//                    
+//            c_view_template.addAll(all_covering_sets);
+//            
+//            all_covering_sets.clear();
+//            
+//        }
+//    
 
 	
 //	public static HashSet<String> gen_citation(Head_strs h_vals, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException, JSONException
@@ -2832,7 +2834,7 @@ public class Tuple_level_approach {
 //		return citations;
 //	}
 //	
-	static HashSet<String> gen_citation(HashSet<Covering_set> c_views, Connection c, PreparedStatement pst, ArrayList<HashMap<String, Integer>> view_query_mapping, String star_op, String plus_op) throws ClassNotFoundException, SQLException, JSONException
+	static HashSet<String> gen_citation(HashSet<Covering_set> c_views, Connection c, PreparedStatement pst, HashMap<String, HashMap<String, Integer>> view_query_mapping, String star_op, String plus_op) throws ClassNotFoundException, SQLException, JSONException
 	{
 		HashSet<String> citations = new HashSet<String>();
 				
@@ -2843,7 +2845,7 @@ public class Tuple_level_approach {
 			
 			Covering_set covering_set = (Covering_set) iter.next();
 									
-			HashSet<String> str = gen_citation1.get_citations3(covering_set, c, pst, view_list, view_query_mapping, author_mapping, max_author_num, query_ids, query_lambda_str, view_author_mapping, star_op);
+			HashSet<String> str = gen_citation1.get_citations3(covering_set, c, pst, view_query_mapping, author_mapping, max_author_num, query_ids, query_lambda_str, view_author_mapping, star_op);
 			
 			citations.addAll(str);		
 		}
@@ -3178,7 +3180,7 @@ public class Tuple_level_approach {
             }
           }
           
-          HashSet<String> curr_citations = gen_citation1.get_citations3(covering_set, c, pst, view_list, view_query_mapping, author_mapping, max_author_num, query_ids, query_lambda_str, view_author_mapping, populate_db.star_op);
+          HashSet<String> curr_citations = gen_citation1.get_citations3(covering_set, c, pst, view_query_mapping, author_mapping, max_author_num, query_ids, query_lambda_str, view_author_mapping, populate_db.star_op);
           
           citations.addAll(curr_citations);
           
@@ -3673,7 +3675,7 @@ public class Tuple_level_approach {
 		return correct;
 	}
 	
-	public static HashSet<Tuple> get_citation_units_condition(ArrayList<HashSet<String>> c_units, int start_pos, Query q, HashSet<Argument> all_head_vars, HashSet<Tuple> curr_tuple_mapping) throws ClassNotFoundException, SQLException
+	public static HashSet<Tuple> get_citation_units_condition(ArrayList<HashSet<String>> c_units, int start_pos, Query q, HashSet<Argument> all_head_vars, HashSet<Tuple> curr_tuple_mapping) throws SQLException
 	{
 		HashSet<Tuple> c_views = new HashSet<Tuple>();
 		
@@ -3916,9 +3918,9 @@ public class Tuple_level_approach {
 //		return c_view_map;
 //	}
 //	
-	static void find_max_covering(String target_relation_name, HashSet<Argument> all_head_vars)
+	static void find_max_covering(String target_relation_name, HashSet<Integer> all_head_vars)
 	{
-		ArrayList<Argument> query_head_curr_relations = head_variable_query_mapping.get(target_relation_name);
+		ArrayList<Integer> query_head_curr_relations = head_variable_query_mapping.get(target_relation_name);
 		
 		if(query_head_curr_relations == null)
 		{
@@ -3931,7 +3933,7 @@ public class Tuple_level_approach {
 		
 	}
 	
-	public static HashSet<Covering_set> join_views_curr_relation(ArrayList<Tuple> tuples, HashSet<Covering_set> curr_view_com, HashSet<Argument> curr_head_args, HashMap<String, Query> view_mapping)
+	public static HashSet<Covering_set> join_views_curr_relation(ArrayList<Tuple> tuples, HashSet<Covering_set> curr_view_com, HashSet<Integer> curr_head_args)
 	{
 		if(curr_view_com.isEmpty())
 		{
@@ -3951,7 +3953,7 @@ public class Tuple_level_approach {
 					if(valid_tuple.lambda_terms.size() > 0)
 					{
 						
-						citation_view_parametered c = new citation_view_parametered(valid_tuple.name, view_mapping.get(valid_tuple.name), valid_tuple);
+						citation_view_parametered c = new citation_view_parametered(valid_tuple.name, valid_tuple.query, valid_tuple);
 						
 						Covering_set curr_views = new Covering_set(c);
 						
@@ -3987,7 +3989,7 @@ public class Tuple_level_approach {
 				if(valid_tuple.lambda_terms.size() > 0)
 				{
 					
-					c = new citation_view_parametered(valid_tuple.name, view_mapping.get(valid_tuple.name), valid_tuple);
+					c = new citation_view_parametered(valid_tuple.name, valid_tuple.query, valid_tuple);
 				}	
 				else
 				{
@@ -4268,7 +4270,7 @@ public class Tuple_level_approach {
 		return c_combinations;
 	}
 	
-	public static void get_valid_citation_combination(HashSet<Covering_set> c_view_template, ArrayList<ArrayList<Tuple>>c_unit_vec, Query query, ArrayList<HashSet<Argument>> all_head_vars) throws ClassNotFoundException, SQLException
+	public static void get_valid_citation_combination(HashSet<Covering_set> c_view_template, ArrayList<ArrayList<Tuple>>c_unit_vec, Query query, ArrayList<HashSet<Integer>> all_head_vars) throws ClassNotFoundException, SQLException
 	{
 //		HashSet<citation_view_vector2> c_combinations = new HashSet<citation_view_vector2>();
 		
@@ -4302,7 +4304,7 @@ public class Tuple_level_approach {
 			
 			Subgoal subgoal = (Subgoal) query.body.get(i);
 			
-			HashSet<Argument> curr_relation_head_vars = all_head_vars.get(i);  
+			HashSet<Integer> curr_relation_head_vars = all_head_vars.get(i);  
 			
 			find_max_covering(subgoal.name, curr_relation_head_vars);
 			
@@ -4316,15 +4318,15 @@ public class Tuple_level_approach {
 				
 				ArrayList<Tuple> curr_tuples_copy = (ArrayList<Tuple>) curr_c_unit_vec.clone();
 				
-				Argument curr_head_var = (Argument) iter.next();
+				Integer curr_head_var = (Integer) iter.next();
 				
-				ArrayList<Tuple> available_tuples = head_variable_view_mapping.get(curr_head_var);
+				ArrayList<Tuple> available_tuples = head_variable_view_mapping[curr_head_var];
 				
 				curr_tuples_copy.retainAll(available_tuples);
 				
 				
 				
-				view_com = join_views_curr_relation(curr_tuples_copy, view_com, curr_relation_head_vars, view_mapping);
+				view_com = join_views_curr_relation(curr_tuples_copy, view_com, curr_relation_head_vars);
 				
 //				remove_duplicate_view_combinations(view_com);
 			}
@@ -4351,85 +4353,85 @@ public class Tuple_level_approach {
 		temp_combinations.clear();
 	}
 	
-	public static void get_valid_citation_combination_no_clustering(HashSet<Covering_set> c_view_template, ArrayList<ArrayList<Tuple>>c_unit_vec, Query query, ArrayList<HashSet<Argument>> all_head_vars) throws ClassNotFoundException, SQLException
-    {
-	  HashSet<Covering_set> temp_combinations = new HashSet<Covering_set>();
-      
-//    int valid_subgoal_num = 0;
-      
-//    for(int i = 0; i<c_unit_vec.size(); i++)
+//	public static void get_valid_citation_combination_no_clustering(HashSet<Covering_set> c_view_template, ArrayList<ArrayList<Tuple>>c_unit_vec, Query query, ArrayList<HashSet<Integer>> all_head_vars) throws ClassNotFoundException, SQLException
 //    {
-//        Vector<citation_view> curr_c_unit_vec = c_unit_vec.get(i);
-//        
-//        Subgoal subgoal = (Subgoal) query.body.get(i); 
-//        
-//        if(curr_c_unit_vec.size() != 0)
-//        {
-//            subgoal_names.add(subgoal.name);
-////              valid_subgoal_num ++;
-//        }
-//        
+//	  HashSet<Covering_set> temp_combinations = new HashSet<Covering_set>();
+//      
+////    int valid_subgoal_num = 0;
+//      
+////    for(int i = 0; i<c_unit_vec.size(); i++)
+////    {
+////        Vector<citation_view> curr_c_unit_vec = c_unit_vec.get(i);
+////        
+////        Subgoal subgoal = (Subgoal) query.body.get(i); 
+////        
+////        if(curr_c_unit_vec.size() != 0)
+////        {
+////            subgoal_names.add(subgoal.name);
+//////              valid_subgoal_num ++;
+////        }
+////        
+////    }
+//      
+//      
+////    boolean final_col = false;
+//      
+//      for(int i = 0; i<c_unit_vec.size(); i++)
+//      {
+//          ArrayList<Tuple> curr_c_unit_vec = c_unit_vec.get(i);
+//          
+//          if(curr_c_unit_vec.size() == 0)
+//              continue;
+//          
+//          Subgoal subgoal = (Subgoal) query.body.get(i);
+//          
+//          HashSet<Integer> curr_relation_head_vars = all_head_vars.get(i);
+//          
+//          find_max_covering(subgoal.name, curr_relation_head_vars);
+//          
+//          if(curr_relation_head_vars.isEmpty())
+//              continue;
+//          
+////          HashSet<citation_view_vector> view_com = new HashSet<citation_view_vector>();
+//          
+//          for(Iterator iter = curr_relation_head_vars.iterator(); iter.hasNext();)
+//          {
+//              
+//              ArrayList<Tuple> curr_tuples_copy = (ArrayList<Tuple>) curr_c_unit_vec.clone();
+//              
+//              Integer curr_head_var = (Integer) iter.next();
+//              
+//              ArrayList<Tuple> available_tuples = head_variable_view_mapping[curr_head_var];
+//              
+//              curr_tuples_copy.retainAll(available_tuples);
+//              
+//              temp_combinations = join_views_curr_relation(curr_tuples_copy, temp_combinations, query.head.args);
+//              
+////            remove_duplicate_view_combinations(view_com);
+//          }
+//          
+////        remove_duplicate_view_combinations(view_com);
+////        else
+////        {
+////            valid_subgoal_num --;
+////            
+////            if(valid_subgoal_num == 0)
+////                final_col = true;
+////        }           
+////          temp_combinations = join_operation(temp_combinations, view_com, temp_combinations.size());
+//          
+////        remove_duplicate_view_combinations(temp_combinations);
+//          
+//          
+//      }
+//      
+////    remove_duplicate_view_combinations_final(temp_combinations);
+//      
+//      c_view_template.addAll(temp_combinations);
+//      
+//      temp_combinations.clear();
 //    }
-      
-      
-//    boolean final_col = false;
-      
-      for(int i = 0; i<c_unit_vec.size(); i++)
-      {
-          ArrayList<Tuple> curr_c_unit_vec = c_unit_vec.get(i);
-          
-          if(curr_c_unit_vec.size() == 0)
-              continue;
-          
-          Subgoal subgoal = (Subgoal) query.body.get(i);
-          
-          HashSet<Argument> curr_relation_head_vars = all_head_vars.get(i);
-          
-          find_max_covering(subgoal.name, curr_relation_head_vars);
-          
-          if(curr_relation_head_vars.isEmpty())
-              continue;
-          
-//          HashSet<citation_view_vector> view_com = new HashSet<citation_view_vector>();
-          
-          for(Iterator iter = curr_relation_head_vars.iterator(); iter.hasNext();)
-          {
-              
-              ArrayList<Tuple> curr_tuples_copy = (ArrayList<Tuple>) curr_c_unit_vec.clone();
-              
-              Argument curr_head_var = (Argument) iter.next();
-              
-              ArrayList<Tuple> available_tuples = head_variable_view_mapping.get(curr_head_var);
-              
-              curr_tuples_copy.retainAll(available_tuples);
-              
-              temp_combinations = join_views_curr_relation(curr_tuples_copy, temp_combinations, query.head.args, view_mapping);
-              
-//            remove_duplicate_view_combinations(view_com);
-          }
-          
-//        remove_duplicate_view_combinations(view_com);
-//        else
-//        {
-//            valid_subgoal_num --;
-//            
-//            if(valid_subgoal_num == 0)
-//                final_col = true;
-//        }           
-//          temp_combinations = join_operation(temp_combinations, view_com, temp_combinations.size());
-          
-//        remove_duplicate_view_combinations(temp_combinations);
-          
-          
-      }
-      
-//    remove_duplicate_view_combinations_final(temp_combinations);
-      
-      c_view_template.addAll(temp_combinations);
-      
-      temp_combinations.clear();
-    }
-	
+//	
 	static void remove_duplicate_view_combinations(ArrayList<Covering_set> c_view_template)
 	{
 		for(int i = 0; i<c_view_template.size(); i++)

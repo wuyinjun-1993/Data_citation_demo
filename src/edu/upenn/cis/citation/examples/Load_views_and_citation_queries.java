@@ -1,8 +1,11 @@
 package edu.upenn.cis.citation.examples;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,7 +14,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.Vector;
-
+import java.util.Map.Entry;
 import edu.upenn.cis.citation.Corecover.Argument;
 import edu.upenn.cis.citation.Corecover.Lambda_term;
 import edu.upenn.cis.citation.Corecover.Query;
@@ -19,6 +22,7 @@ import edu.upenn.cis.citation.Corecover.Subgoal;
 import edu.upenn.cis.citation.Operation.Conditions;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.Pre_processing.view_operation;
+import edu.upenn.cis.citation.datalog.Query_converter;
 
 public class Load_views_and_citation_queries {
 
@@ -317,6 +321,118 @@ public class Load_views_and_citation_queries {
 	  
 	  return string;
 	}
+	
+	   public static void write2files(String file_name, Vector<String> views)
+	    {
+	      
+	      BufferedWriter bw = null;
+	      try {
+	         //Specify the file name and path here
+	     File file = new File(file_name);
+
+	     /* This logic will make sure that the file 
+	      * gets created if it is not present at the
+	      * specified location*/
+	      if (!file.exists()) {
+	         file.createNewFile();
+	      }
+
+	      FileWriter fw = new FileWriter(file);
+	      bw = new BufferedWriter(fw);
+	      
+	      for(int i = 0; i<views.size(); i++)
+	      {
+	        bw.append(views.get(i));
+	        bw.newLine();
+	      }
+	      
+	      bw.close();
+
+	      } catch (IOException ioe) {
+	       ioe.printStackTrace();
+	    }
+	    }
+	
+	public static Vector<String> views2text_strings(Vector<Query> views)
+    {
+      Vector<String> strings = new Vector<String>();
+      for(int i = 0; i<views.size(); i++)
+      {
+        strings.add(view2text_string(views.get(i)));
+      }
+      return strings;
+    }
+    
+    static String view2text_string(Query view)
+    {
+      String string = view.name + "|";
+
+      for(int i = 0; i<view.head.args.size(); i++)
+      {
+        if(i >= 1)
+          string += ",";
+        String arg_name = view.head.args.get(i).toString();
+        string += arg_name.replaceAll("\\" + populate_db.separator, ".");
+      }
+      
+      if(view.head.agg_args != null)
+      {
+        for(int i = 0; i<view.head.agg_args.size(); i++)
+          {
+            if(view.head.args.size() > 0 || (view.head.args.size() == 0 && i >= 1))
+              string += ",";
+            String arg_name = view.head.agg_function.get(i).toString() + "(" + Query_converter.get_agg_attr_string(view.head.agg_args.get(i), "#") + ")";
+            string += arg_name.replaceAll("\\" + populate_db.separator, ".");
+          }
+      }
+      
+      string += "|";
+      
+      for(int i = 0; i<view.body.size(); i++)
+      {
+        Subgoal subgoal = (Subgoal) view.body.get(i);
+        if(i >= 1)
+          string += ",";
+        
+        string += subgoal.name;
+      }
+      
+      string += "|" ;
+      
+      for(int i = 0; i<view.conditions.size(); i++)
+      {
+        if(i >= 1)
+          string += ",";
+        string += view.conditions.get(i).toString().replaceAll("\\" + populate_db.separator, ".");
+      }
+      
+      string += "|";
+      
+      for(int i = 0; i<view.lambda_term.size(); i++)
+      {
+        if(i >= 1)
+          string += ",";
+        string += view.lambda_term.get(i).toString().replaceAll("\\" + populate_db.separator, ".");
+      }
+      
+      string += "|";
+      
+      int count = 0;
+      for(Entry<String, String> subgoal_mappings: view.subgoal_name_mapping.entrySet())
+      {
+        if(count >= 1)
+          string += ",";
+        
+        string += subgoal_mappings.getKey() + ":" + subgoal_mappings.getValue();
+        
+        count ++;
+        
+      }
+      
+      
+      
+      return string;
+    }
 	
 	static Vector<Lambda_term> split_lambda_terms(String lambda_term_str)
 	{

@@ -25,7 +25,7 @@ public class Covering_set {
 	
 	public Vector<String> index_vec;
 	
-	public HashSet<Argument> head_variables = new HashSet<Argument>();
+	public HashSet<Integer> head_variables = new HashSet<Integer>();
 	
 	public HashSet<String> table_names;
 		
@@ -92,7 +92,7 @@ public class Covering_set {
 		for(int i = 0; i<vec.size(); i++)
 		{
 			
-			if(!table_names.containsAll(vec.get(i).get_table_names()) || !head_variables.contains(vec.get(i).get_view_tuple().getArgs()))
+			if(!table_names.containsAll(vec.get(i).get_table_names()) || !head_variables.contains(vec.get(i).get_view_tuple().covered_arg_ids))
 			{
 				table_names.addAll(vec.get(i).get_table_names());
 				
@@ -100,7 +100,7 @@ public class Covering_set {
 				
 				c_vec.add(vec.get(i));
 				
-				head_variables.addAll(vec.get(i).get_view_tuple().getArgs());
+				head_variables.addAll(vec.get(i).get_view_tuple().covered_arg_ids);
 				
 			}
 
@@ -136,7 +136,7 @@ public class Covering_set {
 		
 		String table_name_str = new String();
 		
-		if(!table_names_new.containsAll(c.get_table_names()) || !head_variables.containsAll(c.get_view_tuple().getArgs()))
+		if(!table_names_new.containsAll(c.get_table_names()) || !head_variables.containsAll(c.get_view_tuple().covered_arg_ids))
 		{
 			table_names_new.addAll(c.get_table_names());
 			
@@ -178,7 +178,7 @@ public class Covering_set {
 		
 		c_v.head_variables = this.head_variables;
 		
-		c_v.head_variables.addAll(c.get_view_tuple().getArgs());
+		c_v.head_variables.addAll(c.get_view_tuple().covered_arg_ids);
 		
 		c_v.index_str = index_str_new;
 		
@@ -390,7 +390,7 @@ public class Covering_set {
 		
 		view_name_str = c.get_name();
 		
-		head_variables.addAll(c.get_view_tuple().getArgs());
+		head_variables.addAll(c.get_view_tuple().covered_arg_ids);
 		
 		unique_str_id = get_unique_string_id();
 		
@@ -425,7 +425,7 @@ public class Covering_set {
 		
 		tables.addAll(c.table_names);
 		
-		HashSet<Argument> args = new HashSet<Argument>();
+		HashSet<Integer> args = new HashSet<Integer>();
 		
 		args.addAll(vec.head_variables);
 		
@@ -648,7 +648,7 @@ public class Covering_set {
 		
 		c_v.table_name_str = table_name_str;
 		
-		c_v.head_variables = (HashSet<Argument>) head_variables.clone();
+		c_v.head_variables = (HashSet<Integer>) head_variables.clone();
 		
 		c_v.unique_str_id = unique_str_id;
 		
@@ -706,7 +706,7 @@ public class Covering_set {
 //				return false;
 //		}
 		
-		return c_vec.hashCode() == this.hashCode();
+		return c_vec.unique_str_id.equals(this.unique_str_id);
 	}
 	
 	@Override

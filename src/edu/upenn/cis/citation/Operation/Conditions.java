@@ -64,10 +64,12 @@ public class Conditions {
 		
 		String str = arg1.name;
 		
-		if(arg2.isConst())
-			return subgoal1 + populate_db.separator + str + op + arg2;
-		else
-			return subgoal1 + populate_db.separator + str + op + subgoal2 + populate_db.separator + arg2;
+		return str + op + arg2;
+		
+//		if(arg2.isConst())
+//			return subgoal1 + populate_db.separator + str + op + arg2;
+//		else
+//			return subgoal1 + populate_db.separator + str + op + subgoal2 + populate_db.separator + arg2;
 	}
 	
 	public String toStringinsql()
@@ -224,7 +226,7 @@ public class Conditions {
 		
 		Conditions condition = new Conditions(conditions.arg1, conditions.subgoal1, conditions.op.negation(), conditions.arg2, conditions.subgoal2);
 				
-		return conditions;
+		return condition;
 	}
 	
 	

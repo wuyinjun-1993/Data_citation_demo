@@ -35,13 +35,18 @@ public class populate_db {
 	//psql --host=datacitation.cn7s3bpawoj2.us-east-1.rds.amazonaws.com --port=5432 --username=postgres --password
 	//psql --host=citedb.cx9xmwhyomib.us-east-1.rds.amazonaws.com --port=5432 --username=postgres --dbname=postgres
 	
+//    static String path = "/home/wuyinjun/workspace/Data_citation_provenance/";
+  static String path = "./";
+  
 	public static String separator = "|";
 
 //	public static String[] base_relations = {"gpcr_c","object_c","interaction_c","ligand_c","pathophysiology_c","interaction_affinity_refs_c","gtip_process_c","process_assoc_c","disease_c", "family_c", "introduction_c"};
 
 //	public static String[] base_tables = {"gpcr","object","interaction","ligand","pathophysiology","interaction_affinity_refs","gtip_process","process_assoc","disease", "family", "introduction"};
 
-	public static String db_url = "jdbc:postgresql://localhost:5432/example";
+	public static String db_url_prefix = "jdbc:postgresql://localhost:5432/";
+	
+	public static String db_url = "jdbc:postgresql://localhost:5432/test1";
 	
 	public static String db_url1 = "jdbc:postgresql://localhost:5432/test1";
 
@@ -85,21 +90,29 @@ public class populate_db {
 		
 		
 //	      initial();
-		
-		Connection c = null;
-	      PreparedStatement pst = null;
-		Class.forName("org.postgresql.Driver");
-	    c = DriverManager
-	        .getConnection(db_url1, usr_name , passwd);
+	  String view_file = path + args[0];
+	  
+	  String db_name = args[1];
+
+      Connection c = null;
+      PreparedStatement pst = null;
+    Class.forName("org.postgresql.Driver");
+    c = DriverManager
+        .getConnection(populate_db.db_url_prefix + db_name, populate_db.usr_name , populate_db.passwd);
 //		
 //		
 //		delete_view_single_table("v2", "family_c", c, pst);
 		
 //	    delete_views(c, pst);
-	    drop_citation_view_cols(c, pst);
+//	    drop_citation_view_cols(c, pst);
+    
+      set_test_file_name(view_file);
 		
 		initial(c, pst);
 		
+		System.out.println("annotation done");
+		
+		c.close();
 		
 	}
 	
@@ -1617,7 +1630,7 @@ public class populate_db {
 			
 //			boolean annotation_exist = exist_annotations(subgoal.name + suffix, c, pst);
 			
-			if(subgoal_lambda_term_map.size() == 0)
+//			if(subgoal_lambda_term_map.size() == 0)
 			{
 				
 //				if(annotation_exist)
@@ -1629,40 +1642,40 @@ public class populate_db {
 					query2 += "'" + view.name + "'";
 //				}
 			}
-			else
-			{
-				Vector<Integer> int_list = subgoal_lambda_term_map.get(subgoal.name);
-				
-//				if(annotation_exist)
-					query1 += "citation_view || '|" + view.name + "('";
-//				else
-					query2 += "'" + view.name + "('";
-				
-//				for(int k = 0; k< view.lambda_term.size(); k++)
-//				{
-//					
-//					if(k >= 1)
-//					{
-//						query1 += " || ','";
-//						
-//						query2 += " || ','";
-//					}
-//					
-//					if(int_list != null && int_list.contains(k))
-//					{
-//						query1 += " || " + "f." + view.lambda_term.get(k).name.substring(subgoal.name.length() + 1, view.lambda_term.get(k).name.length());
-//						
-//						query2 += " || " + "f." + view.lambda_term.get(k).name.substring(subgoal.name.length() + 1, view.lambda_term.get(k).name.length());
-//					}
-//				}
-				
-				query1 += " || ')'";
-				
-				query2 += " || ')'";
-				
-//				query += insert_annotation;
-				
-			}
+//			else
+//			{
+//				Vector<Integer> int_list = subgoal_lambda_term_map.get(subgoal.name);
+//				
+////				if(annotation_exist)
+//					query1 += "citation_view || '|" + view.name + "('";
+////				else
+//					query2 += "'" + view.name + "('";
+//				
+////				for(int k = 0; k< view.lambda_term.size(); k++)
+////				{
+////					
+////					if(k >= 1)
+////					{
+////						query1 += " || ','";
+////						
+////						query2 += " || ','";
+////					}
+////					
+////					if(int_list != null && int_list.contains(k))
+////					{
+////						query1 += " || " + "f." + view.lambda_term.get(k).name.substring(subgoal.name.length() + 1, view.lambda_term.get(k).name.length());
+////						
+////						query2 += " || " + "f." + view.lambda_term.get(k).name.substring(subgoal.name.length() + 1, view.lambda_term.get(k).name.length());
+////					}
+////				}
+//				
+//				query1 += " || ')'";
+//				
+//				query2 += " || ')'";
+//				
+////				query += insert_annotation;
+//				
+//			}
 			
 			query1 += " where citation_view is not null";
 			
@@ -1692,9 +1705,11 @@ public class populate_db {
 						str = "'" + condition.arg2.name.substring(1, condition.arg2.name.length() - 1).replaceAll("'", "''") + "'";
 					}
 					
-					query1 += " and " + condition.arg1 + condition.op + str;
+					String arg1_str = condition.arg1.name.replace(separator, ".");
 					
-					query2 += " and " + condition.arg1 + condition.op + str;
+					query1 += " and " + arg1_str + condition.op + str;
+					
+					query2 += " and " + arg1_str + condition.op + str;
 				}
 			}
 			

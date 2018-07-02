@@ -41,6 +41,7 @@ import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.Pre_processing.view_operation;
 import edu.upenn.cis.citation.citation_view.citation_view;
 import edu.upenn.cis.citation.datalog.Query_converter;
+import edu.upenn.cis.citation.examples.Load_views_and_citation_queries;
 
 public class view_generator {
 	
@@ -260,6 +261,14 @@ public class view_generator {
 	    c = DriverManager
 	        .getConnection(populate_db.db_url, populate_db.usr_name , populate_db.passwd);
 	    
+	    
+	    String query_file = args[0];
+	    String view_file = args[1];
+	    int view_num = Integer.valueOf(args[2]);
+	    
+	    gen_test_cases_for_aggregation(query_file, view_file, view_num, c, pst);
+	    
+	    c.close();
 //	    clear_views(c, pst);
 //	    
 //	    clear_other_tables(c, pst);
@@ -384,6 +393,116 @@ public class view_generator {
 	    	    
 	    return views;
 	}
+	
+	public static void gen_test_cases_for_aggregation(String query_file, String view_file, int view_num, Connection c, PreparedStatement pst) throws SQLException
+	{
+	  String relation = "family";
+	  
+	  HashMap<String, String> attr_types = get_attr_types(relation, c, pst);
+	  
+	  Argument head_arg = new Argument("family|type", relation);
+	  
+	  HashSet<Argument> all_agg_args = new HashSet<Argument>();
+	  
+	  Set<String> attrs = attr_types.keySet();
+	  
+	  System.out.println(attrs);
+	  
+	  String[] attr_array = attrs.toArray(new String[0]);
+	  
+	  Vector<Query> views = gen_views_for_aggregation(view_num, all_agg_args, attr_array, head_arg, c, pst);
+	  
+	  Query query = gen_query_for_aggregation(head_arg, all_agg_args, c, pst);
+	  
+	  Vector<Query> queries = new Vector<Query>();
+	  queries.add(query);
+	  
+	  Load_views_and_citation_queries.write2files(view_file, Load_views_and_citation_queries.views2text_strings(views));
+	  
+	  Load_views_and_citation_queries.write2files(query_file, Load_views_and_citation_queries.views2text_strings(queries));
+	  
+	}
+	
+	static Vector<Query> gen_views_for_aggregation(int view_num, HashSet<Argument> all_agg_args, String[] attr_array, Argument head_arg, Connection c, PreparedStatement pst)
+	{
+	  Vector<Query> views = new Vector<Query>();
+      
+      for(int i = 0; i<view_num; i++)
+      {
+        Vector<Argument> head_args = new Vector<Argument>();
+        
+        head_args.add(head_arg);
+        
+        String attr = attr_array[i%attr_array.length];
+        
+        Argument arg = new Argument("family|" + attr, "family");
+        
+        all_agg_args.add(arg);
+           
+        head_args.add(arg);
+        
+        Subgoal subgoal = new Subgoal("v" + i, head_args);
+        
+        Vector<Subgoal> bodies = new Vector<Subgoal>();
+        
+        Subgoal body = new Subgoal("family", new Vector<Argument>());
+        
+        bodies.add(body);
+        
+        HashMap<String, String> subgoal_mappings = new HashMap<String, String>();
+        
+        subgoal_mappings.put("family", "family");
+        
+        views.add(new Query(subgoal.name, subgoal, bodies, new Vector<Lambda_term>(), new Vector<Conditions>(), subgoal_mappings));
+      }
+      
+      return views;
+	}
+	
+	static Query gen_query_for_aggregation(Argument head_arg, HashSet<Argument> all_agg_args, Connection c, PreparedStatement pst)
+	{
+	  
+	  Vector<Argument> head_args = new Vector<Argument>();
+	  
+	  head_args.add(head_arg);
+	  
+	  Vector<String> agg_functions = new Vector<String>();
+	  
+	  Vector<Vector<Argument>> agg_args = new Vector<Vector<Argument>>();
+	  
+	  for(Argument agg_arg: all_agg_args)
+	  {
+	    Vector<Argument> curr_agg_args = new Vector<Argument>();
+	    curr_agg_args.add(agg_arg);
+	    agg_args.add(curr_agg_args);
+	    agg_functions.add("count");
+	  }
+	  
+	   Subgoal head = new Subgoal("Q", head_args, agg_args, agg_functions, true);
+	  
+	  Subgoal subgoal1 = new Subgoal("family", new Vector<Argument>());
+	  
+	  Subgoal subgoal2 = new Subgoal("introduction", new Vector<Argument>());
+	  
+	  Subgoal subgoal3 = new Subgoal("family1", new Vector<Argument>());
+	  
+	  Vector<Subgoal> body = new Vector<Subgoal>();
+	  body.add(subgoal2);
+	  body.add(subgoal3);
+	  body.add(subgoal1);
+	  
+	  HashMap<String, String> subgoal_name_mapping = new HashMap<String, String>();
+	  
+	  subgoal_name_mapping.put("family", "family");
+	  subgoal_name_mapping.put("introduction", "introduction");
+	  subgoal_name_mapping.put("family1", "family");
+	  
+	  Conditions condition = new Conditions(new Argument("family1|family_id", "family1"), "family1", new op_less_equal(), new Argument("'2'"), null);
+	  Vector<Conditions> conditions = new Vector<Conditions>();
+	  conditions.add(condition);
+	  return new Query("Q", head, body, new Vector<Lambda_term>(), conditions, subgoal_name_mapping);
+	}
+	
 	
 	public static Vector<Query> generate_store_views_without_predicates(Vector<String> subgoal_names, int num_views, int sizeofquery, Connection c1, Connection c2, Connection c3, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
@@ -4922,7 +5041,7 @@ public class view_generator {
 		{
 			String attr_name = rs.getString(1);
 			
-			if(attr_name.endsWith(populate_db.separator + "prov"))
+			if(attr_name.endsWith(populate_db.separator + "prov") || attr_name.equals("citation_view"))
 			  continue;
 			
 			String type = rs.getString(2);

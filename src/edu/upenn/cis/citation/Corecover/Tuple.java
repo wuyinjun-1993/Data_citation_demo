@@ -13,6 +13,10 @@ public class Tuple {
   public String name = null;
   public Vector args = null;  // a list of arguments
   public Vector<Vector<Argument>> agg_args = null;
+  
+  public HashSet<Integer> covered_arg_ids = new HashSet<Integer>();
+  
+  
   public Vector agg_functions = null;
   public Mapping phi = null;  // mapping from query args to the database deriving
 		       // the tuple

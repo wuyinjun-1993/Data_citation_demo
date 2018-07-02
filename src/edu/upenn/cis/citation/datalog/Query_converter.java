@@ -2182,6 +2182,16 @@ public class Query_converter {
 		return str;
 	}
 	
+	static String change_arg_name(String arg_name)
+	{
+	  return arg_name.replace(populate_db.separator, ".");
+	}
+	
+	static String get_arg_name(String arg_name)
+	{
+	  return arg_name.substring(arg_name.indexOf(populate_db.separator) + 1, arg_name.length());
+	}
+	
 	public static String get_full_mapping_condition_str(Conditions condition)
 	{
 	  if(condition.subgoal2 == null || condition.subgoal2.isEmpty())
@@ -2195,13 +2205,13 @@ public class Query_converter {
           
           
           
-          String string = "(" + condition.subgoal1 + "." + condition.arg1 + condition.op + arg2_str + ")";
+          String string = "(" + change_arg_name(condition.arg1.name) + condition.op + arg2_str + ")";
           
           return string;
       }
       else
       {
-        String string = "(" + condition.subgoal1 + "." + condition.arg1 + condition.op + condition.subgoal2 + "." + condition.arg2 + ")";
+        String string = "(" + change_arg_name(condition.arg1.name) + condition.op + change_arg_name(condition.arg2.name) + ")";
         
         return string;
       }
@@ -2265,6 +2275,89 @@ public class Query_converter {
             partial_mapping_expression += ",";
           
           partial_mapping_expression += curr_partial_mapping_expression;
+          
+          partial_mapping_count ++;
+          
+//        System.out.println(tuple.mapSubgoals_str);
+//        
+//        System.out.println(partial_mapping_expression);
+        }
+        
+//      System.out.println(with_sub_queries_id_mappings);
+        
+        if(!partial_mapping_expression.isEmpty())
+        {
+          if(str[0].isEmpty())
+          {
+            str[0] += partial_mapping_expression;
+          }
+          else
+          {
+            str[0] += "," + partial_mapping_expression;
+          }
+        }
+        
+        
+        return str;
+    }
+	
+	static String[] get_condition_boolean_value_agg(Query q, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, HashMap<String, Integer> with_sub_queries_id_mappings, Vector<String> full_mapping_condition_str,Vector<Conditions> valid_conditions, HashSet<Tuple> viewTuples)
+    {
+        
+        String [] str = new String[2];
+        
+        str[0] = new String();
+        
+        str[1] = new String();
+        
+        int condition_num = 0;
+        
+        for(String condition_str: full_mapping_condition_str)
+        {
+          if(condition_num >= 1)
+          {
+              str[0] += ",";
+//          str[1] += ",";
+          }
+          
+          str[0] += "array_agg(" + condition_str + ")";
+          
+          condition_num++;
+        }
+        
+        Set<String> sub_queries = with_sub_queries_id_mappings.keySet();
+        
+        if(!sub_queries.isEmpty())
+          str[1] += "with ";
+        
+        int sub_query_count = 0;
+        
+        for(String sub_query: sub_queries)
+        {
+          if(sub_query_count >= 1)
+            str[1] += ",";
+          
+          int sub_query_id = with_sub_queries_id_mappings.get(sub_query);
+          
+          str[1] += "with_sub_query" + sub_query_id + " as (" + sub_query + ")";
+          
+          sub_query_count++;
+        }
+        
+        String partial_mapping_expression = new String();
+        
+        int partial_mapping_count = 0;
+        
+        for(String curr_partial_mapping_expression: partial_mapping_strings)
+        {
+          
+//          if(curr_partial_mapping_expression.isEmpty())
+//            continue;
+          
+          if(partial_mapping_count >= 1)
+            partial_mapping_expression += ",";
+          
+          partial_mapping_expression += "array_agg(" + curr_partial_mapping_expression + ")";
           
           partial_mapping_count ++;
           
@@ -2548,6 +2641,23 @@ public class Query_converter {
 		return str;
 	}
 	
+	   static String get_lambda_str_agg(Query v, Vector<Lambda_term> lambda_terms)
+	    {
+	        String str = new String();
+	        
+	        for(int i = 0; i<lambda_terms.size(); i++)
+	        {
+	            if(i >= 1)
+	                str += ",";
+	            
+	            String name = lambda_terms.get(i).arg_name;
+	            
+	            str += "array_agg(" + lambda_terms.get(i).table_name + "." + name.substring(name.indexOf(populate_db.separator) + 1, name.length()) + ")";
+	        }
+	        
+	        return str;
+	    }
+	
 	static String get_unique_lambda_str(Query v, HashSet<Lambda_term> lambda_terms)
 	{
 		String str = new String();
@@ -2720,7 +2830,7 @@ public class Query_converter {
 	{
 	  String arg2_name = arg2.name;
 	  
-      String partial_mapping_bool_exp = tuple.mapSubgoals_str.get(subgoal_name2) + "." + arg2_name + condition.op + subgoal_name1 + "_" + arg1.name;
+      String partial_mapping_bool_exp = tuple.mapSubgoals_str.get(subgoal_name2) + "." + Query_converter.get_arg_name(arg2_name) + condition.op + subgoal_name1 + "_" + Query_converter.get_arg_name(arg1.name);
       
       return partial_mapping_bool_exp;
 
@@ -2791,7 +2901,10 @@ public class Query_converter {
 	          if(join_condition_count >= 1)
 	            curr_with_sql += " and ";
 	          
-	          curr_with_sql += condition.subgoal1 + "." + arg1.name.replaceFirst("\\" + populate_db.separator, ".") + condition.op.toString() + condition.subgoal2 + "." + arg2.name.replaceFirst("\\" + populate_db.separator, ".");
+	          if(!condition.arg2.isConst())
+	            curr_with_sql += condition.subgoal1 + "." + Query_converter.get_arg_name(arg1.name) + condition.op.toString() + condition.subgoal2 + "." + Query_converter.get_arg_name(arg2.name);
+	          else
+	            curr_with_sql += condition.subgoal1 + "." + Query_converter.get_arg_name(arg1.name) + condition.op.toString() + Query_converter.get_arg_name(arg2.name);
 	          
 	          join_condition_count ++;
 	        }
@@ -3414,14 +3527,14 @@ public class Query_converter {
 	        
 	    }
 	   
-	   static String get_agg_attr_string(Vector<Argument> agg_attributes)
+	   public static String get_agg_attr_string(Vector<Argument> agg_attributes, String separator)
 	   {
 	     String string = new String();
 	     
 	     for(int i = 0; i<agg_attributes.size(); i++)
 	     {
 	       if(i >= 1)
-	         string += "||";
+	         string += separator;
 	       
 	       Argument arg = (Argument) agg_attributes.get(i);
 	       
@@ -3436,12 +3549,13 @@ public class Query_converter {
 	   {
 	     String string = new String();
 	     
+	     if(q.head.has_agg)
 	     for(int i = 0; i < q.head.agg_args.size(); i++)
 	     {
 	       if(i >= 1)
 	         string += ",";
 	       
-	       String agg_attr_string = get_agg_attr_string(q.head.agg_args.get(i));
+	       String agg_attr_string = get_agg_attr_string(q.head.agg_args.get(i), "||");
 	       
 	       String agg_function = (String) q.head.agg_function.get(i);
 	       
@@ -3563,7 +3677,7 @@ public class Query_converter {
 	     return string;
 	   }
 	
-	   public static String datalog2sql_citation3(Query query, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, HashMap<String, Integer> with_sub_queries_id_mappings, Vector<String> full_mapping_condition_str, Vector<Conditions> valid_conditions, Vector<Lambda_term> lambda_terms, HashSet<Tuple> viewTuples) throws SQLException
+	   public static String datalog2sql_citation_agg(boolean isTLA, Query query, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, HashMap<String, Integer> with_sub_queries_id_mappings, Vector<String> full_mapping_condition_str, Vector<Conditions> valid_conditions, Vector<Lambda_term> lambda_terms, HashSet<Tuple> viewTuples) throws SQLException
 	    {
 	                
 	        String sel_item = new String();
@@ -3572,11 +3686,11 @@ public class Query_converter {
 	        
 	        sel_item = get_sel_item(query);
 	        
-	        String sel_lambda_terms = get_lambda_str(query, lambda_terms);
+	        String sel_lambda_terms = get_lambda_str_agg(query, lambda_terms);
 	        
 	        String sel_agg_items = get_agg_item_in_select_clause(query);
 	        
-	        String [] condition_str = get_condition_boolean_value(query, partial_mapping_strings, partial_mapping_view_mapping_mappings, with_sub_queries_id_mappings, full_mapping_condition_str, valid_conditions, viewTuples);
+	        String [] condition_str = get_condition_boolean_value_agg(query, partial_mapping_strings, partial_mapping_view_mapping_mappings, with_sub_queries_id_mappings, full_mapping_condition_str, valid_conditions, viewTuples);
 	        
 	        
 	        String citation_table = get_relations_without_citation_table(query);
@@ -3589,7 +3703,10 @@ public class Query_converter {
 	        
 	        if(!sel_item.isEmpty())
 	        {
-	          sql += sel_item + "," + citation_view_agg;
+	          if(isTLA)
+	            sql += sel_item + "," + citation_view_agg;
+	          else
+	            sql += sel_item;
 	          if(!sel_agg_items.isEmpty())
 	            sql += "," + sel_agg_items;
 	        }

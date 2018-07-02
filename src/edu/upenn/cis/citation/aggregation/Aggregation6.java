@@ -620,7 +620,7 @@ public class Aggregation6 {
 ////		return new HashSet<String>();
 //	}
 	
-	public static HashSet<String> do_agg_intersection2(HashSet<Covering_set> covering_set_schema_level, HashSet<Tuple> valid_view_mappings_schema_level, ResultSet rs, HashMap<String, HashSet<Covering_set> > c_view_map, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, ArrayList<ArrayList<String>>> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, JSONException
+	public static HashSet<String> do_agg_intersection2(HashSet<Covering_set> covering_set_schema_level, HashSet<Tuple> valid_view_mappings_schema_level, ResultSet rs, HashMap<String, HashSet<Covering_set> > c_view_map, int start_pos, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, ArrayList<ArrayList<String>>> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, JSONException
 	{
 		
 		
@@ -1095,7 +1095,7 @@ public class Aggregation6 {
 //		return views_per_group;
 //	}
 	
-	public static HashSet<String> do_agg_union(HashSet<Covering_set> covering_set_schema_level, HashSet<Tuple> valid_view_mapping_schema_level,  HashMap<String, HashSet<Tuple>> signature_view_mappings_mappings, HashMap<String, HashSet<Integer>> signiture_rid_mappings, ResultSet rs, HashMap<String, HashSet<Covering_set> > c_view_map, HashMap<String, HashSet<Integer>> signature_rids_mappings, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, ArrayList<ArrayList<String>>> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, JSONException
+	public static HashSet<String> do_agg_union(HashSet<Covering_set> covering_set_schema_level, HashSet<Tuple> valid_view_mapping_schema_level,  HashMap<String, HashSet<Tuple>> signature_view_mappings_mappings, HashMap<String, HashSet<Integer>> signiture_rid_mappings, ResultSet rs, HashMap<String, HashSet<Covering_set> > c_view_map, HashMap<String, HashSet<Integer>> signature_rids_mappings, int start_pos, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, ArrayList<ArrayList<String>>> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, JSONException
 	{
 		
 		Set<String> signature_set = signature_view_mappings_mappings.keySet();

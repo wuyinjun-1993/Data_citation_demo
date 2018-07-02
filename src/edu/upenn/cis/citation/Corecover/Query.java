@@ -29,7 +29,7 @@ public class Query {
 
   public Vector<Conditions> conditions = null;
 
-  public HashMap<String, Integer> subgoal_id_mappings;
+  public HashMap<String, Integer> subgoal_id_mappings = new HashMap<String, Integer>();
   
   Vector<Lambda_term> get_lambda_term()
   {
@@ -45,6 +45,14 @@ public class Query {
 //    genHead(relations, queryType, bodySubgoalNum);
   }
 
+  static void set_subgoal_id_mapping(Vector<Subgoal> subgoals, HashMap<String, Integer> subgoal_name_id_mappings)
+  {
+    for(int i = 0; i<subgoals.size();i++)
+    {
+      subgoal_name_id_mappings.put(subgoals.get(i).name, i);
+    }
+  }
+  
   /**
    * Constructor
    */
@@ -52,6 +60,7 @@ public class Query {
     this.name = name;
     this.head = head;
     this.body = body;
+    set_subgoal_id_mapping(body, subgoal_id_mappings);
   }
 
   public Query(String name, Subgoal head, Vector body, Vector lambda_term) {
@@ -59,6 +68,7 @@ public class Query {
 	    this.head = head;
 	    this.body = body;
 	    this.lambda_term = lambda_term;
+	    set_subgoal_id_mapping(body, subgoal_id_mappings);
   }
 
   public Query(String name, Subgoal head, Vector body, Vector lambda_term, Vector<Conditions> conditions, HashMap<String, String> subgoal_name_mapping) {
@@ -68,6 +78,7 @@ public class Query {
 	    this.lambda_term = lambda_term;
 	    this.conditions = conditions;
 	    this.subgoal_name_mapping = subgoal_name_mapping;
+	    set_subgoal_id_mapping(body, subgoal_id_mappings);
 }
 
 

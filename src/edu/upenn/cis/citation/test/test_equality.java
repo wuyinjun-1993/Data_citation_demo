@@ -12,9 +12,9 @@ import edu.upenn.cis.citation.Corecover.Query;
 
 public class test_equality {
 	
-	static String file1 = "reasoning_results/covering_sets1";
+	public static String file1 = "reasoning_results/covering_sets1";
 	
-	static String file2 = "reasoning_results/covering_sets2";
+	public static String file2 = "reasoning_results/covering_sets2";
 	
 	static String file3 = "reasoning_results/covering_sets3";
     
@@ -35,11 +35,11 @@ public class test_equality {
 	public static void main(String [] args)
 	{
 	  
-	  test_equality2();
+//	  test_equality2();
 	  
 	  test_equality1();
 	  
-	  test_equality3();
+//	  test_equality3();
 	  
 	}
 	
@@ -220,22 +220,26 @@ public class test_equality {
           
           arr1_copy.addAll(arr1);
           
-//          arr2_copy.addAll(arr2);
+          arr2_copy.addAll(arr3);
         
 //          arr1.removeAll(arr2);  
           
           arr2_copy.removeAll(arr1_copy);
         
 //        System.out.println(arr1);
+          
+          arr1.removeAll(arr3);
+          
+          System.out.println(arr1);
         
-//        System.out.println(arr2_copy);
+        System.out.println(arr2_copy);
 
         
-        HashSet<String> citation1 = get_view_strs1(citation_file1);
-        
-        HashSet<String> citation2 = get_view_strs1(citation_file2);
-        
-        System.out.println("citation:" + citation1.equals(citation2));
+//        HashSet<String> citation1 = get_view_strs1(citation_file1);
+//        
+//        HashSet<String> citation2 = get_view_strs1(citation_file2);
+//        
+//        System.out.println("citation:" + citation1.equals(citation2));
 	}
 	
 	static boolean compare_arrs(Vector<String> arr1, Vector<String> arr2)

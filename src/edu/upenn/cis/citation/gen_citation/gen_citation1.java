@@ -546,7 +546,7 @@ public class gen_citation1 {
 		return json_obj;
 	}
 	
-	public static HashMap<String, HashSet<String>> join_covering_sets(Covering_set c_vec, Connection c, PreparedStatement pst, StringList view_list, ArrayList<HashMap<String, Integer>> view_query_mapping, HashMap<String, ArrayList<ArrayList<String>>> author_mapping, HashMap<String, Integer> citation_max_num, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping) throws SQLException
+	public static HashMap<String, HashSet<String>> join_covering_sets(Covering_set c_vec, Connection c, PreparedStatement pst, HashMap<String, HashMap<String, Integer>> view_query_mapping, HashMap<String, ArrayList<ArrayList<String>>> author_mapping, HashMap<String, Integer> citation_max_num, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping) throws SQLException
 	{
 		HashMap<String, HashSet<String>> json_citation = new HashMap<String, HashSet<String>>();
 		
@@ -555,12 +555,12 @@ public class gen_citation1 {
 		for(citation_view curr_view_mapping:c_vec.c_vec)
 		{
 			
-			int view_index = view_list.find(curr_view_mapping.get_name());
+//			int view_index = view_query_mapping.get(curr_view_mapping.get_name());
 			
 			
 			if(curr_view_mapping.has_lambda_term())
 			{
-				HashMap<String, HashSet<String>> j_citation = get_authors3((citation_view_parametered)curr_view_mapping, c, pst, view_index, view_query_mapping, author_mapping, citation_max_num, query_ids, query_lambda_str, view_author_mapping);
+				HashMap<String, HashSet<String>> j_citation = get_authors3((citation_view_parametered)curr_view_mapping, c, pst, view_query_mapping, author_mapping, citation_max_num, query_ids, query_lambda_str, view_author_mapping);
 				
 				json_citation = join_citation(json_citation, j_citation, json_citation_size, citation_max_num);
 				
@@ -568,7 +568,7 @@ public class gen_citation1 {
 			else
 			{
 				
-				HashMap<String, HashSet<String>> j_citation = get_authors3((citation_view_unparametered)curr_view_mapping, c, pst, view_index, view_query_mapping, author_mapping, citation_max_num, query_ids, query_lambda_str, view_author_mapping);
+				HashMap<String, HashSet<String>> j_citation = get_authors3((citation_view_unparametered)curr_view_mapping, c, pst, view_query_mapping, author_mapping, citation_max_num, query_ids, query_lambda_str, view_author_mapping);
 				
 				json_citation = join_citation(json_citation, j_citation, json_citation_size, citation_max_num);
 			}
@@ -582,7 +582,7 @@ public class gen_citation1 {
 		return json_citation;
 	}
 	
-	public static HashSet<String> get_citations3(Covering_set c_vec, Connection c, PreparedStatement pst, StringList view_list, ArrayList<HashMap<String, Integer>> view_query_mapping, HashMap<String, ArrayList<ArrayList<String>>> author_mapping, HashMap<String, Integer> citation_max_num, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping, String star_op) throws SQLException, JSONException
+	public static HashSet<String> get_citations3(Covering_set c_vec, Connection c, PreparedStatement pst, HashMap<String, HashMap<String, Integer>> view_query_mapping, HashMap<String, ArrayList<ArrayList<String>>> author_mapping, HashMap<String, Integer> citation_max_num, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping, String star_op) throws SQLException, JSONException
 	{
 //		String author_str = new String();
 		
@@ -597,7 +597,7 @@ public class gen_citation1 {
 			
 			
 			
-			HashMap<String, HashSet<String>> json_citation = join_covering_sets(c_vec, c, pst, view_list, view_query_mapping, author_mapping, citation_max_num, query_ids, query_lambda_str, view_author_mapping);
+			HashMap<String, HashSet<String>> json_citation = join_covering_sets(c_vec, c, pst, view_query_mapping, author_mapping, citation_max_num, query_ids, query_lambda_str, view_author_mapping);
 			
 //			System.out.println(json_citation);
 			
@@ -661,12 +661,12 @@ public class gen_citation1 {
 			for(citation_view curr_view_mapping:c_vec.c_vec)
 			{
 				
-				int view_index = view_list.find(curr_view_mapping.get_name());
+//				int view_index = view_list.find(curr_view_mapping.get_name());
 				
 				
 				if(curr_view_mapping.has_lambda_term())
 				{
-					HashMap<String, HashSet<String>> j_citation = get_authors3((citation_view_parametered)curr_view_mapping, c, pst, view_index, view_query_mapping, author_mapping, citation_max_num, query_ids, query_lambda_str, view_author_mapping);
+					HashMap<String, HashSet<String>> j_citation = get_authors3((citation_view_parametered)curr_view_mapping, c, pst, view_query_mapping, author_mapping, citation_max_num, query_ids, query_lambda_str, view_author_mapping);
 					
 					JSONObject json_citation = get_json_citation(j_citation);
 					
@@ -678,7 +678,7 @@ public class gen_citation1 {
 				else
 				{
 					
-					HashMap<String, HashSet<String>> j_citation = get_authors3((citation_view_unparametered)curr_view_mapping, c, pst, view_index, view_query_mapping, author_mapping, citation_max_num, query_ids, query_lambda_str, view_author_mapping);
+					HashMap<String, HashSet<String>> j_citation = get_authors3((citation_view_unparametered)curr_view_mapping, c, pst, view_query_mapping, author_mapping, citation_max_num, query_ids, query_lambda_str, view_author_mapping);
 					
 					JSONObject json_citation = get_json_citation(j_citation);
 					
@@ -1375,7 +1375,7 @@ public class gen_citation1 {
 		
 	}
 	
-	public static HashMap<String, HashSet<String>> get_authors3(citation_view_parametered c_view, Connection c, PreparedStatement pst, int view_id, ArrayList<HashMap<String, Integer>> view_query_mapping, HashMap<String, ArrayList<ArrayList<String>>> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping) throws SQLException
+	public static HashMap<String, HashSet<String>> get_authors3(citation_view_parametered c_view, Connection c, PreparedStatement pst, HashMap<String, HashMap<String, Integer>> view_query_mapping, HashMap<String, ArrayList<ArrayList<String>>> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping) throws SQLException
 	{
 		
 		if(view_author_mapping.get(c_view.toString()) != null)
@@ -1489,7 +1489,7 @@ public class gen_citation1 {
 //		}
 						
 //		for(Iterator it = query_id_set.iterator(); it.hasNext();)
-		HashMap<String, Integer> curr_query_ids = view_query_mapping.get(view_id);
+		HashMap<String, Integer> curr_query_ids = view_query_mapping.get(c_view.name);
 		
 		Set<String> keys = curr_query_ids.keySet();
 		
@@ -1888,20 +1888,20 @@ public class gen_citation1 {
 //		}
 	}
 	
-	public static void init_author_mapping(StringList view_list, ArrayList<HashMap<String, Integer>> view_query_mapping, IntList query_ids, HashMap<String, ArrayList<ArrayList<String>>> author_mappings, HashMap<String, Integer> max_num, Connection c, PreparedStatement pst, ArrayList<Lambda_term[]> query_lambda_str, HashMap<Integer, Query> citation_queries) throws SQLException
+	public static void init_author_mapping(Vector<Query> views, HashMap<String, HashMap<String, Integer>> view_query_mapping, IntList query_ids, HashMap<String, ArrayList<ArrayList<String>>> author_mappings, HashMap<String, Integer> max_num, Connection c, PreparedStatement pst, ArrayList<Lambda_term[]> query_lambda_str, HashMap<Integer, Query> citation_queries) throws SQLException
 	{
 		
 //		boolean [] query_id_set = new boolean[query_ids.size]; 
 		
 //		get_all_query_ids(query_ids, c, pst);
 				
-		for(int i = 0; i < view_list.size; i++)
+		for(int i = 0; i < views.size(); i++)
 		{
-			HashMap<String, Integer> curr_query_ids = get_query_id3(view_list.list[i], query_ids, c, pst);
+			HashMap<String, Integer> curr_query_ids = get_query_id3(views.get(i).name, query_ids, c, pst);
 			
 //			System.out.println(curr_query_ids);
 			
-			view_query_mapping.add(i, curr_query_ids);
+			view_query_mapping.put(views.get(i).name, curr_query_ids);
 			
 			Set<String> block_names = curr_query_ids.keySet();
 			
@@ -2006,7 +2006,7 @@ public class gen_citation1 {
 				{
 					Head_strs h_str = (Head_strs) it.next();
 					
-					String key = view_list.list[i] + populate_db.separator + block_name + populate_db.separator + h_str.toString() + populate_db.separator + id;
+					String key = views.get(i).name + populate_db.separator + block_name + populate_db.separator + h_str.toString() + populate_db.separator + id;
 										
 					author_mappings.put(key, curr_author_mapping.get(h_str));
 				}
@@ -2195,7 +2195,7 @@ public class gen_citation1 {
 	}
 	
 	
-	public static HashMap<String, HashSet<String>> get_authors3(citation_view_unparametered c_view, Connection c, PreparedStatement pst, int view_id, ArrayList<HashMap<String, Integer>> view_query_mapping, HashMap<String, ArrayList<ArrayList<String>>> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping) throws SQLException
+	public static HashMap<String, HashSet<String>> get_authors3(citation_view_unparametered c_view, Connection c, PreparedStatement pst, HashMap<String, HashMap<String, Integer>> view_query_mapping, HashMap<String, ArrayList<ArrayList<String>>> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping) throws SQLException
 	{
 		if(view_author_mapping.get(c_view.toString()) != null)
 		{
@@ -2312,7 +2312,7 @@ public class gen_citation1 {
 						
 //		for(Iterator it = query_id_set.iterator(); it.hasNext();)
 		
-		HashMap<String, Integer> curr_query_ids = view_query_mapping.get(view_id);
+		HashMap<String, Integer> curr_query_ids = view_query_mapping.get(c_view.name);
 		
 		Set<String> keys = curr_query_ids.keySet();
 		

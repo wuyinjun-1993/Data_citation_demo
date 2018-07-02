@@ -476,7 +476,9 @@ public class query_generator {
 			
 //			Vector<Argument> args = new Vector<Argument>();
 			
-			Vector<Argument> args = view_operation.get_full_schema(relation_name, relation, c, pst);
+			HashMap<String, Argument> arg_mappings = new HashMap<String, Argument>();
+			
+			Vector<Argument> args = view_operation.get_full_schema(relation_name, relation, arg_mappings, c, pst);
 			
 			body.add(new Subgoal(relation_name, args));
 		}

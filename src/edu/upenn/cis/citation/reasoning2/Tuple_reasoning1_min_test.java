@@ -51,7 +51,7 @@ import edu.upenn.cis.citation.datalog.Parse_datalog;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.examples.Init_examples;
 import edu.upenn.cis.citation.examples.Load_views_and_citation_queries;
-import edu.upenn.cis.citation.gen_citation.gen_citation1;
+import edu.upenn.cis.citation.gen_citation.gen_citation0;
 import edu.upenn.cis.citation.output.output2excel;
 import edu.upenn.cis.citation.set_cover_algo.cost_function;
 import edu.upenn.cis.citation.user_query.query_storage;
@@ -1789,7 +1789,7 @@ public class Tuple_reasoning1_min_test {
 
 	    // compute tuple-cores
 	    
-	    gen_citation1.get_all_query_ids(query_ids, c, pst);
+	    gen_citation0.get_all_query_ids(query_ids, c, pst);
 	    
 	    view_query_mapping = new ArrayList<HashMap<String, Integer>>(view_list.size);
 	    		
@@ -1798,7 +1798,7 @@ public class Tuple_reasoning1_min_test {
 			query_lambda_str.add(null);
 		}
 	    	    
-	    gen_citation1.init_author_mapping(view_list, view_query_mapping, query_ids, author_mapping, max_author_num, c, pst, query_lambda_str, citation_queries);
+	    gen_citation0.init_author_mapping(view_list, view_query_mapping, query_ids, author_mapping, max_author_num, c, pst, query_lambda_str, citation_queries);
 	    
 	    return viewTuples;
 	    
@@ -2568,7 +2568,7 @@ public class Tuple_reasoning1_min_test {
 //		for(int p =0; p<c_views.size(); p++)
 		{
 									
-			HashSet<String> str = gen_citation1.get_citations3(c_views, c, pst, view_list, view_query_mapping, author_mapping, max_author_num, query_ids, query_lambda_str, view_author_mapping, star_op);
+			HashSet<String> str = gen_citation0.get_citations3(c_views, c, pst, view_list, view_query_mapping, author_mapping, max_author_num, query_ids, query_lambda_str, view_author_mapping, star_op);
 			
 			citations.addAll(str);		
 		}

@@ -45,7 +45,7 @@ import edu.upenn.cis.citation.datalog.Parse_datalog;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.examples.Example_real;
 import edu.upenn.cis.citation.examples.Load_views_and_citation_queries;
-import edu.upenn.cis.citation.gen_citation.gen_citation1;
+import edu.upenn.cis.citation.gen_citation.gen_citation0;
 import edu.upenn.cis.citation.output.output2excel;
 import sun.util.resources.cldr.ur.CurrencyNames_ur;
 
@@ -933,7 +933,7 @@ public class Schema_level_approach {
 	
 	public static void prepare_citation_information(Connection c, PreparedStatement pst) throws SQLException
 	{
-		gen_citation1.get_all_query_ids(query_ids, c, pst);
+		gen_citation0.get_all_query_ids(query_ids, c, pst);
 	    
 	    view_query_mapping = new ArrayList<HashMap<String, Integer>>(view_list.size);
 	    		
@@ -942,7 +942,7 @@ public class Schema_level_approach {
 			query_lambda_str.add(null);
 		}
 	    	    
-	    gen_citation1.init_author_mapping(view_list, view_query_mapping, query_ids, author_mapping, max_author_num, c, pst, query_lambda_str, citation_queries);
+	    gen_citation0.init_author_mapping(view_list, view_query_mapping, query_ids, author_mapping, max_author_num, c, pst, query_lambda_str);
 
 	}
 	
@@ -2325,23 +2325,23 @@ public class Schema_level_approach {
 //		return citations;
 //	}
 
-	static HashSet<String> gen_citation(ArrayList<Covering_set> c_views, Connection c, PreparedStatement pst, ArrayList<HashMap<String, Integer>> view_query_mapping) throws ClassNotFoundException, SQLException, JSONException
-	{
-		HashSet<String> citations = new HashSet<String>();
-						
-		JSONObject json_obj = new JSONObject();
-		
-		HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping = new HashMap<String, HashMap<String, HashSet<String>>>();
-		
-		for(int p =0; p<c_views.size(); p++)
-		{								
-			HashSet<String> str = gen_citation1.get_citations3(c_views.get(p), c, pst, view_list, view_query_mapping, author_mapping, max_author_num, query_ids, query_lambda_str, view_author_mapping, populate_db.star_op);
-			
-			citations.addAll(str);
-		}
-	
-		return citations;
-	}
+//	static HashSet<String> gen_citation(ArrayList<Covering_set> c_views, Connection c, PreparedStatement pst, ArrayList<HashMap<String, Integer>> view_query_mapping) throws ClassNotFoundException, SQLException, JSONException
+//	{
+//		HashSet<String> citations = new HashSet<String>();
+//						
+//		JSONObject json_obj = new JSONObject();
+//		
+//		HashMap<String, HashMap<String, HashSet<String>>> view_author_mapping = new HashMap<String, HashMap<String, HashSet<String>>>();
+//		
+//		for(int p =0; p<c_views.size(); p++)
+//		{								
+//			HashSet<String> str = gen_citation1.get_citations3(c_views.get(p), c, pst, view_list, view_query_mapping, author_mapping, max_author_num, query_ids, query_lambda_str, view_author_mapping, populate_db.star_op);
+//			
+//			citations.addAll(str);
+//		}
+//	
+//		return citations;
+//	}
 
 	
 	
@@ -3052,16 +3052,13 @@ public class Schema_level_approach {
 	        }
 	    }
 	
-	public static void get_views_parameters(ArrayList<citation_view> insert_c_view, ResultSet rs, int start_pos, ArrayList<HashSet<Head_strs>> values, ArrayList<Integer> view_ids) throws SQLException
+	public static void get_views_parameters(ArrayList<citation_view> insert_c_view, ResultSet rs, int start_pos, ArrayList<HashSet<Head_strs>> values) throws SQLException
 	{
 		
 		
-		for(int j = 0; j<view_ids.size(); j++)
+		for(int j = 0; j<insert_c_view.size(); j++)
 		{
-			
-			int i = view_ids.get(j);
-			
-			citation_view c_vec = insert_c_view.get(i);
+			citation_view c_vec = insert_c_view.get(j);
 			
 //			for(int j = 0; j<c_vec.c_vec.size(); j++)
 //			{
@@ -3086,20 +3083,31 @@ public class Schema_level_approach {
 					
 					Head_strs head_values = new Head_strs(heads);
 					
-//					if(values.size() > i)
+					if(values.size() > j)
 					{
-						values.get(i).add(head_values);
+						values.get(j).add(head_values);
 					}
-//					else
-//					{
-//						HashSet<Head_strs> curr_head_values = new HashSet<Head_strs>();
-//						
-//						curr_head_values.add(head_values);
-//						
-//						values.add(curr_head_values);
-//					}
+					else
+					{
+						HashSet<Head_strs> curr_head_values = new HashSet<Head_strs>();
+						
+						curr_head_values.add(head_values);
+						
+						values.add(curr_head_values);
+					}
 					
 				}
+				else
+                {
+                    if(values.size() > j)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        values.add(new HashSet<Head_strs>());
+                    }
+                }
 //				else
 //				{
 //					if(values.size() > i)

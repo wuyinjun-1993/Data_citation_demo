@@ -37,7 +37,7 @@ import edu.upenn.cis.citation.aggregation.Aggregation1;
 import edu.upenn.cis.citation.citation_view.*;
 import edu.upenn.cis.citation.datalog.Parse_datalog;
 import edu.upenn.cis.citation.datalog.Query_converter;
-import edu.upenn.cis.citation.gen_citation.gen_citation1;
+import edu.upenn.cis.citation.gen_citation.gen_citation0;
 import edu.upenn.cis.citation.output.output2excel;
 import edu.upenn.cis.citation.user_query.query_storage;
 import sun.util.resources.cldr.ur.CurrencyNames_ur;
@@ -451,7 +451,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 		{
 //			output_vec_com(agg_res.get(i));
 			
-			String str = gen_citation1.get_citation_agg(agg_res.get(i), max_author_num, view_query_mapping, query_lambda_str, author_mapping);
+			String str = gen_citation0.get_citation_agg(agg_res.get(i), max_author_num, view_query_mapping, query_lambda_str, author_mapping);
 			
 			citation_aggs.add(str);
 //			
@@ -472,7 +472,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 		
 		for(int i = 0; i<agg_res.size(); i++)
 		{
-			String str = gen_citation1.get_citation_agg(agg_res.get(i), max_author_num, view_query_mapping, query_lambda_str, author_mapping);
+			String str = gen_citation0.get_citation_agg(agg_res.get(i), max_author_num, view_query_mapping, query_lambda_str, author_mapping);
 			
 			citation_aggs.add(str);
 //			
@@ -1922,7 +1922,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 			value_str += head_vals.get(i);
 		}
 		
-		citation += value_str + "." + gen_citation1.db_name;
+		citation += value_str + "." + gen_citation0.db_name;
 		
 		return citation;
 	}
@@ -1937,7 +1937,7 @@ static HashMap<String, Vector<Integer> > view_query_mapping = new HashMap<String
 		for(int p =0; p<update_c_view.size(); p++)
 		{
 			
-			String str = gen_citation1.populate_citation(update_c_view.get(p), vals, c, pst, citation_strings.get(p), max_author_num);
+			String str = gen_citation0.populate_citation(update_c_view.get(p), vals, c, pst, citation_strings.get(p), max_author_num);
 
 			citations.add(str);
 			

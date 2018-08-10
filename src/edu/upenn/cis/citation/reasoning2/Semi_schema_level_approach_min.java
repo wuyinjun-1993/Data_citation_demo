@@ -45,7 +45,7 @@ import edu.upenn.cis.citation.data_structure.Unique_StringList;
 import edu.upenn.cis.citation.datalog.Parse_datalog;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.examples.Load_views_and_citation_queries;
-import edu.upenn.cis.citation.gen_citation.gen_citation1;
+import edu.upenn.cis.citation.gen_citation.gen_citation0;
 import edu.upenn.cis.citation.output.output2excel;
 import edu.upenn.cis.citation.set_cover_algo.cost_function;
 import edu.upenn.cis.citation.set_cover_algo.set_cover;
@@ -74,7 +74,7 @@ public class Semi_schema_level_approach_min {
 	
 	static HashSet<String> str_set = new HashSet<String>();
 	
-	static ArrayList<HashMap<String, Integer>> view_query_mapping = null;
+	static HashMap<String, HashMap<String, Integer>> view_query_mapping = null;
 	
 	
 	
@@ -602,27 +602,42 @@ public class Semi_schema_level_approach_min {
 
 	    
 	    if(prepare_info)
-	    	prepare_citation_information(c, pst);
+	    	prepare_citation_information(views, c, pst);
 	    
 	    return viewTuples;
 	    
 	    
 	}
 	
-	public static void prepare_citation_information(Connection c, PreparedStatement pst) throws SQLException
-	{
-		gen_citation1.get_all_query_ids(query_ids, c, pst);
-	    
-	    view_query_mapping = new ArrayList<HashMap<String, Integer>>(view_list.size);
-	    		
-		for(int i = 0; i<query_ids.size; i++)
-		{
-			query_lambda_str.add(null);
-		}
-	    	    
-	    gen_citation1.init_author_mapping(view_list, view_query_mapping, query_ids, author_mapping, max_author_num, c, pst, query_lambda_str, citation_queries);
+//	public static void prepare_citation_information(Connection c, PreparedStatement pst) throws SQLException
+//	{
+//		gen_citation0.get_all_query_ids(query_ids, c, pst);
+//	    
+//	    view_query_mapping = new ArrayList<HashMap<String, Integer>>(view_list.size);
+//	    		
+//		for(int i = 0; i<query_ids.size; i++)
+//		{
+//			query_lambda_str.add(null);
+//		}
+//	    	    
+//	    gen_citation0.init_author_mapping(view_list, view_query_mapping, query_ids, author_mapping, max_author_num, c, pst, query_lambda_str);
+//
+//	}
+	
+	public static void prepare_citation_information(Vector<Query> views, Connection c, PreparedStatement pst) throws SQLException
+    {
+        gen_citation0.get_all_query_ids(query_ids, c, pst);
+        
+//    view_query_mapping = new ArrayList<HashMap<String, Integer>>(view_list.size);
+                
+        for(int i = 0; i<query_ids.size; i++)
+        {
+            query_lambda_str.add(null);
+        }
+                
+        gen_citation0.init_author_mapping(views, view_query_mapping, query_ids, author_mapping, max_author_num, c, pst, query_lambda_str, citation_queries);
 
-	}
+    }
 	
 	public static HashMap<String, Integer> get_citation_queries(String view_name)
 	{
@@ -1856,7 +1871,7 @@ public class Semi_schema_level_approach_min {
 					
 //					do_aggregate(curr_res, c_view, i, author_lists, view_query_mapping, query_lambda_str, author_mapping, max_num, c, pst);
 					
-					citations.addAll(gen_citation(c_views, c, pst, view_query_mapping));
+					citations.addAll(gen_citation(c_views, c, pst, view_query_mapping, populate_db.star_op, populate_db.plus_op  ));
 				}
 				
 				
@@ -1954,7 +1969,7 @@ public class Semi_schema_level_approach_min {
 //		return citations;
 //	}
 
-	static HashSet<String> gen_citation(Covering_set c_views, Connection c, PreparedStatement pst, ArrayList<HashMap<String, Integer>> view_query_mapping) throws ClassNotFoundException, SQLException, JSONException
+	static HashSet<String> gen_citation(Covering_set c_views, Connection c, PreparedStatement pst, HashMap<String, HashMap<String, Integer>> view_query_mapping, String star_op, String plus_op) throws ClassNotFoundException, SQLException, JSONException
 	{
 		HashSet<String> citations = new HashSet<String>();
 						
@@ -1964,7 +1979,7 @@ public class Semi_schema_level_approach_min {
 		
 //		for(int p =0; p<c_views.size(); p++)
 		{								
-			HashSet<String> str = gen_citation1.get_citations3(c_views, c, pst, view_list, view_query_mapping, author_mapping, max_author_num, query_ids, query_lambda_str, view_author_mapping, populate_db.star_op);
+			HashSet<String> str = gen_citation0.get_citations3(c_views, c, pst, view_query_mapping, author_mapping, max_author_num, query_ids, query_lambda_str, view_author_mapping, star_op);
 			
 			citations.addAll(str);
 		}

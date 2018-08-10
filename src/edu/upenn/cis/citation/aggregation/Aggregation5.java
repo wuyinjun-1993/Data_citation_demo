@@ -35,7 +35,7 @@ import edu.upenn.cis.citation.data_structure.IntList;
 import edu.upenn.cis.citation.data_structure.StringList;
 import edu.upenn.cis.citation.data_structure.Unique_StringList;
 import edu.upenn.cis.citation.datalog.Query_converter;
-import edu.upenn.cis.citation.gen_citation.gen_citation1;
+import edu.upenn.cis.citation.gen_citation.gen_citation0;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test_opt;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
@@ -519,7 +519,7 @@ public class Aggregation5 {
 			
 			HashMap<String, HashSet<String>> authors = author_lists.get(i);
 			
-			JSONObject json = gen_citation1.get_json_citation(authors);
+			JSONObject json = gen_citation0.get_json_citation(authors);
 			
 			if(json == null)
 				continue;
@@ -1691,7 +1691,7 @@ public class Aggregation5 {
 			{
 				Covering_set covering_set = curr_res.get(i);
 				
-				HashMap<String, HashSet<String>> citations = gen_citation1.join_covering_sets(covering_set, c, pst, view_list, view_query_mapping, author_mapping, max_num, query_ids, query_lambda_str, view_author_mapping);
+				HashMap<String, HashSet<String>> citations = gen_citation0.join_covering_sets(covering_set, c, pst, view_list, view_query_mapping, author_mapping, max_num, query_ids, query_lambda_str, view_author_mapping);
 				
 				author_lists.add(citations);
 			}
@@ -1702,7 +1702,7 @@ public class Aggregation5 {
 			{
 				Covering_set covering_set = curr_res.get(i);
 				
-				HashMap<String, HashSet<String>> citations = gen_citation1.join_covering_sets(covering_set, c, pst, view_list, view_query_mapping, author_mapping, max_num, query_ids, query_lambda_str, view_author_mapping);
+				HashMap<String, HashSet<String>> citations = gen_citation0.join_covering_sets(covering_set, c, pst, view_list, view_query_mapping, author_mapping, max_num, query_ids, query_lambda_str, view_author_mapping);
 				
 				merge_citations(author_lists.get(i), citations);
 			}

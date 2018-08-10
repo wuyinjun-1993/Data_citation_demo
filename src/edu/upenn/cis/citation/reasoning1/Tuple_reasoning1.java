@@ -40,7 +40,7 @@ import edu.upenn.cis.citation.aggregation.Aggregation2;
 import edu.upenn.cis.citation.citation_view.*;
 import edu.upenn.cis.citation.datalog.Parse_datalog;
 import edu.upenn.cis.citation.datalog.Query_converter;
-import edu.upenn.cis.citation.gen_citation.gen_citation1;
+import edu.upenn.cis.citation.gen_citation.gen_citation0;
 import edu.upenn.cis.citation.output.output2excel;
 import edu.upenn.cis.citation.user_query.query_storage;
 import sun.util.resources.cldr.ur.CurrencyNames_ur;
@@ -941,7 +941,7 @@ public class Tuple_reasoning1 {
 		{
 //			output_vec_com(agg_res.get(i));
 			
-			String str = gen_citation1.get_citation_agg(agg_res.get(i), max_author_num, view_query_mapping, query_lambda_str, author_mapping);
+			String str = gen_citation0.get_citation_agg(agg_res.get(i), max_author_num, view_query_mapping, query_lambda_str, author_mapping);
 			
 			citation_aggs.add(str);
 //			
@@ -1005,7 +1005,7 @@ public class Tuple_reasoning1 {
 		for(int i = 0; i<agg_res.size(); i++)
 		{
 			
-			String str = gen_citation1.get_citation_agg(agg_res.get(i), max_author_num, view_query_mapping, query_lambda_str, author_mapping);
+			String str = gen_citation0.get_citation_agg(agg_res.get(i), max_author_num, view_query_mapping, query_lambda_str, author_mapping);
 			
 			citation_aggs.add(str);
 //			
@@ -2389,7 +2389,7 @@ public class Tuple_reasoning1 {
 			
 			author_list = new HashSet<String>();
 						
-			String str = gen_citation1.get_citations2(c_views.get(p), vals, c, pst, view_query_mapping, query_lambda_str, author_mapping, max_author_num, author_list);
+			String str = gen_citation0.get_citations2(c_views.get(p), vals, c, pst, view_query_mapping, query_lambda_str, author_mapping, max_author_num, author_list);
 			
 //			System.out.println(c_views.get(p));
 //			
@@ -2458,7 +2458,7 @@ public class Tuple_reasoning1 {
 			
 			author_list = new HashSet<String>();
 			
-			String str = gen_citation1.populate_citation(update_c_view.get(p), vals, c, pst, citation_strings, max_author_num, author_list);
+			String str = gen_citation0.populate_citation(update_c_view.get(p), vals, c, pst, citation_strings, max_author_num, author_list);
 
 			citations.add(str);
 			

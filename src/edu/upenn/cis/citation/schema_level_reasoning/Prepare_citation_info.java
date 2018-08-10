@@ -9,13 +9,13 @@ import java.util.Vector;
 import edu.upenn.cis.citation.Corecover.Lambda_term;
 import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.data_structure.IntList;
-import edu.upenn.cis.citation.gen_citation.gen_citation1;
+import edu.upenn.cis.citation.gen_citation.gen_citation0;
 
 public class Prepare_citation_info {
   
   public static void prepare_citation_information(HashMap<Integer, Query> citation_queries, HashMap<String, Integer> max_author_num, HashMap<String, HashMap<String, Integer>> view_query_mapping, HashMap<String, ArrayList<ArrayList<String>>> author_mapping, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, Vector<Query> views, Connection c, PreparedStatement pst) throws SQLException
   {
-      gen_citation1.get_all_query_ids(query_ids, c, pst);
+      gen_citation0.get_all_query_ids(query_ids, c, pst);
       
 //    view_query_mapping = new ArrayList<HashMap<String, Integer>>(view_list.size);
               
@@ -24,7 +24,7 @@ public class Prepare_citation_info {
           query_lambda_str.add(null);
       }
               
-      gen_citation1.init_author_mapping(views, view_query_mapping, query_ids, author_mapping, max_author_num, c, pst, query_lambda_str, citation_queries);
+      gen_citation0.init_author_mapping(views, view_query_mapping, query_ids, author_mapping, max_author_num, c, pst, query_lambda_str, citation_queries);
 
   }
 

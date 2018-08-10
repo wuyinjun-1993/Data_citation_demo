@@ -29,7 +29,7 @@ import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.citation_view;
 import edu.upenn.cis.citation.citation_view.citation_view_parametered;
 import edu.upenn.cis.citation.citation_view.Covering_set;
-import edu.upenn.cis.citation.gen_citation.gen_citation1;
+import edu.upenn.cis.citation.gen_citation.gen_citation0;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
@@ -97,7 +97,7 @@ public class Query_converter {
 		
 		for(citation_view curr_view_mapping:c_views.c_vec)
 		{
-			Vector<Integer> query_ids = gen_citation1.get_query_id(curr_view_mapping.get_name(), c, pst);
+			Vector<Integer> query_ids = gen_citation0.get_query_id(curr_view_mapping.get_name(), c, pst);
 						
 			Vector<String> curr_citation_queries = new Vector<String>();
 			
@@ -3711,7 +3711,12 @@ public class Query_converter {
 	            sql += "," + sel_agg_items;
 	        }
 	        else
-	          sql += sel_agg_items;
+	        {
+	          if(isTLA)
+	            sql += citation_view_agg + "," + sel_agg_items;
+	          else
+	            sql += sel_agg_items;
+	        }
 	        
 	        if(sel_lambda_terms != null && !sel_lambda_terms.isEmpty())
 	            sql += "," + sel_lambda_terms;

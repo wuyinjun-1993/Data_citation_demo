@@ -190,19 +190,45 @@ public class Schema_reasoning_with_agg {
   
   static boolean check_head_mapping(Vector<Argument> args, Query q)
   {
-      
+    
+    if(!q.head.has_agg)
+    {
       Vector<Argument> q_head_args = q.head.args;
       
       for(int i = 0; i<args.size(); i++)
       {
           for(int j = 0; j<q_head_args.size(); j++)
           {   
-              if(args.get(i).toString().equals(q_head_args.get(j).toString()) && args.get(i).relation_name.equals(q_head_args.get(j).relation_name))
+//              if(args.get(i).toString().equals(q_head_args.get(j).toString()) && args.get(i).relation_name.equals(q_head_args.get(j).relation_name))
+            if(args.get(i).equals(q_head_args.get(j)))
                   return true;
           }
       }
+    }
+    else
+    {
+      Vector<Vector<Argument>> q_head_args = q.head.agg_args;
       
-      return false;
+      for(int i = 0; i<q_head_args.size(); i++)
+      {
+        Vector<Argument> head_args = q_head_args.get(i);
+        
+        if(args.containsAll(head_args))
+          return true;
+      }
+      
+      
+//      for(int i = 0; i<args.size(); i++)
+//      {
+//          for(int j = 0; j<q_head_args.size(); j++)
+//          {   
+//              if(args.get(i).toString().equals(q_head_args.get(j).toString()) && args.get(i).relation_name.equals(q_head_args.get(j).relation_name))
+//                  return true;
+//          }
+//      }
+    }
+
+    return false;
       
   }
   
@@ -225,6 +251,73 @@ public class Schema_reasoning_with_agg {
       
       return update_tuples;
   }
+  
+  public static<K, V> void put_mappings(HashMap<K, ArrayList<V>> maps, K key, V value)
+  {
+    ArrayList<V> values = maps.get(key);
+    
+    if(values == null)
+    {
+      values = new ArrayList<V>();
+    }
+    
+    values.add(value);
+    
+    maps.put(key, values);
+  }
+  
+  
+  public static void put_view_mapping_var_id_mappings(HashMap<Tuple, ArrayList<Integer>> view_mapping_head_var_ids_mappings, Query query, HashSet<Tuple> view_mappings)
+  {
+    if(query.head.has_agg)
+    {
+      for(int i = 0; i<query.head.agg_args.size(); i++)
+      {
+        for(Tuple view_mapping: view_mappings)
+        {
+          Vector<Argument> mapped_args = view_mapping.args;
+          
+          if(mapped_args.containsAll(query.head.agg_args.get(i)))
+          {
+            put_mappings(view_mapping_head_var_ids_mappings, view_mapping, i);
+          }
+        }
+      }
+    }
+    else
+    {
+      for(int i = 0; i<query.head.args.size(); i++)
+      {
+        for(Tuple view_mapping: view_mappings)
+        {
+          Vector<Argument> mapped_args = view_mapping.args;
+          
+          if(mapped_args.contains(query.head.args.get(i)))
+          {
+            put_mappings(view_mapping_head_var_ids_mappings, view_mapping, i);
+          }
+        }
+      }
+    }
+  }
+  
+  
+  public static HashMap<Tuple, Integer> build_view_mapping_id_mappings(HashSet<Tuple> view_mappings)
+  {
+    int i = 0;
+    
+    HashMap<Tuple, Integer> view_mapping_id_mappings = new HashMap<Tuple, Integer>();
+    
+    for(Tuple view_mapping: view_mappings)
+    {
+      view_mapping_id_mappings.put(view_mapping, i);
+      
+      i++;
+    }
+    
+    return view_mapping_id_mappings;
+  }
+  
   
   public static HashSet pre_processing(boolean isTLA, HashMap<Integer, Query> citation_queries, HashMap<String, Integer> max_author_num, HashMap<String, HashMap<String, Integer>> view_query_mapping, HashMap<String, ArrayList<ArrayList<String>>> author_mapping, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, boolean prepare_info, HashMap<String, Integer> lambda_term_id_mapping, Vector<Lambda_term> valid_lambda_terms, HashMap<Conditions, ArrayList<Tuple>> conditions_map, Vector<Conditions> valid_conditions, HashMap<String, ArrayList<Tuple>> view_tuple_mapping, HashMap<String, ArrayList<Integer>> head_variable_query_mapping, HashMap<String, HashSet<Integer>> relation_arg_mapping, ArrayList<Tuple>[]head_variable_view_mapping, Vector<Query> views, Query q, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, HashMap<String, Integer> with_sub_queries_id_mappings, Vector<String> full_mapping_condition_str, Connection c, PreparedStatement pst) throws SQLException
   {

@@ -389,7 +389,7 @@ public class final_stress_test_instance_size_min {
 			
 			middle_time = System.nanoTime();
 			
-			Tuple_level_approach_min.prepare_citation_information(c, pst);
+			Tuple_level_approach_min.prepare_citation_information(views, c, pst);
 			
 			agg_citations = Tuple_level_approach_min.tuple_gen_agg_citations(query, c, pst);
 													
@@ -637,7 +637,7 @@ public class final_stress_test_instance_size_min {
 			
 			middle_time = System.nanoTime();
 			
-			Semi_schema_level_approach_min.prepare_citation_information(c, pst);
+			Semi_schema_level_approach_min.prepare_citation_information(views, c, pst);
 			
 			agg_citations = Semi_schema_level_approach_min.tuple_gen_agg_citations(query, c, pst);
 													

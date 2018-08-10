@@ -40,7 +40,7 @@ import edu.upenn.cis.citation.data_structure.StringList;
 import edu.upenn.cis.citation.data_structure.Unique_StringList;
 import edu.upenn.cis.citation.datalog.Parse_datalog;
 import edu.upenn.cis.citation.datalog.Query_converter;
-import edu.upenn.cis.citation.gen_citation.gen_citation1;
+import edu.upenn.cis.citation.gen_citation.gen_citation0;
 import edu.upenn.cis.citation.output.output2excel;
 import sun.util.resources.cldr.ur.CurrencyNames_ur;
 
@@ -659,7 +659,7 @@ public class Tuple_reasoning2_test {
 	    	
 	    }
 
-	    gen_citation1.get_all_query_ids(query_ids, c, pst);
+	    gen_citation0.get_all_query_ids(query_ids, c, pst);
 	    
 	    view_query_mapping = new ArrayList<HashMap<String, Integer>>(view_list.size);
 	    		
@@ -668,7 +668,7 @@ public class Tuple_reasoning2_test {
 			query_lambda_str.add(null);
 		}
 	    	    
-	    gen_citation1.init_author_mapping(view_list, view_query_mapping, query_ids, author_mapping, max_author_num, c, pst, query_lambda_str);
+	    gen_citation0.init_author_mapping(view_list, view_query_mapping, query_ids, author_mapping, max_author_num, c, pst, query_lambda_str);
 
 	    
 	    
@@ -1671,7 +1671,7 @@ public class Tuple_reasoning2_test {
 		
 		for(int p =0; p<c_views.size(); p++)
 		{								
-			HashSet<String> str = gen_citation1.get_citations3(c_views.get(p), c, pst, view_list, view_query_mapping, author_mapping, max_author_num, query_ids, query_lambda_str, view_author_mapping, populate_db.star_op);
+			HashSet<String> str = gen_citation0.get_citations3(c_views.get(p), c, pst, view_list, view_query_mapping, author_mapping, max_author_num, query_ids, query_lambda_str, view_author_mapping, populate_db.star_op);
 			
 			citations.addAll(str);
 		}

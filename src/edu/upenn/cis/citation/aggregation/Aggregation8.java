@@ -26,22 +26,24 @@ import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Corecover.Tuple;
 import edu.upenn.cis.citation.Operation.Conditions;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
-import edu.upenn.cis.citation.citation_view.Head_strs;
-import edu.upenn.cis.citation.citation_view.citation_view;
-import edu.upenn.cis.citation.citation_view.citation_view_parametered;
-import edu.upenn.cis.citation.citation_view.citation_view_unparametered;
-import edu.upenn.cis.citation.citation_view.Covering_set;
+import edu.upenn.cis.citation.citation_view1.Head_strs;
+import edu.upenn.cis.citation.citation_view1.citation_view;
+import edu.upenn.cis.citation.citation_view1.citation_view_parametered;
+import edu.upenn.cis.citation.citation_view1.citation_view_unparametered;
+import edu.upenn.cis.citation.citation_view1.Covering_set;
 import edu.upenn.cis.citation.data_structure.IntList;
 import edu.upenn.cis.citation.data_structure.StringList;
 import edu.upenn.cis.citation.data_structure.Unique_StringList;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.gen_citation.gen_citation0;
 import edu.upenn.cis.citation.reasoning1.Tuple_level_approach;
+import edu.upenn.cis.citation.reasoning1.Tuple_level_approach_agg;
 import edu.upenn.cis.citation.reasoning1.Semi_schema_level_approach;
+import edu.upenn.cis.citation.reasoning1.Semi_schema_level_approach_agg;
 import edu.upenn.cis.citation.reasoning1.Schema_level_approach;
 import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_min_test;
 
-public class Aggregation6 {
+public class Aggregation8 {
 	
 	public static HashSet<HashMap<String, HashSet<String>>> full_citations = new HashSet<HashMap<String, HashSet<String>>>();
 	
@@ -743,13 +745,13 @@ public class Aggregation6 {
 			rs.absolute(i + 1);
 			
 			if(tuple_level)
-				Tuple_level_approach.get_views_parameters(valid_view_mappings_schema_level, rs, start_pos, lambda_values);
+				Tuple_level_approach_agg.get_views_parameters(valid_view_mappings_schema_level, rs, start_pos, lambda_values);
 			else
 			{
 				if(!schema_level)
-					Semi_schema_level_approach.get_views_parameters(valid_view_mappings_schema_level, rs, start_pos, lambda_values);
-				else
-					Schema_level_approach.get_views_parameters(valid_view_mappings_schema_level, rs, start_pos, lambda_values);
+					Semi_schema_level_approach_agg.get_views_parameters(valid_view_mappings_schema_level, rs, start_pos, lambda_values);
+//				else
+//					Schema_level_approach.get_views_parameters(valid_view_mappings_schema_level, rs, start_pos, lambda_values);
 			}
 			
 //			convert_covering_set2citation(i, curr_res, author_lists, view_query_mapping, query_lambda_str, author_mapping, max_num, query_ids, view_list, c, pst, tuple_level);
@@ -1114,9 +1116,9 @@ public class Aggregation6 {
                   rs.absolute(i + 1);
                   
                   if(tuple_level)
-                      Tuple_level_approach.get_views_parameters(curr_view_mappings, rs, start_pos, lambda_values);
+                      Tuple_level_approach_agg.get_views_parameters(curr_view_mappings, rs, start_pos, lambda_values);
                   else
-                      Semi_schema_level_approach.get_views_parameters(curr_view_mappings, rs, start_pos, lambda_values);
+                      Semi_schema_level_approach_agg.get_views_parameters(curr_view_mappings, rs, start_pos, lambda_values);
                   
 //                do_aggregate(curr_res, c_view, i);
                   

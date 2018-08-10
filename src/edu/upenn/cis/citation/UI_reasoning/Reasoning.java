@@ -18,7 +18,7 @@ import edu.upenn.cis.citation.citation_view.Covering_set;
 import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.data_structure.StringList;
 import edu.upenn.cis.citation.examples.Load_views_and_citation_queries;
-import edu.upenn.cis.citation.gen_citation.gen_citation1;
+import edu.upenn.cis.citation.gen_citation.gen_citation0;
 import edu.upenn.cis.citation.reasoning1.Semi_schema_level_approach;
 import edu.upenn.cis.citation.ui.CitationConverter;
 
@@ -117,7 +117,7 @@ public class Reasoning {
       lambda_vs = new Head_strs(lambda_values);
     }
     
-    ArrayList<ArrayList<String>> authors = gen_citation1.get_authors(Semi_schema_level_approach.author_mapping, Semi_schema_level_approach.view_list, Semi_schema_level_approach.view_query_mapping, view_name, lambda_vs, block_name);
+    ArrayList<ArrayList<String>> authors = gen_citation0.get_authors(Semi_schema_level_approach.author_mapping, Semi_schema_level_approach.view_list, Semi_schema_level_approach.view_query_mapping, view_name, lambda_vs, block_name);
     
     if(authors == null)
       return new ArrayList<ArrayList<String>>();

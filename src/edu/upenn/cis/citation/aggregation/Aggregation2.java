@@ -21,7 +21,7 @@ import edu.upenn.cis.citation.citation_view.citation_view;
 import edu.upenn.cis.citation.citation_view.citation_view_parametered;
 import edu.upenn.cis.citation.citation_view.citation_view_unparametered;
 import edu.upenn.cis.citation.citation_view.Covering_set;
-import edu.upenn.cis.citation.gen_citation.gen_citation1;
+import edu.upenn.cis.citation.gen_citation.gen_citation0;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test_stable;
@@ -52,7 +52,7 @@ public class Aggregation2 {
 					
 					if(c_v.has_lambda_term())
 					{
-						authors = gen_citation1.get_authors2((citation_view_parametered)c_v, c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num);
+						authors = gen_citation0.get_authors2((citation_view_parametered)c_v, c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num);
 						
 //						System.out.println(authors);
 						
@@ -60,7 +60,7 @@ public class Aggregation2 {
 					}
 					else
 					{
-						authors = gen_citation1.get_authors2((citation_view_unparametered)c_v, c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num);
+						authors = gen_citation0.get_authors2((citation_view_unparametered)c_v, c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num);
 						
 //						System.out.println(authors);
 						
@@ -120,7 +120,7 @@ public class Aggregation2 {
 					
 					if(c_v.has_lambda_term())
 					{
-						authors = gen_citation1.get_authors2((citation_view_parametered)c_v, c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num);
+						authors = gen_citation0.get_authors2((citation_view_parametered)c_v, c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num);
 						
 //						System.out.println(authors);
 						
@@ -128,7 +128,7 @@ public class Aggregation2 {
 					}
 					else
 					{
-						authors = gen_citation1.get_authors2((citation_view_unparametered)c_v, c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num);
+						authors = gen_citation0.get_authors2((citation_view_unparametered)c_v, c, pst, view_query_mapping, query_lambda_str, author_mapping, max_num);
 						
 						author_list.get(i).addAll(authors);
 					}
@@ -320,7 +320,7 @@ public class Aggregation2 {
 			
 			JSONObject json = new JSONObject();
 			
-			HashSet<String> authors = gen_citation1.reorder_hashset(author_lists.get(i));
+			HashSet<String> authors = gen_citation0.reorder_hashset(author_lists.get(i));
 			
 			JSONArray jarray = new JSONArray();
 
@@ -340,7 +340,7 @@ public class Aggregation2 {
 			
 			json.put("author", jarray);
 			
-			json.put("db_name", gen_citation1.db_name);
+			json.put("db_name", gen_citation0.db_name);
 			
 			if(!unique_string.contains(json.toString()))
 			{

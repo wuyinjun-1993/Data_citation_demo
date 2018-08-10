@@ -31,11 +31,11 @@ import edu.upenn.cis.citation.Corecover.Mapping;
 import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Pre_processing.Query_operation;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
-import edu.upenn.cis.citation.citation_view1.Head_strs;
-import edu.upenn.cis.citation.citation_view1.citation_view;
-import edu.upenn.cis.citation.citation_view1.citation_view_parametered;
-import edu.upenn.cis.citation.citation_view1.citation_view_unparametered;
-import edu.upenn.cis.citation.citation_view1.Covering_set;
+import edu.upenn.cis.citation.citation_view.Head_strs;
+import edu.upenn.cis.citation.citation_view.citation_view;
+import edu.upenn.cis.citation.citation_view.citation_view_parametered;
+import edu.upenn.cis.citation.citation_view.citation_view_unparametered;
+import edu.upenn.cis.citation.citation_view.Covering_set;
 import edu.upenn.cis.citation.data_structure.IntList;
 import edu.upenn.cis.citation.data_structure.Query_lm_authors;
 import edu.upenn.cis.citation.data_structure.StringList;
@@ -45,7 +45,7 @@ import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
 import edu.upenn.cis.citation.sort_citation_view_vec.sort_insert;
 
-public class gen_citation1 {
+public class gen_citation0 {
 	
 	static String join = "join";
 	

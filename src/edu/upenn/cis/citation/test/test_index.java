@@ -28,7 +28,7 @@ import edu.upenn.cis.citation.data_structure.IntList;
 import edu.upenn.cis.citation.data_structure.StringList;
 import edu.upenn.cis.citation.data_structure.Unique_StringList;
 import edu.upenn.cis.citation.examples.Load_views_and_citation_queries;
-import edu.upenn.cis.citation.gen_citation.gen_citation1;
+import edu.upenn.cis.citation.gen_citation.gen_citation0;
 import edu.upenn.cis.citation.index.Graph;
 
 public class test_index {
@@ -463,7 +463,7 @@ public class test_index {
 
 	    // compute tuple-cores
 	    
-	    gen_citation1.get_all_query_ids(query_ids, c, pst);
+	    gen_citation0.get_all_query_ids(query_ids, c, pst);
 	    
 	    view_query_mapping = new ArrayList<HashMap<String, Integer>>(view_list.size);
 	    		

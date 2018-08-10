@@ -29,7 +29,7 @@ public class output_covering_set {
       bw.close();
   }
   
-  public static void write2file(String file_name, HashMap<String, HashSet<Covering_set>> views) throws IOException
+  public static void write2file(String file_name, HashMap<String, HashSet> views) throws IOException
   {
     File fout = new File(file_name);
     FileOutputStream fos = new FileOutputStream(fout);
@@ -45,13 +45,13 @@ public class output_covering_set {
       bw.write("group " + num);
       bw.newLine();
       
-      HashSet<Covering_set> covering_sets = views.get(label);
+      HashSet covering_sets = views.get(label);
       
       String [] covering_set_string = new String [covering_sets.size()];
       
       int id = 0;
       
-      for(Covering_set covering_set: covering_sets)
+      for(Object covering_set: covering_sets)
       {
         covering_set_string[id ++] = covering_set.toString(); 
       }

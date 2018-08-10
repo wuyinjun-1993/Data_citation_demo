@@ -28,7 +28,7 @@ import edu.upenn.cis.citation.citation_view.Covering_set;
 import edu.upenn.cis.citation.data_structure.IntList;
 import edu.upenn.cis.citation.data_structure.StringList;
 import edu.upenn.cis.citation.data_structure.Unique_StringList;
-import edu.upenn.cis.citation.gen_citation.gen_citation1;
+import edu.upenn.cis.citation.gen_citation.gen_citation0;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_full_test;
 import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1_test;
@@ -54,7 +54,7 @@ public class Aggregation3 {
 			
 			for(int i = 0; i<c_views.size(); i++)
 			{
-				HashMap<String, HashSet<String>> json_citation = gen_citation1.join_covering_sets(c_views.get(i), c, pst, view_list, view_query_mapping, author_mapping, max_num, query_ids, query_lambda_str, view_author_mapping);
+				HashMap<String, HashSet<String>> json_citation = gen_citation0.join_covering_sets(c_views.get(i), c, pst, view_list, view_query_mapping, author_mapping, max_num, query_ids, query_lambda_str, view_author_mapping);
 				
 				author_list.add(json_citation);
 				
@@ -102,7 +102,7 @@ public class Aggregation3 {
 				if(check_block_full(curr_authors, max_num, full_flag))
 					continue;
 				
-				HashMap<String, HashSet<String>> authors = gen_citation1.join_covering_sets(c_vector, c, pst, view_list, view_query_mapping, author_mapping, max_num, query_ids, query_lambda_str, view_author_mapping);				
+				HashMap<String, HashSet<String>> authors = gen_citation0.join_covering_sets(c_vector, c, pst, view_list, view_query_mapping, author_mapping, max_num, query_ids, query_lambda_str, view_author_mapping);				
 				
 //				System.out.println(c_vector + ":::::::::::" + authors);
 
@@ -182,7 +182,7 @@ public class Aggregation3 {
 			
 			for(int i = 0; i<c_views.size(); i++)
 			{
-				HashMap<String, HashSet<String>> json_citation = gen_citation1.join_covering_sets(c_views.get(i), c, pst, view_list, view_query_mapping, author_mapping, max_num, query_ids, query_lambda_str, view_author_mapping);
+				HashMap<String, HashSet<String>> json_citation = gen_citation0.join_covering_sets(c_views.get(i), c, pst, view_list, view_query_mapping, author_mapping, max_num, query_ids, query_lambda_str, view_author_mapping);
 				
 				author_list.add(json_citation);
 				
@@ -232,7 +232,7 @@ public class Aggregation3 {
 				if(check_block_full(curr_authors, max_num, full_flag))
 					continue;
 				
-				HashMap<String, HashSet<String>> authors = gen_citation1.join_covering_sets(c_vector, c, pst, view_list, view_query_mapping, author_mapping, max_num, query_ids, query_lambda_str, view_author_mapping);				
+				HashMap<String, HashSet<String>> authors = gen_citation0.join_covering_sets(c_vector, c, pst, view_list, view_query_mapping, author_mapping, max_num, query_ids, query_lambda_str, view_author_mapping);				
 
 				view_citation_mapping.put(c_vector.toString(), authors.toString());
 
@@ -507,7 +507,7 @@ public class Aggregation3 {
 			
 			HashMap<String, HashSet<String>> authors = author_lists.get(i);
 			
-			JSONObject json = gen_citation1.get_json_citation(authors);
+			JSONObject json = gen_citation0.get_json_citation(authors);
 			
 			if(json == null)
 				continue;

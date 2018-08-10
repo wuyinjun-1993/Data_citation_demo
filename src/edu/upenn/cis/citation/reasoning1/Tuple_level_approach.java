@@ -49,7 +49,7 @@ import edu.upenn.cis.citation.data_structure.Unique_StringList;
 import edu.upenn.cis.citation.datalog.Parse_datalog;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.examples.Load_views_and_citation_queries;
-import edu.upenn.cis.citation.gen_citation.gen_citation1;
+import edu.upenn.cis.citation.gen_citation.gen_citation0;
 import edu.upenn.cis.citation.output.output2excel;
 import edu.upenn.cis.citation.user_query.query_storage;
 import sun.util.resources.cldr.ur.CurrencyNames_ur;
@@ -120,6 +120,8 @@ public class Tuple_level_approach {
 	public static long second2nano = 1000000000;
 	
 	static Tuple [] viewtuples = null;
+	
+	public static StringList view_list = new StringList();
 	
 	public static HashMap<Head_strs, ArrayList<Integer>> head_strs_rows_mapping = new HashMap<Head_strs, ArrayList<Integer>>();
 	
@@ -208,7 +210,7 @@ public class Tuple_level_approach {
     
     populate_db.set_test_file_name(view_file);
     
-    populate_db.initial(c, pst);
+    populate_db.initial(true, c, pst);
     
       Vector<Query> queries = Load_views_and_citation_queries.get_views(query_file, c, pst);
       
@@ -1780,7 +1782,7 @@ public class Tuple_level_approach {
 	
 	public static void prepare_citation_information(Vector<Query> views, Connection c, PreparedStatement pst) throws SQLException
 	{
-		gen_citation1.get_all_query_ids(query_ids, c, pst);
+		gen_citation0.get_all_query_ids(query_ids, c, pst);
 	    
 //	    view_query_mapping = new ArrayList<HashMap<String, Integer>>(views.size());
 	    		
@@ -1789,16 +1791,16 @@ public class Tuple_level_approach {
 			query_lambda_str.add(null);
 		}
 	    	    
-	    gen_citation1.init_author_mapping(views, view_query_mapping, query_ids, author_mapping, max_author_num, c, pst, query_lambda_str, citation_queries);
+	    gen_citation0.init_author_mapping(views, view_query_mapping, query_ids, author_mapping, max_author_num, c, pst, query_lambda_str, citation_queries);
 
 	}
 	
-//	public static HashMap<String, Integer> get_citation_queries(String view_name)
-//	{
-//		int view_id = view_list.find(view_name);
-//		
-//		return view_query_mapping.get(view_id);
-//	}
+	public static HashMap<String, Integer> get_citation_queries(String view_name)
+	{
+		int view_id = view_list.find(view_name);
+		
+		return view_query_mapping.get(view_id);
+	}
 		
 	public static void tuple_reasoning(Query q, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
 	{
@@ -2845,7 +2847,7 @@ public class Tuple_level_approach {
 			
 			Covering_set covering_set = (Covering_set) iter.next();
 									
-			HashSet<String> str = gen_citation1.get_citations3(covering_set, c, pst, view_query_mapping, author_mapping, max_author_num, query_ids, query_lambda_str, view_author_mapping, star_op);
+			HashSet<String> str = gen_citation0.get_citations3(covering_set, c, pst, view_query_mapping, author_mapping, max_author_num, query_ids, query_lambda_str, view_author_mapping, star_op);
 			
 			citations.addAll(str);		
 		}
@@ -3180,7 +3182,7 @@ public class Tuple_level_approach {
             }
           }
           
-          HashSet<String> curr_citations = gen_citation1.get_citations3(covering_set, c, pst, view_query_mapping, author_mapping, max_author_num, query_ids, query_lambda_str, view_author_mapping, populate_db.star_op);
+          HashSet<String> curr_citations = gen_citation0.get_citations3(covering_set, c, pst, view_query_mapping, author_mapping, max_author_num, query_ids, query_lambda_str, view_author_mapping, populate_db.star_op);
           
           citations.addAll(curr_citations);
           

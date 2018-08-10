@@ -93,6 +93,8 @@ public class populate_db {
 	  String view_file = path + args[0];
 	  
 	  String db_name = args[1];
+	  
+	  boolean renew_table = Boolean.valueOf(args[2]);
 
       Connection c = null;
       PreparedStatement pst = null;
@@ -108,7 +110,7 @@ public class populate_db {
     
       set_test_file_name(view_file);
 		
-		initial(c, pst);
+		initial(renew_table, c, pst);
 		
 		System.out.println("annotation done");
 		
@@ -569,7 +571,7 @@ public class populate_db {
 //			
 //			query += "primary key (" + primary_key_string + "), foreign key (" + primary_key_string + ") references " + relation_names.get(i) + "(" + primary_key_string + ") on update cascade )";
 //			
-////			System.out.println(query);
+			System.out.println(query);
 //			
 //			pst = c.prepareStatement(query);
 //			
@@ -678,7 +680,7 @@ public class populate_db {
 		pst.execute();
 	}
 	
-	public static void initial(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	public static void initial(boolean renew_table, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
 //		Connection c = null;
 //	      PreparedStatement pst = null;
@@ -686,6 +688,7 @@ public class populate_db {
 //	    c = DriverManager
 //	        .getConnection(db_url, usr_name , passwd);
 //		add_column(c,pst);
+	  if(renew_table)
 	    renew_table2(c, pst);
 	    
 		populate_db2(c, pst);
@@ -1715,9 +1718,9 @@ public class populate_db {
 			
 			
 			
-//			System.out.println(query1);
-//			
-//			System.out.println(query2);
+			System.out.println(query1);
+			
+			System.out.println(query2);
 			
 			pst = c.prepareStatement(query1);
 			

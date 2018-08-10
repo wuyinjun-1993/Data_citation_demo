@@ -352,7 +352,7 @@ public class final_stress_test_group_full {
 			
 			middle_time = System.nanoTime();
 			
-			Tuple_level_approach.prepare_citation_information(c, pst);
+			Tuple_level_approach.prepare_citation_information(views, c, pst);
 			
 			agg_citations = Tuple_level_approach.gen_citation_schema_level(c, pst);
 			
@@ -596,7 +596,7 @@ public class final_stress_test_group_full {
 				
 				middle_time = System.nanoTime();
 				
-				Semi_schema_level_approach.prepare_citation_information(c, pst);
+				Semi_schema_level_approach.prepare_citation_information(views, c, pst);
 				
 				Semi_schema_level_approach.gen_citation_schema_level(c, pst);
 				

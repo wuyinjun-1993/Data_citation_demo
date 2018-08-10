@@ -171,13 +171,15 @@ public class final_real_test_min2 {
 	    
 	    	    		
 		boolean tuple_level = Boolean.valueOf(args[2]);
-				
+			
+	    Vector<Query> views = view_operation.get_all_views(c2, pst);
+
 //		for(int i = 0; i<queries.size(); i++)
 		{
 //			System.out.println(i);
 			
 			
-			stress_test(queries.get(view_id), tuple_level);
+			stress_test(views, queries.get(view_id), tuple_level);
 		}		
 		
 		Vector<Query> user_query = new Vector<Query>();
@@ -185,8 +187,6 @@ public class final_real_test_min2 {
 		user_query.add(queries.get(view_id));
 		
 		output_queries(user_query, path2 + "user_queries");
-		
-		Vector<Query> views = view_operation.get_all_views(c2, pst);
 		
 		output_queries(views, path2 + "views");
 		
@@ -224,7 +224,7 @@ public class final_real_test_min2 {
 	}
 	
 	
-	static void stress_test(Query query, boolean tuple_level) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
+	static void stress_test(Vector<Query> views, Query query, boolean tuple_level) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
 	{
 		HashMap<Head_strs, HashSet<String> > citation_strs = new HashMap<Head_strs, HashSet<String>>();
 		
@@ -269,7 +269,7 @@ public class final_real_test_min2 {
 			
 			middle_time = System.nanoTime();
 			
-			Tuple_level_approach_min.prepare_citation_information(c, pst);
+			Tuple_level_approach_min.prepare_citation_information(views, c, pst);
 			
 			agg_citations = Tuple_level_approach_min.tuple_gen_agg_citations(query, c, pst);
 													
@@ -517,7 +517,7 @@ public class final_real_test_min2 {
 			
 			middle_time = System.nanoTime();
 			
-			Semi_schema_level_approach_min.prepare_citation_information(c, pst);
+			Semi_schema_level_approach_min.prepare_citation_information(views, c, pst);
 			
 			agg_citations = Semi_schema_level_approach_min.tuple_gen_agg_citations(query, c, pst);
 													

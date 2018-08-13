@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
+import arq.query;
 import java.sql.Statement;
 
 import edu.upenn.cis.citation.Corecover.Argument;
@@ -2320,7 +2321,10 @@ public class Query_converter {
 //          str[1] += ",";
           }
           
-          str[0] += "array_agg(" + condition_str + ")";
+          if(q.head.has_agg)
+            str[0] += "array_agg(" + condition_str + ")";
+          else
+            str[0] += condition_str;
           
           condition_num++;
         }
@@ -3672,11 +3676,93 @@ public class Query_converter {
 	         string += ",";
 	       Subgoal subgoal = (Subgoal) query.body.get(i);
 	       
-	       string += "array_agg(" + subgoal.name + ".citation_view)";
+	       if(query.head.has_agg)
+	         string += "array_agg(" + subgoal.name + ".citation_view)";
+	       else
+	         string += subgoal.name + ".citation_view";
 	     }
 	     return string;
 	   }
 	
+	   
+       public static String datalog2sql_citation_agg_test(boolean isTLA, Query query, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, HashMap<String, Integer> with_sub_queries_id_mappings, Vector<String> full_mapping_condition_str, Vector<Conditions> valid_conditions, Vector<Lambda_term> lambda_terms, HashSet<Tuple> viewTuples) throws SQLException
+       {
+                   
+           String sel_item = new String();
+           
+           String sql = new String();
+           
+           sel_item = get_sel_item(query);
+           
+           String sel_lambda_terms = get_lambda_str_agg(query, lambda_terms);
+           
+           String sel_agg_items = get_agg_item_in_select_clause(query);
+           
+           String [] condition_str = get_condition_boolean_value_agg(query, partial_mapping_strings, partial_mapping_view_mapping_mappings, with_sub_queries_id_mappings, full_mapping_condition_str, valid_conditions, viewTuples);
+           
+           
+           String citation_table = get_relations_without_citation_table(query);
+           
+           String citation_view_agg = get_citation_view_agg(query);
+           
+           String condition = get_condition(query);
+           
+           sql = "select ";
+           
+           if(!sel_item.isEmpty())
+           {
+             if(isTLA)
+               sql += sel_item + "," + citation_view_agg;
+             else
+               sql += sel_item;
+             if(!sel_agg_items.isEmpty())
+               sql += "," + sel_agg_items;
+           }
+           else
+           {
+             if(isTLA)
+               sql += citation_view_agg + "," + sel_agg_items;
+             else
+               sql += sel_agg_items;
+           }
+           
+           if(sel_lambda_terms != null && !sel_lambda_terms.isEmpty())
+               sql += "," + sel_lambda_terms;
+           
+           if(condition_str[0] != null && !condition_str[0].isEmpty())
+               sql += "," + condition_str[0];
+           
+           sql += " from " + citation_table;
+           
+           sql += " where " + query.lambda_term.get(0).arg_name;
+           
+           if(condition != null && !condition.isEmpty())
+               sql += " and " + condition;
+           
+           if(query.head.has_agg && !sel_item.isEmpty())
+//           if((isTLA && !sel_item.isEmpty()) || (!isTLA && !condition_str[0].isEmpty()))
+             sql += " group by " + sel_item;
+           
+           String having_clause = get_having_clauses(query);
+           
+           if(!having_clause.isEmpty())
+             sql += " having " + having_clause;
+           
+//         if(condition_str[1] != null && !condition_str[1].isEmpty())
+//             sql += " order by " + condition_str[1]; 
+           
+//       System.out.println("sql:::" + sql);
+           
+//         System.out.println(condition_str[1]);
+//         
+//         System.out.println(condition_str[0]);
+           
+           return condition_str[1] + " " + sql;
+           
+           
+           
+       }
+	   
 	   public static String datalog2sql_citation_agg(boolean isTLA, Query query, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, HashMap<String, Integer> with_sub_queries_id_mappings, Vector<String> full_mapping_condition_str, Vector<Conditions> valid_conditions, Vector<Lambda_term> lambda_terms, HashSet<Tuple> viewTuples) throws SQLException
 	    {
 	                
@@ -3729,7 +3815,8 @@ public class Query_converter {
 	        if(condition != null && !condition.isEmpty())
 	            sql += " where " + condition;
 	        
-	        if(!sel_item.isEmpty())
+//	        if((isTLA && !sel_item.isEmpty()) || (!isTLA && !condition_str[0].isEmpty()))
+	        if(query.head.has_agg && !sel_item.isEmpty())
 	          sql += " group by " + sel_item;
 	        
 	        String having_clause = get_having_clauses(query);

@@ -95,9 +95,9 @@ public class view_generator {
 		
 		Vector<Conditions> conditions = new Vector<Conditions>();
 		
-		conditions.add(new Conditions(new Argument("contributor_id", "contributor2object"), "contributor2object", new op_equal(), new Argument("contributor_id", "contributor"), "contributor"));
+		conditions.add(new Conditions(new Argument("contributor2object" + populate_db.separator + "contributor_id", "contributor2object"), "contributor2object", new op_equal(), new Argument("contributor" + populate_db.separator + "contributor_id", "contributor"), "contributor"));
 		
-		conditions.add(new Conditions(new Argument("object_id", "contributor2object"), "contributor2object", new op_equal(), new Argument("object_id", "object"), "object"));
+		conditions.add(new Conditions(new Argument("contributor2object" + populate_db.separator + "object_id", "contributor2object"), "contributor2object", new op_equal(), new Argument("object" + populate_db.separator + "object_id", "object"), "object"));
 		
 //		conditions.add("object_object_id = contributor2object_object_id");
 		
@@ -123,9 +123,9 @@ public class view_generator {
 		
 		conditions = new Vector<Conditions>();
 		
-		conditions.add(new Conditions(new Argument("contributor_id", "contributor2object"), "contributor2object", new op_equal(), new Argument("contributor_id", "contributor"), "contributor"));
+		conditions.add(new Conditions(new Argument("contributor2object" + populate_db.separator + "contributor_id", "contributor2object"), "contributor2object", new op_equal(), new Argument("contributor" + populate_db.separator + "contributor_id", "contributor"), "contributor"));
 		
-		conditions.add(new Conditions(new Argument("object_id", "contributor2object"), "contributor2object", new op_equal(), new Argument("object_id", "gpcr"), "gpcr"));
+		conditions.add(new Conditions(new Argument("contributor2object" + populate_db.separator + "object_id", "contributor2object"), "contributor2object", new op_equal(), new Argument("gpcr" + populate_db.separator + "object_id", "gpcr"), "gpcr"));
 		
 //		conditions.add("object_object_id = contributor2object_object_id");
 		
@@ -151,9 +151,9 @@ public class view_generator {
 		
 		conditions = new Vector<Conditions>();
 		
-		conditions.add(new Conditions(new Argument("contributor_id", "contributor2family"), "contributor2family", new op_equal(), new Argument("contributor_id", "contributor"), "contributor"));
+		conditions.add(new Conditions(new Argument("contributor2family" + populate_db.separator + "contributor_id", "contributor2family"), "contributor2family", new op_equal(), new Argument("contributor" + populate_db.separator + "contributor_id", "contributor"), "contributor"));
 		
-		conditions.add(new Conditions(new Argument("family_id", "contributor2family"), "contributor2family", new op_equal(), new Argument("family_id", "family"), "family"));
+		conditions.add(new Conditions(new Argument("contributor2family" + populate_db.separator + "family_id", "contributor2family"), "contributor2family", new op_equal(), new Argument("family" + populate_db.separator + "family_id", "family"), "family"));
 		
 //		conditions.add("object_object_id = contributor2object_object_id");
 		
@@ -179,9 +179,9 @@ public class view_generator {
 		
 		conditions = new Vector<Conditions>();
 		
-		conditions.add(new Conditions(new Argument("contributor_id", "contributor2intro"), "contributor2intro", new op_equal(), new Argument("contributor_id", "contributor"), "contributor"));
+		conditions.add(new Conditions(new Argument("contributor2intro" + populate_db.separator + "contributor_id", "contributor2intro"), "contributor2intro", new op_equal(), new Argument("contributor" + populate_db.separator + "contributor_id", "contributor"), "contributor"));
 		
-		conditions.add(new Conditions(new Argument("family_id", "contributor2intro"), "contributor2intro", new op_equal(), new Argument("family_id", "introduction"), "introduction"));
+		conditions.add(new Conditions(new Argument("contributor2intro" + populate_db.separator + "family_id", "contributor2intro"), "contributor2intro", new op_equal(), new Argument("introduction" + populate_db.separator + "family_id", "introduction"), "introduction"));
 		
 //		conditions.add("object_object_id = contributor2object_object_id");
 		
@@ -205,7 +205,7 @@ public class view_generator {
 		
 		conditions = new Vector<Conditions>();
 				
-		conditions.add(new Conditions(new Argument("ligand_id", "contributor2ligand"), "contributor2ligand", new op_equal(), new Argument("ligand_id", "ligand"), "ligand"));
+		conditions.add(new Conditions(new Argument("contributor2ligand" + populate_db.separator + "ligand_id", "contributor2ligand"), "contributor2ligand", new op_equal(), new Argument("ligand" + populate_db.separator + "ligand_id", "ligand"), "ligand"));
 		
 //		conditions.add("object_object_id = contributor2object_object_id");
 		
@@ -314,13 +314,13 @@ public class view_generator {
 	    
 	    clear_other_tables(c2, pst);
 	    
-	    populate_db.renew_table(c1, pst);
+//	    populate_db.renew_table(c1, pst);
 	    
 	    get_joinable_relations(c2, pst);
 	    
 	    Vector<Query> views = gen_views_without_predicates(subgoal_names, num_views, sizeofquery,  c2, pst);
 	    
-	    store_views(views, c1, c2, pst);
+//	    store_views(views, c1, c2, pst);
 	    	    
 	    return views;
 	}
@@ -375,21 +375,21 @@ public class view_generator {
 	{
 		initial();
 		    
-	    clear_views(c1, pst, true);
-	    
-	    clear_other_tables(c1, pst);
-	    
-	    clear_views(c2, pst, false);
-	    
-	    clear_other_tables(c2, pst);
-	    
-	    populate_db.renew_table(c1, pst);
+//	    clear_views(c1, pst, true);
+//	    
+//	    clear_other_tables(c1, pst);
+//	    
+//	    clear_views(c2, pst, false);
+//	    
+//	    clear_other_tables(c2, pst);
+//	    
+//	    populate_db.renew_table(c1, pst);
 	    
 	    get_joinable_relations(c2, pst);
 	    
 	    Vector<Query> views = gen_random_views(subgoal_names, num_views, query, c2, pst);
 	    
-	    store_views(views, c1, c2, pst);
+//	    store_views(views, c1, c2, pst);
 	    	    
 	    return views;
 	}
@@ -557,7 +557,7 @@ public class view_generator {
 	}
 	
 	
-	public static void clear_views(Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, ClassNotFoundException
+	public static void clear_views(Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException
 	{
 		Vector<Integer> ids = get_all_view_ids(c, pst);
 		
@@ -569,7 +569,7 @@ public class view_generator {
 		
 	}
 	
-	public static Vector<Query> gen_default_views(Vector<String> relations, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	public static Vector<Query> gen_default_views(Vector<String> relations, Connection c, PreparedStatement pst) throws SQLException
 	{
 		initial();	    
 	    
@@ -578,8 +578,6 @@ public class view_generator {
 	    clear_views(c, pst, true);
 	    
 	    clear_other_tables(c, pst);
-	    
-	    populate_db.renew_table(c, pst);
 	    
 	    Vector<Query> views = new Vector<Query>();
 		
@@ -1130,6 +1128,72 @@ public class view_generator {
 		
 	}
 	
+	static Query store_citation_queries(Query view, int num, String qname)
+    {
+        Vector<String> citable_table_names = new Vector<String>();
+        
+        citable_table_names.addAll(Arrays.asList(citatable_tables));
+        
+        String subgoal = null;
+        
+//      while(true)
+        {
+            Random r = new Random();
+            
+            int index = r.nextInt(view.body.size());
+            
+            
+            
+            subgoal = view.subgoal_name_mapping.get(((Subgoal)view.body.get(index)).name);
+            
+//          if(citable_table_names.contains(subgoal))
+//              break;
+        }
+        
+//        String [] primary_key_type = get_primary_key(subgoal, c, pst);
+        
+        
+        Vector<Conditions> conditions = query_conditions.get(subgoal);
+        
+        Vector<Argument> head_vars = query_head_names.get(subgoal);
+        
+        Vector<String> subgoals = query_table_names.get(subgoal);
+        
+        Subgoal head = new Subgoal(qname, head_vars);
+        
+        Vector<Subgoal> body = new Vector<Subgoal>();
+        
+        HashMap<String, String> subgoal_mapping = new HashMap<String, String>();
+        
+        for(int i = 0; i < subgoals.size(); i++)
+        {
+            Vector<Argument> args = new Vector<Argument>();
+            
+            body.add(new Subgoal(subgoals.get(i), args));
+            
+            subgoal_mapping.put(subgoals.get(i), subgoals.get(i));
+        }
+        
+        Vector<Lambda_term> l_args = new Vector<Lambda_term>();
+        
+        for(int i = 0; i<view.lambda_term.size(); i++)
+        {
+            Lambda_term l = view.lambda_term.get(i);
+            
+            if(l.table_name.equals(subgoal))
+            {
+                l_args.add(l);
+                
+                break;
+            }
+        }
+                
+        Query q = new Query(qname, head, body, l_args, conditions, subgoal_mapping);
+        
+        return q;
+        
+    }
+	
 	static Query store_citation_queries_lambda(Query view, int num, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
 	{
 		Vector<String> citable_table_names = new Vector<String>();
@@ -1194,7 +1258,7 @@ public class view_generator {
 		
 	}
 	
-	static void get_joinable_relations(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	static void get_joinable_relations(Connection c, PreparedStatement pst) throws SQLException
 	{
 		
 	    
@@ -1645,7 +1709,7 @@ public class view_generator {
 		}
 	}
 	
-	public static void gen_one_additional_predicates(Vector<Query> views, Vector<String> subgoal_names, int sizeofquery, Query query, Connection c1, Connection c2, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	public static Vector<Query> gen_one_additional_predicates(Vector<Query> views, Vector<String> subgoal_names, int sizeofquery, Query query, Connection c1, Connection c2, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
 //		Vector<Integer> sizes = generator_random_numbers(1, sizeofquery);				
 		Random r = new Random();
@@ -1691,6 +1755,7 @@ public class view_generator {
 			}
 		}
 		
+		Vector<Query> new_views = new Vector<Query>();
 		
 		while(true)
 		{
@@ -1720,46 +1785,56 @@ public class view_generator {
 //					continue;
 //				else
 				{
-					if(split_view(good_ids, views, view, c1, c2, pst))
+					if(split_view(good_ids, views, view, new_views, c1, c2, pst))
 					{
 						views.remove(view);
 						
-						int old_id = view_operation.delete_view_by_name(view.name, c1, pst);
+						Load_views_and_citation_queries.remove_one_view_with_citation_queries(view.name, c2, pst);
 						
-						view_operation.delete_view_by_name(view.name, c2, pst, false);
+						populate_db.delete(view.name, view.body, view.subgoal_name_mapping, c1, pst);
 						
-						citation_view_operation.delete_citation_views_by_id(old_id, c1, pst);
-						
-						citation_view_operation.delete_citation_views_by_id(old_id, c2, pst);
-						
-						Query_operation.delete_query_by_id(old_id, c1, pst);
-						
-						Query_operation.delete_query_by_id(old_id, c2, pst);
+//						int old_id = view_operation.delete_view_by_name(view.name, c1, pst);
+//						
+//						view_operation.delete_view_by_name(view.name, c2, pst, false);
+//						
+//						citation_view_operation.delete_citation_views_by_id(old_id, c1, pst);
+//						
+//						citation_view_operation.delete_citation_views_by_id(old_id, c2, pst);
+//						
+//						Query_operation.delete_query_by_id(old_id, c1, pst);
+//						
+//						Query_operation.delete_query_by_id(old_id, c2, pst);
 						
 						break;
 					}
 				}
 			}
 			
-			if(split_view(views, view, c1, c2, pst))
+			if(split_view(views, view, new_views, c1, c2, pst))
 			{
 				views.remove(view);
 				
-				int old_id = view_operation.delete_view_by_name(view.name, c1, pst);
+				Load_views_and_citation_queries.remove_one_view_with_citation_queries(view.name, c2, pst);
 				
-				view_operation.delete_view_by_name(view.name, c2, pst, false);
+				populate_db.delete(view.name, view.body, view.subgoal_name_mapping, c1, pst);
 				
-				citation_view_operation.delete_citation_views_by_id(old_id, c1, pst);
-				
-				citation_view_operation.delete_citation_views_by_id(old_id, c2, pst);
-				
-				Query_operation.delete_query_by_id(old_id, c1, pst);
-				
-				Query_operation.delete_query_by_id(old_id, c2, pst);
+//				int old_id = view_operation.delete_view_by_name(view.name, c1, pst);
+//				
+//				view_operation.delete_view_by_name(view.name, c2, pst, false);
+//				
+//				citation_view_operation.delete_citation_views_by_id(old_id, c1, pst);
+//				
+//				citation_view_operation.delete_citation_views_by_id(old_id, c2, pst);
+//				
+//				Query_operation.delete_query_by_id(old_id, c1, pst);
+//				
+//				Query_operation.delete_query_by_id(old_id, c2, pst);
 				
 				break;
 			}
 		}
+		
+		return new_views;
 				
 	}
 	
@@ -2480,7 +2555,7 @@ public class view_generator {
 		}
 	}
 	
-	static boolean split_view(Vector<Query> views, Query view, Connection c1, Connection c2, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	static boolean split_view(Vector<Query> views, Query view, Vector<Query> new_views, Connection c1, Connection c2, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
 		
 		String relation = null;
@@ -2561,9 +2636,9 @@ public class view_generator {
 			const_id = conflict_ids.get(0) + r.nextInt(range);
 		}
 		
-		Conditions condition1 = new Conditions(new Argument(primary_key_type[0], origin_name), origin_name, new op_greater(), new Argument("'" + ranges.get(const_id) + "'"), new String());
+		Conditions condition1 = new Conditions(new Argument(origin_name + populate_db.separator + primary_key_type[0], origin_name), origin_name, new op_greater(), new Argument("'" + ranges.get(const_id) + "'"), new String());
 		
-		Conditions condition2 = new Conditions(new Argument(primary_key_type[0], origin_name), origin_name, new op_less_equal(), new Argument("'" + ranges.get(const_id) + "'"), new String());
+		Conditions condition2 = new Conditions(new Argument(origin_name + populate_db.separator + primary_key_type[0], origin_name), origin_name, new op_less_equal(), new Argument("'" + ranges.get(const_id) + "'"), new String());
 		
 		Query view1 = (Query) view.clone();
 		
@@ -2585,7 +2660,7 @@ public class view_generator {
 		remove_duplicate_predicates(view2, ranges, relation, primary_key_type[0]);
 
 				
-		int v1_id = view_operation.add(view1, view1.name, c1, pst);
+//		int v1_id = view_operation.add(view1, view1.name, c1, pst);
 		
 		view1.name = view.name + "_1";
 
@@ -2598,15 +2673,15 @@ public class view_generator {
 
 		String query_name1 = view1.name.replaceFirst("v", "q");
 		
-		store_single_citation_view(view1, v1_id, citation_view_name1, query_name1, c1, pst);
+//		store_single_citation_view(view1, v1_id, citation_view_name1, query_name1, c1, pst);
 		
-		store_single_citation_view(view1, v1_id, citation_view_name1, query_name1, c2, pst);
+//		store_single_citation_view(view1, v1_id, citation_view_name1, query_name1, c2, pst);
 		
-		int v2_id = view_operation.add(view2, view2.name, c1, pst);
+//		int v2_id = view_operation.add(view2, view2.name, c1, pst);
 		
 		view2.name = view.name + "_2";
 		
-		view_operation.add(view2, view2.name, c2, pst, false);
+//		view_operation.add(view2, view2.name, c2, pst, false);
 		
 		view2.name = view.name + "_2";
 
@@ -2614,13 +2689,17 @@ public class view_generator {
 
 		String query_name2 = view2.name.replaceFirst("v", "q");
 		
-		store_single_citation_view(view2, v2_id, citation_view_name2, query_name2, c1, pst);
+//		store_single_citation_view(view2, v2_id, citation_view_name2, query_name2, c1, pst);
 		
-		store_single_citation_view(view2, v2_id, citation_view_name2, query_name2, c2, pst);
+//		store_single_citation_view(view2, v2_id, citation_view_name2, query_name2, c2, pst);
 		
 		views.add(view1);
 		
 		views.add(view2);
+		
+		new_views.add(view1);
+		
+		new_views.add(view2);
 		
 		return true;
 	}
@@ -2771,7 +2850,7 @@ public class view_generator {
     }
     
 	
-	static boolean split_view(Vector<Integer> ids, Vector<Query> views, Query view, Connection c1, Connection c2, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	static boolean split_view(Vector<Integer> ids, Vector<Query> views, Query view, Vector<Query> new_views, Connection c1, Connection c2, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
 		
 		String relation = null;
@@ -2864,9 +2943,9 @@ public class view_generator {
 		int inter_value = (lower_value + higher_value)/2;
 		
 		
-		Conditions condition1 = new Conditions(new Argument(primary_key_type[0], origin_name), origin_name, new op_greater(), new Argument("'" + inter_value + "'"), new String());
+		Conditions condition1 = new Conditions(new Argument(origin_name + populate_db.separator + primary_key_type[0], origin_name), origin_name, new op_greater(), new Argument("'" + inter_value + "'"), new String());
 		
-		Conditions condition2 = new Conditions(new Argument(primary_key_type[0], origin_name), origin_name, new op_less_equal(), new Argument("'" + inter_value + "'"), new String());
+		Conditions condition2 = new Conditions(new Argument(origin_name + populate_db.separator + primary_key_type[0], origin_name), origin_name, new op_less_equal(), new Argument("'" + inter_value + "'"), new String());
 		
 		Query view1 = (Query) view.clone();
 		
@@ -2888,12 +2967,12 @@ public class view_generator {
 		remove_duplicate_predicates(view2, ranges, relation, primary_key_type[0]);
 
 				
-		int v1_id = view_operation.add(view1, view1.name, c1, pst);
+//		int v1_id = view_operation.add(view1, view1.name, c1, pst);
 		
 		view1.name = view.name + "_1";
 
 		
-		view_operation.add(view1, view1.name, c2, pst, false);
+//		view_operation.add(view1, view1.name, c2, pst, false);
 		
 		view1.name = view.name + "_1";
 		
@@ -2901,15 +2980,15 @@ public class view_generator {
 
 		String query_name1 = view1.name.replaceFirst("v", "q");
 		
-		store_single_citation_view(view1, v1_id, citation_view_name1, query_name1, c1, pst);
+//		store_single_citation_view(view1, v1_id, citation_view_name1, query_name1, c1, pst);
 		
-		store_single_citation_view(view1, v1_id, citation_view_name1, query_name1, c2, pst);
-		
-		int v2_id = view_operation.add(view2, view2.name, c1, pst);
+//		store_single_citation_view(view1, v1_id, citation_view_name1, query_name1, c2, pst);
+//		
+//		int v2_id = view_operation.add(view2, view2.name, c1, pst);
 		
 		view2.name = view.name + "_2";
 		
-		view_operation.add(view2, view2.name, c2, pst, false);
+//		view_operation.add(view2, view2.name, c2, pst, false);
 		
 		view2.name = view.name + "_2";
 
@@ -2917,13 +2996,17 @@ public class view_generator {
 
 		String query_name2 = view2.name.replaceFirst("v", "q");
 		
-		store_single_citation_view(view2, v2_id, citation_view_name2, query_name2, c1, pst);
+//		store_single_citation_view(view2, v2_id, citation_view_name2, query_name2, c1, pst);
 		
-		store_single_citation_view(view2, v2_id, citation_view_name2, query_name2, c2, pst);
+//		store_single_citation_view(view2, v2_id, citation_view_name2, query_name2, c2, pst);
 		
 		views.add(view1);
 		
 		views.add(view2);
+		
+		new_views.add(view1);
+		
+		new_views.add(view2);
 		
 		return true;
 	}
@@ -3082,53 +3165,58 @@ public class view_generator {
         return true;
     }
 	
-	public static void gen_one_additional_view(Vector<Query> views, Vector<String> subgoal_names, int sizeofquery, Query q, Connection c1, Connection c2, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	public static Vector<Query> gen_one_additional_view(Vector<Query> views, Vector<String> subgoal_names, int sizeofquery, Query q, Connection c1, Connection c2, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
 		Vector<Integer> sizes = generator_random_numbers(1, subgoal_names.size());
 				
 		int old_num = views.size();
 		
-		while(views.size() < old_num + 1)
-		{
+		Vector<Query> new_views = new Vector<Query>();
+		
+//		while(views.size() < old_num + 1)
+//		{
 			
 			int size = sizes.get(0);
 						
 			Query query = generate_view_without_predicates(subgoal_names, views.size() + 1, sizes.get(0), c1, pst);
 						
 //			if(!views.contains(query))
-			{
+//			{
 				views.add(query);
-				
-		    	System.out.println(query.lambda_term + "," + query.toString());
-		    	
-		    	int curr_num = old_num + 1;
-		    	
-		    	view_operation.add(query, query.name, c1, pst, true);
-		    	
-		    	view_operation.add(query, query.name, c2, pst, false);
-		    	
-		    	citation_view_operation.add_citation_view("c" + curr_num, c1, pst);
-		    	
-		    	citation_view_operation.add_citation_view("c" + curr_num, c2, pst);
-				
-				citation_view_operation.add_connection_view_with_citations("c" + curr_num, query.name, c1, pst);
-				
-				citation_view_operation.add_connection_view_with_citations("c" + curr_num, query.name, c2, pst);
-				
-				Query citation_query = store_citation_queries(query, null, curr_num, c1, pst);
-				
-				store_citation_queries(query, citation_query, curr_num, c2, pst);
-				
-				Query_operation.add_connection_citation_with_query("c" + curr_num, "q" + curr_num , "author", c1, pst);
-				
-				Query_operation.add_connection_citation_with_query("c" + curr_num, "q" + curr_num , "author", c2, pst);
-		    	
-			}
+//				
+//		    	System.out.println(query.lambda_term + "," + query.toString());
+//		    	
+//		    	int curr_num = old_num + 1;
+//		    	
+//		    	view_operation.add(query, query.name, c1, pst, true);
+//		    	
+//		    	view_operation.add(query, query.name, c2, pst, false);
+//		    	
+//		    	citation_view_operation.add_citation_view("c" + curr_num, c1, pst);
+//		    	
+//		    	citation_view_operation.add_citation_view("c" + curr_num, c2, pst);
+//				
+//				citation_view_operation.add_connection_view_with_citations("c" + curr_num, query.name, c1, pst);
+//				
+//				citation_view_operation.add_connection_view_with_citations("c" + curr_num, query.name, c2, pst);
+//				
+//				Query citation_query = store_citation_queries(query, null, curr_num, c1, pst);
+//				
+//				store_citation_queries(query, citation_query, curr_num, c2, pst);
+//				
+//				Query_operation.add_connection_citation_with_query("c" + curr_num, "q" + curr_num , "author", c1, pst);
+//				
+//				Query_operation.add_connection_citation_with_query("c" + curr_num, "q" + curr_num , "author", c2, pst);
+//		    	
+//			}
 			
 			System.out.println(query);
 			
+			new_views.add(query);
 			
-		}		
+			return new_views;
+			
+//		}		
 		
 	}
 	
@@ -3523,7 +3611,7 @@ public class view_generator {
 		return head_vars;
 	}
 	
-	static Query generate_default_view(String subgoal_name, int id, Connection c1, Connection c2, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	static Query generate_default_view(String subgoal_name, int id, Connection c1, Connection c2, PreparedStatement pst) throws SQLException
 	{		
 		Vector<Argument> heads = new Vector<Argument>();
 		
@@ -3580,25 +3668,25 @@ public class view_generator {
 		
 		Query view =  new Query(name, new Subgoal(name, heads), body, lambda_terms, predicates, maps);
 		
-		view_operation.add(view, view.name, c1, pst, true);
-		
-		view_operation.add(view, view.name, c2, pst, false);
-		
-		citation_view_operation.add_citation_view("c" + id, c1, pst);
-		
-		citation_view_operation.add_citation_view("c" + id, c2, pst);
-		
-		citation_view_operation.add_connection_view_with_citations("c" + id, name, c1, pst);
-		
-		citation_view_operation.add_connection_view_with_citations("c" + id, name, c2, pst);
-		
-		Query citation_query = store_citation_queries(view, null, id, c1, pst);
-		
-		store_citation_queries(view, citation_query, id, c2, pst);
-		
-		Query_operation.add_connection_citation_with_query("c" + id, "q" + id , "author", c1, pst);
-		
-		Query_operation.add_connection_citation_with_query("c" + id, "q" + id , "author", c2, pst);
+//		view_operation.add(view, view.name, c1, pst, true);
+//		
+//		view_operation.add(view, view.name, c2, pst, false);
+//		
+//		citation_view_operation.add_citation_view("c" + id, c1, pst);
+//		
+//		citation_view_operation.add_citation_view("c" + id, c2, pst);
+//		
+//		citation_view_operation.add_connection_view_with_citations("c" + id, name, c1, pst);
+//		
+//		citation_view_operation.add_connection_view_with_citations("c" + id, name, c2, pst);
+//		
+//		Query citation_query = store_citation_queries(view, null, id, c1, pst);
+//		
+//		store_citation_queries(view, citation_query, id, c2, pst);
+//		
+//		Query_operation.add_connection_citation_with_query("c" + id, "q" + id , "author", c1, pst);
+//		
+//		Query_operation.add_connection_citation_with_query("c" + id, "q" + id , "author", c2, pst);
 		
 		
 		return view;
@@ -5129,7 +5217,45 @@ public class view_generator {
 			
 		}
 	}
-	
+
+	  public static void store_views_with_citation_queries(Vector<Query> views, String view_file, String citation_query_file, String view_citation_query_mapping_file_name)
+	  {
+	    Vector<String> view_strings = Load_views_and_citation_queries.views2text_strings(views);
+	    Load_views_and_citation_queries.write2files(view_file, view_strings);
+	    Vector<Query> citation_queries = new Vector<Query>();
+	    Vector<String> view_citation_query_mappings = new Vector<String>();
+	    for(int i = 0; i<views.size(); i++)
+	    {
+	      Query query = store_citation_queries(views.get(i), i, "q" + i);
+	      citation_queries.add(query);
+	      view_citation_query_mappings.add(views.get(i).name + "|" + query.name + "|" + "Contributor");
+	    }
+	    Vector<String> citation_query_strings = Load_views_and_citation_queries.views2text_strings(citation_queries);
+	    Load_views_and_citation_queries.write2files(citation_query_file, citation_query_strings);
+	    Load_views_and_citation_queries.write2files(view_citation_query_mapping_file_name, view_citation_query_mappings);
+//	    
+	    
+	  }
+	  
+	  public static void append_views_with_citation_queries(Vector<Query> views, int offset, String view_file_name, String citation_query_file_name, String view_citation_query_mapping_file_name)
+	  {
+	    Vector<String> view_strings = Load_views_and_citation_queries.views2text_strings(views);
+	    Load_views_and_citation_queries.append2files(view_file_name, view_strings);
+	    Vector<Query> citation_queries = new Vector<Query>();
+	    Vector<String> view_citation_query_mappings = new Vector<String>();
+	    for(int i = 0; i<views.size(); i++)
+	    {
+	      int id = i + offset;
+	      Query query = store_citation_queries(views.get(i), id, "q" + id);
+	      citation_queries.add(query);
+	      view_citation_query_mappings.add(views.get(i).name + "|" + query.name + "|" + "Contributor");
+	    }
+	    Vector<String> citation_query_strings = Load_views_and_citation_queries.views2text_strings(citation_queries);
+	    Load_views_and_citation_queries.append2files(citation_query_file_name, citation_query_strings);
+	    Load_views_and_citation_queries.append2files(view_citation_query_mapping_file_name, view_citation_query_mappings);
+	    
+	    
+	  }
 	
 
 }

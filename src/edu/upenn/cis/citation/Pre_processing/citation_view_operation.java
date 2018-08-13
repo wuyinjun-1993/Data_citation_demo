@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Vector;
 
 import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
@@ -33,6 +34,45 @@ public class citation_view_operation {
         
         insert_citation_table(id, name, c, pst);
                 
+	}
+	
+	public static HashMap<String, HashMap<String, String>> get_all_view_citation_query_mappings(Connection c, PreparedStatement pst) throws SQLException
+	{
+	  String sql = "select view, citation_block, name from citation2view, citation2query, query2head_variables where citation2view.citation_view_id = citation2query.citation_view_id and citation2query.query_id = query2head_variables.query_id";
+	  
+	  pst = c.prepareStatement(sql);
+	  
+	  ResultSet rs = pst.executeQuery();
+	  
+	  HashMap<String, HashMap<String, String>> view_citation_query_mappings = new HashMap<String, HashMap<String, String>>();
+	  
+	  while(rs.next())
+	  {
+	    String view_name = rs.getString(1);
+	    
+	    String block_name = rs.getString(2);
+	    
+	    String citation_query_name = rs.getString(3);
+	    
+	    HashMap<String, String> curr_citation_queries = view_citation_query_mappings.get(view_name);
+	    
+	    if(curr_citation_queries == null)
+	    {
+	      curr_citation_queries = new HashMap<String, String>();
+	      
+	      curr_citation_queries.put(block_name, citation_query_name);
+	      
+	      view_citation_query_mappings.put(view_name, curr_citation_queries);
+	    }
+	    else
+	    {
+	      curr_citation_queries.put(block_name, citation_query_name);
+	      
+	      view_citation_query_mappings.put(view_name, curr_citation_queries);
+	    }
+	  }
+	  
+	  return view_citation_query_mappings;
 	}
 	
 	public static Vector<String> get_views(String c_name, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException

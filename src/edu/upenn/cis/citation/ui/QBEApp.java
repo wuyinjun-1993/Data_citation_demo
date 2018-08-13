@@ -4,6 +4,7 @@ import edu.upenn.cis.citation.Corecover.Query;
 import edu.upenn.cis.citation.Pre_processing.Gen_query;
 import edu.upenn.cis.citation.Pre_processing.Query_operation;
 import edu.upenn.cis.citation.Pre_processing.citation_view_operation;
+import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.Pre_processing.view_operation;
 import edu.upenn.cis.citation.UI_reasoning.Reasoning;
 import edu.upenn.cis.citation.citation_view.Head_strs;
@@ -78,7 +79,6 @@ import ucar.ma2.ArrayDouble.D3.IF;
 import com.sun.javafx.geom.RectangularShape;
 import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import com.sun.org.apache.bcel.internal.generic.NEW;
-import com.sun.xml.internal.bind.v2.TODO;
 
 import java.awt.*;
 //import java.awt.TextArea;
@@ -3088,7 +3088,13 @@ private Object String;
 				  
 				  Reasoning.set_test_case(false);
 				  
-				  Reasoning.tuple_reasoning(userGeneratedQuery, conn, st);
+				  Vector<Query> views = populate_db.get_views_schema(conn, st);
+				  
+				  Vector<Query> citation_queries = Query_operation.get_all_citation_queries(conn, st);
+				  
+				  HashMap<String, HashMap<String, String>> view_citation_query_mappings = citation_view_operation.get_all_view_citation_query_mappings(conn, st);
+				  
+				  Reasoning.tuple_reasoning(userGeneratedQuery, views, citation_queries, view_citation_query_mappings, conn, st);
 				
 				} catch (IOException | InterruptedException | JSONException e) {
 					e.printStackTrace();

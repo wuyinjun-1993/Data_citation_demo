@@ -39,7 +39,6 @@ import edu.upenn.cis.citation.gen_citation.gen_citation0;
 import edu.upenn.cis.citation.reasoning1.Tuple_level_approach;
 import edu.upenn.cis.citation.reasoning1.Semi_schema_level_approach;
 import edu.upenn.cis.citation.reasoning1.Schema_level_approach;
-import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_min_test;
 
 public class Aggregation6 {
 	
@@ -860,7 +859,7 @@ public class Aggregation6 {
       }
   }
 	
-//	public static void cal_covering_set_schema_level_intersection(ResultSet rs, HashSet<Integer> tuple_ids, HashMap<String, HashSet<citation_view_vector> > c_view_map, HashMap<String, HashSet<Integer>> signature_rid_mappings, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException
+//	public static void cal_covering_set_schema_level_intersection(ResultSet rs, HashSet<Integer> tuple_ids, HashMap<String, HashSet<Covering_set> > c_view_map, HashMap<String, HashSet<Integer>> signature_rid_mappings, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException
 //    {
 //	  
 //        Set<String> intervals = c_view_map.keySet();
@@ -887,7 +886,7 @@ public class Aggregation6 {
 //          
 //          if(!rids.isEmpty())
 //          {
-//            HashSet<citation_view_vector> c_view = c_view_map.get(interval);
+//            HashSet<Covering_set> c_view = c_view_map.get(interval);
 //            
 //            do_aggregate(curr_res, c_view, group_num);
 //            
@@ -1447,9 +1446,9 @@ public class Aggregation6 {
 	
 	static HashMap<String, HashSet<String>> gen_citation_view_level(Tuple single_view, HashSet<Head_strs> lambda_values, boolean tuple_level, boolean schema_level, Connection c, PreparedStatement pst) throws SQLException
 	{
-		HashMap<String, Integer> citation_queries_ids = null;
+		HashMap<String, String> citation_queries_ids = null;
 		
-		HashMap<Integer, Query> citation_queries = null;
+		HashMap<String, Query> citation_queries = null;
 		
 		HashMap<String, HashSet<String>> citations = new HashMap<String, HashSet<String>>();
 		
@@ -1491,7 +1490,7 @@ public class Aggregation6 {
 		{			
 			String block_name = (String)iter.next();
 			
-			Query q = citation_queries.get(query_ids.list[citation_queries_ids.get(block_name)]);
+			Query q = citation_queries.get(citation_queries_ids.get(block_name));
 			
 			String query_base = Query_converter.datalog2sql(q);
 			
@@ -1779,6 +1778,125 @@ public class Aggregation6 {
 			}
 		}
 	}
+
+//    public static HashSet<String> gen_citation_entire_query(ResultSet rs, boolean tuple_level, boolean schema_level, ArrayList<Covering_set> covering_sets, int start_pos, HashMap<String, Integer> max_num, Connection c, PreparedStatement pst) throws SQLException
+//    {
+//        ArrayList<String> view_keys = new ArrayList<String>();
+//        
+//        ArrayList<citation_view> single_views = get_single_citation_views(covering_sets, view_keys);
+//        
+//        ArrayList<String> single_view_names = get_citation_view_names(single_views);
+//                        
+//        int tuple_num = 0;
+//        
+//        if(tuple_level)
+//        {
+//            tuple_num = Tuple_level_approach.tuple_num;
+//        }
+//        else
+//        {
+//            if(!schema_level)
+//            {
+//                tuple_num = Semi_schema_level_approach.tuple_num;
+//            }
+//            else
+//            {
+//                tuple_num = Schema_level_approach.tuple_num;
+//            }
+//        }
+//        
+//        for(int i = 0; i<tuple_num; i++)
+//        {
+//            rs.absolute(i + 1);
+//            
+//            if(tuple_level)
+//                Tuple_level_approach.get_views_parameters(single_views, rs, start_pos, lambda_values);
+//            else
+//            {
+//                if(!schema_level)
+//                  Semi_schema_level_approach.get_views_parameters(single_views, rs, start_pos, lambda_values);
+//                else
+//                    Schema_level_approach.get_views_parameters(single_views, rs, start_pos, lambda_values);
+//            }
+//            
+////          convert_covering_set2citation(i, curr_res, author_lists, view_query_mapping, query_lambda_str, author_mapping, max_num, query_ids, view_list, c, pst, tuple_level);
+//            
+//            
+//        }
+//        
+//        
+//        
+//        ArrayList<HashMap<String, HashSet<String>>> citations = gen_citation_view_level(single_views, lambda_values, tuple_level, schema_level, c, pst);
+//                
+//        full_citations = gen_citations_covering_set_level(citations, covering_sets, single_view_names, view_keys);
+//        
+//        return gen_citations(full_citations, max_num);
+//    }
+//    
+    static HashSet<HashMap<String, HashSet<String>>> gen_citations_covering_set_level(ArrayList<HashMap<String, HashSet<String>>> citations, ArrayList<Covering_set> curr_res, ArrayList<String> single_view_names, ArrayList<String> view_keys)
+    {
+      HashSet<HashMap<String, HashSet<String>>> full_citations = new HashSet<HashMap<String, HashSet<String>>>();
+        
+        for(int i = 0; i<curr_res.size(); i++)
+        {
+            Covering_set c_vector = curr_res.get(i);
+            
+            HashMap<String, HashSet<String>> curr_full_citations = new HashMap<String, HashSet<String>>();
+            
+            for(citation_view view_mapping: c_vector.c_vec)
+            {
+                
+                String view_key = view_mapping.get_name() + populate_db.separator + view_mapping.get_table_name_string();
+                
+                int id = view_keys.indexOf(view_key);
+                
+                HashMap<String, HashSet<String>> curr_citations = citations.get(id);
+                
+                if(curr_full_citations.isEmpty())
+                {
+                    Set<String> keys = curr_citations.keySet();
+                    
+                    for(Iterator iter = keys.iterator(); iter.hasNext();)
+                    {
+                        String key = (String)iter.next();
+                        
+                        HashSet<String> curr_values = new HashSet<String>();
+                        
+                        curr_values.addAll(curr_citations.get(key));
+                        
+                        curr_full_citations.put(key, curr_values);
+                    }
+                    
+                }
+                else
+                {
+                    Set<String> keys = curr_citations.keySet();
+                    
+                    for(Iterator iter = keys.iterator(); iter.hasNext();)
+                    {
+                        String key = (String)iter.next();
+                        
+                        HashSet<String> curr_values = (HashSet<String>) curr_citations.get(key).clone();
+                        
+                        if(curr_full_citations.containsKey(key))
+                        {
+                            curr_full_citations.get(key).addAll(curr_values);
+                        }
+                        else
+                        {
+                            curr_full_citations.put(key, curr_values);
+                        }
+                    }
+                }
+            }
+            
+            full_citations.add(curr_full_citations);
+        }
+        
+        
+        
+        return full_citations;
+    }
 	
 //	public static HashSet<String> do_agg_intersection(ResultSet rs, HashMap<int[], ArrayList<citation_view_vector>> c_view_map, int start_pos, ArrayList<HashMap<String, Integer>> view_query_mapping, ArrayList<Lambda_term[]> query_lambda_str, HashMap<String, Unique_StringList> author_mapping, HashMap<String, Integer> max_num, IntList query_ids, StringList view_list, HashMap<String, String> view_citation_mapping, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, ClassNotFoundException, JSONException
 //	{

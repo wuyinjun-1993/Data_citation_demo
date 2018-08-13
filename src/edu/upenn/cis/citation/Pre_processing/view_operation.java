@@ -322,7 +322,7 @@ public class view_operation {
         
         
 //        if(tuple_level)
-//        	populate_db.delete("v" + id, subgoals, subgoal_name_mapping, has_lambda, c, pst);
+//        	populate_db.delete("v" + id, subgoals, subgoal_name_mapping, c, pst);
         
         
         return id;
@@ -428,7 +428,7 @@ public class view_operation {
         delete_all_view_table(c, pst);
 	}
 	
-	public static void delete_view_by_id(int id, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException, ClassNotFoundException
+	public static void delete_view_by_id(int id, Connection c, PreparedStatement pst, boolean tuple_level) throws SQLException
 	{
         
 //        String id = get_view_id(name, c, pst);

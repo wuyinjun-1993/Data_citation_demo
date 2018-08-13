@@ -40,7 +40,11 @@ public class Reasoning {
     
     Query user_query = queries.get(0);
     
-    HashSet<Covering_set> covering_sets = Reasoning.tuple_reasoning(user_query, c, pst);
+    Vector<Query> views = populate_db.get_views_schema(c, pst);
+    
+    
+    
+//    HashSet<Covering_set> covering_sets = Reasoning.tuple_reasoning(user_query, views, c, pst);
     
 //    HashSet<String> citations = Reasoning.gen_citation_schema_level(c, pst);
 //    
@@ -54,7 +58,7 @@ public class Reasoning {
     
     ArrayList<ArrayList<String>> reference_ids = get_contributors("v2", lambda_values, "Reference");
 
-    System.out.println(covering_sets);
+//    System.out.println(covering_sets);
     
     System.out.println(authors);
     
@@ -96,9 +100,9 @@ public class Reasoning {
     return Semi_schema_level_approach.gen_citation_schema_level(c, pst);
   }
 
-  public static HashSet<Covering_set> tuple_reasoning(Query query, Connection c, PreparedStatement pst) throws JSONException, SQLException, IOException, InterruptedException
+  public static HashSet<Covering_set> tuple_reasoning(Query query, Vector<Query> views, Vector<Query> citation_queries, HashMap<String, HashMap<String, String>> view_citation_query_mappings, Connection c, PreparedStatement pst) throws JSONException, SQLException, IOException, InterruptedException
   {
-    Semi_schema_level_approach.tuple_reasoning(query, c, pst);
+    Semi_schema_level_approach.tuple_reasoning(query, views, citation_queries, view_citation_query_mappings, c, pst);
     
     return Semi_schema_level_approach.covering_set_schema_level;
   }

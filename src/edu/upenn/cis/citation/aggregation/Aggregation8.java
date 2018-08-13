@@ -41,7 +41,6 @@ import edu.upenn.cis.citation.reasoning1.Tuple_level_approach_agg;
 import edu.upenn.cis.citation.reasoning1.Semi_schema_level_approach;
 import edu.upenn.cis.citation.reasoning1.Semi_schema_level_approach_agg;
 import edu.upenn.cis.citation.reasoning1.Schema_level_approach;
-import edu.upenn.cis.citation.reasoning2.Tuple_reasoning1_min_test;
 
 public class Aggregation8 {
 	
@@ -1449,9 +1448,9 @@ public class Aggregation8 {
 	
 	static HashMap<String, HashSet<String>> gen_citation_view_level(Tuple single_view, HashSet<Head_strs> lambda_values, boolean tuple_level, boolean schema_level, Connection c, PreparedStatement pst) throws SQLException
 	{
-		HashMap<String, Integer> citation_queries_ids = null;
+		HashMap<String, String> citation_queries_ids = null;
 		
-		HashMap<Integer, Query> citation_queries = null;
+		HashMap<String, Query> citation_queries = null;
 		
 		HashMap<String, HashSet<String>> citations = new HashMap<String, HashSet<String>>();
 		
@@ -1493,7 +1492,7 @@ public class Aggregation8 {
 		{			
 			String block_name = (String)iter.next();
 			
-			Query q = citation_queries.get(query_ids.list[citation_queries_ids.get(block_name)]);
+			Query q = citation_queries.get(citation_queries_ids.get(block_name));
 			
 			String query_base = Query_converter.datalog2sql(q);
 			

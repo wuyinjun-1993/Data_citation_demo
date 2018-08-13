@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.Vector;
 
 import edu.upenn.cis.citation.citation_view.Covering_set;
-import edu.upenn.cis.citation.reasoning1.Tuple_reasoning1;
 
 public class Aggregation1 {
 	

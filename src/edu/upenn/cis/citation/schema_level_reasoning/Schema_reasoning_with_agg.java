@@ -318,15 +318,25 @@ public class Schema_reasoning_with_agg {
     return view_mapping_id_mappings;
   }
   
+  static void build_subgoal_id_mapping(Query q, HashMap<String, Integer> q_subgoal_id)
+  {
+      for(int i = 0; i<q.body.size(); i++)
+      {
+          Subgoal subgoal = (Subgoal) q.body.get(i);
+          
+          q_subgoal_id.put(subgoal.name, i);
+      }
+  }
   
-  public static HashSet pre_processing(boolean isTLA, HashMap<Integer, Query> citation_queries, HashMap<String, Integer> max_author_num, HashMap<String, HashMap<String, Integer>> view_query_mapping, HashMap<String, ArrayList<ArrayList<String>>> author_mapping, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, boolean prepare_info, HashMap<String, Integer> lambda_term_id_mapping, Vector<Lambda_term> valid_lambda_terms, HashMap<Conditions, ArrayList<Tuple>> conditions_map, Vector<Conditions> valid_conditions, HashMap<String, ArrayList<Tuple>> view_tuple_mapping, HashMap<String, ArrayList<Integer>> head_variable_query_mapping, HashMap<String, HashSet<Integer>> relation_arg_mapping, ArrayList<Tuple>[]head_variable_view_mapping, Vector<Query> views, Query q, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, HashMap<String, Integer> with_sub_queries_id_mappings, Vector<String> full_mapping_condition_str, Connection c, PreparedStatement pst) throws SQLException
+  
+  public static HashSet pre_processing(boolean isTLA, HashMap<String, Query> citation_queries, HashMap<String, Integer> max_author_num, HashMap<String, HashMap<String, String>> view_query_mapping, HashMap<String, ArrayList<ArrayList<String>>> author_mapping, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, boolean prepare_info, HashMap<String, Integer> lambda_term_id_mapping, Vector<Lambda_term> valid_lambda_terms, HashMap<Conditions, ArrayList<Tuple>> conditions_map, Vector<Conditions> valid_conditions, HashMap<String, ArrayList<Tuple>> view_tuple_mapping, HashMap<String, ArrayList<Integer>> head_variable_query_mapping, HashMap<String, HashSet<Integer>> relation_arg_mapping, ArrayList<Tuple>[]head_variable_view_mapping, Vector<Query> views, Vector<Query> cqs, HashMap<String, HashMap<String, String>> view_citation_query_mappings, Query q, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, HashMap<String, Integer> with_sub_queries_id_mappings, Vector<String> full_mapping_condition_str, HashMap<String, Integer> query_subgoal_id_mappings,  Connection c, PreparedStatement pst) throws SQLException
   {
       
       build_query_head_variable_mapping(q, head_variable_query_mapping);
       
       HashSet<Conditions> query_negated_conditions = q.get_all_negated_conditions();
 
-      
+      view_query_mapping.putAll(view_citation_query_mappings);
 //  q = q.minimize();
 
       // construct the canonical db
@@ -338,6 +348,8 @@ public class Schema_reasoning_with_agg {
       
       viewTuples = check_distinguished_variables(viewTuples, q);
                       
+      build_subgoal_id_mapping(q, query_subgoal_id_mappings);
+      
       int tuple_id = 0;
       
       for(Iterator iter = viewTuples.iterator();iter.hasNext();)
@@ -499,7 +511,7 @@ public class Schema_reasoning_with_agg {
       }
 
       if(prepare_info)
-          Prepare_citation_info.prepare_citation_information(citation_queries, max_author_num, view_query_mapping, author_mapping, query_ids, query_lambda_str, views, c, pst);
+          Prepare_citation_info.prepare_citation_information(citation_queries, max_author_num, view_query_mapping, author_mapping, query_ids, query_lambda_str, views, cqs, c, pst);
               
       
 //  System.out.println("partial_mapping_conditions:::" + partial_mapping_strings);
@@ -511,15 +523,15 @@ public class Schema_reasoning_with_agg {
   
   static boolean build_view_tuple_mapping(Tuple tuple, Query q, HashMap<String, ArrayList<Tuple>> view_tuple_mapping)
   {
-    if(!tuple.args.containsAll(q.head.args))
-      return false;
-    
     int k = 0;
     
 //  System.out.println("Tuple_head_arg::" + tuple.args);
     
     if(q.head.has_agg)
     {
+      
+      if(!tuple.args.containsAll(q.head.args))
+        return false;
 //    Vector<Integer> agg_arg_ids = new Vector<Integer>();
       
       for(k = 0; k<q.head.agg_args.size(); k++)
@@ -535,6 +547,22 @@ public class Schema_reasoning_with_agg {
       
       if(k >= q.head.agg_args.size())
         return false;
+    }
+    else
+    {
+      for(k = 0; k<q.head.args.size(); k++)
+      {
+        Argument curr_agg_args = (Argument) q.head.args.get(k);
+        
+//      System.out.println(curr_agg_args);
+        
+        if(tuple.args.contains(curr_agg_args))
+          break;
+        
+      }
+    
+    if(k >= q.head.args.size())
+      return false;
     }
     
       for(Iterator iter = q.body.iterator(); iter.hasNext();)

@@ -13,7 +13,7 @@ import edu.upenn.cis.citation.citation_view.Covering_set;
 
 public class Covering_sets_no_clustering {
   
-  public static void reasoning_single_tuple(HashMap<String, ArrayList<Integer>> head_variable_query_mapping, ArrayList<Tuple>[] head_variable_view_mapping, HashMap<String, HashSet<Integer>> relation_arg_mapping, HashSet views, Query query, ResultSet rs, HashSet<Covering_set> c_view_template, HashSet<Argument> curr_head_vars) throws SQLException
+  public static void reasoning_single_tuple(HashMap<String, ArrayList<Integer>> head_variable_query_mapping, ArrayList<Tuple>[] head_variable_view_mapping, HashMap<String, HashSet<Integer>> relation_arg_mapping, HashSet views, Query query, ResultSet rs, HashSet<Covering_set> c_view_template, HashSet<Argument> curr_head_vars)
   {
       
 //  ArrayList<citation_view_vector> view_com = new ArrayList<citation_view_vector>();
@@ -22,6 +22,10 @@ public class Covering_sets_no_clustering {
       
       for(int i = 0; i < head_variable_view_mapping.length; i ++)
       {
+        if(head_variable_view_mapping[i] == null)
+          continue;
+        
+        
         ArrayList<Tuple> curr_tuples = (ArrayList<Tuple>) head_variable_view_mapping[i].clone();
         
         curr_tuples.retainAll(views);

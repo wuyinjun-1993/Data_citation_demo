@@ -547,7 +547,7 @@ public class query_storage {
 		
 		for(int i = 0; i<conditions.size(); i++)
 		{
-			String query = query_base + conditions.get(i).toStringinsql() + "')";
+			String query = query_base + conditions.get(i).toString() + "')";
 			
 			pst = c.prepareStatement(query);
 			

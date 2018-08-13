@@ -66,7 +66,7 @@ public class Load_views_and_citation_queries {
 		    }
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return queries;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -75,6 +75,197 @@ public class Load_views_and_citation_queries {
 		
 		return queries;
 	}
+	
+	
+	public static boolean remove_one_view(String file, String view_name, Connection c, PreparedStatement pst) throws SQLException
+    {
+	  Vector<Query> views = get_views(file, c, pst);
+	  
+	  boolean removed = false;
+	  
+	  for(int i = 0; i<views.size(); i++)
+	  {
+	    if(views.get(i).name.equals(view_name))
+	    {
+	      views.remove(i);
+	      
+	      i--;
+	      
+	      removed = true;
+	    }
+	  }
+	  
+	  write2files(file, Load_views_and_citation_queries.views2text_strings(views));
+	  
+	  return removed;
+    }
+	
+	public static void remove_one_view_with_citation_queries(String view_name, Connection c, PreparedStatement pst) throws SQLException
+	{
+	  remove_one_view(populate_db.synthetic_view_files, view_name, c, pst);
+	  
+	  HashMap<String, HashMap<String, String>> view_citation_query_mappings = get_view_citation_query_mappings(populate_db.synthetic_citation_query_view_mapping_files);
+
+	  HashMap<String, String> curr_view_citation_query_mappings = view_citation_query_mappings.get(view_name);
+	  
+	  for(Entry<String, String> entry: curr_view_citation_query_mappings.entrySet())
+	  {
+	    remove_one_view(populate_db.synthetic_citation_query_files, entry.getValue(), c, pst);
+	  }	  
+	  
+	  view_citation_query_mappings.remove(view_name);
+	  
+	  store_view_citation_query_mappings(view_citation_query_mappings, populate_db.synthetic_citation_query_view_mapping_files);
+	  
+	}
+
+	static void store_view_citation_query_mappings(HashMap<String, HashMap<String, String>> view_citation_query_mappings, String file_name)
+	{
+	  Set<String> view_names = view_citation_query_mappings.keySet();
+	  
+	  Vector<String> view_citation_query_mappings_text = new Vector<String>();
+	  
+	  for(String view_name: view_names)
+	  {
+	    HashMap<String, String> citation_queries = view_citation_query_mappings.get(view_name);
+	    
+	    Set<String> blocks = citation_queries.keySet();
+	    
+	    for(String block : blocks)
+	    {
+	      view_citation_query_mappings_text.add(view_name + "|" + citation_queries.get(block) + "|" + block);
+	    }
+	  }
+	  
+	  write2files(file_name, view_citation_query_mappings_text);
+	}
+	
+	
+    public static void append2files(String file_name, Vector<String> views)
+    {
+      
+      BufferedWriter bw = null;
+      try {
+         //Specify the file name and path here
+     File file = new File(file_name);
+
+     /* This logic will make sure that the file 
+      * gets created if it is not present at the
+      * specified location*/
+      if (!file.exists()) {
+         file.createNewFile();
+      }
+
+      FileWriter fw = new FileWriter(file, true);
+      bw = new BufferedWriter(fw);
+      
+      for(int i = 0; i<views.size(); i++)
+      {
+        bw.append(views.get(i));
+        bw.newLine();
+      }
+      
+      bw.close();
+
+      } catch (IOException ioe) {
+       ioe.printStackTrace();
+    }
+      
+      
+    }
+    
+    public static Vector<Query> get_query_test_case(String file, Connection c, PreparedStatement pst) throws SQLException
+    {
+        Vector<Query> queries = new Vector<Query>();
+        
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            
+            while ((line = br.readLine()) != null) {
+               // process the line.
+                
+                queries.add(get_query(line, c, pst));
+            }
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+//            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+//            e.printStackTrace();
+        }
+        
+        
+        return queries;
+    }
+    
+    static Query get_query(String line, Connection c, PreparedStatement pst) throws SQLException
+    {
+//      System.out.println(line);
+        
+        String [] strs = line.split("\\" + split1);
+        
+        String view_name = strs[0];
+        
+        String heads = strs[1];
+        
+        String body = strs[2];
+        
+        String predicates = strs[3];
+        
+        String lambda_term_str = strs[4];
+        
+        String relation_mapping_str = strs[5];
+        
+        HashMap<String, Argument> name_arg_mappings = new HashMap<String, Argument>();
+        
+        HashMap<String, String> relation_mapping = get_relation_mapping(relation_mapping_str);
+        
+        Vector<Subgoal> relational_subgoals = split_bodies(body, relation_mapping, name_arg_mappings, c ,pst);
+        
+        Subgoal head_subgoal = split_head(view_name, heads, name_arg_mappings);
+                
+        Vector<Conditions> predicate_subgoal = split_predicates(predicates, name_arg_mappings);
+        
+        Vector<Lambda_term> l_terms = new Vector<Lambda_term>();
+        
+        l_terms.add(new Lambda_term(lambda_term_str));
+        
+        return new Query(view_name, head_subgoal, relational_subgoals, l_terms, predicate_subgoal, relation_mapping);
+        
+    }
+    
+    public static HashMap<String, HashMap<String, String>> get_view_citation_query_mappings(String file) throws SQLException
+    {
+        HashMap<String, HashMap<String, String>> view_citation_query_mappings = new HashMap<String, HashMap<String, String>>();
+        
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            
+            while ((line = br.readLine()) != null) {
+               // process the line.
+                String[]view_citation_query_block_names = line.split("\\|");
+                if(view_citation_query_mappings.get(view_citation_query_block_names[0]) == null)
+                {
+                  HashMap<String, String> block_name_citation_query_mappings = new HashMap<String, String>();
+                  block_name_citation_query_mappings.put(view_citation_query_block_names[2], view_citation_query_block_names[1]);
+                  view_citation_query_mappings.put(view_citation_query_block_names[0], block_name_citation_query_mappings);
+                }
+                else
+                {
+                  view_citation_query_mappings.get(view_citation_query_block_names[0]).put(view_citation_query_block_names[2], view_citation_query_block_names[1]);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        
+        return view_citation_query_mappings;
+    }
 	
     static Query get_view(String line, Connection c, PreparedStatement pst) throws SQLException
     {

@@ -28,12 +28,12 @@ import edu.upenn.cis.citation.Corecover.Tuple;
 import edu.upenn.cis.citation.Pre_processing.Query_operation;
 import edu.upenn.cis.citation.Pre_processing.populate_db;
 import edu.upenn.cis.citation.Pre_processing.view_operation;
-import edu.upenn.cis.citation.aggregation.Aggregation5;
 import edu.upenn.cis.citation.aggregation.Aggregation6;
 import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.citation_view;
 import edu.upenn.cis.citation.citation_view.Covering_set;
 import edu.upenn.cis.citation.datalog.Query_converter;
+import edu.upenn.cis.citation.examples.Load_views_and_citation_queries;
 import edu.upenn.cis.citation.reasoning1.Tuple_level_approach;
 import edu.upenn.cis.citation.reasoning1.Semi_schema_level_approach;
 import edu.upenn.cis.citation.reasoning1.Schema_level_approach;
@@ -275,7 +275,12 @@ public class final_stress_test_partial_mapping_full {
             
             
 
-            Vector<Query> all_citation_queries = Query_operation.get_all_citation_queries(c2, pst);
+//            Vector<Query> all_citation_queries = Query_operation.get_all_citation_queries(c2, pst);
+            
+            Vector<Query> citation_queries = Load_views_and_citation_queries.get_views(populate_db.synthetic_citation_query_files, c2, pst);
+            
+            HashMap<String, HashMap<String, String>> view_citation_query_mappings = Load_views_and_citation_queries.get_view_citation_query_mappings(populate_db.synthetic_citation_query_view_mapping_files);
+
             
             c1.close();
             
@@ -283,7 +288,7 @@ public class final_stress_test_partial_mapping_full {
                         
             System.out.println("start_test");
             
-//            stress_test(query, views, tuple_level, schema_level, agg_intersection);
+            stress_test.stress_test(query, views, citation_queries, view_citation_query_mappings, tuple_level, schema_level, agg_intersection);
 
             
             Vector<Query> user_query = new Vector<Query>();
@@ -294,7 +299,7 @@ public class final_stress_test_partial_mapping_full {
             
             output_queries(views, path + "views");
             
-            output_queries(all_citation_queries, path + "citation_query");
+            output_queries(citation_queries, path + "citation_query");
             
             
             
@@ -349,644 +354,644 @@ public class final_stress_test_partial_mapping_full {
     }
     
     
-    static void stress_test(Query query, Vector<Query> views, boolean tuple_level, boolean schema_level, boolean agg_intersection) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
-    {
-        HashMap<Head_strs, HashSet<String> > citation_strs = new HashMap<Head_strs, HashSet<String>>();
-        
-        HashMap<Head_strs, HashSet<String> > citation_strs2 = new HashMap<Head_strs, HashSet<String>>();
-
-        
-        String f_name = new String();
-        
-        HashMap<Head_strs, Vector<Vector<Covering_set>>> citation_view_map1 = new HashMap<Head_strs, Vector<Vector<Covering_set>>>();
-
-        HashMap<Head_strs, Vector<Vector<Covering_set>>> citation_view_map2 = new HashMap<Head_strs, Vector<Vector<Covering_set>>>();
-        
-        Vector<Vector<Covering_set>> citation_view2 = new Vector<Vector<Covering_set>>();
-
-        
-//      while(views.size() < view_max_size)
-        if(tuple_level)
-        {
-            
-            Connection c = null;
-              PreparedStatement pst = null;
-            Class.forName("org.postgresql.Driver");
-            c = DriverManager
-                .getConnection(populate_db.db_url1, populate_db.usr_name , populate_db.passwd);
-            
-            Tuple_level_approach.prepare_info = false;
-        
-            Tuple_level_approach.agg_intersection = agg_intersection;
-            
-            double end_time = 0;
-
-            double middle_time = 0;
-            
-            double start_time = 0;
-            
-            double time1 = 0;
-            
-            HashSet<String> agg_citations = null;
-                        
-            start_time = System.nanoTime();
-            
-            Tuple_level_approach.tuple_reasoning(query, c, pst);
-            
-            time1 = System.nanoTime();
-            
-            middle_time = System.nanoTime();
-            
-            Tuple_level_approach.prepare_citation_information(views, c, pst);
-            
-            agg_citations = Tuple_level_approach.gen_citation_schema_level(c, pst);
-            
-//           Tuple_reasoning1_full_test_opt.tuple_gen_agg_citations(query, c, pst);
-                                                    
-            end_time = System.nanoTime();
-            
-            double time = (end_time - start_time)*1.0;
-            
-            double agg_time = (middle_time - time1) * 1.0/1000000000;
-            
-            double reasoning_time = (middle_time - start_time) * 1.0/1000000000;
-            
-            double citation_gen_time = (end_time - middle_time) * 1.0/1000000000;
-            
-            time = time /(times * 1000000000);
-                        
-            System.out.print(Tuple_level_approach.group_num + "  ");
-            
-            System.out.print(Tuple_level_approach.tuple_num + "  ");
-            
-            System.out.print(time + "s  ");
-            
-            System.out.print("total_exe_time::" + time + "  ");
-            
-            System.out.print("reasoning_time::" + reasoning_time + "    ");
-            
-            System.out.print("aggregation_time::" + agg_time + "    ");
-            
-            System.out.print("citation_gen_time::" + citation_gen_time + "  ");
-            
-            System.out.print("covering_sets::" + Aggregation5.curr_res + "  ");
-            
-            System.out.print("covering_set_size::" + Tuple_level_approach.covering_set_schema_level.size() + "   ");
-            
-            int distinct_view_size = Aggregation6.cal_distinct_views();
-            
-            System.out.print("distinct_view_size::" + distinct_view_size + "    ");
-            
-            HashMap<Tuple, Integer> view_mapping_count_mappings = Tuple_level_approach.count_view_mapping_valid_row_numbers();
-            
-            write2file(path + "view_mapping_rows2", view_mapping_count_mappings);
-
-            write2file_covering_set(path + "covering_sets_per_group2", Tuple_level_approach.c_view_map);
-            
-            Query_operation.write2file(path + "covering_sets2", Tuple_level_approach.covering_set_schema_level);
-
-            Query_operation.write2file(path + "citations", agg_citations);
-
-            
-//          Set<Head_strs> h_l = Tuple_reasoning1_full_min_test.head_strs_rows_mapping.keySet();
-//          
-//          double citation_size1 = 0;
-//          
-//          int row = 0;
-//          
-//          start_time = System.nanoTime();
-//          
-//          for(Iterator iter = h_l.iterator(); iter.hasNext();)
-//          {
-//              Head_strs h_value = (Head_strs) iter.next();
-//              
-//              HashSet<String> citations = Tuple_reasoning1_full_min_test.gen_citation(h_value, c, pst);
-//              
-//              citation_size1 += citations.size();
-//              
-////                System.out.println(citations);
-//              
-//              row ++;
-//              
-//              if(row >= 10)
-//                  break;
-//              
-//          }
-//          
-//          end_time = System.nanoTime();
-//          
-//          if(row !=0)
-//          citation_size1 = citation_size1 / row;
-//          
-//          time = (end_time - start_time)/(row * 1.0 * 1000000000);
-//          
-//          System.out.print(time + "s  ");
-//          
-//          System.out.print(citation_size1 + " ");
-//          
-//          System.out.print(row + "    ");
-            
-//          Set<Head_strs> head = citation_view_map1.keySet();
-//          
-//          int row_num = 0;
-//          
-//          double origin_citation_size = 0.0;
-//          
-//          for(Iterator iter = head.iterator(); iter.hasNext();)
-//          {
-//              Head_strs head_val = (Head_strs) iter.next();
-//              
-//              Vector<Vector<citation_view_vector>> c_view = citation_view_map1.get(head_val);
-//              
-//              row_num++;
-//              
-//              for(int p = 0; p<c_view.size(); p++)
-//              {
-//                  origin_citation_size += c_view.get(p).size();
-//              }
-//              
-//          }
-//          
-//          
-//          
-//          if(row_num !=0)
-//              origin_citation_size = origin_citation_size / row_num;
-//          
-            
-            
-            System.out.print(Tuple_level_approach.covering_set_num * 1.0/Tuple_level_approach.tuple_num + "   ");
-            
-            System.out.print("pre_processing::" + Tuple_level_approach.pre_processing_time + "   ");
-            
-            System.out.print("query::" + Tuple_level_approach.query_time + " ");
-            
-            System.out.print("reasoning::" + Tuple_level_approach.reasoning_time + " ");
-            
-            System.out.print("population::" + Tuple_level_approach.population_time + "   ");
-            
-            
-            
-//          time = (end_time - start_time) * 1.0/1000000000;
-//          
-//          System.out.print("Aggregation_time::" + time + "    ");
-//          
-//          System.out.print("Aggregation_size::" + agg_citations.size() + "    ");
-            
-//          start_time = System.nanoTime();
-//          
-//          Tuple_reasoning1_full_test.tuple_reasoning(query, c, pst);
-//          
-//          agg_citations = Tuple_reasoning1_full_test.tuple_gen_agg_citations(query);
-//                      
-//          end_time = System.nanoTime();
-//          
-//          time = (end_time - start_time) * 1.0/1000000000;
-//          
-//          System.out.print("total_reasoning_time::" + time + "    ");
-            
-//          Vector<String> agg_results = new Vector<String>();
-//          
-//          agg_results.add(Tuple_reasoning1_full_min_test.covering_sets_query.toString());
-//          
-//          Query_operation.write2file(path + "covering_sets", agg_results);
-
-//          for(int k = 0; k<Aggregation5.curr_res.size(); k++)
-//          {
-//              agg_results.add(Aggregation5.curr_res.get(k).toString());
-//          }
-            
-//          String aggregate_result = Aggregation5.curr_res.toString();
-            
-//          System.out.println(aggregate_result);
-                        
-            
-//          HashSet<String> agg_citations2 = Tuple_reasoning1_full_test.tuple_gen_agg_citations2(query);
-//          
-//          System.out.println("citation1::" + agg_citations);
-//          
-//          System.out.println("citation2::" + agg_citations2);
-//          
-//          if(!agg_citations.equals(agg_citations2))
-//          {
-//              
-//              for(int p = 0; p < Aggregation3.author_lists.size(); p ++)
-//              {
-//                  HashMap<String, HashSet<String>> citation1 = Aggregation3.author_lists.get(p);
-//                  
-//                  HashMap<String, HashSet<String>> citation2 = Aggregation5.full_citations.get(p);
-//                  
-//                  HashSet<String> author1 = citation1.get("author");
-//                  
-//                  HashSet<String> author2 = citation2.get("author");
-//                  
-//                  if(!author1.equals(author2))
-//                  {
-//                      
-//                      HashSet<String> curr_authors = new HashSet<String>();
-//                      
-//                      curr_authors.addAll(author1);
-//                      
-//                      curr_authors.removeAll(author2);
-//                      
-//                      System.out.println(Aggregation3.curr_res.get(p));
-//                      
-//                      System.out.println(Aggregation5.curr_res.get(p));
-//                      
-//                      System.out.println(p);
-//                      
-//                      System.out.println(author1.size());
-//                      
-//                      System.out.println(author2.size());
-//                      
-//                      int y = 0;
-//                      
-//                      y++;
-//                  }
-//              }
-//              
-//              Assert.assertEquals(true, false);
-//          }
-                        
-//          diff_agg_time(tuple_level, query);
-            
-            System.out.println();
-            
-//          System.out.println(agg_citations.toString());
-            
-            c.close();
-            
-//          System.out.println(agg_citations);
-            
-            
-        }
-        else
-        {
-            
-            if(!schema_level)
-            {
-                Connection c = null;
-                  PreparedStatement pst = null;
-                Class.forName("org.postgresql.Driver");
-                c = DriverManager
-                    .getConnection(populate_db.db_url2, populate_db.usr_name , populate_db.passwd);
-                
-                Semi_schema_level_approach.prepare_info = false;
-                
-                Semi_schema_level_approach.agg_intersection = agg_intersection;
-                
-                double end_time = 0;
-
-                double middle_time = 0;
-                
-                double start_time = 0;
-                
-                double time1 = 0.0;
-                
-                HashSet<String> agg_citations = null;
-                            
-                start_time = System.nanoTime();
-                
-                Semi_schema_level_approach.tuple_reasoning(query, c, pst);
-                
-                time1 = System.nanoTime();
-                
-                middle_time = System.nanoTime();
-                
-                Semi_schema_level_approach.prepare_citation_information(views, c, pst);
-                
-                agg_citations = Semi_schema_level_approach.gen_citation_schema_level(c, pst);
-                
-//                agg_citations = Tuple_reasoning2_full_test2_copy.tuple_gen_agg_citations(query, c, pst);
-                                                        
-                end_time = System.nanoTime();
-                
-                double time = (end_time - start_time)*1.0;
-                
-                double agg_time = (middle_time - time1) * 1.0/1000000000;
-                
-                double reasoning_time = (middle_time - start_time) * 1.0/1000000000;
-                
-                double citation_gen_time = (end_time - middle_time) * 1.0/1000000000;
-                
-                time = time /(times * 1000000000);
-                            
-                System.out.print(Semi_schema_level_approach.group_num + " ");
-                
-                System.out.print(Semi_schema_level_approach.tuple_num + " ");
-                
-                System.out.print(time + "s  ");
-                
-                System.out.print("total_exe_time::" + time + "  ");
-                
-                System.out.print("reasoning_time::" + reasoning_time + "    ");
-                
-                System.out.print("aggregation_time::" + agg_time + "    ");
-                
-                System.out.print("citation_gen_time::" + citation_gen_time + "  ");
-
-//              System.out.print("covering_sets::" + Aggregation5.curr_res + "  ");
-                
-                System.out.print("covering_set_size::" + Semi_schema_level_approach.covering_set_schema_level.size() + "  ");
-                
-                int distinct_view_size = Aggregation6.cal_distinct_views();
-                
-                System.out.print("distinct_view_size::" + distinct_view_size + "    ");
-                
-                HashMap<Tuple, Integer> view_mapping_count_mappings = Semi_schema_level_approach.count_view_mapping_valid_row_numbers();
-                
-//                System.out.println();
-////                
-//                System.out.println(view_mapping_count_mappings);
-                
-                write2file(path + "view_mapping_rows1", view_mapping_count_mappings);
-                
-                write2file_covering_set(path + "covering_sets_per_group1", Semi_schema_level_approach.c_view_map);
-                
-                Query_operation.write2file(path + "covering_sets1", Semi_schema_level_approach.covering_set_schema_level);
-
-                Query_operation.write2file(path + "citations", agg_citations);
-                
-//                Set<String> signatures = Tuple_reasoning2_full_test2_copy.signiture_rid_mappings.keySet();
+//    static void stress_test(Query query, Vector<Query> views, boolean tuple_level, boolean schema_level, boolean agg_intersection) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
+//    {
+//        HashMap<Head_strs, HashSet<String> > citation_strs = new HashMap<Head_strs, HashSet<String>>();
+//        
+//        HashMap<Head_strs, HashSet<String> > citation_strs2 = new HashMap<Head_strs, HashSet<String>>();
+//
+//        
+//        String f_name = new String();
+//        
+//        HashMap<Head_strs, Vector<Vector<Covering_set>>> citation_view_map1 = new HashMap<Head_strs, Vector<Vector<Covering_set>>>();
+//
+//        HashMap<Head_strs, Vector<Vector<Covering_set>>> citation_view_map2 = new HashMap<Head_strs, Vector<Vector<Covering_set>>>();
+//        
+//        Vector<Vector<Covering_set>> citation_view2 = new Vector<Vector<Covering_set>>();
+//
+//        
+////      while(views.size() < view_max_size)
+//        if(tuple_level)
+//        {
+//            
+//            Connection c = null;
+//              PreparedStatement pst = null;
+//            Class.forName("org.postgresql.Driver");
+//            c = DriverManager
+//                .getConnection(populate_db.db_url1, populate_db.usr_name , populate_db.passwd);
+//            
+//            Tuple_level_approach.prepare_info = false;
+//        
+//            Tuple_level_approach.agg_intersection = agg_intersection;
+//            
+//            double end_time = 0;
+//
+//            double middle_time = 0;
+//            
+//            double start_time = 0;
+//            
+//            double time1 = 0;
+//            
+//            HashSet<String> agg_citations = null;
+//                        
+//            start_time = System.nanoTime();
+//            
+//            Tuple_level_approach.tuple_reasoning(query, c, pst);
+//            
+//            time1 = System.nanoTime();
+//            
+//            middle_time = System.nanoTime();
+//            
+//            Tuple_level_approach.prepare_citation_information(views, c, pst);
+//            
+//            agg_citations = Tuple_level_approach.gen_citation_schema_level(c, pst);
+//            
+////           Tuple_reasoning1_full_test_opt.tuple_gen_agg_citations(query, c, pst);
+//                                                    
+//            end_time = System.nanoTime();
+//            
+//            double time = (end_time - start_time)*1.0;
+//            
+//            double agg_time = (middle_time - time1) * 1.0/1000000000;
+//            
+//            double reasoning_time = (middle_time - start_time) * 1.0/1000000000;
+//            
+//            double citation_gen_time = (end_time - middle_time) * 1.0/1000000000;
+//            
+//            time = time /(times * 1000000000);
+//                        
+//            System.out.print(Tuple_level_approach.group_num + "  ");
+//            
+//            System.out.print(Tuple_level_approach.tuple_num + "  ");
+//            
+//            System.out.print(time + "s  ");
+//            
+//            System.out.print("total_exe_time::" + time + "  ");
+//            
+//            System.out.print("reasoning_time::" + reasoning_time + "    ");
+//            
+//            System.out.print("aggregation_time::" + agg_time + "    ");
+//            
+//            System.out.print("citation_gen_time::" + citation_gen_time + "  ");
+//            
+//            System.out.print("covering_sets::" + Aggregation5.curr_res + "  ");
+//            
+//            System.out.print("covering_set_size::" + Tuple_level_approach.covering_set_schema_level.size() + "   ");
+//            
+//            int distinct_view_size = Aggregation6.cal_distinct_views();
+//            
+//            System.out.print("distinct_view_size::" + distinct_view_size + "    ");
+//            
+//            HashMap<Tuple, Integer> view_mapping_count_mappings = Tuple_level_approach.count_view_mapping_valid_row_numbers();
+//            
+//            write2file(path + "view_mapping_rows2", view_mapping_count_mappings);
+//
+//            write2file_covering_set(path + "covering_sets_per_group2", Tuple_level_approach.c_view_map);
+//            
+//            Query_operation.write2file(path + "covering_sets2", Tuple_level_approach.covering_set_schema_level);
+//
+//            Query_operation.write2file(path + "citations", agg_citations);
+//
+//            
+////          Set<Head_strs> h_l = Tuple_reasoning1_full_min_test.head_strs_rows_mapping.keySet();
+////          
+////          double citation_size1 = 0;
+////          
+////          int row = 0;
+////          
+////          start_time = System.nanoTime();
+////          
+////          for(Iterator iter = h_l.iterator(); iter.hasNext();)
+////          {
+////              Head_strs h_value = (Head_strs) iter.next();
+////              
+////              HashSet<String> citations = Tuple_reasoning1_full_min_test.gen_citation(h_value, c, pst);
+////              
+////              citation_size1 += citations.size();
+////              
+//////                System.out.println(citations);
+////              
+////              row ++;
+////              
+////              if(row >= 10)
+////                  break;
+////              
+////          }
+////          
+////          end_time = System.nanoTime();
+////          
+////          if(row !=0)
+////          citation_size1 = citation_size1 / row;
+////          
+////          time = (end_time - start_time)/(row * 1.0 * 1000000000);
+////          
+////          System.out.print(time + "s  ");
+////          
+////          System.out.print(citation_size1 + " ");
+////          
+////          System.out.print(row + "    ");
+//            
+////          Set<Head_strs> head = citation_view_map1.keySet();
+////          
+////          int row_num = 0;
+////          
+////          double origin_citation_size = 0.0;
+////          
+////          for(Iterator iter = head.iterator(); iter.hasNext();)
+////          {
+////              Head_strs head_val = (Head_strs) iter.next();
+////              
+////              Vector<Vector<citation_view_vector>> c_view = citation_view_map1.get(head_val);
+////              
+////              row_num++;
+////              
+////              for(int p = 0; p<c_view.size(); p++)
+////              {
+////                  origin_citation_size += c_view.get(p).size();
+////              }
+////              
+////          }
+////          
+////          
+////          
+////          if(row_num !=0)
+////              origin_citation_size = origin_citation_size / row_num;
+////          
+//            
+//            
+//            System.out.print(Tuple_level_approach.covering_set_num * 1.0/Tuple_level_approach.tuple_num + "   ");
+//            
+//            System.out.print("pre_processing::" + Tuple_level_approach.pre_processing_time + "   ");
+//            
+//            System.out.print("query::" + Tuple_level_approach.query_time + " ");
+//            
+//            System.out.print("reasoning::" + Tuple_level_approach.reasoning_time + " ");
+//            
+//            System.out.print("population::" + Tuple_level_approach.population_time + "   ");
+//            
+//            
+//            
+////          time = (end_time - start_time) * 1.0/1000000000;
+////          
+////          System.out.print("Aggregation_time::" + time + "    ");
+////          
+////          System.out.print("Aggregation_size::" + agg_citations.size() + "    ");
+//            
+////          start_time = System.nanoTime();
+////          
+////          Tuple_reasoning1_full_test.tuple_reasoning(query, c, pst);
+////          
+////          agg_citations = Tuple_reasoning1_full_test.tuple_gen_agg_citations(query);
+////                      
+////          end_time = System.nanoTime();
+////          
+////          time = (end_time - start_time) * 1.0/1000000000;
+////          
+////          System.out.print("total_reasoning_time::" + time + "    ");
+//            
+////          Vector<String> agg_results = new Vector<String>();
+////          
+////          agg_results.add(Tuple_reasoning1_full_min_test.covering_sets_query.toString());
+////          
+////          Query_operation.write2file(path + "covering_sets", agg_results);
+//
+////          for(int k = 0; k<Aggregation5.curr_res.size(); k++)
+////          {
+////              agg_results.add(Aggregation5.curr_res.get(k).toString());
+////          }
+//            
+////          String aggregate_result = Aggregation5.curr_res.toString();
+//            
+////          System.out.println(aggregate_result);
+//                        
+//            
+////          HashSet<String> agg_citations2 = Tuple_reasoning1_full_test.tuple_gen_agg_citations2(query);
+////          
+////          System.out.println("citation1::" + agg_citations);
+////          
+////          System.out.println("citation2::" + agg_citations2);
+////          
+////          if(!agg_citations.equals(agg_citations2))
+////          {
+////              
+////              for(int p = 0; p < Aggregation3.author_lists.size(); p ++)
+////              {
+////                  HashMap<String, HashSet<String>> citation1 = Aggregation3.author_lists.get(p);
+////                  
+////                  HashMap<String, HashSet<String>> citation2 = Aggregation5.full_citations.get(p);
+////                  
+////                  HashSet<String> author1 = citation1.get("author");
+////                  
+////                  HashSet<String> author2 = citation2.get("author");
+////                  
+////                  if(!author1.equals(author2))
+////                  {
+////                      
+////                      HashSet<String> curr_authors = new HashSet<String>();
+////                      
+////                      curr_authors.addAll(author1);
+////                      
+////                      curr_authors.removeAll(author2);
+////                      
+////                      System.out.println(Aggregation3.curr_res.get(p));
+////                      
+////                      System.out.println(Aggregation5.curr_res.get(p));
+////                      
+////                      System.out.println(p);
+////                      
+////                      System.out.println(author1.size());
+////                      
+////                      System.out.println(author2.size());
+////                      
+////                      int y = 0;
+////                      
+////                      y++;
+////                  }
+////              }
+////              
+////              Assert.assertEquals(true, false);
+////          }
+//                        
+////          diff_agg_time(tuple_level, query);
+//            
+//            System.out.println();
+//            
+////          System.out.println(agg_citations.toString());
+//            
+//            c.close();
+//            
+////          System.out.println(agg_citations);
+//            
+//            
+//        }
+//        else
+//        {
+//            
+//            if(!schema_level)
+//            {
+//                Connection c = null;
+//                  PreparedStatement pst = null;
+//                Class.forName("org.postgresql.Driver");
+//                c = DriverManager
+//                    .getConnection(populate_db.db_url2, populate_db.usr_name , populate_db.passwd);
 //                
-//                for(String signature: signatures)
-//                {
-//                  System.out.println(signature + "|" + Tuple_reasoning2_full_test2_copy.signiture_rid_mappings.get(signature).size());
-//                }
-
-//                System.out.println(Tuple_reasoning2_full_test2_copy.covering_set_schema_level);
+//                Semi_schema_level_approach.prepare_info = false;
+//                
+//                Semi_schema_level_approach.agg_intersection = agg_intersection;
+//                
+//                double end_time = 0;
+//
+//                double middle_time = 0;
+//                
+//                double start_time = 0;
+//                
+//                double time1 = 0.0;
+//                
+//                HashSet<String> agg_citations = null;
+//                            
+//                start_time = System.nanoTime();
+//                
+//                Semi_schema_level_approach.tuple_reasoning(query, c, pst);
+//                
+//                time1 = System.nanoTime();
+//                
+//                middle_time = System.nanoTime();
+//                
+//                Semi_schema_level_approach.prepare_citation_information(views, c, pst);
+//                
+//                agg_citations = Semi_schema_level_approach.gen_citation_schema_level(c, pst);
+//                
+////                agg_citations = Tuple_reasoning2_full_test2_copy.tuple_gen_agg_citations(query, c, pst);
+//                                                        
+//                end_time = System.nanoTime();
+//                
+//                double time = (end_time - start_time)*1.0;
+//                
+//                double agg_time = (middle_time - time1) * 1.0/1000000000;
+//                
+//                double reasoning_time = (middle_time - start_time) * 1.0/1000000000;
+//                
+//                double citation_gen_time = (end_time - middle_time) * 1.0/1000000000;
+//                
+//                time = time /(times * 1000000000);
+//                            
+//                System.out.print(Semi_schema_level_approach.group_num + " ");
+//                
+//                System.out.print(Semi_schema_level_approach.tuple_num + " ");
+//                
+//                System.out.print(time + "s  ");
+//                
+//                System.out.print("total_exe_time::" + time + "  ");
+//                
+//                System.out.print("reasoning_time::" + reasoning_time + "    ");
+//                
+//                System.out.print("aggregation_time::" + agg_time + "    ");
+//                
+//                System.out.print("citation_gen_time::" + citation_gen_time + "  ");
+//
+////              System.out.print("covering_sets::" + Aggregation5.curr_res + "  ");
+//                
+//                System.out.print("covering_set_size::" + Semi_schema_level_approach.covering_set_schema_level.size() + "  ");
+//                
+//                int distinct_view_size = Aggregation6.cal_distinct_views();
+//                
+//                System.out.print("distinct_view_size::" + distinct_view_size + "    ");
+//                
+//                HashMap<Tuple, Integer> view_mapping_count_mappings = Semi_schema_level_approach.count_view_mapping_valid_row_numbers();
+//                
+////                System.out.println();
+//////                
+////                System.out.println(view_mapping_count_mappings);
+//                
+//                write2file(path + "view_mapping_rows1", view_mapping_count_mappings);
+//                
+//                write2file_covering_set(path + "covering_sets_per_group1", Semi_schema_level_approach.c_view_map);
+//                
+//                Query_operation.write2file(path + "covering_sets1", Semi_schema_level_approach.covering_set_schema_level);
+//
+//                Query_operation.write2file(path + "citations", agg_citations);
+//                
+////                Set<String> signatures = Tuple_reasoning2_full_test2_copy.signiture_rid_mappings.keySet();
 ////                
-//                System.out.println(Tuple_reasoning2_full_test2_copy.c_view_map);
-                
-//              Set<Head_strs> h_l = Tuple_reasoning1_full_min_test.head_strs_rows_mapping.keySet();
-//              
-//              double citation_size1 = 0;
-//              
-//              int row = 0;
-//              
-//              start_time = System.nanoTime();
-//              
-//              for(Iterator iter = h_l.iterator(); iter.hasNext();)
-//              {
-//                  Head_strs h_value = (Head_strs) iter.next();
-//                  
-//                  HashSet<String> citations = Tuple_reasoning1_full_min_test.gen_citation(h_value, c, pst);
-//                  
-//                  citation_size1 += citations.size();
-//                  
-////                    System.out.println(citations);
-//                  
-//                  row ++;
-//                  
-//                  if(row >= 10)
-//                      break;
-//                  
-//              }
-//              
-//              end_time = System.nanoTime();
-//              
-//              if(row !=0)
-//              citation_size1 = citation_size1 / row;
-//              
-//              time = (end_time - start_time)/(row * 1.0 * 1000000000);
-//              
-//              System.out.print(time + "s  ");
-//              
-//              System.out.print(citation_size1 + " ");
-//              
-//              System.out.print(row + "    ");
-                
-//              Set<Head_strs> head = citation_view_map1.keySet();
-//              
-//              int row_num = 0;
-//              
-//              double origin_citation_size = 0.0;
-//              
-//              for(Iterator iter = head.iterator(); iter.hasNext();)
-//              {
-//                  Head_strs head_val = (Head_strs) iter.next();
-//                  
-//                  Vector<Vector<citation_view_vector>> c_view = citation_view_map1.get(head_val);
-//                  
-//                  row_num++;
-//                  
-//                  for(int p = 0; p<c_view.size(); p++)
-//                  {
-//                      origin_citation_size += c_view.get(p).size();
-//                  }
-//                  
-//              }
-//              
-//              
-//              
-//              if(row_num !=0)
-//                  origin_citation_size = origin_citation_size / row_num;
-//              
-                
-                
-                System.out.print(Semi_schema_level_approach.covering_set_num * 1.0/Semi_schema_level_approach.tuple_num + " ");
-                
-                System.out.print("pre_processing::" + Semi_schema_level_approach.pre_processing_time + "  ");
-                
-                System.out.print("query::" + Semi_schema_level_approach.query_time + "    ");
-                
-                System.out.print("reasoning::" + Semi_schema_level_approach.reasoning_time + "    ");
-                
-                System.out.print("population::" + Semi_schema_level_approach.population_time + "  ");
-                
-                System.out.println();
-                
-
-                c.close();
-                
-//              Tuple_reasoning1.compare(citation_view_map1, citation_view_map2);
-                
-//              Tuple_reasoning1.compare_citation(citation_strs, citation_strs2);
-                
-                
-//                          
-//              reset();
-//              
-//              Vector<Query> queries = query_generator.gen_queries(j, size_range);
-//              
-//              Query query = query_generator.gen_query(j, c, pst);
-                
-//              System.out.println(queries.get(0));
-
-                
-//              Vector<String> relation_names = get_unique_relation_names(queries.get(0));
-                
-//              view_generator.generate_store_views(relation_names, num_views);
-                
-//              query_storage.store_query(queries.get(0), new Vector<Integer>());
-            }
-            else
-            {
-                Connection c = null;
-                  PreparedStatement pst = null;
-                Class.forName("org.postgresql.Driver");
-                c = DriverManager
-                    .getConnection(populate_db.db_url2, populate_db.usr_name , populate_db.passwd);
-                
-                Schema_level_approach.prepare_info = false;
-                                
-                double end_time = 0;
-
-                double middle_time = 0;
-                
-                double start_time = 0;
-                
-                double inter_time = 0;
-                
-                HashSet<String> agg_citations = null;
-                            
-                start_time = System.nanoTime();
-                
-                Schema_level_approach.tuple_reasoning(query, c, pst);
-                
-                inter_time = System.nanoTime();
-                                
-                Schema_level_approach.execute_query(query, c, pst);
-                
-                middle_time = System.nanoTime();
-                
-                Schema_level_approach.prepare_citation_information(c, pst);
-                
-//              agg_citations = schema_reasoning.tuple_gen_agg_citations(query, c, pst);
-                                                        
-                end_time = System.nanoTime();
-                
-                double time = (end_time - start_time)*1.0;
-                
-                double agg_time = (end_time - middle_time) * 1.0/1000000000;
-                
-                double reasoning_time = (inter_time - start_time) * 1.0/1000000000;
-                
-                time = time /(times * 1000000000);
-                
-                double query_time = (middle_time - inter_time) * 1.0/1000000000;
-                            
-                System.out.print(Schema_level_approach.tuple_num + " ");
-                
-                System.out.print(time + "s  ");
-                
-                System.out.print("total_exe_time::" + time + "  ");
-                
-                System.out.print("total_reasoning_time::" + reasoning_time + "  ");
-                
-                System.out.print("aggregation_time::" + agg_time + "    ");
-                
-//              System.out.print("covering_sets::" + schema_reasoning.covering_set_query + "    ");
-                
-                System.out.print("covering_set_size::" + Schema_level_approach.covering_set_query.size() + " ");
-                
-                int distinct_view_size = Aggregation5.cal_distinct_views();
-                
-                System.out.print("distinct_view_size::" + distinct_view_size + "    ");
-                
-//              Set<Head_strs> h_l = Tuple_reasoning1_full_min_test.head_strs_rows_mapping.keySet();
-//              
-//              double citation_size1 = 0;
-//              
-//              int row = 0;
-//              
-//              start_time = System.nanoTime();
-//              
-//              for(Iterator iter = h_l.iterator(); iter.hasNext();)
-//              {
-//                  Head_strs h_value = (Head_strs) iter.next();
-//                  
-//                  HashSet<String> citations = Tuple_reasoning1_full_min_test.gen_citation(h_value, c, pst);
-//                  
-//                  citation_size1 += citations.size();
-//                  
-////                    System.out.println(citations);
-//                  
-//                  row ++;
-//                  
-//                  if(row >= 10)
-//                      break;
-//                  
-//              }
-//              
-//              end_time = System.nanoTime();
-//              
-//              if(row !=0)
-//              citation_size1 = citation_size1 / row;
-//              
-//              time = (end_time - start_time)/(row * 1.0 * 1000000000);
-//              
-//              System.out.print(time + "s  ");
-//              
-//              System.out.print(citation_size1 + " ");
-//              
-//              System.out.print(row + "    ");
-                
-//              Set<Head_strs> head = citation_view_map1.keySet();
-//              
-//              int row_num = 0;
-//              
-//              double origin_citation_size = 0.0;
-//              
-//              for(Iterator iter = head.iterator(); iter.hasNext();)
-//              {
-//                  Head_strs head_val = (Head_strs) iter.next();
-//                  
-//                  Vector<Vector<citation_view_vector>> c_view = citation_view_map1.get(head_val);
-//                  
-//                  row_num++;
-//                  
-//                  for(int p = 0; p<c_view.size(); p++)
-//                  {
-//                      origin_citation_size += c_view.get(p).size();
-//                  }
-//                  
-//              }
-//              
-//              
-//              
-//              if(row_num !=0)
-//                  origin_citation_size = origin_citation_size / row_num;
-//              
-                
-                                
-                System.out.print("pre_processing::" + Schema_level_approach.pre_processing_time + "  ");
-                
-                System.out.print("query::" + query_time + " ");
-                                                
-                System.out.println();
-                
-
-                c.close();
-                
-//              Tuple_reasoning1.compare(citation_view_map1, citation_view_map2);
-                
-//              Tuple_reasoning1.compare_citation(citation_strs, citation_strs2);
-                
-                
-//                          
-//              reset();
-//              
-//              Vector<Query> queries = query_generator.gen_queries(j, size_range);
-//              
-//              Query query = query_generator.gen_query(j, c, pst);
-                
-//              System.out.println(queries.get(0));
-
-                
-//              Vector<String> relation_names = get_unique_relation_names(queries.get(0));
-                
-//              view_generator.generate_store_views(relation_names, num_views);
-                
-//              query_storage.store_query(queries.get(0), new Vector<Integer>());
-            }
-            
-            
-            
-            
-            
-        }
-    }
-    
+////                for(String signature: signatures)
+////                {
+////                  System.out.println(signature + "|" + Tuple_reasoning2_full_test2_copy.signiture_rid_mappings.get(signature).size());
+////                }
+//
+////                System.out.println(Tuple_reasoning2_full_test2_copy.covering_set_schema_level);
+//////                
+////                System.out.println(Tuple_reasoning2_full_test2_copy.c_view_map);
+//                
+////              Set<Head_strs> h_l = Tuple_reasoning1_full_min_test.head_strs_rows_mapping.keySet();
+////              
+////              double citation_size1 = 0;
+////              
+////              int row = 0;
+////              
+////              start_time = System.nanoTime();
+////              
+////              for(Iterator iter = h_l.iterator(); iter.hasNext();)
+////              {
+////                  Head_strs h_value = (Head_strs) iter.next();
+////                  
+////                  HashSet<String> citations = Tuple_reasoning1_full_min_test.gen_citation(h_value, c, pst);
+////                  
+////                  citation_size1 += citations.size();
+////                  
+//////                    System.out.println(citations);
+////                  
+////                  row ++;
+////                  
+////                  if(row >= 10)
+////                      break;
+////                  
+////              }
+////              
+////              end_time = System.nanoTime();
+////              
+////              if(row !=0)
+////              citation_size1 = citation_size1 / row;
+////              
+////              time = (end_time - start_time)/(row * 1.0 * 1000000000);
+////              
+////              System.out.print(time + "s  ");
+////              
+////              System.out.print(citation_size1 + " ");
+////              
+////              System.out.print(row + "    ");
+//                
+////              Set<Head_strs> head = citation_view_map1.keySet();
+////              
+////              int row_num = 0;
+////              
+////              double origin_citation_size = 0.0;
+////              
+////              for(Iterator iter = head.iterator(); iter.hasNext();)
+////              {
+////                  Head_strs head_val = (Head_strs) iter.next();
+////                  
+////                  Vector<Vector<citation_view_vector>> c_view = citation_view_map1.get(head_val);
+////                  
+////                  row_num++;
+////                  
+////                  for(int p = 0; p<c_view.size(); p++)
+////                  {
+////                      origin_citation_size += c_view.get(p).size();
+////                  }
+////                  
+////              }
+////              
+////              
+////              
+////              if(row_num !=0)
+////                  origin_citation_size = origin_citation_size / row_num;
+////              
+//                
+//                
+//                System.out.print(Semi_schema_level_approach.covering_set_num * 1.0/Semi_schema_level_approach.tuple_num + " ");
+//                
+//                System.out.print("pre_processing::" + Semi_schema_level_approach.pre_processing_time + "  ");
+//                
+//                System.out.print("query::" + Semi_schema_level_approach.query_time + "    ");
+//                
+//                System.out.print("reasoning::" + Semi_schema_level_approach.reasoning_time + "    ");
+//                
+//                System.out.print("population::" + Semi_schema_level_approach.population_time + "  ");
+//                
+//                System.out.println();
+//                
+//
+//                c.close();
+//                
+////              Tuple_reasoning1.compare(citation_view_map1, citation_view_map2);
+//                
+////              Tuple_reasoning1.compare_citation(citation_strs, citation_strs2);
+//                
+//                
+////                          
+////              reset();
+////              
+////              Vector<Query> queries = query_generator.gen_queries(j, size_range);
+////              
+////              Query query = query_generator.gen_query(j, c, pst);
+//                
+////              System.out.println(queries.get(0));
+//
+//                
+////              Vector<String> relation_names = get_unique_relation_names(queries.get(0));
+//                
+////              view_generator.generate_store_views(relation_names, num_views);
+//                
+////              query_storage.store_query(queries.get(0), new Vector<Integer>());
+//            }
+//            else
+//            {
+//                Connection c = null;
+//                  PreparedStatement pst = null;
+//                Class.forName("org.postgresql.Driver");
+//                c = DriverManager
+//                    .getConnection(populate_db.db_url2, populate_db.usr_name , populate_db.passwd);
+//                
+//                Schema_level_approach.prepare_info = false;
+//                                
+//                double end_time = 0;
+//
+//                double middle_time = 0;
+//                
+//                double start_time = 0;
+//                
+//                double inter_time = 0;
+//                
+//                HashSet<String> agg_citations = null;
+//                            
+//                start_time = System.nanoTime();
+//                
+//                Schema_level_approach.tuple_reasoning(query, c, pst);
+//                
+//                inter_time = System.nanoTime();
+//                                
+//                Schema_level_approach.execute_query(query, c, pst);
+//                
+//                middle_time = System.nanoTime();
+//                
+//                Schema_level_approach.prepare_citation_information(views, c, pst);
+//                
+////              agg_citations = schema_reasoning.tuple_gen_agg_citations(query, c, pst);
+//                                                        
+//                end_time = System.nanoTime();
+//                
+//                double time = (end_time - start_time)*1.0;
+//                
+//                double agg_time = (end_time - middle_time) * 1.0/1000000000;
+//                
+//                double reasoning_time = (inter_time - start_time) * 1.0/1000000000;
+//                
+//                time = time /(times * 1000000000);
+//                
+//                double query_time = (middle_time - inter_time) * 1.0/1000000000;
+//                            
+//                System.out.print(Schema_level_approach.tuple_num + " ");
+//                
+//                System.out.print(time + "s  ");
+//                
+//                System.out.print("total_exe_time::" + time + "  ");
+//                
+//                System.out.print("total_reasoning_time::" + reasoning_time + "  ");
+//                
+//                System.out.print("aggregation_time::" + agg_time + "    ");
+//                
+////              System.out.print("covering_sets::" + schema_reasoning.covering_set_query + "    ");
+//                
+//                System.out.print("covering_set_size::" + Schema_level_approach.covering_set_query.size() + " ");
+//                
+//                int distinct_view_size = Aggregation5.cal_distinct_views();
+//                
+//                System.out.print("distinct_view_size::" + distinct_view_size + "    ");
+//                
+////              Set<Head_strs> h_l = Tuple_reasoning1_full_min_test.head_strs_rows_mapping.keySet();
+////              
+////              double citation_size1 = 0;
+////              
+////              int row = 0;
+////              
+////              start_time = System.nanoTime();
+////              
+////              for(Iterator iter = h_l.iterator(); iter.hasNext();)
+////              {
+////                  Head_strs h_value = (Head_strs) iter.next();
+////                  
+////                  HashSet<String> citations = Tuple_reasoning1_full_min_test.gen_citation(h_value, c, pst);
+////                  
+////                  citation_size1 += citations.size();
+////                  
+//////                    System.out.println(citations);
+////                  
+////                  row ++;
+////                  
+////                  if(row >= 10)
+////                      break;
+////                  
+////              }
+////              
+////              end_time = System.nanoTime();
+////              
+////              if(row !=0)
+////              citation_size1 = citation_size1 / row;
+////              
+////              time = (end_time - start_time)/(row * 1.0 * 1000000000);
+////              
+////              System.out.print(time + "s  ");
+////              
+////              System.out.print(citation_size1 + " ");
+////              
+////              System.out.print(row + "    ");
+//                
+////              Set<Head_strs> head = citation_view_map1.keySet();
+////              
+////              int row_num = 0;
+////              
+////              double origin_citation_size = 0.0;
+////              
+////              for(Iterator iter = head.iterator(); iter.hasNext();)
+////              {
+////                  Head_strs head_val = (Head_strs) iter.next();
+////                  
+////                  Vector<Vector<citation_view_vector>> c_view = citation_view_map1.get(head_val);
+////                  
+////                  row_num++;
+////                  
+////                  for(int p = 0; p<c_view.size(); p++)
+////                  {
+////                      origin_citation_size += c_view.get(p).size();
+////                  }
+////                  
+////              }
+////              
+////              
+////              
+////              if(row_num !=0)
+////                  origin_citation_size = origin_citation_size / row_num;
+////              
+//                
+//                                
+//                System.out.print("pre_processing::" + Schema_level_approach.pre_processing_time + "  ");
+//                
+//                System.out.print("query::" + query_time + " ");
+//                                                
+//                System.out.println();
+//                
+//
+//                c.close();
+//                
+////              Tuple_reasoning1.compare(citation_view_map1, citation_view_map2);
+//                
+////              Tuple_reasoning1.compare_citation(citation_strs, citation_strs2);
+//                
+//                
+////                          
+////              reset();
+////              
+////              Vector<Query> queries = query_generator.gen_queries(j, size_range);
+////              
+////              Query query = query_generator.gen_query(j, c, pst);
+//                
+////              System.out.println(queries.get(0));
+//
+//                
+////              Vector<String> relation_names = get_unique_relation_names(queries.get(0));
+//                
+////              view_generator.generate_store_views(relation_names, num_views);
+//                
+////              query_storage.store_query(queries.get(0), new Vector<Integer>());
+//            }
+//            
+//            
+//            
+//            
+//            
+//        }
+//    }
+//    
     public static void write2file_covering_set(String file_name, HashMap<String, HashSet<Covering_set>> views) throws IOException
     {
       File fout = new File(file_name);

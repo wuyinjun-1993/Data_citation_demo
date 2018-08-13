@@ -38,6 +38,16 @@ public class populate_db {
 //    static String path = "/home/wuyinjun/workspace/Data_citation_provenance/";
   static String path = "./";
   
+    public static String synthetic_example_path = "synthetic_example/";
+    
+    public static String synthetic_query_files = synthetic_example_path + "query";
+    
+    public static String synthetic_view_files = synthetic_example_path + "views";
+    
+    public static String synthetic_citation_query_files = synthetic_example_path + "citation_queries";
+    
+    public static String synthetic_citation_query_view_mapping_files = synthetic_example_path + "view_citation_query_mappings";
+  
 	public static String separator = "|";
 
 //	public static String[] base_relations = {"gpcr_c","object_c","interaction_c","ligand_c","pathophysiology_c","interaction_affinity_refs_c","gtip_process_c","process_assoc_c","disease_c", "family_c", "introduction_c"};
@@ -159,7 +169,7 @@ public class populate_db {
 	    
 	}
 	
-	public static Vector<String> get_primary_key(String table_name, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	public static Vector<String> get_primary_key(String table_name, Connection c, PreparedStatement pst) throws SQLException
 	{
 	    
 //	    Vector<String> table_names = get_table_list(c, pst);
@@ -409,7 +419,7 @@ public class populate_db {
 		}
 	}
 	
-	public static void renew_table(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	public static void renew_table(Connection c, PreparedStatement pst) throws SQLException
 	{
 		
 //		renew_tables(c, pst);
@@ -486,7 +496,7 @@ public class populate_db {
 		
 	}
 	
-	public static void renew_table2(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	public static void renew_table2(Connection c, PreparedStatement pst) throws SQLException
 	{
 		
 		Vector<String> relation_names = get_all_relations(c, pst);
@@ -571,7 +581,7 @@ public class populate_db {
 //			
 //			query += "primary key (" + primary_key_string + "), foreign key (" + primary_key_string + ") references " + relation_names.get(i) + "(" + primary_key_string + ") on update cascade )";
 //			
-			System.out.println(query);
+//			System.out.println(query);
 //			
 //			pst = c.prepareStatement(query);
 //			
@@ -725,13 +735,13 @@ public class populate_db {
 		
 	}
 	
-	public static void delete(String id, Vector<Subgoal> subgoals, HashMap<String, String> subgoal_name_mapping, boolean has_lambda, Connection c, PreparedStatement pst) throws SQLException
+	public static void delete(String id, Vector<Subgoal> subgoals, HashMap<String, String> subgoal_name_mapping, Connection c, PreparedStatement pst) throws SQLException
 	{
 //	    add_column(c,pst);
 	    
 	    for(int i = 0; i<subgoals.size(); i++)
 	    {
-	    	delete_view_single_table2(id, subgoal_name_mapping.get(subgoals.get(i).name), has_lambda, c, pst);
+	    	delete_view_single_table2(id, subgoal_name_mapping.get(subgoals.get(i).name), c, pst);
 	    }
 	    
 	}
@@ -860,7 +870,7 @@ public class populate_db {
 		
 	}
 	
-	static void delete_view_single_table2(String id, String relation, boolean has_lambda, Connection c, PreparedStatement pst) throws SQLException
+	static void delete_view_single_table2(String id, String relation, Connection c, PreparedStatement pst) throws SQLException
 	{
 //		String query = "select * from " + relation + " where citation_view like '%" + id + "%'";
 //		
@@ -895,11 +905,11 @@ public class populate_db {
 //			
 			String new_citation_view = new String();
 			
-			if(has_lambda)
-			{
-				new_citation_view = id + "(\\((.*?)\\))";
-			}
-			else
+//			if(has_lambda)
+//			{
+//				new_citation_view = id + "(\\((.*?)\\))";
+//			}
+//			else
 			{
 				new_citation_view = id;
 			}
@@ -1113,6 +1123,27 @@ public class populate_db {
 	      
 	    
 	}
+	
+	
+	public static void populate_db2(Vector<Query> views, Connection c, PreparedStatement pst) throws SQLException
+	{
+	  HashMap<String, String> table_name_view = new HashMap<String, String>();
+	  
+	  for(int i = 0; i<views.size();i++)
+      {
+          Query view = views.get(i);
+          
+//        Vector<Boolean> web_view = new Vector<Boolean> ();
+          
+          
+          
+//        Vector<citation_view> citation_view = get_citation_view(view);
+          
+          
+          gen_citation_view_query2(view, table_name_view, c, pst);
+      }
+	}
+	
 	
 	public static void populate_db(Query view, Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
 	{
@@ -1608,7 +1639,7 @@ public class populate_db {
 		
 	}
 	
-	public static void gen_citation_view_query2(Query view, HashMap<String, String> table_name_view, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException
+	public static void gen_citation_view_query2(Query view, HashMap<String, String> table_name_view, Connection c, PreparedStatement pst) throws SQLException
 	{
 //		String citation_view_query = new String();
 		
@@ -1718,9 +1749,9 @@ public class populate_db {
 			
 			
 			
-			System.out.println(query1);
-			
-			System.out.println(query2);
+//			System.out.println(query1);
+//			
+//			System.out.println(query2);
 			
 			pst = c.prepareStatement(query1);
 			

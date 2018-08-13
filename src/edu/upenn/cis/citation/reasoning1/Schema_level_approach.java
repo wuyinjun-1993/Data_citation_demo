@@ -200,7 +200,7 @@ public class Schema_level_approach {
 		
 //		citations = Aggregation6.gen_citation_entire_query(rs, false, true, all_covering_sets, Resultset_prefix_col_num, max_author_num, c, pst);
 		
-		citations = Aggregation6.gen_citation_entire_query(covering_set_schema_level, rs, false, true, valid_view_mappings_schema_level, Resultset_prefix_col_num, max_author_num, c, pst);
+		citations = Aggregation6.gen_citation_entire_query(covering_set_schema_level, rs, tuple_num, valid_view_mappings_schema_level, Resultset_prefix_col_num, max_author_num, c, pst, view_query_mapping, citation_queries, lambda_term_id_mapping);
 		
 		end = System.nanoTime();
 		
@@ -1184,6 +1184,8 @@ public class Schema_level_approach {
 		end = System.nanoTime();
 		
 		pre_processing_time = (end - start) * 1.0/ second2nano;
+		
+//		execute_query(q, c, pst);
 		
 		reasoning_schema_level(view_mappings, q);
 	}

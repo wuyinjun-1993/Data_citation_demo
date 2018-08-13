@@ -1,4 +1,4 @@
-package edu.upenn.cis.citation.reasoning1;
+package edu.upenn.cis.citation.reasoning2;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -46,7 +46,7 @@ import edu.upenn.cis.citation.output.output2excel;
 import edu.upenn.cis.citation.schema_level_reasoning.Schema_reasoning_with_agg;
 import sun.util.resources.cldr.ur.CurrencyNames_ur;
 
-public class Semi_schema_level_approach {
+public class SSLA_min {
 	
 	
 	static HashMap<String, Query> view_mapping = new HashMap<String, Query>();
@@ -65,6 +65,8 @@ public class Semi_schema_level_approach {
 	
 	static HashMap<Conditions, ArrayList<Tuple>> conditions_map = new HashMap<Conditions, ArrayList<Tuple>>();
 		
+	static HashMap<Tuple, Double> view_mapping_cost = new HashMap<Tuple, Double>();
+	
 	static String file_name = "tuple_level1.xls";
 	
 	static HashMap<String, Integer> q_subgoal_id = new HashMap<String, Integer>();
@@ -81,13 +83,13 @@ public class Semi_schema_level_approach {
 	
 	public static HashMap<String, ArrayList<ArrayList<String>>> author_mapping = new HashMap<String, ArrayList<ArrayList<String>>>(); 
 	
-	public static HashMap<String, HashSet<Covering_set> > c_view_map = new HashMap<String, HashSet<Covering_set>>();
+	public static HashMap<String, Covering_set> c_view_map = new HashMap<String, Covering_set>();
 	
 	public static HashMap<String, HashSet<Integer>> signiture_rid_mappings = new HashMap<String, HashSet<Integer>>();
 	
 	public static HashMap<String, HashSet<Tuple>> signature_view_mappings_mappings = new HashMap<String, HashSet<Tuple>>();
 	
-	public static HashSet<Covering_set> covering_set_schema_level = new HashSet<Covering_set>();
+	public static Covering_set covering_set_schema_level = null;
 	
     public static HashSet<Tuple> valid_view_mappings_schema_level = null;
 	
@@ -143,6 +145,12 @@ public class Semi_schema_level_approach {
 	public static boolean isclustering = true;
 	
 	public static double covering_set_time = 0.0; 
+	
+	static HashMap<Tuple, HashSet<String>> single_subgoal_relations = new HashMap<Tuple, HashSet<String>>();
+    
+    static HashMap<Tuple, HashSet<Argument>> single_view_head_args = new HashMap<Tuple, HashSet<Argument>>();
+    
+    static HashMap<Tuple, Integer> view_mapping_id_mappings = new HashMap<Tuple, Integer>();
 //	static HashMap<String, ArrayList<String>> 
 	
 //	static HashMap<String, ArrayList<Tuple>> tuple_mapping = new HashMap<String, ArrayList<Tuple>>(); 
@@ -213,7 +221,7 @@ public class Semi_schema_level_approach {
 		{
 		  String key = (String) iter.next();
 			
-			HashSet<Covering_set> c_views = c_view_map.get(key);
+			Covering_set c_views = c_view_map.get(key);
 			
 			System.out.println(c_views);
 		}
@@ -350,7 +358,7 @@ public class Semi_schema_level_approach {
 	          
 	          HashSet<Integer> rids = signiture_rid_mappings.get(curr_tuple_key);
 	          
-	          HashSet<Covering_set> c_views = c_view_map.get(curr_tuple_key);
+	          Covering_set c_views = c_view_map.get(curr_tuple_key);
 	          
 	          for(i = 0; i<id_lists.size(); i++)
 	          {
@@ -385,7 +393,7 @@ public class Semi_schema_level_approach {
 	      return citations;
 	    }
 	
-	   public static HashSet<String> gen_citations_per_covering_set(HashSet<Covering_set> insert_c_view, ResultSet rs, int start_pos, int tuple_id, Connection c, PreparedStatement pst) throws SQLException, JSONException
+	   public static HashSet<String> gen_citations_per_covering_set(Covering_set insert_c_view, ResultSet rs, int start_pos, int tuple_id, Connection c, PreparedStatement pst) throws SQLException, JSONException
 	    {
 	        
 //	      HashSet<citation_view_vector2> update_c_views = new HashSet<citation_view_vector2>();
@@ -396,9 +404,9 @@ public class Semi_schema_level_approach {
 	      
 	        Set<String> head_sets = lambda_term_id_mapping.keySet();
 	        
-	        for(Iterator iter = insert_c_view.iterator(); iter.hasNext();)
+//	        for(Iterator iter = insert_c_view.iterator(); iter.hasNext();)
 	        {
-	          Covering_set covering_set = (Covering_set) iter.next();
+	          Covering_set covering_set = insert_c_view;
 	          
 	          for(citation_view view_mapping: covering_set.c_vec)
 	          {
@@ -443,11 +451,21 @@ public class Semi_schema_level_approach {
 //			return citations;
 //		}
 //		else
-		{
-			HashSet<String> citations = Aggregation6.do_agg_union(covering_set_schema_level, valid_view_mappings_schema_level, signature_view_mappings_mappings, signiture_rid_mappings, rs, signiture_rid_mappings, Resultset_prefix_col_num, author_mapping, max_author_num, lambda_term_id_mapping, c, pst, view_query_mapping, citation_queries, false);
+	  
+	  HashSet<Tuple> valid_view_mappings = new HashSet<Tuple>();
+      
+      for(citation_view view_mapping: covering_set_schema_level.c_vec)
+      {
+        valid_view_mappings.add(view_mapping.get_view_tuple());
+      }
+      
+      HashSet<Covering_set> covering_sets = new HashSet<Covering_set>();
+      
+      covering_sets.add(covering_set_schema_level);
+	  
+      HashSet<String> citations = Aggregation6.do_agg_union(covering_sets, valid_view_mappings, signature_view_mappings_mappings, signiture_rid_mappings, rs, signiture_rid_mappings, Resultset_prefix_col_num, author_mapping, max_author_num, lambda_term_id_mapping, c, pst, view_query_mapping, citation_queries, false);
 			
-			return citations;
-		}
+	  return citations;
 	}
 	
 //	public static HashSet<String> cal_unique_covering_sets() throws SQLException
@@ -1210,7 +1228,7 @@ public class Semi_schema_level_approach {
 						
 		citation_queries.clear();
 		
-		covering_set_schema_level.clear();
+		covering_set_schema_level = null;
 	      
 		if(valid_view_mappings_schema_level != null)
 	        valid_view_mappings_schema_level.clear();
@@ -1262,6 +1280,8 @@ public class Semi_schema_level_approach {
 //        System.out.println(sql);
 //        
 //        System.out.println(q);
+        
+        reasoning_min.init_computation(view_mapping_id_mappings, view_mapping_cost, view_tuples, q, single_subgoal_relations, single_view_head_args);
         
 		reasoning(q, partial_mapping_strings, partial_mapping_view_mapping_mappings, c, pst, sql, view_tuples);
 				
@@ -1935,12 +1955,24 @@ public class Semi_schema_level_approach {
                       
                       double start_time = System.nanoTime();
                       
-                      if(isclustering)
-                        Covering_sets_clustering_by_relation.reasoning_single_tuple(head_variable_query_mapping, head_variable_view_mapping, relation_arg_mapping, curr_views, query, rs, c_view_template, curr_head_vars);
-                      else
-                        Covering_sets_no_clustering.reasoning_single_tuple(head_variable_query_mapping, head_variable_view_mapping, relation_arg_mapping, curr_views, query, rs, c_view_template, curr_head_vars);
+                      HashSet<Argument> all_head_vars = new HashSet<Argument>();
                       
-                      c_view_map.put(curr_str, c_view_template);
+                      HashSet<String> all_covered_subgoal_names = new HashSet<String>();
+                      
+                      reasoning_min.get_all_covered_subgoals_args(all_covered_subgoal_names, all_head_vars, curr_views);
+//                      HashSet<Tuple> c_unit_vec = get_citation_units_condition(c_units, query.body.size() + query.head.args.size(), query, all_head_vars, all_covered_subgoal_names, curr_views);
+                      
+                      HashSet<Tuple> selected_view_mappings = reasoning_min.greedy_algorithm(view_mapping_cost, curr_views, all_covered_subgoal_names, all_head_vars, single_subgoal_relations, single_view_head_args);
+                      
+                      Covering_set covering_set = reasoning_min.get_valid_citation_combination(selected_view_mappings);
+
+                      
+//                      if(isclustering)
+//                        Covering_sets_clustering_by_relation.reasoning_single_tuple(head_variable_query_mapping, head_variable_view_mapping, relation_arg_mapping, curr_views, query, rs, c_view_template, curr_head_vars);
+//                      else
+//                        Covering_sets_no_clustering.reasoning_single_tuple(head_variable_query_mapping, head_variable_view_mapping, relation_arg_mapping, curr_views, query, rs, c_view_template, curr_head_vars);
+//                      
+                      c_view_map.put(curr_str, covering_set);
                       
                       double end_time = System.nanoTime();
                       
@@ -2161,7 +2193,7 @@ public class Semi_schema_level_approach {
 		  
 		  if(valid_view_mappings_schema_level.size() == curr_view_mappings.size() && valid_view_mappings_schema_level.containsAll(curr_view_mappings))
 		  {
-		    covering_set_schema_level.addAll(c_view_map.get(curr_signature));
+		    covering_set_schema_level = c_view_map.get(curr_signature);
 		    
 		    matched = true;
 		    
@@ -2172,10 +2204,23 @@ public class Semi_schema_level_approach {
 		
 		if(!matched)
 		{
-		  if(isclustering)
-            Covering_sets_clustering_by_relation.reasoning_single_tuple(head_variable_query_mapping, head_variable_view_mapping, relation_arg_mapping, valid_view_mappings_schema_level, query, rs, covering_set_schema_level, get_all_head_variables(valid_view_mappings_schema_level, query));
-          else
-            Covering_sets_no_clustering.reasoning_single_tuple(head_variable_query_mapping, head_variable_view_mapping, relation_arg_mapping, valid_view_mappings_schema_level, query, rs, covering_set_schema_level, get_all_head_variables(valid_view_mappings_schema_level, query));
+		  
+		  HashSet<String> all_covered_subgoal_names = new HashSet<String>();
+          
+          HashSet<Argument> all_covered_args = new HashSet<Argument>();
+          
+          reasoning_min.get_all_covered_subgoals_args(all_covered_subgoal_names, all_covered_args, valid_view_mappings_schema_level);
+          
+//          HashSet<Tuple> c_unit_vec = get_citation_units_condition(valid_view_mapping_schema_level, query.body.size() + query.head.args.size(), query, all_covered_args, all_covered_subgoal_names, curr_views);
+          
+          HashSet<Tuple> selected_view_mappings = reasoning_min.greedy_algorithm(view_mapping_cost, valid_view_mappings_schema_level, all_covered_subgoal_names, all_covered_args, single_subgoal_relations, single_view_head_args);
+          
+          covering_set_schema_level = reasoning_min.get_valid_citation_combination(selected_view_mappings);
+
+//		  if(isclustering)
+//            Covering_sets_clustering_by_relation.reasoning_single_tuple(head_variable_query_mapping, head_variable_view_mapping, relation_arg_mapping, valid_view_mappings_schema_level, query, rs, covering_set_schema_level, get_all_head_variables(valid_view_mappings_schema_level, query));
+//          else
+//            Covering_sets_no_clustering.reasoning_single_tuple(head_variable_query_mapping, head_variable_view_mapping, relation_arg_mapping, valid_view_mappings_schema_level, query, rs, covering_set_schema_level, get_all_head_variables(valid_view_mappings_schema_level, query));
 
 		}
 

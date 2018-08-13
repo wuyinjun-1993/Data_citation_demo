@@ -22,6 +22,7 @@ import edu.upenn.cis.citation.Pre_processing.view_operation;
 import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.citation_view.Covering_set;
 import edu.upenn.cis.citation.datalog.Query_converter;
+import edu.upenn.cis.citation.examples.Load_views_and_citation_queries;
 import edu.upenn.cis.citation.stress_test.query_generator;
 import edu.upenn.cis.citation.stress_test.view_generator;
 import edu.upenn.cis.citation.user_query.query_storage;
@@ -151,116 +152,162 @@ public class final_stress_test_group_min {
 		
 		boolean new_start = Boolean.valueOf(args[5]);
 		
-				
+		boolean agg_intersection = Boolean.valueOf(args[6]);		
+		
+        query_generator.query_result_size = 10000;
+		
 		query_generator.init_parameterizable_attributes(c2, pst);
 
-		
+		Query query = stress_test.init_query(k, new_query, c1, c2, pst);
+        
+        relations = get_unique_relation_names(query);
+        
+//        HashMap<String, Vector<String>> q_head_var_mapping = query_head_variables_mapping(query);
+        
+        
+        Vector<Query> views = null;
+        
+        Vector<Query> new_views = null;
+        
+        if(new_rounds)
+        {
+            
+            views = view_generator.generate_store_views_without_predicates(relations, view_size, query.body.size(), c1, c2, pst);//(relations, c1, c2, pst);
+            
+        }
+        else
+        {
+            views = Load_views_and_citation_queries.get_views(populate_db.synthetic_view_files, c2, pst);
+            
+            if(new_start)
+              new_views = view_generator.gen_one_additional_predicates(views, relations, query.body.size(), query, c1, c2, pst);
+        }
+        
+        stress_test.init_views(views, new_views, new_rounds, new_start, query, relations, c1, c2, pst);
+        
+        for(Iterator iter = views.iterator(); iter.hasNext();)
+        {
+            Query view = (Query) iter.next();
+            
+            System.out.println(view);
+        }
+        
+        Vector<Query> citation_queries = Load_views_and_citation_queries.get_views(populate_db.synthetic_citation_query_files, c2, pst);
+        
+        HashMap<String, HashMap<String, String>> view_citation_query_mappings = Load_views_and_citation_queries.get_view_citation_query_mappings(populate_db.synthetic_citation_query_view_mapping_files);
+
+        
+        c1.close();
+        
+        c2.close();
+        
+        stress_test.stress_test_min(query, views, citation_queries, view_citation_query_mappings, tuple_level, agg_intersection);
 //		Query query = query_storage.get_query_by_id(1);
 		
 //		for(int k = 3; k<=query_num; k++)
-		{
-			if(new_query)
-			{
-				System.out.println("new query");
-				
-				reset(c1, pst);
-				
-				reset(c2, pst);
-			}
-						
-			Query query = null;
-			
-			try{
-				query = query_storage.get_query_by_id(1, c2, pst);
-			}
-			catch(Exception e)
-			{
-				query = query_generator.gen_query(k, c2, pst);
-				query_storage.store_user_query(query, "1", c2, pst);
-				System.out.println(query);
-			}
-			
-			if(new_query)
-			{
-				Vector<String> sqls = new Vector<String>();
-				
-				sqls.add(Query_converter.datalog2sql_test(query));
-				
-				Query_operation.write2file(path + "user_query_sql", sqls);
-			}
-			
-			relations = get_unique_relation_names(query);
-			
-			Vector<Query> views = null;
-			
-			if(new_rounds)
-			{
-				
-				populate_db.renew_table(c1, pst);
-				
-				get_table_size(relations, c1, pst);
-				
-				views = view_generator.generate_store_views_without_predicates(relations, view_size, query.body.size(), c1, c2, pst);//(relations, c1, c2, pst);
-				
-//				views = view_generator.generate_store_views_without_predicates(relation_names, view_size, query.body.size());
-				
-				for(Iterator iter = views.iterator(); iter.hasNext();)
-				{
-					Query view = (Query) iter.next();
-					
-					System.out.println(view);
-				}
-				
-				get_table_size(relations, c1, pst);
-			}
-			else
-			{
-				views = view_operation.get_all_views(c2, pst);
-				
-				if(new_start)
-				{
-					System.out.println();
-					
-					view_generator.initial();
-					
-					view_generator.gen_one_additional_predicates(views, relations, query.body.size(), query, c1, c2, pst);
-					
-					for(Iterator iter = views.iterator(); iter.hasNext();)
-					{
-						Query view = (Query) iter.next();
-						
-						System.out.println(view);
-					}
-					
-					get_table_size(relations, c1, pst);
-				}
-			}
-			
-			
-			
-
-			Vector<Query> all_citation_queries = Query_operation.get_all_citation_queries(c1, pst);
-			
-			c1.close();
-			
-			c2.close();
-			
-//			stress_test.stress_test(query, views, tuple_level);
-
-			
-			Vector<Query> user_query = new Vector<Query>();
-			
-			user_query.add(query);
-			
-			output_queries(user_query, path + "user_queries");
-			
-			output_queries(views, path + "views");
-			
-			output_queries(all_citation_queries, path + "citation_query");
-			
-			
-			
-		}
+//		{
+//			if(new_query)
+//			{
+//				System.out.println("new query");
+//				
+//				reset(c1, pst);
+//				
+//				reset(c2, pst);
+//			}
+//						
+//			Query query = null;
+//			
+//			try{
+//				query = query_storage.get_query_by_id(1, c2, pst);
+//			}
+//			catch(Exception e)
+//			{
+//				query = query_generator.gen_query(k, c2, pst);
+//				query_storage.store_user_query(query, "1", c2, pst);
+//				System.out.println(query);
+//			}
+//			
+//			if(new_query)
+//			{
+//				Vector<String> sqls = new Vector<String>();
+//				
+//				sqls.add(Query_converter.datalog2sql_test(query));
+//				
+//				Query_operation.write2file(path + "user_query_sql", sqls);
+//			}
+//			
+//			relations = get_unique_relation_names(query);
+//			
+//			Vector<Query> views = null;
+//			
+//			if(new_rounds)
+//			{
+//				
+//				populate_db.renew_table(c1, pst);
+//				
+//				get_table_size(relations, c1, pst);
+//				
+//				views = view_generator.generate_store_views_without_predicates(relations, view_size, query.body.size(), c1, c2, pst);//(relations, c1, c2, pst);
+//				
+////				views = view_generator.generate_store_views_without_predicates(relation_names, view_size, query.body.size());
+//				
+//				for(Iterator iter = views.iterator(); iter.hasNext();)
+//				{
+//					Query view = (Query) iter.next();
+//					
+//					System.out.println(view);
+//				}
+//				
+//				get_table_size(relations, c1, pst);
+//			}
+//			else
+//			{
+//				views = view_operation.get_all_views(c2, pst);
+//				
+//				if(new_start)
+//				{
+//					System.out.println();
+//					
+//					view_generator.initial();
+//					
+//					view_generator.gen_one_additional_predicates(views, relations, query.body.size(), query, c1, c2, pst);
+//					
+//					for(Iterator iter = views.iterator(); iter.hasNext();)
+//					{
+//						Query view = (Query) iter.next();
+//						
+//						System.out.println(view);
+//					}
+//					
+//					get_table_size(relations, c1, pst);
+//				}
+//			}
+//			
+//			
+//			
+//
+//			Vector<Query> all_citation_queries = Query_operation.get_all_citation_queries(c1, pst);
+//			
+//			c1.close();
+//			
+//			c2.close();
+//			
+////			stress_test.stress_test(query, views, tuple_level);
+//
+//			
+//			Vector<Query> user_query = new Vector<Query>();
+//			
+//			user_query.add(query);
+//			
+//			output_queries(user_query, path + "user_queries");
+//			
+//			output_queries(views, path + "views");
+//			
+//			output_queries(all_citation_queries, path + "citation_query");
+//			
+//			
+//			
+//		}
 		
 
 		

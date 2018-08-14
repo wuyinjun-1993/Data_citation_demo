@@ -152,9 +152,19 @@ public class final_stress_test_group_min {
 		
 		boolean new_start = Boolean.valueOf(args[5]);
 		
-		boolean agg_intersection = Boolean.valueOf(args[6]);		
+		boolean agg_intersection = Boolean.valueOf(args[6]);	
 		
-        query_generator.query_result_size = 10000;
+		int query_instance_size = Integer.valueOf(args[7]);
+        
+        String db_name1 = args[8];
+        
+        String db_name2 = args[9];
+        
+        String usr_name = args[10];
+        
+        String passwd = args[11];
+		
+        query_generator.query_result_size = query_instance_size;
 		
 		query_generator.init_parameterizable_attributes(c2, pst);
 
@@ -201,7 +211,7 @@ public class final_stress_test_group_min {
         
         c2.close();
         
-        stress_test.stress_test_min(query, views, citation_queries, view_citation_query_mappings, tuple_level, agg_intersection);
+        stress_test.stress_test_min(query, views, citation_queries, view_citation_query_mappings, tuple_level, agg_intersection, true, db_name1, db_name2, usr_name, passwd);
 //		Query query = query_storage.get_query_by_id(1);
 		
 //		for(int k = 3; k<=query_num; k++)

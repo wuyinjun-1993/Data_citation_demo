@@ -1804,7 +1804,7 @@ public class Tuple_level_approach {
 		return view_query_mapping.get(view_name);
 	}
 		
-	public static void tuple_reasoning(Query q, Vector<Query> views, Vector<Query> cqs, HashMap<String, HashMap<String, String>> view_citation_query_mappings, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
+	public static void tuple_reasoning(Query q, Vector<Query> views, Vector<Query> cqs, HashMap<String, HashMap<String, String>> view_citation_query_mappings, Connection c, PreparedStatement pst) throws SQLException, IOException, InterruptedException, JSONException
 	{
 		
 ////		Query q = Parse_datalog.parse_query(query, valid_subgoal_id);
@@ -2277,7 +2277,12 @@ public class Tuple_level_approach {
 				{
 					String citation_vec = rs.getString(i + 1);
 					
-//					System.out.println("citation_vec::" + citation_vec);
+					if(citation_vec == null)
+					{
+//					  System.out.println("citation_vec::" + citation_vec);
+					  
+					  continue;
+					}
 					
 //					String[] citation_vec_arr = (String[]) citation_vec.getArray();
 //					

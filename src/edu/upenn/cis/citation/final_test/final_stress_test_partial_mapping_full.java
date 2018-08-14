@@ -172,7 +172,17 @@ public class final_stress_test_partial_mapping_full {
         
         boolean agg_intersection = Boolean.valueOf(args[7]);
         
-      query_generator.query_result_size = 10000;
+        int query_instance_size = Integer.valueOf(args[7]);
+        
+        String db_name1 = args[8];
+        
+        String db_name2 = args[9];
+        
+        String usr_name = args[10];
+        
+        String passwd = args[11];
+        
+      query_generator.query_result_size = query_instance_size;
                 
 //      Query query = query_storage.get_query_by_id(1);
         query_generator.init_parameterizable_attributes(c2, pst);
@@ -288,7 +298,7 @@ public class final_stress_test_partial_mapping_full {
                         
             System.out.println("start_test");
             
-            stress_test.stress_test(query, views, citation_queries, view_citation_query_mappings, tuple_level, schema_level, agg_intersection);
+            stress_test.stress_test(query, views, citation_queries, view_citation_query_mappings, tuple_level, schema_level, agg_intersection, true, db_name1, db_name2, usr_name, passwd);
 
             
             Vector<Query> user_query = new Vector<Query>();

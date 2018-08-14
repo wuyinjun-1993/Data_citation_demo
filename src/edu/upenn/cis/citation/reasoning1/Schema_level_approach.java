@@ -187,7 +187,7 @@ public class Schema_level_approach {
 //		return citations;
 //	}
 	
-	public static HashSet<String> tuple_gen_agg_citations(Query query, Connection c, PreparedStatement pst) throws ClassNotFoundException, SQLException, JSONException
+	public static HashSet<String> tuple_gen_agg_citations(Query query, Connection c, PreparedStatement pst) throws SQLException, JSONException
 	{
 		
 		start = System.nanoTime();

@@ -215,7 +215,7 @@ public class stress_test {
      return query;
   }
   
-  public static void stress_test(Query query, Vector<Query> views, Vector<Query> citation_queries, HashMap<String, HashMap<String, String>> view_citation_query_mappings, boolean tuple_level, boolean schema_level, boolean agg_intersection) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
+  public static void stress_test(Query query, Vector<Query> views, Vector<Query> citation_queries, HashMap<String, HashMap<String, String>> view_citation_query_mappings, boolean tuple_level, boolean schema_level, boolean agg_intersection, boolean test_case, String db_name1, String db_name2, String usr_name, String passwd) throws SQLException, IOException, InterruptedException, JSONException, ClassNotFoundException
   {
 //    while(views.size() < view_max_size)
       if(tuple_level)
@@ -225,13 +225,13 @@ public class stress_test {
             PreparedStatement pst = null;
           Class.forName("org.postgresql.Driver");
           c = DriverManager
-              .getConnection(populate_db.db_url1, populate_db.usr_name , populate_db.passwd);
+              .getConnection(populate_db.db_url_prefix + db_name1, usr_name , passwd);
           
           Tuple_level_approach.prepare_info = false;
       
           Tuple_level_approach.agg_intersection = agg_intersection;
           
-          Tuple_level_approach.test_case = true;
+          Tuple_level_approach.test_case = test_case;
           
           double end_time = 0;
 
@@ -473,13 +473,13 @@ public class stress_test {
                 PreparedStatement pst = null;
               Class.forName("org.postgresql.Driver");
               c = DriverManager
-                  .getConnection(populate_db.db_url2, populate_db.usr_name , populate_db.passwd);
+                  .getConnection(populate_db.db_url_prefix + db_name2, usr_name , passwd);
               
               Semi_schema_level_approach.prepare_info = false;
               
               Semi_schema_level_approach.agg_intersection = agg_intersection;
               
-              Semi_schema_level_approach.test_case = true;
+              Semi_schema_level_approach.test_case = test_case;
               
               double end_time = 0;
 
@@ -651,11 +651,11 @@ public class stress_test {
                 PreparedStatement pst = null;
               Class.forName("org.postgresql.Driver");
               c = DriverManager
-                  .getConnection(populate_db.db_url2, populate_db.usr_name , populate_db.passwd);
+                  .getConnection(populate_db.db_url_prefix + db_name2, usr_name , passwd);
               
               Schema_level_approach.prepare_info = false;
               
-              Schema_level_approach.test_case = true;
+              Schema_level_approach.test_case = test_case;
                               
               double end_time = 0;
 
@@ -816,7 +816,7 @@ public class stress_test {
   }
   
   
-  public static void stress_test_min(Query query, Vector<Query> views, Vector<Query> citation_queries, HashMap<String, HashMap<String, String>> view_citation_query_mappings, boolean tuple_level, boolean agg_intersection) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
+  public static void stress_test_min(Query query, Vector<Query> views, Vector<Query> citation_queries, HashMap<String, HashMap<String, String>> view_citation_query_mappings, boolean tuple_level, boolean agg_intersection, boolean test_case, String db_name1, String db_name2, String usr_name, String passwd) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
   {
 //    while(views.size() < view_max_size)
       if(tuple_level)
@@ -826,13 +826,13 @@ public class stress_test {
             PreparedStatement pst = null;
           Class.forName("org.postgresql.Driver");
           c = DriverManager
-              .getConnection(populate_db.db_url1, populate_db.usr_name , populate_db.passwd);
+              .getConnection(populate_db.db_url_prefix + db_name1, usr_name , passwd);
           
           TLA_min.prepare_info = false;
       
           TLA_min.agg_intersection = agg_intersection;
           
-          TLA_min.test_case = true;
+          TLA_min.test_case = test_case;
           
           double end_time = 0;
 
@@ -1076,13 +1076,13 @@ public class stress_test {
                 PreparedStatement pst = null;
               Class.forName("org.postgresql.Driver");
               c = DriverManager
-                  .getConnection(populate_db.db_url2, populate_db.usr_name , populate_db.passwd);
+                  .getConnection(populate_db.db_url_prefix + db_name2, usr_name , passwd);
               
               SSLA_min.prepare_info = false;
               
               SSLA_min.agg_intersection = agg_intersection;
               
-              SSLA_min.test_case = true;
+              SSLA_min.test_case = test_case;
               
               double end_time = 0;
 

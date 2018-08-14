@@ -191,7 +191,15 @@ public class final_stress_test_view_num_full {
 		
 		boolean agg_intersection = Boolean.valueOf(args[6]);
 		
-				
+		int query_instance_size = Integer.valueOf(args[7]);
+        
+        String db_name1 = args[8];
+        
+        String db_name2 = args[9];
+        
+        String usr_name = args[10];
+        
+        String passwd = args[11];
 //		Query query = query_storage.get_query_by_id(1);
 
 		
@@ -293,7 +301,7 @@ public class final_stress_test_view_num_full {
 			
 			c2.close();
 			
-			stress_test.stress_test(query, views, citation_queries, view_citation_query_mappings, tuple_level, schema_level, agg_intersection);
+			stress_test.stress_test(query, views, citation_queries, view_citation_query_mappings, tuple_level, schema_level, agg_intersection, true, db_name1, db_name2, usr_name, passwd);
 
 			
 			Vector<Query> user_query = new Vector<Query>();

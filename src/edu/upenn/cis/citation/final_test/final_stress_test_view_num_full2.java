@@ -165,19 +165,6 @@ public class final_stress_test_view_num_full2 {
 	
 	public static void main(String [] args) throws ClassNotFoundException, SQLException, IOException, InterruptedException, JSONException
 	{		
-		Connection c1 = null;
-		
-		Connection c2 = null;
-	      PreparedStatement pst = null;
-		Class.forName("org.postgresql.Driver");
-	    c1 = DriverManager
-	        .getConnection(populate_db.db_url1, populate_db.usr_name , populate_db.passwd);
-		
-	    c2 = DriverManager
-	        .getConnection(populate_db.db_url2, populate_db.usr_name , populate_db.passwd);
-	    
-//	    System.out.println(get_single_table_size("family", c, pst));
-	    
 	    
 	    int k = Integer.valueOf(args[0]);
 	    
@@ -193,7 +180,28 @@ public class final_stress_test_view_num_full2 {
 		
 		boolean agg_intersection = Boolean.valueOf(args[6]);
 		
-		query_generator.query_result_size = 10000;
+		int query_instance_size = Integer.valueOf(args[7]);
+		
+		String db_name1 = args[8];
+		
+		String db_name2 = args[9];
+		
+		String usr_name = args[10];
+		
+		String passwd = args[11];
+		
+		Connection c1 = null;
+        
+        Connection c2 = null;
+          PreparedStatement pst = null;
+        Class.forName("org.postgresql.Driver");
+        c1 = DriverManager
+            .getConnection(populate_db.db_url_prefix + db_name1, usr_name , passwd);
+        
+        c2 = DriverManager
+            .getConnection(populate_db.db_url_prefix + db_name2, usr_name , passwd);
+		
+		query_generator.query_result_size = query_instance_size;
 		
 		Query query = stress_test.init_query(k, new_query, c1, c2, pst);
 		
@@ -232,7 +240,7 @@ public class final_stress_test_view_num_full2 {
 			
 			c2.close();
 			
-			stress_test.stress_test(query, views, citation_queries, view_citation_query_mappings, tuple_level, schema_level, agg_intersection);
+			stress_test.stress_test(query, views, citation_queries, view_citation_query_mappings, tuple_level, schema_level, agg_intersection, true, db_name1, db_name2, usr_name, passwd);
 
 			
 			Vector<Query> user_query = new Vector<Query>();

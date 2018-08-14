@@ -1182,7 +1182,7 @@ public class Aggregation6 {
               
 //            if(selected_row_ids.get(i) < interval[1] && selected_row_ids.get(i) >= interval[0])
               {
-                  rs.absolute(i + 1);
+                  rs.absolute(i);
                   
                   get_views_parameters(valid_view_mapping_schema_level, rs, start_pos, lambda_values, lambda_term_id_mapping);
 //                  else

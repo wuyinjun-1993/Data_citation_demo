@@ -2656,7 +2656,11 @@ public class Query_converter {
 	            
 	            String name = lambda_terms.get(i).arg_name;
 	            
-	            str += "array_agg(" + lambda_terms.get(i).table_name + "." + name.substring(name.indexOf(populate_db.separator) + 1, name.length()) + ")";
+	            
+	            if(v.head.has_agg)
+	              str += "array_agg(" + lambda_terms.get(i).table_name + "." + name.substring(name.indexOf(populate_db.separator) + 1, name.length()) + ")";
+	            else
+	              str += lambda_terms.get(i).table_name + "." + name.substring(name.indexOf(populate_db.separator) + 1, name.length());
 	        }
 	        
 	        return str;

@@ -170,6 +170,16 @@ public class final_stress_test_lambda_num_full {
 		
 		boolean agg_intersection = Boolean.valueOf(args[7]);
 		
+		int query_instance_size = Integer.valueOf(args[8]);
+        
+        String db_name1 = args[9];
+        
+        String db_name2 = args[10];
+        
+        String usr_name = args[11];
+        
+        String passwd = args[12];
+		
 //		boolean cal_covering_set = Boolean.valueOf(args[8]);
 		
 				
@@ -273,7 +283,7 @@ public class final_stress_test_lambda_num_full {
 			
 			c2.close();
 			
-			stress_test.stress_test(query, views, citation_queries, view_citation_query_mappings, tuple_level, schema_level, agg_intersection);
+			stress_test.stress_test(query, views, citation_queries, view_citation_query_mappings, tuple_level, schema_level, agg_intersection, true, db_name1, db_name2, usr_name, passwd);
 
 			
 			Vector<Query> user_query = new Vector<Query>();

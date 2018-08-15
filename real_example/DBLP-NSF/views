@@ -1,0 +1,6 @@
+v1|dblp_paper.paper_key, dblp_paper.title, dblp_paper.conference|dblp_paper||dblp_paper.paper_key|dblp_paper:dblp_paper
+v2|dblp_conference.conf_key, dblp_conference.name, dblp_conference.detail|dblp_conference||dblp_conference.conf_key|dblp_conference:dblp_conference
+v3|dblp_paper.paper_key, dblp_paper.title, dblp_conference.name, dblp_paper.year|dblp_paper, dblp_conference|dblp_paper.conference = dblp_conference.name|dblp_conference.name, dblp_paper.year|dblp_conference:dblp_conference, dblp_paper:dblp_paper
+v4|grants_awards.award_id, grants_awards.award_title, grants_awards.abstract_narration, grants_awards.award_amount, grants_awards.award_effective_date, grants_awards.award_expiration_date|grants_awards||grants_awards.award_id|grants_awards:grants_awards
+v5|grants_awards.award_id, grants_awards.award_title, grants_awards.abstract_narration, grants_awards.award_amount, grants_awards.award_effective_date, grants_awards.award_expiration_date|grants_awards||grants_awards.award_effective_date, grants_awards.organisation_code|grants_awards:grants_awards
+v6|dblp_paper.paper_key, dblp_paper.title, dblp_paper.conference|dblp_paper||dblp_paper.paper_key|dblp_paper:dblp_paper

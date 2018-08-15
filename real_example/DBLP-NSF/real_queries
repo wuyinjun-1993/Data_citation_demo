@@ -1,0 +1,3 @@
+Q1|dblp_paper.title|dblp_paper, dblp_conference|dblp_conference.name = dblp_paper.conference, dblp_conference.name = 'VLDB'||dblp_paper:dblp_paper, dblp_conference:dblp_conference
+Q2|dblp_paper.title|dblp_paper, dblp_conference, dblp_author|dblp_conference.name = dblp_paper.conference, dblp_paper.paper_key = dblp_author.paper_key, dblp_paper.year = '2017', dblp_author.name = 'Bryan Hooi'||dblp_paper:dblp_paper, dblp_conference:dblp_conference, dblp_author:dblp_author
+Q3|grants_awards.award_title|grants_awards, paper_awards|paper_awards.award_id = grants_awards.award_id, paper_awards.conference = 'VLDB'||grants_awards:grants_awards, paper_awards:paper_awards

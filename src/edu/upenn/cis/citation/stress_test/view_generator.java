@@ -47,7 +47,7 @@ public class view_generator {
 	
 	
 	
-	public static String [] citatable_tables = {"gpcr","object", "ligand", "family", "introduction"};
+	public static String [] citatable_tables = {"gpcr","object", "family", "introduction"};
 
 	static HashMap<string_array, Vector<string_array> > joinable_attribute_lists = new HashMap<string_array, Vector<string_array>>();
 	
@@ -197,30 +197,30 @@ public class view_generator {
 		
 		query_conditions.put("introduction", conditions);
 		
-		table_names = new Vector<String>();
-				
-		table_names.add("contributor2ligand");
-		
-		table_names.add("ligand");
-		
-		conditions = new Vector<Conditions>();
-				
-		conditions.add(new Conditions(new Argument("contributor2ligand" + populate_db.separator + "ligand_id", "contributor2ligand"), "contributor2ligand", new op_equal(), new Argument("ligand" + populate_db.separator + "ligand_id", "ligand"), "ligand"));
-		
-//		conditions.add("object_object_id = contributor2object_object_id");
-		
-		head_variables = new Vector<Argument>();
-		
-		head_variables.add(new Argument("contributor2ligand" + populate_db.separator + "first_names", "contributor2ligand"));
-		
-		head_variables.add(new Argument("contributor2ligand" + populate_db.separator + "surname", "contributor2ligand"));
-		
-		query_table_names.put("ligand", table_names);
-		
-		query_head_names.put("ligand", head_variables);
-		
-		query_conditions.put("ligand", conditions);
-		
+//		table_names = new Vector<String>();
+//				
+//		table_names.add("contributor2ligand");
+//		
+//		table_names.add("ligand");
+//		
+//		conditions = new Vector<Conditions>();
+//				
+//		conditions.add(new Conditions(new Argument("contributor2ligand" + populate_db.separator + "ligand_id", "contributor2ligand"), "contributor2ligand", new op_equal(), new Argument("ligand" + populate_db.separator + "ligand_id", "ligand"), "ligand"));
+//		
+////		conditions.add("object_object_id = contributor2object_object_id");
+//		
+//		head_variables = new Vector<Argument>();
+//		
+//		head_variables.add(new Argument("contributor2ligand" + populate_db.separator + "first_names", "contributor2ligand"));
+//		
+//		head_variables.add(new Argument("contributor2ligand" + populate_db.separator + "surname", "contributor2ligand"));
+//		
+//		query_table_names.put("ligand", table_names);
+//		
+//		query_head_names.put("ligand", head_variables);
+//		
+//		query_conditions.put("ligand", conditions);
+//		
 //		table_names = new Vector<String>();
 //		
 //		table_names.add("contributor");
@@ -306,13 +306,13 @@ public class view_generator {
 	{
 		initial();
 		    
-	    clear_views(c1, pst, true);
+//	    clear_views(c1, pst, true);
 	    
-	    clear_other_tables(c1, pst);
+//	    clear_other_tables(c1, pst);
 	    
-	    clear_views(c2, pst, false);
+//	    clear_views(c2, pst, false);
 	    
-	    clear_other_tables(c2, pst);
+//	    clear_other_tables(c2, pst);
 	    
 //	    populate_db.renew_table(c1, pst);
 	    
@@ -575,9 +575,9 @@ public class view_generator {
 	    
 	    get_joinable_relations(c, pst);
 	    
-	    clear_views(c, pst, true);
-	    
-	    clear_other_tables(c, pst);
+//	    clear_views(c, pst, true);
+//	    
+//	    clear_other_tables(c, pst);
 	    
 	    Vector<Query> views = new Vector<Query>();
 		
@@ -1128,7 +1128,7 @@ public class view_generator {
 		
 	}
 	
-	static Query store_citation_queries(Query view, int num, String qname)
+	static Query store_citation_queries(Query view, String qname)
     {
         Vector<String> citable_table_names = new Vector<String>();
         
@@ -1777,38 +1777,38 @@ public class view_generator {
 			
 			view = useful_views.get(index_for_change);
 			
-			if(view.conditions.size() >= 1)
-			{
-				Vector<Integer> good_ids = get_interval(view, selected_id);
-				
-//				if(good_ids.size() == 1)
-//					continue;
-//				else
-				{
-					if(split_view(good_ids, views, view, new_views, c1, c2, pst))
-					{
-						views.remove(view);
-						
-						Load_views_and_citation_queries.remove_one_view_with_citation_queries(view.name, c2, pst);
-						
-						populate_db.delete(view.name, view.body, view.subgoal_name_mapping, c1, pst);
-						
-//						int old_id = view_operation.delete_view_by_name(view.name, c1, pst);
+//			if(view.conditions.size() >= 1)
+//			{
+//				Vector<Integer> good_ids = get_interval(view, selected_id);
+//				
+////				if(good_ids.size() == 1)
+////					continue;
+////				else
+//				{
+//					if(split_view(good_ids, views, view, new_views, c1, c2, pst))
+//					{
+//						views.remove(view);
 //						
-//						view_operation.delete_view_by_name(view.name, c2, pst, false);
+//						Load_views_and_citation_queries.remove_one_view_with_citation_queries(view.name, c2, pst);
 //						
-//						citation_view_operation.delete_citation_views_by_id(old_id, c1, pst);
+//						populate_db.delete(view.name, view.body, view.subgoal_name_mapping, c1, pst);
 //						
-//						citation_view_operation.delete_citation_views_by_id(old_id, c2, pst);
+////						int old_id = view_operation.delete_view_by_name(view.name, c1, pst);
+////						
+////						view_operation.delete_view_by_name(view.name, c2, pst, false);
+////						
+////						citation_view_operation.delete_citation_views_by_id(old_id, c1, pst);
+////						
+////						citation_view_operation.delete_citation_views_by_id(old_id, c2, pst);
+////						
+////						Query_operation.delete_query_by_id(old_id, c1, pst);
+////						
+////						Query_operation.delete_query_by_id(old_id, c2, pst);
 //						
-//						Query_operation.delete_query_by_id(old_id, c1, pst);
-//						
-//						Query_operation.delete_query_by_id(old_id, c2, pst);
-						
-						break;
-					}
-				}
-			}
+//						break;
+//					}
+//				}
+//			}
 			
 			if(split_view(views, view, new_views, c1, c2, pst))
 			{
@@ -2332,7 +2332,7 @@ public class view_generator {
 				
 				if(condition.arg2.isConst())
 				{
-					if(view.subgoal_name_mapping.get(condition.subgoal1).equals(relation) && condition.arg1.name.equals(attr_name) && condition.arg2.name.equals(constant))
+					if(condition.subgoal1.equals(relation) && condition.arg1.name.equals(attr_name) && condition.arg2.name.equals(constant))
 						return true;
 				}
 			}
@@ -2595,7 +2595,7 @@ public class view_generator {
 			ranges = query_generator.relation_primary_key_ranges.get(relation);
 		}
 		
-		Vector<Integer> conflict_ids = find_conflict_condition(view, origin_name, primary_key_type[0], ranges);
+		Vector<Integer> conflict_ids = find_conflict_condition(view, origin_name, origin_name + populate_db.separator + primary_key_type[0], ranges);
 		
 		if(conflict_ids == null)
 			return false;
@@ -2629,7 +2629,7 @@ public class view_generator {
 		
 		
 		
-		while(check_duplicated_conditions(views, relation, primary_key_type[0], "'" + ranges.get(const_id) + "'"))
+		while(check_duplicated_conditions(views, relation, relation + populate_db.separator + primary_key_type[0], "'" + ranges.get(const_id) + "'"))
 		{
 			int range = conflict_ids.get(1) - conflict_ids.get(0);
 			
@@ -2645,7 +2645,7 @@ public class view_generator {
 		
 		view1.conditions.add(condition1);
 		
-		remove_duplicate_predicates(view1, ranges, relation, primary_key_type[0]);
+		remove_duplicate_predicates(view1, ranges, relation, relation + populate_db.separator + primary_key_type[0]);
 
 		
 		view1.name = view.name + "_1";
@@ -2657,7 +2657,7 @@ public class view_generator {
 						
 		view2.conditions.add(condition2);
 		
-		remove_duplicate_predicates(view2, ranges, relation, primary_key_type[0]);
+		remove_duplicate_predicates(view2, ranges, relation, relation + populate_db.separator + primary_key_type[0]);
 
 				
 //		int v1_id = view_operation.add(view1, view1.name, c1, pst);
@@ -2665,13 +2665,13 @@ public class view_generator {
 		view1.name = view.name + "_1";
 
 		
-		view_operation.add(view1, view1.name, c2, pst, false);
+//		view_operation.add(view1, view1.name, c2, pst, false);
 		
 		view1.name = view.name + "_1";
 		
-		String citation_view_name1 = view1.name.replaceFirst("v", "c");
-
-		String query_name1 = view1.name.replaceFirst("v", "q");
+//		String citation_view_name1 = view1.name.replaceFirst("v", "c");
+//
+//		String query_name1 = view1.name.replaceFirst("v", "q");
 		
 //		store_single_citation_view(view1, v1_id, citation_view_name1, query_name1, c1, pst);
 		
@@ -2685,9 +2685,9 @@ public class view_generator {
 		
 		view2.name = view.name + "_2";
 
-		String citation_view_name2 = view2.name.replaceFirst("v", "c");
-
-		String query_name2 = view2.name.replaceFirst("v", "q");
+//		String citation_view_name2 = view2.name.replaceFirst("v", "c");
+//
+//		String query_name2 = view2.name.replaceFirst("v", "q");
 		
 //		store_single_citation_view(view2, v2_id, citation_view_name2, query_name2, c1, pst);
 		
@@ -2952,7 +2952,7 @@ public class view_generator {
 		
 		view1.conditions.add(condition1);
 		
-		remove_duplicate_predicates(view1, ranges, relation, primary_key_type[0]);
+		remove_duplicate_predicates(view1, ranges, relation, relation + populate_db.separator + primary_key_type[0]);
 
 		
 		view1.name = view.name + "_1";
@@ -2964,7 +2964,7 @@ public class view_generator {
 						
 		view2.conditions.add(condition2);
 		
-		remove_duplicate_predicates(view2, ranges, relation, primary_key_type[0]);
+		remove_duplicate_predicates(view2, ranges, relation, relation + populate_db.separator + primary_key_type[0]);
 
 				
 //		int v1_id = view_operation.add(view1, view1.name, c1, pst);
@@ -5226,7 +5226,9 @@ public class view_generator {
 	    Vector<String> view_citation_query_mappings = new Vector<String>();
 	    for(int i = 0; i<views.size(); i++)
 	    {
-	      Query query = store_citation_queries(views.get(i), i, "q" + i);
+	      String citation_query_name = views.get(i).name.replaceFirst("v", "q");
+	      
+	      Query query = store_citation_queries(views.get(i), citation_query_name);
 	      citation_queries.add(query);
 	      view_citation_query_mappings.add(views.get(i).name + "|" + query.name + "|" + "Contributor");
 	    }
@@ -5245,8 +5247,8 @@ public class view_generator {
 	    Vector<String> view_citation_query_mappings = new Vector<String>();
 	    for(int i = 0; i<views.size(); i++)
 	    {
-	      int id = i + offset;
-	      Query query = store_citation_queries(views.get(i), id, "q" + id);
+	      String query_name = views.get(i).name.replaceFirst("v", "q");
+	      Query query = store_citation_queries(views.get(i), query_name);
 	      citation_queries.add(query);
 	      view_citation_query_mappings.add(views.get(i).name + "|" + query.name + "|" + "Contributor");
 	    }

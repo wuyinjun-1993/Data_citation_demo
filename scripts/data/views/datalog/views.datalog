@@ -1,0 +1,3 @@
+Family_name|family.name|family||family.family_id|family:family
+FamilyIntro_text|introduction.family_id,introduction.text|introduction||introduction.family_id|introduction:introduction
+Family_join_Familyintro|family.family_id, family.name, family.type, introduction.text|family, introduction |family.family_id = introduction.family_id|| family:family,introduction:introduction

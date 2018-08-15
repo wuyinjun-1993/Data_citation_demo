@@ -1,3 +1,0 @@
-select customer_id, cust_address_ntab
-multiset except distinct cust_address2_ntab multiset_except
-from customers_demo

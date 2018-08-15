@@ -15,7 +15,7 @@ public class Prepare_citation_info {
   
   public static void prepare_citation_information(HashMap<String, Query> citation_queries, HashMap<String, Integer> max_author_num, HashMap<String, HashMap<String, String>> view_query_mapping, HashMap<String, ArrayList<ArrayList<String>>> author_mapping, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, Vector<Query> views, Vector<Query> cqs, Connection c, PreparedStatement pst) throws SQLException
   {
-      gen_citation0.get_all_query_ids(query_ids, c, pst);
+//      gen_citation0.get_all_query_ids(query_ids, c, pst);
       
 //    view_query_mapping = new ArrayList<HashMap<String, Integer>>(view_list.size);
               

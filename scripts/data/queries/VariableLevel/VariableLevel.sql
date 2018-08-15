@@ -1,0 +1,1 @@
+SELECT family.name, family.type, family.family_id FROM family;

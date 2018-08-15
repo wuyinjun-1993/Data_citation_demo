@@ -1925,6 +1925,12 @@ public class Semi_schema_level_approach {
                         }
                       }
                       
+//                      System.out.println("Group" + group_num);
+//                      
+//                      for(Tuple view_mapping: curr_views)
+//                      {
+//                        System.out.println(view_mapping.name);
+//                      }
                       
                       signature_view_mappings_mappings.put(curr_str, curr_views);
 

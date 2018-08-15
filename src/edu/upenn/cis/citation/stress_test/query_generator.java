@@ -41,7 +41,7 @@ public class query_generator {
 	
 	
 	
-	public static String [] citatable_tables = {"ligand", "gpcr","object", "family", "introduction"};
+	public static String [] citatable_tables = {"gpcr","object", "family", "introduction"};
 	
 	static HashMap<String, Vector<String>> parameterizable_attri = new HashMap<String, Vector<String>>();
 
@@ -338,7 +338,7 @@ public class query_generator {
 		
 		relation_primary_key_mapping.put("object", "object_id");
 		
-		relation_primary_key_mapping.put("ligand", "ligand_id");
+//		relation_primary_key_mapping.put("ligand", "ligand_id");
 		
 		relation_primary_key_mapping.put("gpcr", "object_id");
 		

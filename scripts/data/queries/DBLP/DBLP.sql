@@ -1,0 +1,3 @@
+select paper.title from paper JOIN proceedings ON paper.conference_key=proceedings.conference_key where proceedings.cname="VLDB" and proceedings.year=2017;
+select paper.title from paper JOIN proceedings ON paper.conference_key=proceedings.conference_key join author on author.paper_key=paper.paper_key where author.name="Alawini" and proceedings.year=2017;
+select paper.title from paper JOIN proceedings ON paper.conference_key=proceedings.conference_key join author on author.paper_key=paper.paper_key where author.name="Alawini" and proceedings.year=2017 and proceedings.cname="VLDB";

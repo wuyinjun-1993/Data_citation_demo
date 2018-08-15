@@ -1,0 +1,5 @@
+Q0|family.family_id, family.name|family|||family:family
+Q1|family.family_id, family.name, introduction.text|family, introduction|family.family_id = introduction.family_id||family:family, introduction:introduction
+Q2|family.family_id|family|||family:family
+Q3|family.family_id, family.name, introduction.text|family, introduction|||family:family, introduction:introduction
+Q4|family.name, family1.name, introduction.text|family, family1, introduction|||family:family, introduction:introduction, family1:family

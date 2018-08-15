@@ -168,12 +168,6 @@ public class final_stress_test_instance_size_full {
 		Connection c2 = null;
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");
-	    c1 = DriverManager
-	        .getConnection(populate_db.db_url1, populate_db.usr_name , populate_db.passwd);
-		
-	    c2 = DriverManager
-	        .getConnection(populate_db.db_url2, populate_db.usr_name , populate_db.passwd);
-		
 //	    System.out.println(get_single_table_size("family", c, pst));
 	    
 	    
@@ -193,25 +187,31 @@ public class final_stress_test_instance_size_full {
 				
 		boolean agg_intersection = Boolean.valueOf(args[7]);
 		
-		int query_instance_size = Integer.valueOf(args[8]);
+        String db_name1 = args[8];
         
-        String db_name1 = args[9];
+        String db_name2 = args[9];
         
-        String db_name2 = args[10];
+        String usr_name = args[10];
         
-        String usr_name = args[11];
+        String passwd = args[11];
         
-        String passwd = args[12];
+        String path = args[12];
+        
+        populate_db.synthetic_example_path = path;
 //		Query query = query_storage.get_query_by_id(1);
 
 		
 //		for(int k = 3; k<=query_num; k++)
 		
-		query_generator.init_parameterizable_attributes(c2, pst);
+//		query_generator.init_parameterizable_attributes(c2, pst);
 		
+        c1 = DriverManager
+            .getConnection(populate_db.db_url_prefix + db_name1, usr_name , passwd);
+        
+        c2 = DriverManager
+            .getConnection(populate_db.db_url_prefix + db_name2, usr_name , passwd);
 		
-		
-	      Query query = stress_test.init_query(k, instance_size, new_query, c1, c2, pst);
+	      Query query = stress_test.init_query(k, instance_size, new_query, path, c1, c2, pst);
 	        
 	        relations = get_unique_relation_names(query);
 	        

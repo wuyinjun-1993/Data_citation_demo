@@ -131,12 +131,6 @@ public class final_stress_test_group_min {
 		Connection c2 = null;
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");
-	    c1 = DriverManager
-	        .getConnection(populate_db.db_url1, populate_db.usr_name , populate_db.passwd);
-		
-	    c2 = DriverManager
-	        .getConnection(populate_db.db_url2, populate_db.usr_name , populate_db.passwd);
-		
 //	    System.out.println(get_single_table_size("family", c, pst));
 	    
 	    
@@ -163,16 +157,26 @@ public class final_stress_test_group_min {
         String usr_name = args[10];
         
         String passwd = args[11];
+        
+        String path = args[12];
+        
+        populate_db.synthetic_example_path = path;
 		
         query_generator.query_result_size = query_instance_size;
 		
-		query_generator.init_parameterizable_attributes(c2, pst);
+//		query_generator.init_parameterizable_attributes(c2, pst);
 
-		Query query = stress_test.init_query(k, new_query, c1, c2, pst);
+		Query query = stress_test.init_query(k, new_query, path, c1, c2, pst);
         
         relations = get_unique_relation_names(query);
         
 //        HashMap<String, Vector<String>> q_head_var_mapping = query_head_variables_mapping(query);
+        
+        c1 = DriverManager
+            .getConnection(populate_db.db_url_prefix + db_name1, usr_name , passwd);
+        
+        c2 = DriverManager
+            .getConnection(populate_db.db_url_prefix + db_name2, usr_name , passwd);
         
         
         Vector<Query> views = null;

@@ -1,0 +1,4 @@
+v1|family.family_id, family.name|family||family.family_id|family:family
+v2|family.family_id, family.type|family|family.family_id>'60'|family.family_id|family:family
+v3|introduction.family_id,introduction.text|introduction||introduction.family_id|introduction:introduction
+v4|family.family_id, introduction.text|family, introduction |family.family_id = introduction.family_id|family.type| family:family,introduction:introduction

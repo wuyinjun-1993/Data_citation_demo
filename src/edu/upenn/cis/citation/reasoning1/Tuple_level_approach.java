@@ -2277,6 +2277,8 @@ public class Tuple_level_approach {
 				{
 					String citation_vec = rs.getString(i + 1);
 					
+					curr_str += "####" + citation_vec + "####";
+					
 					if(citation_vec == null)
 					{
 //					  System.out.println("citation_vec::" + citation_vec);
@@ -2353,6 +2355,13 @@ public class Tuple_level_approach {
                   
                   HashSet<Tuple> c_unit_vec = get_citation_units_condition(c_units, query.body.size() + query.head.args.size(), query, all_head_vars, curr_views);
                   
+//                  System.out.println("Group" + group_num);
+//                  
+//                  for(Tuple view_mapping: c_unit_vec)
+//                  {
+//                    System.out.println(view_mapping.name);
+//                  }
+//                  
                   double start = System.nanoTime();
                   
                   if(isclustering)
@@ -2489,6 +2498,13 @@ public class Tuple_level_approach {
             Covering_sets_no_clustering.reasoning_single_tuple(head_variable_query_mapping, head_variable_view_mapping, relation_arg_mapping, valid_view_mapping_schema_level, query, rs, covering_set_schema_level, get_all_head_variables(valid_view_mapping_schema_level, query));
 
         }
+        
+        
+//        System.out.println("schema");
+//        for(Tuple view_mapping: valid_view_mapping_schema_level)
+//        {
+//          System.out.println(view_mapping.name);
+//        }
 		
 //		if(c_view_template != null)
 //		{			

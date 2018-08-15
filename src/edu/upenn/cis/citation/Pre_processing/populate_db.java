@@ -95,6 +95,18 @@ public class populate_db {
 	
 	public static String [] available_block = {"author"};
 	
+	public static void refresh_file_name()
+	{
+	  synthetic_query_files = synthetic_example_path + "query";
+	    
+	  synthetic_view_files = synthetic_example_path + "views";
+	    
+	  synthetic_citation_query_files = synthetic_example_path + "citation_queries";
+	    
+	  synthetic_citation_query_view_mapping_files = synthetic_example_path + "view_citation_query_mappings";
+
+	}
+	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException
 	{
 		

@@ -1450,6 +1450,11 @@ public class Schema_level_approach {
 	  
 	  valid_view_mappings_schema_level.addAll(view_mappings);
 	  
+//	  for(Tuple tuple: valid_view_mappings_schema_level)
+//	  {
+//	    System.out.println(tuple.name);
+//	  }
+	  
 	  if(isclustering)
         Covering_sets_clustering_by_relation.reasoning_single_tuple(head_variable_query_mapping, head_variable_view_mapping, relation_arg_mapping, valid_view_mappings_schema_level, q, rs, covering_set_schema_level, get_all_head_variables(valid_view_mappings_schema_level, q));
       else

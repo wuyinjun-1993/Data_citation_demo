@@ -1,2 +1,0 @@
-with days as (select (select trunc(sysdate, 'MONTH') from dual) + rownum -1 as d from dual connect by rownum < 31)
-select d from days where (trunc(d) - trunc(d,'IW') +1 ) not in (6,7) and d <= last_day(sysdate)

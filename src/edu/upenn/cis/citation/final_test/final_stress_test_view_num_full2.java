@@ -190,6 +190,10 @@ public class final_stress_test_view_num_full2 {
 		
 		String passwd = args[11];
 		
+		String path = args[12];
+		
+		populate_db.synthetic_example_path = path;
+		
 		Connection c1 = null;
         
         Connection c2 = null;
@@ -203,11 +207,11 @@ public class final_stress_test_view_num_full2 {
 		
 		query_generator.query_result_size = query_instance_size;
 		
-		Query query = stress_test.init_query(k, new_query, c1, c2, pst);
+		Query query = stress_test.init_query(k, new_query, path, c1, c2, pst);
 		
 			relations = get_unique_relation_names(query);
 			
-			HashMap<String, Vector<String>> q_head_var_mapping = query_head_variables_mapping(query);
+//			HashMap<String, Vector<String>> q_head_var_mapping = query_head_variables_mapping(query);
 			
 			
 			Vector<Query> views = null;

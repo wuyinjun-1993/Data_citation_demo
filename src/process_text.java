@@ -11,13 +11,46 @@ import org.apache.commons.lang3.StringUtils;
 
 public class process_text {
 	
-	static String path = "final_test_result/";
+	static String path = "scripts/";
 	
-	public static void main(String[] strs)
+	public static void main(String[] args)
 	{
-		process_text_full_case(path + "final_stress_test_group_full.txt", path + "exp_final_group_test_full_tuple_agg_intersection.csv", path + "exp_final_group_test_full_tuple_agg_union.csv", path + "exp_final_group_test_full_semi_schema_agg_intersection.csv", path + "exp_final_group_test_full_semi_schema_agg_union.csv", path + "exp_final_group_test_full_schema.csv");
-		
-//		process_text_min_case(path + "final_stress_test_group_min.txt", path + "exp_final_stress_test_group_min_tuple.csv", path + "exp_final_stress_test_group_min_semi_schema.csv", path + "exp_final_stress_test_group_min_schema.csv");
+	  
+	  path = args[0];
+	  
+	  boolean full_case = Boolean.valueOf(args[1]);
+	  
+	  boolean instance_case = Boolean.valueOf(args[2]);
+	  
+	  String input_file_name_without_surfix = args[3];
+	  
+	  int first_value = Integer.valueOf(args[4]);
+	  
+	  
+	  if(full_case)
+	  {
+	    String f1 = path + input_file_name_without_surfix + "_tuple_agg_intersection.csv";
+	    
+	    String f2 = path + input_file_name_without_surfix + "_tuple_agg_union.csv";
+	    
+	    String f3 = path + input_file_name_without_surfix + "_semi_schema_agg_intersection.csv";
+	    
+	    String f4 = path + input_file_name_without_surfix + "_semi_schema_agg_union.csv";
+	    
+	    String f5 = path + input_file_name_without_surfix + "_schema.csv";
+	    
+	    process_text_full_case(path + input_file_name_without_surfix + ".txt", f1, f2, f3, f4, f5, instance_case, first_value);
+	  }
+	  else
+	  {
+	    String f1 = path + input_file_name_without_surfix + "_tuple.csv";
+	    
+	    String f2 = path + input_file_name_without_surfix + "_semi_schema.csv";
+	    
+	    String f3 = path + input_file_name_without_surfix + "_schema.csv";
+	    
+	    process_text_min_case(path + input_file_name_without_surfix + ".txt", f1, f2, f3, instance_case, first_value);
+	  }
 	}
 
 	
@@ -242,7 +275,7 @@ public class process_text {
 	      
 	}
 	
-	static void process_text_full_case(String file_name, String f1, String f2, String f3, String f4, String f5)
+	static void process_text_full_case(String file_name, String f1, String f2, String f3, String f4, String f5, boolean instance_test_case, int first_value)
 	{
 		Vector<Vector<Double>> tuple_level_agg_intersection = new Vector<Vector<Double>>();
 	    
@@ -261,13 +294,17 @@ public class process_text {
 		    
 		    int num = 0;
 		    
+		    int index = first_value;
+		    
 		    while ((line = br.readLine()) != null) {
 		       // process the line.
-		    	String[] str = line.split("	");
+		    	String[] str = line.split("\\s+");
 		    	
 		    	if(StringUtils.isNumeric(str[0]) && line.length() > 10)
 		    	{
 		    		Vector<Double> curr_values = new Vector<Double>();
+		    		
+		    		curr_values.add((double) index);
 		    		
 //		    		System.out.println(num + "::" + line);
 		    		
@@ -317,6 +354,14 @@ public class process_text {
 		    					else
 		    					{
 		    						schema.add(curr_values);
+		    						
+		    						if(num % (5*m) == 5*m - 1)
+		    						{
+		    						  if(instance_test_case)
+	                                      index *= 10;
+	                                    else
+	                                      index ++;
+		    						}
 		    					}
 		    				}
 		    			}
@@ -359,7 +404,7 @@ public class process_text {
 	    write(f5, covert2vec_str(schema_average));
 	}
 	
-	static void process_text_min_case(String file_name, String f1, String f2, String f3)
+	static void process_text_min_case(String file_name, String f1, String f2, String f3, boolean instance_test_case, int first_value)
 	{
 		Vector<Vector<Double>> tuple_level = new Vector<Vector<Double>>();
 	    	    
@@ -368,6 +413,8 @@ public class process_text {
 	    Vector<Vector<Double>> schema = new Vector<Vector<Double>>();
 		
 	    int m = 10;
+	    
+	    int index = first_value;
 	    
 		try (BufferedReader br = new BufferedReader(new FileReader(file_name))) {
 		    String line;		    
@@ -381,6 +428,8 @@ public class process_text {
 		    	if(StringUtils.isNumeric(str[0]) && line.length() > 10)
 		    	{
 		    		Vector<Double> curr_values = new Vector<Double>();
+		    		
+		    		curr_values.add((double) index);
 		    		
 //		    		System.out.println(num + "::" + line);
 		    		
@@ -411,7 +460,15 @@ public class process_text {
 		    		{
 		    			
 		    			semi_schema.add(curr_values);
-	    					    			
+		    			
+		    			if(num % (2*m) == 2*m - 1)
+		    			{
+		    			  if(instance_test_case)
+	                          index *= 10;
+	                        else
+	                          index ++;
+		    			}
+		    			
 		    		}
 		    		
 			    	num ++;

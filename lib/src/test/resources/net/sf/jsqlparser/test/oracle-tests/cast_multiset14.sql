@@ -1,4 +1,0 @@
-select customer_id, cust_address_ntab
-multiset intersect all cust_address2_ntab multiset_intersect
-from customers_demo
-order by customer_id

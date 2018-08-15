@@ -1,0 +1,1 @@
+select paper.title, awards.title from investigator_award JOIN investigator ON investigator.investigator_key=investigator_award.investigator_key JOIN awards ON awards.award_key=investigator_award.award_key JOIN award_publication ON awards.award_key=award_publication.award_key JOIN paper ON award_publication.paper_key=paper.paper_key where investigator.name="Alawini";

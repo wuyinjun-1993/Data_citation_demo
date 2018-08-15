@@ -36,7 +36,7 @@ public class stress_test {
   static int times = 1;
 
   
-  static String path = "reasoning_results/";
+//  static String path = "reasoning_results/";
   
   static void reset() throws IOException
   {
@@ -112,8 +112,10 @@ public class stress_test {
   }
   
   
-  public static Query init_query(int k, boolean new_query, Connection c1, Connection c2, PreparedStatement pst) throws IOException, SQLException
+  public static Query init_query(int k, boolean new_query, String path, Connection c1, Connection c2, PreparedStatement pst) throws IOException, SQLException
   {
+    populate_db.refresh_file_name();
+    
     query_generator.init_parameterizable_attributes(c2, pst);
     if(new_query)
     {
@@ -151,20 +153,20 @@ public class stress_test {
 //        System.out.println(query);
     }
     
-//    if(new_query)
-//    {
-//        Vector<String> sqls = new Vector<String>();
-//        
-//        sqls.add(Query_converter.datalog2sql_test(query));
-//        
-//        Query_operation.write2file(path + "user_query_sql", sqls);
-//    }
+    if(new_query)
+    {
+        Vector<String> sqls = new Vector<String>();
+        
+        sqls.add(Query_converter.datalog2sql_test(query));
+        
+        Query_operation.write2file(path + "user_query_sql", sqls);
+    }
         
      return query;
   }
   
   
-  public static Query init_query(int k, int instance_size, boolean new_query, Connection c1, Connection c2, PreparedStatement pst) throws IOException, SQLException
+  public static Query init_query(int k, int instance_size, boolean new_query, String path, Connection c1, Connection c2, PreparedStatement pst) throws IOException, SQLException
   {
     query_generator.init_parameterizable_attributes(c2, pst);
     if(new_query)
@@ -393,7 +395,7 @@ public class stress_test {
 //        
 //        agg_results.add(Tuple_reasoning1_full_min_test.covering_sets_query.toString());
 //        
-          Query_operation.write2file(path + "covering_sets", Tuple_level_approach.covering_set_schema_level);
+//          Query_operation.write2file(path + "covering_sets", Tuple_level_approach.covering_set_schema_level);
 
 //        for(int k = 0; k<Aggregation5.curr_res.size(); k++)
 //        {
@@ -619,7 +621,7 @@ public class stress_test {
               
               System.out.println();
               
-              System.out.println(agg_citations);
+//              System.out.println(agg_citations);
               
 
               c.close();
@@ -888,7 +890,7 @@ public class stress_test {
           
 //          System.out.print("covering_sets::" + Tuple_level_approach.covering_set_schema_level + "  ");
           
-          System.out.print("covering_set::" + TLA_min.covering_set_schema_level + "   ");
+//          System.out.print("covering_set::" + TLA_min.covering_set_schema_level + "   ");
           
 //          int distinct_view_size = Aggregation5.cal_distinct_views();
           
@@ -1138,7 +1140,7 @@ public class stress_test {
 
 //              System.out.print("covering_sets::" + Semi_schema_level_approach.covering_set_schema_level + "  ");
               
-              System.out.print("covering_set_size::" + SSLA_min.covering_set_schema_level + "   ");
+//              System.out.print("covering_set_size::" + SSLA_min.covering_set_schema_level + "   ");
               
 //              int distinct_view_size = Aggregation5.cal_distinct_views();
 //              

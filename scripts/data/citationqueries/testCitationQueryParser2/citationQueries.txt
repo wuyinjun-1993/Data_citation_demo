@@ -1,0 +1,1 @@
+cq1|contributor.first_names,contributor.surname|contributor,contributor2family,family|contributor.contributor_id=contributor2family.contributor_id, family.family_id=contributor2family.family_id|family.family_id, family.type|family:family,contributor:contributor,contributor2family:contributor2family

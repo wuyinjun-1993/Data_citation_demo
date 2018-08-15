@@ -141,13 +141,6 @@ public class final_stress_test_group_full {
 		
 //		Connection c3 = null;
 	      PreparedStatement pst = null;
-		Class.forName("org.postgresql.Driver");
-	    c1 = DriverManager
-	        .getConnection(populate_db.db_url1, populate_db.usr_name , populate_db.passwd);
-		
-	    c2 = DriverManager
-	        .getConnection(populate_db.db_url2, populate_db.usr_name , populate_db.passwd);
-	    
 //	    c3 = DriverManager
 //		        .getConnection(populate_db.db_url3, populate_db.usr_name , populate_db.passwd);
 		
@@ -179,14 +172,26 @@ public class final_stress_test_group_full {
         String usr_name = args[11];
         
         String passwd = args[12];
+        
+        String path = args[13];
+        
+        populate_db.synthetic_example_path = path;
 		
 		query_generator.query_result_size = query_instance_size;
 				
+		
+		Class.forName("org.postgresql.Driver");
+        c1 = DriverManager
+            .getConnection(populate_db.db_url_prefix + db_name1, usr_name , passwd);
+        
+        c2 = DriverManager
+            .getConnection(populate_db.db_url_prefix + db_name2, usr_name , passwd);
+		
 //		Query query = query_storage.get_query_by_id(1);
-		query_generator.init_parameterizable_attributes(c2, pst);
+//		query_generator.init_parameterizable_attributes(c2, pst);
 
 		
-		Query query = stress_test.init_query(k, new_query, c1, c2, pst);
+		Query query = stress_test.init_query(k, new_query, path, c1, c2, pst);
         
         relations = get_unique_relation_names(query);
         
@@ -221,6 +226,36 @@ public class final_stress_test_group_full {
         c1.close();
         
         c2.close();
+        
+        
+//        System.out.println(query);
+//        
+//        System.out.println(query.lambda_term.get(0));
+//        
+//        for(Iterator iter = views.iterator(); iter.hasNext();)
+//        {
+//            Query view = (Query) iter.next();
+//            
+//            System.out.println(view);
+//        }
+//        
+//        for(Iterator iter = citation_queries.iterator(); iter.hasNext();)
+//        {
+//            Query view = (Query) iter.next();
+//            
+//            System.out.println(view);
+//        }
+//        
+//        Set<String> view_names = view_citation_query_mappings.keySet();
+//        
+//        for(String view_name : view_names)
+//        {
+//          HashMap<String, String> cqs = view_citation_query_mappings.get(view_name);
+//          
+//          System.out.println(view_name + "::" + cqs);
+//        }
+//        
+//        System.out.println(view_citation_query_mappings);
         
         stress_test.stress_test(query, views, citation_queries, view_citation_query_mappings, tuple_level, schema_level, agg_intersection, true, db_name1, db_name2, usr_name, passwd);
 

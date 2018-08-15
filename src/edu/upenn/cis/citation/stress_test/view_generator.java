@@ -1509,7 +1509,7 @@ public class view_generator {
 			{
 				queries.add(query);
 				
-		    	System.out.println(query.lambda_term + "," + query.toString());
+//		    	System.out.println(query.lambda_term + "," + query.toString());
 				
 				num ++;
 			}
@@ -1601,7 +1601,7 @@ public class view_generator {
 			{
 				queries.add(query);
 				
-		    	System.out.println(query.lambda_term + "," + query.toString());
+//		    	System.out.println(query.lambda_term + "," + query.toString());
 				
 				num ++;
 			}
@@ -4889,7 +4889,7 @@ public class view_generator {
 			op = new op_less_equal();
 		}
 		
-		Argument arg1 = new Argument(primary_keys[0], subgoal.name);
+		Argument arg1 = new Argument(subgoal.name + populate_db.separator + primary_keys[0], subgoal.name);
 		
 		Argument arg2 = new Argument("'" + ids[value_id] + "'");
 		

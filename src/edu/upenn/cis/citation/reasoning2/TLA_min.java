@@ -2297,6 +2297,15 @@ public class TLA_min {
 				{
 					String citation_vec = rs.getString(i + 1);
 					
+					curr_str += "####" + citation_vec + "####";
+					
+					if(citation_vec == null)
+                    {
+//                    System.out.println("citation_vec::" + citation_vec);
+                      
+                      continue;
+                    }
+					
 //					System.out.println("citation_vec::" + citation_vec);
 					
 //					String[] citation_vec_arr = (String[]) citation_vec.getArray();

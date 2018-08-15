@@ -423,7 +423,7 @@ public class process_text {
 		    
 		    while ((line = br.readLine()) != null) {
 		       // process the line.
-		    	String[] str = line.split("	");
+		    	String[] str = line.split("\\s+");
 		    	
 		    	if(StringUtils.isNumeric(str[0]) && line.length() > 10)
 		    	{
@@ -439,7 +439,7 @@ public class process_text {
 		    			{
 		    				String num_val = str[i].split("::")[1];
 		    				
-		    				System.out.print(str[i].split("::")[0] + "	");
+//		    				System.out.print(str[i].split("::")[0] + "	");
 		    				
 		    				if(isNumeric(num_val))
 		    				{
@@ -450,7 +450,7 @@ public class process_text {
 		    			}
 		    		}
 		    		
-		    		System.out.println();
+//		    		System.out.println();
 		    		
 		    		if(num % (2*m) <m)
 		    		{
@@ -475,7 +475,7 @@ public class process_text {
 
 		    	}
 		    	
-		    	if(str[0].startsWith("execution time::"))
+		    	if(str[0].startsWith("execution"))
 		    	{
 		    		Vector<Double> curr_values = new Vector<Double>();
 		    		
@@ -487,7 +487,7 @@ public class process_text {
 		    			{
 		    				String num_val = str[i].split("::")[1];
 		    				
-		    				System.out.print(str[i].split("::")[0] + "	");
+//		    				System.out.print(str[i].split("::")[0] + "	");
 		    				
 		    				if(isNumeric(num_val))
 		    				{
@@ -500,7 +500,7 @@ public class process_text {
 		    		
 		    		schema.add(curr_values);
 		    		
-		    		System.out.println();
+//		    		System.out.println();
 		    	}
 		    	
 		    }

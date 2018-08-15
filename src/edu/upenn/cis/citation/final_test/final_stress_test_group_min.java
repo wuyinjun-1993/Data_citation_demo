@@ -165,18 +165,18 @@ public class final_stress_test_group_min {
         query_generator.query_result_size = query_instance_size;
 		
 //		query_generator.init_parameterizable_attributes(c2, pst);
-
-		Query query = stress_test.init_query(k, new_query, path, c1, c2, pst);
-        
-        relations = get_unique_relation_names(query);
-        
-//        HashMap<String, Vector<String>> q_head_var_mapping = query_head_variables_mapping(query);
         
         c1 = DriverManager
             .getConnection(populate_db.db_url_prefix + db_name1, usr_name , passwd);
         
         c2 = DriverManager
             .getConnection(populate_db.db_url_prefix + db_name2, usr_name , passwd);
+
+		Query query = stress_test.init_query(k, new_query, path, c1, c2, pst);
+        
+        relations = get_unique_relation_names(query);
+        
+//        HashMap<String, Vector<String>> q_head_var_mapping = query_head_variables_mapping(query);
         
         
         Vector<Query> views = null;
@@ -199,12 +199,12 @@ public class final_stress_test_group_min {
         
         stress_test.init_views(views, new_views, new_rounds, new_start, query, relations, c1, c2, pst);
         
-        for(Iterator iter = views.iterator(); iter.hasNext();)
-        {
-            Query view = (Query) iter.next();
-            
-            System.out.println(view);
-        }
+//        for(Iterator iter = views.iterator(); iter.hasNext();)
+//        {
+//            Query view = (Query) iter.next();
+//            
+//            System.out.println(view);
+//        }
         
         Vector<Query> citation_queries = Load_views_and_citation_queries.get_views(populate_db.synthetic_citation_query_files, c2, pst);
         

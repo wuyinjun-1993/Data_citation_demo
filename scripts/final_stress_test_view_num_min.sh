@@ -10,9 +10,15 @@ echo $3
 
 echo $4
 
+echo $5
+
+echo $6
+
 query_size=4
 
-query_instance_size=10000
+query_instance_size=$5
+
+max_view_num=$6
 
 echo $k
 
@@ -29,7 +35,7 @@ db_schema="IUPHAR"
 
 #for query_size in 4 5 6 7 8 9 10
 #do
-	for round_times in {1..50}
+	for round_times in {1..$max_view_num}
 	do	
 		echo "$round_times"
 		if [ $round_times -eq 1 ];

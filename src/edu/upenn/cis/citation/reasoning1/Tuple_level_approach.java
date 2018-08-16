@@ -1868,20 +1868,20 @@ public class Tuple_level_approach {
       
 //    HashSet<Tuple> view_tuples = pre_processing(views, q, partial_mapping_strings, partial_mapping_view_mapping_mappings, with_sub_queries_id_mappings, full_mapping_condition_str, c,pst);
       
-      HashSet<Tuple> view_tuples = Schema_reasoning_with_agg.pre_processing(true, citation_queries, max_author_num, view_query_mapping, author_mapping, query_ids, query_lambda_str, prepare_info, lambda_term_id_mapping, valid_lambda_terms, conditions_map, valid_conditions, view_tuple_mapping, head_variable_query_mapping, relation_arg_mapping, head_variable_view_mapping, views, cqs, view_citation_query_mappings, q, partial_mapping_strings, partial_mapping_view_mapping_mappings, with_sub_queries_id_mappings, full_mapping_condition_str, q_subgoal_id, c,pst);
+      viewTuples = Schema_reasoning_with_agg.pre_processing(true, citation_queries, max_author_num, view_query_mapping, author_mapping, query_ids, query_lambda_str, prepare_info, lambda_term_id_mapping, valid_lambda_terms, conditions_map, valid_conditions, view_tuple_mapping, head_variable_query_mapping, relation_arg_mapping, head_variable_view_mapping, views, cqs, view_citation_query_mappings, q, partial_mapping_strings, partial_mapping_view_mapping_mappings, with_sub_queries_id_mappings, full_mapping_condition_str, q_subgoal_id, c,pst);
       
       String sql = null;
       
       if(!test_case)
-          sql = Query_converter.datalog2sql_citation_agg(true, q, partial_mapping_strings, partial_mapping_view_mapping_mappings, with_sub_queries_id_mappings, full_mapping_condition_str, valid_conditions, valid_lambda_terms, view_tuples);
+          sql = Query_converter.datalog2sql_citation_agg(true, q, partial_mapping_strings, partial_mapping_view_mapping_mappings, with_sub_queries_id_mappings, full_mapping_condition_str, valid_conditions, valid_lambda_terms, viewTuples);
       else
-          sql = Query_converter.datalog2sql_citation_agg_test(true, q, partial_mapping_strings, partial_mapping_view_mapping_mappings, with_sub_queries_id_mappings, full_mapping_condition_str, valid_conditions, valid_lambda_terms, view_tuples);
+          sql = Query_converter.datalog2sql_citation_agg_test(true, q, partial_mapping_strings, partial_mapping_view_mapping_mappings, with_sub_queries_id_mappings, full_mapping_condition_str, valid_conditions, valid_lambda_terms, viewTuples);
       
-      System.out.println(sql);
+//      System.out.println(sql);
 //      
 //      System.out.println(q);
       
-      reasoning(q, partial_mapping_strings, partial_mapping_view_mapping_mappings, c, pst, sql, view_tuples);
+      reasoning(q, partial_mapping_strings, partial_mapping_view_mapping_mappings, c, pst, sql, viewTuples);
 		
 //		HashSet<Tuple> viewTuples = pre_processing(views, q ,c,pst);
 //		
@@ -2283,6 +2283,8 @@ public class Tuple_level_approach {
 					{
 //					  System.out.println("citation_vec::" + citation_vec);
 					  
+					  c_units.add(new HashSet<String>());
+					  
 					  continue;
 					}
 					
@@ -2369,6 +2371,8 @@ public class Tuple_level_approach {
                   else
                     Covering_sets_no_clustering.reasoning_single_tuple(head_variable_query_mapping, head_variable_view_mapping, relation_arg_mapping, c_unit_vec, query, rs, c_view_template, all_head_vars);
 
+                  
+//                  System.out.println(c_view_template.size());
 //                  if(isclustering)
 //                    get_valid_citation_combination(c_view_template, c_unit_vec,query, all_head_vars);
 //                  else
@@ -2408,7 +2412,9 @@ public class Tuple_level_approach {
                   
                   covering_set_time = (end - start)*1.0/second2nano;
                   
-                  covering_set_num += c_view_template.size();
+                  covering_set_num += c_view_map.get(curr_str).size();
+                  
+//                  System.out.println(tuple_num + "::" + covering_set_num);
                   
                   old_value = curr_str;
                   
@@ -2443,7 +2449,9 @@ public class Tuple_level_approach {
 				  
                   start = System.nanoTime();
                   
-                  covering_set_num += c_view_template.size();
+                  covering_set_num += c_view_map.get(curr_str).size();
+                  
+//                  System.out.println(tuple_num + "::" + covering_set_num);
                   
                   if(head_strs_rows_mapping.get(h_vals) == null)
                   {

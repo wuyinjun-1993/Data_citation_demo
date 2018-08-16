@@ -211,7 +211,7 @@ public class final_stress_test_instance_size_full {
         c2 = DriverManager
             .getConnection(populate_db.db_url_prefix + db_name2, usr_name , passwd);
 		
-	      Query query = stress_test.init_query(k, instance_size, new_query, path, c1, c2, pst);
+	      Query query = stress_test.init_query(k, instance_size, new_query, new_rounds, path, c1, c2, pst);
 	        
 	        relations = get_unique_relation_names(query);
 	        
@@ -222,7 +222,7 @@ public class final_stress_test_instance_size_full {
 	        
 	        Vector<Query> new_views = null;
 	        
-	        if(new_rounds)
+	        if(new_query)
 	        {
 	            
 	           views = view_generator.gen_random_views(relations, view_size, query, c1, c2, pst);
@@ -232,13 +232,15 @@ public class final_stress_test_instance_size_full {
 	            views = Load_views_and_citation_queries.get_views(populate_db.synthetic_view_files, c2, pst);
 	        }
 	        
-	        stress_test.init_views(views, new_views, new_rounds, false, query, relations, c1, c2, pst);
+	        stress_test.init_views(views, new_views, new_query, false, query, relations, c1, c2, pst);
 	        
 	        Vector<Query> citation_queries = Load_views_and_citation_queries.get_views(populate_db.synthetic_citation_query_files, c2, pst);
             
             HashMap<String, HashMap<String, String>> view_citation_query_mappings = Load_views_and_citation_queries.get_view_citation_query_mappings(populate_db.synthetic_citation_query_view_mapping_files);
 
-	        
+//	        System.out.println(query);
+            
+            
 	        c1.close();
 	        
 	        c2.close();

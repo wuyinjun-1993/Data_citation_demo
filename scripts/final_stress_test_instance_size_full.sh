@@ -1,5 +1,7 @@
 #!/bin/bash
 
+trap "exit" INT
+
 k=3;
 
 echo $k
@@ -12,12 +14,18 @@ echo $3
 
 echo $4
 
+echo $5
+
+echo $6
+
 
 true_str="true";
 
 false_str="false";
 
-view_size=15
+view_size=$6
+
+max_instance_size=$5
 
 query_size=3
 
@@ -25,12 +33,23 @@ path="../target/"
 
 synthetic_dir="synthetic_example/"
 
-for instance_size in 100 1000 10000 100000 1000000 10000000 100000000
+instance_size=10;
+
+for ((i=1;instance_size < max_instance_size;i++))
 do
+
+	instance_size=$((instance_size*10))
+
+	echo "instance_size::"$instance_size
+
+	if ((instance_size > max_instance_size))
+	then
+		instance_size=$max_instance_size
+	fi
 #	for round_times in {1..100}
 #	do	
 #		echo "$round_times"
-		if [ $instance_size -eq 100 ];
+		if [ $i -eq 1 ];
 		then
 			echo "start new view size"
 			command="java -Xmx20480m  -jar final_stress_test_instance_size_full.jar $query_size $view_size $instance_size ${true_str} ${true_str} ${true_str} ${true_str}"
@@ -73,7 +92,7 @@ do
 		else
 			command="java -Xmx20480m  -jar final_stress_test_instance_size_full.jar $query_size $view_size $instance_size ${true_str} ${false_str} ${true_str} ${false_str} ${true_str}"
                         echo ${command}
-                        java -Xmx20480m -jar "$path"final_stress_test_instance_size_full.jar $query_size $view_size $instance_size ${true_str} ${false_str} ${true_str} ${false_str} ${true_str} $1 $2 $3 $4 $synthetic_dir
+                        java -Xmx20480m -jar "$path"final_stress_test_instance_size_full.jar $query_size $view_size $instance_size ${false_str} ${true_str} ${true_str} ${false_str} ${true_str} $1 $2 $3 $4 $synthetic_dir
                         for execution_times in {1..2}
                         do
                                java -Xmx20480m -jar "$path"final_stress_test_instance_size_full.jar $query_size $view_size $instance_size ${false_str} ${false_str} ${true_str} ${false_str} ${true_str} $1 $2 $3 $4 $synthetic_dir

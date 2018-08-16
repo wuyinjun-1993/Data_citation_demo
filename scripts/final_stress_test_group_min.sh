@@ -13,14 +13,20 @@ echo $3
 
 echo $4
 
+echo $5
+
+echo $6
+
+echo $7
+
 
 true_str="true";
 
 false_str="false";
 
-view_size=15
+view_size=$6
 
-query_instance_size=10000
+query_instance_size=$5
 
 db_schema="IUPHAR"
 
@@ -28,9 +34,11 @@ path="../target/"
 
 synthetic_dirc="synthetic_example/"
 
+max_predicate_num=$7
+
 #for view_size in 10 15 20 25 30 
 #do
-	for round_times in {1..20}
+	for round_times in {1..$max_predicate_num}
 	do	
 		echo "$round_times"
 		if [ $round_times -eq 1 ];

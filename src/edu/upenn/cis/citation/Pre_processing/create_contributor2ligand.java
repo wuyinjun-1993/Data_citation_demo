@@ -12,13 +12,17 @@ public class create_contributor2ligand {
 	
 	public static void main(String []args) throws SQLException, ClassNotFoundException
 	{
+	  String db_name = args[0];
+	  
+	  String usr_name = args[1];
+	  
+	  String passwd = args[2];
+	  
 		Connection c = null;
-	      ResultSet rs = null;
 	      PreparedStatement pst = null;
 		Class.forName("org.postgresql.Driver");
 	    c = DriverManager
-	        .getConnection(populate_db.db_url,
-	    	        populate_db.usr_name,populate_db.passwd);
+	        .getConnection(populate_db.db_url_prefix + db_name, usr_name, passwd);
 	    
 	    create_table(c, pst);
 	}
@@ -43,8 +47,19 @@ public class create_contributor2ligand {
 	}
 	
 	
+	static void create_table_schema(Connection c, PreparedStatement pst) throws SQLException
+	{
+	  String sql = "CREATE TABLE IF NOT EXISTS contributor2ligand(ligand integer, first_names text, surname text)";
+	  
+	  pst = c.prepareStatement(sql);
+	  
+	  pst.execute();
+	}
+	
 	static void create_table(Connection c, PreparedStatement pst) throws SQLException
 	{
+	  create_table_schema(c, pst);
+	  
 		int max_val = get_max_id(c, pst);
 		
 		for(int i = 1; i<= max_val; i++)

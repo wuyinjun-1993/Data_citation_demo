@@ -1527,7 +1527,7 @@ public class Query_converter {
 			if(i >= 1)
 				str += ",";
 			
-			str += "(" + arg.table_name + "." + arg.arg_name.substring(arg.arg_name.indexOf(populate_db.separator) + 1, arg.arg_name.length()) + ")";
+			str += arg.table_name + "." + arg.arg_name.substring(arg.arg_name.indexOf(populate_db.separator) + 1, arg.arg_name.length());
 			
 		}
 		return str;
@@ -1559,7 +1559,7 @@ public class Query_converter {
 		
 //		String citation_condition = get_citation_condition(query, c, pst);
 		
-		sql = "select distinct " + sel_item;
+		sql = "select " + sel_item;
 		
 		if(!sel_item_with_lambda_terms.isEmpty())
 			sql += "," + sel_item_with_lambda_terms;
@@ -1574,7 +1574,7 @@ public class Query_converter {
 		if(condition != null && !condition.isEmpty())
 			sql += " where " + condition;
 		
-		sql += " order by " + sel_item;
+//		sql += " order by " + sel_item;
 //		if(condition_str[1] != null && !condition_str[1].isEmpty())
 //			sql += " order by " + condition_str[1]; 
 		
@@ -1635,81 +1635,81 @@ public class Query_converter {
 	}
 	
 	
-	public static String datalog2sql_full(Query query) throws SQLException, ClassNotFoundException
-	{
-		
-//		String citation_unit = new String();
-		
-		String sel_item = new String();
-		
-		
-		Connection c = null;
-		
-	    PreparedStatement pst = null;
-	      
-		Class.forName("org.postgresql.Driver");
-		
-	    c = DriverManager
-	        .getConnection(populate_db.db_url,
-	    	        populate_db.usr_name,populate_db.passwd);
-		
-		String sql = new String();				
-				
-		HashMap<String, Vector<String[]>> arg_name_map = new HashMap<String, Vector<String[]>>();
-		
-		HashMap<String, Vector<String>> table_name_map = new HashMap<String, Vector<String>>();
-		
-		HashMap<String, Integer> table_seq_map = new HashMap<String, Integer>();
-				
-		String[] str_l = gen_condition(query, arg_name_map, table_name_map, false, table_seq_map);
-		
-		String where = str_l[0];
-		
-		String citation_table = str_l[1];
-		
-		
-		Set set = arg_name_map.keySet();
-		
-		int num = 0;
-		
-		for(Iterator iter = set.iterator();iter.hasNext();)
-		{
-			String key = (String) iter.next();
-			
-			
-			if(num >= 1)
-				sel_item += ",";
-			Vector<String[]> table_names = arg_name_map.get(key);
-			sel_item += table_names.get(0)[0] + "." + table_names.get(0)[1];
-			
-			num ++;
-		}
-		
-//		for(int i = 0; i<query.head.args.size(); i++)
-//		{
-//			Argument arg = (Argument)query.head.args.get(i);
-//			
-//			
-//			
-//			Vector<String[]> table_names = arg_name_map.get(arg.name);
-//			sel_item += table_names.get(0)[0] + "." + table_names.get(0)[1];
-////			if(arg.type == 0)
-////				sel_item += arg;
-////			else
-////			{
-////				sel_item += arg.origin_name;
-////			}
+//	public static String datalog2sql_full(Query query) throws SQLException, ClassNotFoundException
+//	{
+//		
+////		String citation_unit = new String();
+//		
+//		String sel_item = new String();
+//		
+//		
+//		Connection c = null;
+//		
+//	    PreparedStatement pst = null;
+//	      
+//		Class.forName("org.postgresql.Driver");
+//		
+//	    c = DriverManager
+//	        .getConnection(populate_db.db_url,
+//	    	        populate_db.usr_name,populate_db.passwd);
+//		
+//		String sql = new String();				
 //				
+//		HashMap<String, Vector<String[]>> arg_name_map = new HashMap<String, Vector<String[]>>();
+//		
+//		HashMap<String, Vector<String>> table_name_map = new HashMap<String, Vector<String>>();
+//		
+//		HashMap<String, Integer> table_seq_map = new HashMap<String, Integer>();
+//				
+//		String[] str_l = gen_condition(query, arg_name_map, table_name_map, false, table_seq_map);
+//		
+//		String where = str_l[0];
+//		
+//		String citation_table = str_l[1];
+//		
+//		
+//		Set set = arg_name_map.keySet();
+//		
+//		int num = 0;
+//		
+//		for(Iterator iter = set.iterator();iter.hasNext();)
+//		{
+//			String key = (String) iter.next();
+//			
+//			
+//			if(num >= 1)
+//				sel_item += ",";
+//			Vector<String[]> table_names = arg_name_map.get(key);
+//			sel_item += table_names.get(0)[0] + "." + table_names.get(0)[1];
+//			
+//			num ++;
 //		}
-		
-		sql = "select " + sel_item + " from " + citation_table + where;
-		
-		c.close();
-		
-		return sql;
-	}
-		
-	
+//		
+////		for(int i = 0; i<query.head.args.size(); i++)
+////		{
+////			Argument arg = (Argument)query.head.args.get(i);
+////			
+////			
+////			
+////			Vector<String[]> table_names = arg_name_map.get(arg.name);
+////			sel_item += table_names.get(0)[0] + "." + table_names.get(0)[1];
+//////			if(arg.type == 0)
+//////				sel_item += arg;
+//////			else
+//////			{
+//////				sel_item += arg.origin_name;
+//////			}
+////				
+////		}
+//		
+//		sql = "select " + sel_item + " from " + citation_table + where;
+//		
+//		c.close();
+//		
+//		return sql;
+//	}
+//		
+//	
 	static String get_sel_item(Query q)
 	{
 		String str = new String();
@@ -1728,6 +1728,48 @@ public class Query_converter {
 		}
 		return str;
 	}
+	
+	   static String get_sel_item_full(Query q)
+	    {
+	        String str = new String();
+	        
+//	      System.out.println("head::" + q.head);
+	        
+	        int count = 0;
+	        
+	        for(int i = 0; i<q.body.size(); i++)
+	        {
+	          Subgoal subgoal = (Subgoal) q.body.get(i);
+	          
+	          for(int j = 0; j<subgoal.args.size(); j++)
+	          {
+	            Argument arg = (Argument) subgoal.args.get(j);
+                
+                if(count >= 1)
+                    str += ",";
+                
+                String arg_name = arg.name.substring(arg.name.indexOf(populate_db.separator) + 1, arg.name.length());
+                
+                str += arg.relation_name + "." + arg_name + " as " + arg.relation_name + "_" + arg_name;
+                
+                count ++;
+	          }
+	          
+	        }
+	        
+	        
+//	        for(int i = 0; i<q.head.size(); i++)
+//	        {
+//	            Argument arg = (Argument) q.head.args.get(i);
+//	            
+//	            if(i >= 1)
+//	                str += ",";
+//	            
+//	            str += arg.relation_name + "." + arg.name.substring(arg.name.indexOf(populate_db.separator) + 1, arg.name.length());
+//	            
+//	        }
+	        return str;
+	    }
 	
 	public static String get_renamed_sel_item(Query q)
 	{
@@ -2843,11 +2885,21 @@ public class Query_converter {
 	{
 	  String arg2_name = arg2.name;
 	  
-      String partial_mapping_bool_exp = tuple.mapSubgoals_str.get(subgoal_name2) + "." + Query_converter.get_arg_name(arg2_name) + condition.op + subgoal_name1 + "_" + Query_converter.get_arg_name(arg1.name);
+      String partial_mapping_bool_exp = tuple.mapSubgoals_str.get(subgoal_name2) + "." + Query_converter.get_arg_name(arg2_name) + condition.op + subgoal_name1 + "." + Query_converter.get_arg_name(arg1.name);
       
       return partial_mapping_bool_exp;
 
 	}
+	
+	   static String get_single_partial_mapping_bool_string(Argument arg1, Argument arg2, Tuple tuple, Conditions condition, String view_name, String subgoal_name1, String subgoal_name2)
+	    {
+	      String arg2_name = arg2.name;
+	      
+	      String partial_mapping_bool_exp = tuple.mapSubgoals_str.get(subgoal_name2) + "." + Query_converter.get_arg_name(arg2_name) + condition.op + view_name + "." + subgoal_name1 + "_" + Query_converter.get_arg_name(arg1.name);
+	      
+	      return partial_mapping_bool_exp;
+
+	    }
 	
 	public static Vector<String> get_partial_mapping_boolean_expressions(Tuple tuple, Query view, HashMap<String, Integer> with_sub_queries_id_mappings)
 	  {
@@ -2866,7 +2918,7 @@ public class Query_converter {
 //	      
 //	      System.out.println(tuple.cluster_non_mapping_condition_ids);
 	      
-	      String curr_with_sql = "select ";
+//	      String curr_with_sql = "select ";
 	      
 	      HashSet<Integer> subgoal_ids = tuple.cluster_subgoal_ids.get(i);
 	      
@@ -2890,53 +2942,53 @@ public class Query_converter {
 	        if(subgoal_count >= 1)
 	          from_clause += ",";
 	          
-	        from_clause += origin_subgoal_name + "  " + subgoal.name;
+	        from_clause += origin_subgoal_name + "  " + view.name + "_" + subgoal.name;
 	        
 	        subgoal_count ++;
 	      }
 	      
-	      curr_with_sql += select_clause + " from " + from_clause; 
-	      
-	      if(tuple.cluster_non_mapping_condition_ids.get(i).size() > 0)
-	        curr_with_sql += " where ";
-	      
-	      
-	      int join_condition_count = 0;
-	      
-	      for(Integer id: tuple.cluster_non_mapping_condition_ids.get(i))
-	        {
-	          Conditions condition = view.conditions.get(id);
-	          
-	          Argument arg1 = condition.arg1;
-	          
-	          Argument arg2 = condition.arg2;
-	          
-	          if(join_condition_count >= 1)
-	            curr_with_sql += " and ";
-	          
-	          if(!condition.arg2.isConst())
-	            curr_with_sql += condition.subgoal1 + "." + Query_converter.get_arg_name(arg1.name) + condition.op.toString() + condition.subgoal2 + "." + Query_converter.get_arg_name(arg2.name);
-	          else
-	            curr_with_sql += condition.subgoal1 + "." + Query_converter.get_arg_name(arg1.name) + condition.op.toString() + Query_converter.get_arg_name(arg2.name);
-	          
-	          join_condition_count ++;
-	        }
-	      
-	      int with_sub_queries_id_mappings_id = -1;
-	      
-	      if(with_sub_queries_id_mappings.get(curr_with_sql) == null)
-	      {
-	        int with_sub_queries_id_mappings_size = with_sub_queries_id_mappings.size();
-	        
-	        with_sub_queries_id_mappings_id = with_sub_queries_id_mappings_size;
-	        
-	        with_sub_queries_id_mappings.put(curr_with_sql, with_sub_queries_id_mappings_size);
-	        
-	      }
-	      else
-	      {
-	        with_sub_queries_id_mappings_id = with_sub_queries_id_mappings.get(curr_with_sql);
-	      }
+//	      curr_with_sql += select_clause + " from " + from_clause; 
+//	      
+//	      if(tuple.cluster_non_mapping_condition_ids.get(i).size() > 0)
+//	        curr_with_sql += " where ";
+//	      
+//	      
+//	      int join_condition_count = 0;
+//	      
+//	      for(Integer id: tuple.cluster_non_mapping_condition_ids.get(i))
+//	        {
+//	          Conditions condition = view.conditions.get(id);
+//	          
+//	          Argument arg1 = condition.arg1;
+//	          
+//	          Argument arg2 = condition.arg2;
+//	          
+//	          if(join_condition_count >= 1)
+//	            curr_with_sql += " and ";
+//	          
+//	          if(!condition.arg2.isConst())
+//	            curr_with_sql += condition.subgoal1 + "." + Query_converter.get_arg_name(arg1.name) + condition.op.toString() + condition.subgoal2 + "." + Query_converter.get_arg_name(arg2.name);
+//	          else
+//	            curr_with_sql += condition.subgoal1 + "." + Query_converter.get_arg_name(arg1.name) + condition.op.toString() + Query_converter.get_arg_name(arg2.name);
+//	          
+//	          join_condition_count ++;
+//	        }
+//	      
+//	      int with_sub_queries_id_mappings_id = -1;
+//	      
+//	      if(with_sub_queries_id_mappings.get(curr_with_sql) == null)
+//	      {
+//	        int with_sub_queries_id_mappings_size = with_sub_queries_id_mappings.size();
+//	        
+//	        with_sub_queries_id_mappings_id = with_sub_queries_id_mappings_size;
+//	        
+//	        with_sub_queries_id_mappings.put(curr_with_sql, with_sub_queries_id_mappings_size);
+//	        
+//	      }
+//	      else
+//	      {
+//	        with_sub_queries_id_mappings_id = with_sub_queries_id_mappings.get(curr_with_sql);
+//	      }
 	      
 	      
 	      Vector<Conditions> partial_mapping_conditions = new Vector<Conditions>();
@@ -2944,10 +2996,36 @@ public class Query_converter {
 	      if(tuple.cluster_patial_mapping_condition_ids.get(i).size() <= 0)
 	        continue;
 	      
-	       String curr_partial_mapping_string = "(select exists (select 1 from with_sub_query" + with_sub_queries_id_mappings_id + " where ";
+	       String curr_partial_mapping_string = "(select exists (select 1 from " + from_clause;// + with_sub_queries_id_mappings_id + " where ";
+	       
+//	       if(tuple.cluster_non_mapping_condition_ids.get(i).size() > 0)
+	         curr_partial_mapping_string += " where ";
+	          int join_condition_count = 0;
+
+	        for(Integer id: tuple.cluster_non_mapping_condition_ids.get(i))
+	            {
+	              Conditions condition = view.conditions.get(id);
+	              
+	              Argument arg1 = condition.arg1;
+	              
+	              Argument arg2 = condition.arg2;
+	              
+	              if(join_condition_count >= 1)
+	                curr_partial_mapping_string += " and ";
+	              
+	              if(!condition.arg2.isConst())
+	                curr_partial_mapping_string += view.name + "_" + condition.subgoal1 + "." + Query_converter.get_arg_name(arg1.name) + condition.op.toString() + view.name + "_" +  condition.subgoal2 + "." + Query_converter.get_arg_name(arg2.name);
+	              else
+	                curr_partial_mapping_string += view.name + "_" + condition.subgoal1 + "." + Query_converter.get_arg_name(arg1.name) + condition.op.toString() + Query_converter.get_arg_name(arg2.name);
+	              
+	              join_condition_count ++;
+	            }
 	      
 	      int partial_mapping_condition_count = 0;
 	       
+	      if(tuple.cluster_non_mapping_condition_ids.size() > 0 && tuple.cluster_non_mapping_condition_ids.get(0).size() > 0)
+	        curr_partial_mapping_string += " and ";
+	      
 	      for(Integer id: tuple.cluster_patial_mapping_condition_ids.get(i))
 	      {
 	        if(partial_mapping_condition_count >= 1)
@@ -2965,11 +3043,11 @@ public class Query_converter {
             
             if(tuple.mapSubgoals_str.get(subgoal_name1) == null)
             {
-              curr_partial_mapping_string += get_single_partial_mapping_bool_string(arg1, arg2, tuple, condition, subgoal_name1, subgoal_name2);
+              curr_partial_mapping_string += get_single_partial_mapping_bool_string(arg1, arg2, tuple, condition, view.name + "_" + subgoal_name1, subgoal_name2);
             }
             else
             {
-              curr_partial_mapping_string += get_single_partial_mapping_bool_string(arg2, arg1, tuple, condition, subgoal_name2, subgoal_name1);
+              curr_partial_mapping_string += get_single_partial_mapping_bool_string(arg2, arg1, tuple, condition, view.name + "_" + subgoal_name2, subgoal_name1);
             }
             
             partial_mapping_condition_count++;
@@ -3046,6 +3124,231 @@ public class Query_converter {
 	    return partial_mapping_bool_expressions;
 	    
 	  }
+	
+	public static Vector<String> get_partial_mapping_boolean_expressions2(Tuple tuple, Query view, HashMap<String, Integer> with_sub_queries_id_mappings)
+    {
+      Vector<String> partial_mapping_bool_expressions = new Vector<String>();
+      
+      int partial_mapping_count = 0;
+      
+      for(int i = 0; i<tuple.cluster_subgoal_ids.size(); i++)
+      {
+        if(tuple.cluster_patial_mapping_condition_ids.get(i).size() <= 0)
+          continue;
+        
+//      System.out.println(tuple.cluster_subgoal_ids);
+//      
+//      System.out.println(tuple.cluster_patial_mapping_condition_ids);
+//      
+//      System.out.println(tuple.cluster_non_mapping_condition_ids);
+        
+//      String curr_with_sql = "select ";
+        
+        HashSet<Integer> subgoal_ids = tuple.cluster_subgoal_ids.get(i);
+        
+        String from_clause = new String();
+        
+        String select_clause = new String();
+        
+        int subgoal_count = 0;
+        
+        for(Integer subgoal_id: subgoal_ids)
+        {
+          Subgoal subgoal = (Subgoal) view.body.get(subgoal_id);
+            
+          if(subgoal_count >= 1)
+            select_clause += ",";
+          
+          select_clause += get_select_sub_clause(subgoal);
+          
+          String origin_subgoal_name = view.subgoal_name_mapping.get(subgoal.name);
+            
+          if(subgoal_count >= 1)
+            from_clause += ",";
+            
+          from_clause += origin_subgoal_name + "  " + view.name + "_" + subgoal.name;
+          
+          subgoal_count ++;
+        }
+        
+//      curr_with_sql += select_clause + " from " + from_clause; 
+//      
+//      if(tuple.cluster_non_mapping_condition_ids.get(i).size() > 0)
+//        curr_with_sql += " where ";
+//      
+//      
+//      int join_condition_count = 0;
+//      
+//      for(Integer id: tuple.cluster_non_mapping_condition_ids.get(i))
+//        {
+//          Conditions condition = view.conditions.get(id);
+//          
+//          Argument arg1 = condition.arg1;
+//          
+//          Argument arg2 = condition.arg2;
+//          
+//          if(join_condition_count >= 1)
+//            curr_with_sql += " and ";
+//          
+//          if(!condition.arg2.isConst())
+//            curr_with_sql += condition.subgoal1 + "." + Query_converter.get_arg_name(arg1.name) + condition.op.toString() + condition.subgoal2 + "." + Query_converter.get_arg_name(arg2.name);
+//          else
+//            curr_with_sql += condition.subgoal1 + "." + Query_converter.get_arg_name(arg1.name) + condition.op.toString() + Query_converter.get_arg_name(arg2.name);
+//          
+//          join_condition_count ++;
+//        }
+//      
+//      int with_sub_queries_id_mappings_id = -1;
+//      
+//      if(with_sub_queries_id_mappings.get(curr_with_sql) == null)
+//      {
+//        int with_sub_queries_id_mappings_size = with_sub_queries_id_mappings.size();
+//        
+//        with_sub_queries_id_mappings_id = with_sub_queries_id_mappings_size;
+//        
+//        with_sub_queries_id_mappings.put(curr_with_sql, with_sub_queries_id_mappings_size);
+//        
+//      }
+//      else
+//      {
+//        with_sub_queries_id_mappings_id = with_sub_queries_id_mappings.get(curr_with_sql);
+//      }
+        
+        
+        Vector<Conditions> partial_mapping_conditions = new Vector<Conditions>();
+        
+        if(tuple.cluster_patial_mapping_condition_ids.get(i).size() <= 0)
+          continue;
+        
+         String curr_partial_mapping_string = "(select exists (select 1 from " + view.name;// + with_sub_queries_id_mappings_id + " where ";
+         
+//       if(tuple.cluster_non_mapping_condition_ids.get(i).size() > 0)
+           curr_partial_mapping_string += " where ";
+            int join_condition_count = 0;
+
+//          for(Integer id: tuple.cluster_non_mapping_condition_ids.get(i))
+//              {
+//                Conditions condition = view.conditions.get(id);
+//                
+//                Argument arg1 = condition.arg1;
+//                
+//                Argument arg2 = condition.arg2;
+//                
+//                if(join_condition_count >= 1)
+//                  curr_partial_mapping_string += " and ";
+//                
+//                if(!condition.arg2.isConst())
+//                  curr_partial_mapping_string += view.name + "." + condition.subgoal1 + "_" + Query_converter.get_arg_name(arg1.name) + condition.op.toString() + view.name + "." +  condition.subgoal2 + "_" + Query_converter.get_arg_name(arg2.name);
+//                else
+//                  curr_partial_mapping_string += view.name + "." + condition.subgoal1 + "_" + Query_converter.get_arg_name(arg1.name) + condition.op.toString() + Query_converter.get_arg_name(arg2.name);
+//                
+//                join_condition_count ++;
+//              }
+//        
+        int partial_mapping_condition_count = 0;
+//         
+//        if(tuple.cluster_non_mapping_condition_ids.size() > 0 && tuple.cluster_non_mapping_condition_ids.get(0).size() > 0)
+//          curr_partial_mapping_string += " and ";
+        
+        for(Integer id: tuple.cluster_patial_mapping_condition_ids.get(i))
+        {
+          if(partial_mapping_condition_count >= 1)
+            curr_partial_mapping_string += " and ";
+          
+          Conditions condition = view.conditions.get(id);
+          
+          String subgoal_name1 = condition.subgoal1;
+          
+          String subgoal_name2 = condition.subgoal2;
+          
+          Argument arg1 = condition.arg1;
+          
+          Argument arg2 = condition.arg2;
+          
+          if(tuple.mapSubgoals_str.get(subgoal_name1) == null)
+          {
+            curr_partial_mapping_string += get_single_partial_mapping_bool_string(arg1, arg2, tuple, condition, view.name, subgoal_name1, subgoal_name2);
+          }
+          else
+          {
+            curr_partial_mapping_string += get_single_partial_mapping_bool_string(arg2, arg1, tuple, condition, view.name, subgoal_name2, subgoal_name1);
+          }
+          
+          partial_mapping_condition_count++;
+        }
+        
+        curr_partial_mapping_string += "))";
+        
+        partial_mapping_bool_expressions.add(curr_partial_mapping_string);
+        
+//       for(Integer id: tuple.cluster_patial_mapping_condition_ids.get(i))
+//          {
+//         
+////             if(partial_mapping_count >= 1)
+////               partial_mapping_bool_expressions += ",";
+//         
+//            Conditions condition = view.conditions.get(id);
+//            
+//            Argument arg1 = condition.arg1;
+//            
+//            Argument arg2 = condition.arg2;
+//            
+//            String subgoal_name1 = condition.subgoal1;
+//            
+//            String subgoal_name2 = condition.subgoal2;
+//            
+////            subgoal_names.add(condition.subgoal1);
+////            
+////            subgoal_names.add(condition.subgoal2);
+//            
+//            if(tuple.mapSubgoals_str.get(subgoal_name1) == null)
+//            {
+//              
+//              
+//              String partial_mapping_bool_exp = get_partial_mapping_bool_string(arg1, arg2, tuple, condition, subgoal_name1, subgoal_name2, with_sub_queries_id_mappings_id);
+//              
+//              partial_mapping_bool_expressions.add(partial_mapping_bool_exp);
+//              
+////                sql += "," + arg1.name.replaceAll("\\" + init.separator, "_");
+////                
+////                if(join_condition_count >= 1)
+////                  join_condition += " and ";
+////                
+////                join_condition += "t." + arg1.name.replaceAll("\\" + init.separator, "_") + condition.op.toString() + arg2.name.replaceFirst("\\" + init.separator, ".");
+//
+//            }
+//            else
+//            {
+//              String partial_mapping_bool_exp = get_partial_mapping_bool_string(arg2, arg1, tuple, condition, subgoal_name2, subgoal_name1, with_sub_queries_id_mappings_id);
+//                
+//                partial_mapping_bool_expressions.add(partial_mapping_bool_exp);
+//
+//              
+//              
+////                String arg1_name = arg1.name.substring(arg1.name.indexOf(populate_db.separator), arg1.name.length());
+////                
+////                String arg2_name = arg2.name.substring(arg2.name.indexOf(populate_db.separator), arg2.name.length());
+////                
+////                sql += "," + arg2.name.replaceAll("\\" + init.separator, "_");
+////                
+////                if(join_condition_count >= 1)
+////                  join_condition += " and ";
+////                
+////                join_condition += "t." + arg2.name.replaceAll("\\" + init.separator, "_") + condition.op.toString() + arg1.name.replaceFirst("\\" + init.separator, ".");
+//
+//            }
+//            
+//                    
+//            partial_mapping_count ++;
+//                            
+//          }
+        
+      }
+      
+      return partial_mapping_bool_expressions;
+      
+    }
+  
 	
 	public static String datalog2sql_citation3(Query query, HashSet<Tuple> viewTuples, Vector<Lambda_term> lambda_terms, HashSet<Conditions> valid_conditions, Connection c, PreparedStatement pst)
     {
@@ -3423,6 +3726,27 @@ public class Query_converter {
 		
 		return sql;
 	}
+	
+	   public static String datalog2sql_full(Query query)
+	    {
+	        
+	        String sql = new String();
+
+	        String sel_item = get_sel_item_full(query);
+	            
+	        String citation_table = get_relations_without_citation_table(query);
+	        
+	        String condition = get_condition(query);
+	                
+	        sql = "select " + sel_item;
+	        
+	        sql += " from " + citation_table;
+	        
+	        if(condition != null && !condition.isEmpty())
+	            sql += " where " + condition;
+	        
+	        return sql;
+	    }
 	
 	public static String datalog2sql_test(Query query)
 	{
@@ -3842,7 +4166,7 @@ public class Query_converter {
 //	        
 //	        System.out.println(condition_str[0]);
 	        
-	        return condition_str[1] + " " + sql;
+	        return sql;
 	        
 	        
 	        

@@ -1890,7 +1890,7 @@ public class gen_citation0 {
 //		}
 	}
 	
-	public static void init_author_mapping(Vector<Query> views, Vector<Query> citation_queries, HashMap<String, HashMap<String, String>> view_query_mapping, HashMap<String, ArrayList<ArrayList<String>>> author_mappings, HashMap<String, Integer> max_num, Connection c, PreparedStatement pst, HashMap<String, Query> citation_queries_name_mappings) throws SQLException
+	public static void init_author_mapping(HashSet<String> views, Vector<Query> citation_queries, HashMap<String, HashMap<String, String>> view_query_mapping, HashMap<String, ArrayList<ArrayList<String>>> author_mappings, HashMap<String, Integer> max_num, Connection c, PreparedStatement pst, HashMap<String, Query> citation_queries_name_mappings) throws SQLException
 	{
 		
 //		boolean [] query_id_set = new boolean[query_ids.size]; 
@@ -1908,10 +1908,10 @@ public class gen_citation0 {
 	  
 //	  view_query_mapping.putAll(Load_views_and_citation_queries.get_view_citation_query_mappings(populate_db.synthetic_citation_query_view_mapping_files));
 	  
-		for(int i = 0; i < views.size(); i++)
+		for(String view_name: views)
 		{
 		  
-		  HashMap<String, String> curr_citation_query_block_mappings = view_query_mapping.get(views.get(i).name);
+		  HashMap<String, String> curr_citation_query_block_mappings = view_query_mapping.get(view_name);
 //			HashMap<String, Integer> curr_query_ids = get_query_id3(views.get(i).name, query_ids, c, pst);
 			
 //			System.out.println(curr_query_ids);
@@ -1956,6 +1956,8 @@ public class gen_citation0 {
 //				.addAll(q.lambda_term);				
 //				query_lambda_str.set(id, l_terms);
 				
+				double t1 = System.nanoTime();
+				
 				String sql = Query_converter.datalog2sql_citation_query(q);
 				
 				pst = c.prepareStatement(sql);
@@ -1963,6 +1965,12 @@ public class gen_citation0 {
 				ResultSet rs = pst.executeQuery();
 				
 				ResultSetMetaData meta = rs.getMetaData();
+				
+				double t2 = System.nanoTime();
+				
+				double time = (t2 - t1)*1.0/1000000000;
+				
+//				System.out.println("time::" + time);
 				
 				int col_num = meta.getColumnCount();
 								
@@ -2022,7 +2030,7 @@ public class gen_citation0 {
 				{
 					Head_strs h_str = (Head_strs) it.next();
 					
-					String key = views.get(i).name + populate_db.separator + block_name + populate_db.separator + q.name + populate_db.separator + h_str.toString();
+					String key = view_name + populate_db.separator + block_name + populate_db.separator + q.name + populate_db.separator + h_str.toString();
 										
 					author_mappings.put(key, curr_author_mapping.get(h_str));
 				}

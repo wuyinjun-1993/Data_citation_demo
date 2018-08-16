@@ -183,6 +183,17 @@ public class final_real_test_full {
     	
     	if(new_round)
     	{
+    	  
+    	  
+//    	  stress_test.clear_views_in_database(c1, pst);
+//    	  
+//    	  stress_test.clear_views_in_database(c2, pst);
+//    	  
+//    	  stress_test.materialize_views(views, c1, pst);
+//    	  
+//    	  stress_test.materialize_views(views, c2, pst);
+    	  
+    	  
     	  populate_db.renew_table(c1, pst);
           
           populate_db.populate_db2(views, c1, pst);

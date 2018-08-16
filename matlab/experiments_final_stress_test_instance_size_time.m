@@ -41,4 +41,4 @@ xt = get(gca, 'XTick');
 xlim([50, 10^7]);
 ylim([0 160]);
 set(gca, 'FontSize', 15)
-saveas(gcf,'exp1/final_stress_test_instance_size_full_time.png')
+saveas(gcf,'exp3/final_stress_test_instance_size_full_time.png')

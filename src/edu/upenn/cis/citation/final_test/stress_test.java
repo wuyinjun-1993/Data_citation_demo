@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -166,8 +167,12 @@ public class stress_test {
   }
   
   
-  public static Query init_query(int k, int instance_size, boolean new_query, String path, Connection c1, Connection c2, PreparedStatement pst) throws IOException, SQLException
+  public static Query init_query(int k, int instance_size, boolean new_query, boolean new_rounds, String path, Connection c1, Connection c2, PreparedStatement pst) throws IOException, SQLException
   {
+    
+    populate_db.refresh_file_name();
+    
+    
     query_generator.init_parameterizable_attributes(c2, pst);
     if(new_query)
     {
@@ -178,22 +183,66 @@ public class stress_test {
                 
     Query query = null;
     
-    
+//    query = Load_views_and_citation_queries.get_query_test_case(populate_db.synthetic_query_files, c2, pst).get(0);
+//    
+//    query = query_generator.generate_query_with_new_instance_size(query, instance_size, c2, pst);
 
     
-    try{
-//          query = query_storage.get_query_by_id(1, c2, pst);
-      
-      query = Load_views_and_citation_queries.get_query_test_case(populate_db.synthetic_query_files, c2, pst).get(0);
-      
-      query = query_generator.generate_query_with_new_instance_size(query, instance_size, c2, pst);
-    }
-    catch(Exception e)
+    if(new_query)
     {
-        query_generator.query_result_size = instance_size;
+//      try{
+////      query = query_storage.get_query_by_id(1, c2, pst);
+//  
+//        query = Load_views_and_citation_queries.get_query_test_case(populate_db.synthetic_query_files, c2, pst).get(0);
+//        
+//        query = query_generator.generate_query_with_new_instance_size(query, instance_size, c2, pst);
+//      }
+//      catch(Exception e)
+      {
+          query_generator.query_result_size = instance_size;
+        
+          query = query_generator.gen_query(k, c2, pst);
       
-        query = query_generator.gen_query(k, c2, pst);
-
+          Vector<Query> queries = new Vector<Query>();
+          
+          queries.add(query);
+          
+          Vector<String> query_strings = Load_views_and_citation_queries.views2text_strings(queries);
+          Load_views_and_citation_queries.write2files(populate_db.synthetic_query_files, query_strings);
+          
+      //        query_storage.store_user_query(query, "1", c2, pst);
+          System.out.println(query);
+      }
+      
+        Vector<String> sqls = new Vector<String>();
+        
+        sqls.add(Query_converter.datalog2sql_test(query));
+        
+        Query_operation.write2file(path + "user_query_sql", sqls);
+    }
+    else
+    {
+      if(new_rounds)
+      {
+        try{
+//        query = query_storage.get_query_by_id(1, c2, pst);
+    
+          query = Load_views_and_citation_queries.get_query_test_case(populate_db.synthetic_query_files, c2, pst).get(0);
+          
+          query = query_generator.generate_query_with_new_instance_size(query, instance_size, c2, pst);
+        }
+        catch(Exception e)
+        {
+            query_generator.query_result_size = instance_size;
+          
+            query = query_generator.gen_query(k, c2, pst);
+        
+            
+            
+        //        query_storage.store_user_query(query, "1", c2, pst);
+            System.out.println(query);
+        }
+        
         Vector<Query> queries = new Vector<Query>();
         
         queries.add(query);
@@ -201,19 +250,16 @@ public class stress_test {
         Vector<String> query_strings = Load_views_and_citation_queries.views2text_strings(queries);
         Load_views_and_citation_queries.write2files(populate_db.synthetic_query_files, query_strings);
         
-//            query_storage.store_user_query(query, "1", c2, pst);
-        System.out.println(query);
+          Vector<String> sqls = new Vector<String>();
+          
+          sqls.add(Query_converter.datalog2sql_test(query));
+          
+          Query_operation.write2file(path + "user_query_sql", sqls);
+      }
+      else
+        query = Load_views_and_citation_queries.get_query_test_case(populate_db.synthetic_query_files, c2, pst).get(0);
     }
     
-    if(new_query)
-    {
-        Vector<String> sqls = new Vector<String>();
-        
-        sqls.add(Query_converter.datalog2sql_test(query));
-        
-        Query_operation.write2file(path + "user_query_sql", sqls);
-    }
-        
      return query;
   }
   
@@ -255,7 +301,7 @@ public class stress_test {
           
           middle_time = System.nanoTime();
           
-          Prepare_citation_info.prepare_citation_information(Tuple_level_approach.citation_queries, Tuple_level_approach.max_author_num, view_citation_query_mappings, Tuple_level_approach.author_mapping, Tuple_level_approach.query_ids, Tuple_level_approach.query_lambda_str, views, citation_queries, c, pst);
+          Prepare_citation_info.prepare_citation_information(Tuple_level_approach.viewTuples, Tuple_level_approach.citation_queries, Tuple_level_approach.max_author_num, view_citation_query_mappings, Tuple_level_approach.author_mapping, Tuple_level_approach.query_ids, Tuple_level_approach.query_lambda_str, views, citation_queries, c, pst);
           
           agg_citations = Tuple_level_approach.gen_citation_schema_level(c, pst);
           
@@ -371,8 +417,6 @@ public class stress_test {
           
           System.out.print("population::" + Tuple_level_approach.population_time + "  ");
           
-          
-          
 //        time = (end_time - start_time) * 1.0/1000000000;
 //        
 //        System.out.print("Aggregation_time::" + time + "    ");
@@ -458,6 +502,15 @@ public class stress_test {
           
           System.out.println();
           
+//          Set<String> keys = Tuple_level_approach.signiture_rid_mappings.keySet();
+//          
+//          for(String key: keys)
+//          {
+//            System.out.println(Tuple_level_approach.signiture_rid_mappings.get(key).size() + "::" + Tuple_level_approach.c_view_map.get(key).size());
+//          }
+//          
+//          System.out.println(Tuple_level_approach.covering_set_num);
+          
 //        System.out.println(agg_citations.toString());
           
           c.close();
@@ -503,7 +556,7 @@ public class stress_test {
               
               middle_time = System.nanoTime();
               
-              Prepare_citation_info.prepare_citation_information(Semi_schema_level_approach.citation_queries, Semi_schema_level_approach.max_author_num, view_citation_query_mappings, Semi_schema_level_approach.author_mapping, Semi_schema_level_approach.query_ids, Semi_schema_level_approach.query_lambda_str, views, citation_queries, c, pst);
+              Prepare_citation_info.prepare_citation_information(Semi_schema_level_approach.viewTuples, Semi_schema_level_approach.citation_queries, Semi_schema_level_approach.max_author_num, view_citation_query_mappings, Semi_schema_level_approach.author_mapping, Semi_schema_level_approach.query_ids, Semi_schema_level_approach.query_lambda_str, views, citation_queries, c, pst);
               
 //            Semi_schema_level_approach.gen_citation_schema_level(views_per_group, c, pst);
               
@@ -623,7 +676,15 @@ public class stress_test {
               
 //              System.out.println(agg_citations);
               
-
+//              Set<String> keys = Semi_schema_level_approach.signiture_rid_mappings.keySet();
+//              
+//              for(String key: keys)
+//              {
+//                System.out.println(Semi_schema_level_approach.signiture_rid_mappings.get(key).size() + "::" + Semi_schema_level_approach.c_view_map.get(key).size());
+//              }
+//              
+//              System.out.println(Semi_schema_level_approach.covering_set_num);
+              
               c.close();
               
 //            Tuple_reasoning1.compare(citation_view_map1, citation_view_map2);
@@ -679,7 +740,7 @@ public class stress_test {
               
               middle_time = System.nanoTime();
               
-              Prepare_citation_info.prepare_citation_information(Schema_level_approach.citation_queries, Schema_level_approach.max_author_num, view_citation_query_mappings, Schema_level_approach.author_mapping, Schema_level_approach.query_ids, Schema_level_approach.query_lambda_str, views, citation_queries, c, pst);
+              Prepare_citation_info.prepare_citation_information(Schema_level_approach.viewTuples, Schema_level_approach.citation_queries, Schema_level_approach.max_author_num, view_citation_query_mappings, Schema_level_approach.author_mapping, Schema_level_approach.query_ids, Schema_level_approach.query_lambda_str, views, citation_queries, c, pst);
               
               agg_citations = Schema_level_approach.tuple_gen_agg_citations(query, c, pst);
                                                       
@@ -856,7 +917,7 @@ public class stress_test {
           
           middle_time = System.nanoTime();
           
-          Prepare_citation_info.prepare_citation_information(TLA_min.citation_queries, TLA_min.max_author_num, view_citation_query_mappings, TLA_min.author_mapping, TLA_min.query_ids, TLA_min.query_lambda_str, views, citation_queries, c, pst);
+          Prepare_citation_info.prepare_citation_information(TLA_min.viewTuples, TLA_min.citation_queries, TLA_min.max_author_num, view_citation_query_mappings, TLA_min.author_mapping, TLA_min.query_ids, TLA_min.query_lambda_str, views, citation_queries, c, pst);
           
           agg_citations = TLA_min.gen_citation_schema_level(c, pst);
           
@@ -1106,7 +1167,7 @@ public class stress_test {
               
               middle_time = System.nanoTime();
               
-              Prepare_citation_info.prepare_citation_information(SSLA_min.citation_queries, SSLA_min.max_author_num, view_citation_query_mappings, SSLA_min.author_mapping, SSLA_min.query_ids, SSLA_min.query_lambda_str, views, citation_queries, c, pst);
+              Prepare_citation_info.prepare_citation_information(SSLA_min.viewTuples, SSLA_min.citation_queries, SSLA_min.max_author_num, view_citation_query_mappings, SSLA_min.author_mapping, SSLA_min.query_ids, SSLA_min.query_lambda_str, views, citation_queries, c, pst);
               
 //            Semi_schema_level_approach.gen_citation_schema_level(views_per_group, c, pst);
               
@@ -1713,6 +1774,44 @@ public class stress_test {
 //  }
 //  
   
-
+  static void materialize_views(Vector<Query> views, Connection c, PreparedStatement pst) throws SQLException
+  {
+    for(int i = 0; i<views.size(); i++)
+    {
+      String sql = Query_converter.datalog2sql_full(views.get(i));
+      
+      String view_query = "create MATERIALIZED view " + views.get(i).name + " as (" + sql + ")";
+      
+      System.out.println(view_query);
+      
+      pst = c.prepareStatement(view_query);
+      
+      pst.execute();
+      
+      
+    }
+  }
+  
+  public static void clear_views_in_database(Connection c, PreparedStatement pst) throws SQLException
+  {
+//    String sql = "select table_name from INFORMATION_SCHEMA.views WHERE table_schema = ANY (current_schemas(false))";
+    
+    String sql = "SELECT oid::regclass::text FROM pg_class WHERE relkind = 'm'";
+    
+    pst = c.prepareStatement(sql);
+    
+    ResultSet rs = pst.executeQuery();
+    
+    while(rs.next())
+    {
+      String view_name = rs.getString(1);
+      
+      String drop_sql = "drop MATERIALIZED view " + view_name;
+      
+      pst = c.prepareStatement(drop_sql);
+      
+      pst.execute();
+    }
+  }
 
 }

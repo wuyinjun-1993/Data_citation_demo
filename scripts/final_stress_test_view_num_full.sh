@@ -11,10 +11,14 @@ echo $3
 
 echo $4
 
-query_instance_size=100000
+echo $5
+
+query_instance_size=$5
 
 synthetic_dir="synthetic_example/"
 
+
+max_view_num=30
 
 echo $query_size
 
@@ -33,7 +37,7 @@ mkdir -p reasoning_results
 
 #for query_size in 4 5 6 7 8 9 10
 #do
-	for round_times in {1..30}
+	for round_times in {1..$max_view_num}
 	do	
 		echo "$round_times"
 		if [ $round_times -eq 1 ];

@@ -10,6 +10,7 @@ echo $3
 
 echo $4
 
+echo $5
 
 true_str="true";
 
@@ -17,7 +18,7 @@ false_str="false";
 
 path="../target/"
 
-real_dir="../real_example/IUPHAR/"
+real_dir="../real_example/"$5"/"
 
 for query_size in 0 1 2 3 4 5 6 7
 do

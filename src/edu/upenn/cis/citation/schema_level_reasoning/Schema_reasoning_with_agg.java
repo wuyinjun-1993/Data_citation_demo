@@ -465,7 +465,7 @@ public class Schema_reasoning_with_agg {
 //          }
           }
           
-          Vector<String> curr_partial_mapping_expression = Query_converter.get_partial_mapping_boolean_expressions(tuple, tuple.query, with_sub_queries_id_mappings);
+          Vector<String> curr_partial_mapping_expression = new Vector<String>();//Query_converter.get_partial_mapping_boolean_expressions2(tuple, tuple.query, with_sub_queries_id_mappings);
           
           if(!curr_partial_mapping_expression.isEmpty())
           {
@@ -511,7 +511,7 @@ public class Schema_reasoning_with_agg {
       }
 
       if(prepare_info)
-          Prepare_citation_info.prepare_citation_information(citation_queries, max_author_num, view_query_mapping, author_mapping, query_ids, query_lambda_str, views, cqs, c, pst);
+          Prepare_citation_info.prepare_citation_information(viewTuples, citation_queries, max_author_num, view_query_mapping, author_mapping, query_ids, query_lambda_str, views, cqs, c, pst);
               
       
 //  System.out.println("partial_mapping_conditions:::" + partial_mapping_strings);

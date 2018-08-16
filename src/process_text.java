@@ -26,6 +26,7 @@ public class process_text {
 	  
 	  int first_value = Integer.valueOf(args[4]);
 	  
+	  int repetition = Integer.valueOf(args[5]);
 	  
 	  if(full_case)
 	  {
@@ -39,7 +40,7 @@ public class process_text {
 	    
 	    String f5 = path + input_file_name_without_surfix + "_schema.csv";
 	    
-	    process_text_full_case(path + input_file_name_without_surfix + ".txt", f1, f2, f3, f4, f5, instance_case, first_value);
+	    process_text_full_case(path + input_file_name_without_surfix + ".txt", f1, f2, f3, f4, f5, instance_case, first_value, repetition);
 	  }
 	  else
 	  {
@@ -49,7 +50,7 @@ public class process_text {
 	    
 	    String f3 = path + input_file_name_without_surfix + "_schema.csv";
 	    
-	    process_text_min_case(path + input_file_name_without_surfix + ".txt", f1, f2, f3, instance_case, first_value);
+	    process_text_min_case(path + input_file_name_without_surfix + ".txt", f1, f2, f3, instance_case, first_value, repetition);
 	  }
 	}
 
@@ -275,7 +276,7 @@ public class process_text {
 	      
 	}
 	
-	static void process_text_full_case(String file_name, String f1, String f2, String f3, String f4, String f5, boolean instance_test_case, int first_value)
+	static void process_text_full_case(String file_name, String f1, String f2, String f3, String f4, String f5, boolean instance_test_case, int first_value, int repetition)
 	{
 		Vector<Vector<Double>> tuple_level_agg_intersection = new Vector<Vector<Double>>();
 	    
@@ -287,7 +288,7 @@ public class process_text {
 	    
 	    Vector<Vector<Double>> schema = new Vector<Vector<Double>>();
 		
-	    int m = 3;
+	    int m = repetition;
 	    
 		try (BufferedReader br = new BufferedReader(new FileReader(file_name))) {
 		    String line;		    
@@ -404,7 +405,7 @@ public class process_text {
 	    write(f5, covert2vec_str(schema_average));
 	}
 	
-	static void process_text_min_case(String file_name, String f1, String f2, String f3, boolean instance_test_case, int first_value)
+	static void process_text_min_case(String file_name, String f1, String f2, String f3, boolean instance_test_case, int first_value, int repetition)
 	{
 		Vector<Vector<Double>> tuple_level = new Vector<Vector<Double>>();
 	    	    
@@ -412,7 +413,7 @@ public class process_text {
 	    	    
 	    Vector<Vector<Double>> schema = new Vector<Vector<Double>>();
 		
-	    int m = 10;
+	    int m = repetition;
 	    
 	    int index = first_value;
 	    

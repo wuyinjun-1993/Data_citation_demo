@@ -1,9 +1,9 @@
 #!/bin/bash
 trap "exit" INT
 
-bash final_stress_test_view_num_full.sh $1 $2 $3 $4 > final_stress_test_view_num_full.txt
+bash final_stress_test_view_num_full.sh $1 $2 $3 $4 $5 $6> final_stress_test_view_num_full.txt
 
-bash final_stress_test_view_num_min.sh $1 $2 $3 $4 > final_stress_test_view_num_min.txt
+bash final_stress_test_view_num_min.sh $1 $2 $3 $4 $5 $6> final_stress_test_view_num_min.txt
 
 echo "experiments done"
 

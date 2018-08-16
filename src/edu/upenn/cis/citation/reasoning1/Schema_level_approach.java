@@ -52,7 +52,8 @@ import sun.util.resources.cldr.ur.CurrencyNames_ur;
 
 public class Schema_level_approach {
 	
-	
+    public static HashSet<Tuple> viewTuples = null;
+  
 	static HashMap<String, Query> view_mapping = new HashMap<String, Query>();
 		
 	static Vector<Lambda_term> valid_lambda_terms = new Vector<Lambda_term>();
@@ -1146,6 +1147,8 @@ public class Schema_level_approach {
 		
 		covering_set_schema_level.clear();
 		
+		viewTuples = null;
+		
 		tuple_num = 0;
 		
 		tuples.clear();
@@ -1179,7 +1182,7 @@ public class Schema_level_approach {
 	      
 	      Vector<String> full_mapping_condition_str = new Vector<String>();
 		
-		HashSet<Tuple> view_mappings = Schema_reasoning_with_agg.pre_processing(true, citation_queries, max_author_num, view_query_mapping, author_mapping, query_ids, query_lambda_str, prepare_info, lambda_term_id_mapping, valid_lambda_terms, conditions_map, valid_conditions, view_tuple_mapping, head_variable_query_mapping, relation_arg_mapping, head_variable_view_mapping, views, cqs, view_citation_query_mappings, q, partial_mapping_strings, partial_mapping_view_mapping_mappings, with_sub_queries_id_mappings, full_mapping_condition_str, q_subgoal_id, c,pst);
+		viewTuples = Schema_reasoning_with_agg.pre_processing(true, citation_queries, max_author_num, view_query_mapping, author_mapping, query_ids, query_lambda_str, prepare_info, lambda_term_id_mapping, valid_lambda_terms, conditions_map, valid_conditions, view_tuple_mapping, head_variable_query_mapping, relation_arg_mapping, head_variable_view_mapping, views, cqs, view_citation_query_mappings, q, partial_mapping_strings, partial_mapping_view_mapping_mappings, with_sub_queries_id_mappings, full_mapping_condition_str, q_subgoal_id, c,pst);
 		
 		end = System.nanoTime();
 		
@@ -1187,7 +1190,7 @@ public class Schema_level_approach {
 		
 //		execute_query(q, c, pst);
 		
-		reasoning_schema_level(view_mappings, q);
+		reasoning_schema_level(viewTuples, q);
 	}
 	
 //	public static void output (Vector<Vector<Vector<citation_view>>> citation_views)

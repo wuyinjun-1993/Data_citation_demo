@@ -144,11 +144,11 @@ public class final_real_test_full {
 	    
 	    int view_id = Integer.valueOf(args[0]);
 
-	    boolean tuple_level = Boolean.valueOf(args[1]);
+        boolean new_round = Boolean.valueOf(args[1]);
+	    
+	    boolean tuple_level = Boolean.valueOf(args[2]);
         
-        boolean schema_level = Boolean.valueOf(args[2]);
-        
-        boolean new_round = Boolean.valueOf(args[3]);
+        boolean schema_level = Boolean.valueOf(args[3]);
         
         boolean agg_intersection = Boolean.valueOf(args[4]);
 	    

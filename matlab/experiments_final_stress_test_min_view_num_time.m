@@ -1,7 +1,7 @@
 
-file1 = 'final_stress_test_view_num_min_tuple_agg_intersection.csv';
+file1 = 'final_stress_test_view_num_min_tuple.csv';
 
-file2 = 'final_stress_test_view_num_min_semi_schema_agg_intersection.csv';
+file2 = 'final_stress_test_view_num_min_semi_schema.csv';
 
 file3 = 'final_stress_test_view_num_min_schema.csv';
 
@@ -29,7 +29,7 @@ view_sub_num = view_number(1:3:end,:);
 % bar(view_sub_num, reasoning_time,'barwidth', 1, 'basevalue', 1);
 % bar(view_number, SSL_reasoning_time,'barwidth', .1, 'basevalue', 1);
 % set(gca,'YScale','log')
-h = legend({'t_{cs} of TLA', 't_{cs} of SSLA', 't_{cs} of SLA'},'Location','southwest');
+h = legend({'t_{cs} of TLA', 't_{cs} of SSLA', 't_{cs} of SLA'},'Location','best');
 set(h,'FontSize',15); 
 xlabel('N_v','FontSize', 15);
 ylabel('time (s)','FontSize', 15);

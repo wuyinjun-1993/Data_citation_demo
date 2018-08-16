@@ -1877,7 +1877,7 @@ public class Tuple_level_approach {
       else
           sql = Query_converter.datalog2sql_citation_agg_test(true, q, partial_mapping_strings, partial_mapping_view_mapping_mappings, with_sub_queries_id_mappings, full_mapping_condition_str, valid_conditions, valid_lambda_terms, view_tuples);
       
-//      System.out.println(sql);
+      System.out.println(sql);
 //      
 //      System.out.println(q);
       

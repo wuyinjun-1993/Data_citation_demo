@@ -1,8 +1,8 @@
-file1 = 'final_stress_test_view_num_full_tuple_agg_intersection.csv';
+file1 = 'final_stress_test_group_full_tuple_agg_intersection.csv';
 
-file2 = 'final_stress_test_view_num_full_semi_schema_agg_intersection.csv';
+file2 = 'final_stress_test_group_full_semi_schema_agg_intersection.csv';
 
-file3 = 'final_stress_test_view_num_full_schema.csv';
+file3 = 'final_stress_test_group_full_schema.csv';
 
 
 file_name = 'experiments_final_stress_test_group_num_full.xlsx';

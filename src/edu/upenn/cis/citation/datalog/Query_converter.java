@@ -2361,7 +2361,12 @@ public class Query_converter {
           if(partial_mapping_count >= 1)
             partial_mapping_expression += ",";
           
-          partial_mapping_expression += "array_agg(" + curr_partial_mapping_expression + ")";
+          if(q.head.has_agg)
+            partial_mapping_expression += "array_agg(" + curr_partial_mapping_expression + ")";
+          else
+            partial_mapping_expression += curr_partial_mapping_expression;
+          
+//          partial_mapping_expression += "array_agg(" + curr_partial_mapping_expression + ")";
           
           partial_mapping_count ++;
           

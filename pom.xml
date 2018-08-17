@@ -82,6 +82,120 @@
                 <goal>assembly</goal>
             </goals>
 	    </execution>
+	    <execution>
+	      <id>build-d</id>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <mainClass>edu.upenn.cis.citation.final_test.final_stress_test_view_num_min</mainClass>
+                            </manifest>
+                        </archive>
+                        <descriptorRefs>
+                            <descriptorRef>jar-with-dependencies</descriptorRef>
+                        </descriptorRefs>
+                        <finalName>final_stress_test_view_num_min</finalName>
+			<appendAssemblyId>false</appendAssemblyId>
+                    </configuration>
+            <phase>package</phase>
+            <goals>
+                <goal>assembly</goal>
+            </goals>
+	    </execution>
+	    <execution>
+	      <id>build-e</id>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <mainClass>edu.upenn.cis.citation.final_test.final_stress_test_group_min</mainClass>
+                            </manifest>
+                        </archive>
+                        <descriptorRefs>
+                            <descriptorRef>jar-with-dependencies</descriptorRef>
+                        </descriptorRefs>
+                        <finalName>final_stress_test_group_min</finalName>
+			<appendAssemblyId>false</appendAssemblyId>
+                    </configuration>
+            <phase>package</phase>
+            <goals>
+                <goal>assembly</goal>
+            </goals>
+	    </execution>
+	    <execution>
+	      <id>build-f</id>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <mainClass>edu.upenn.cis.citation.final_test.final_real_test_full</mainClass>
+                            </manifest>
+                        </archive>
+                        <descriptorRefs>
+                            <descriptorRef>jar-with-dependencies</descriptorRef>
+                        </descriptorRefs>
+                        <finalName>final_real_test_full</finalName>
+			<appendAssemblyId>false</appendAssemblyId>
+                    </configuration>
+            <phase>package</phase>
+            <goals>
+                <goal>assembly</goal>
+            </goals>
+	    </execution>
+	    <execution>
+	      <id>build-g</id>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <mainClass>edu.upenn.cis.citation.final_test.final_real_test_min</mainClass>
+                            </manifest>
+                        </archive>
+                        <descriptorRefs>
+                            <descriptorRef>jar-with-dependencies</descriptorRef>
+                        </descriptorRefs>
+                        <finalName>final_real_test_min</finalName>
+			<appendAssemblyId>false</appendAssemblyId>
+                    </configuration>
+            <phase>package</phase>
+            <goals>
+                <goal>assembly</goal>
+            </goals>
+	    </execution>
+	    <execution>
+	      <id>build-h</id>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <mainClass>process_text</mainClass>
+                            </manifest>
+                        </archive>
+                        <descriptorRefs>
+                            <descriptorRef>jar-with-dependencies</descriptorRef>
+                        </descriptorRefs>
+                        <finalName>process_text</finalName>
+			<appendAssemblyId>false</appendAssemblyId>
+                    </configuration>
+            <phase>package</phase>
+            <goals>
+                <goal>assembly</goal>
+            </goals>
+	    </execution>
+	    <execution>
+	      <id>build-i</id>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <mainClass>edu.upenn.cis.citation.Pre_processing.create_contributor2ligand</mainClass>
+                            </manifest>
+                        </archive>
+                        <descriptorRefs>
+                            <descriptorRef>jar-with-dependencies</descriptorRef>
+                        </descriptorRefs>
+                        <finalName>create_contributor2ligand</finalName>
+			<appendAssemblyId>false</appendAssemblyId>
+                    </configuration>
+            <phase>package</phase>
+            <goals>
+                <goal>assembly</goal>
+            </goals>
+	    </execution>
 	  </executions>
 	</plugin>
     </plugins>
@@ -302,11 +416,6 @@
 	<dependency>
 	    <groupId>net.sourceforge.jmatio</groupId>
 	    <artifactId>jmatio</artifactId>
-	    <version>1.0</version>
-	</dependency>
-	<dependency>
-	    <groupId>fr.lri.tao.apro</groupId>
-	    <artifactId>Apro</artifactId>
 	    <version>1.0</version>
 	</dependency>
   </dependencies>

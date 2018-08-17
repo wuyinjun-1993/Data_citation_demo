@@ -47,6 +47,6 @@ set(h,'FontSize',15);
 xlabel('N_p','FontSize', 15);
 ylabel('time (s)','FontSize', 15);
 xt = get(gca, 'XTick');
-xlim([2, 50]);
+%xlim([2, 50]);
 set(gca, 'FontSize', 15)
 saveas(gcf,'exp2/final_stress_test_group_min_time.png')

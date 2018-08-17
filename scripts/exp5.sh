@@ -3,7 +3,7 @@ trap "exit" INT
 
 #bash final_stress_test_group_full.sh $1 $2 $3 $4 > final_stress_test_group_full.txt
 
-bash final_real_test_full.sh $1 $2 $3 $4 DBLP-NSF > final_real_test_full_dblp.txt
+bash final_real_test_full.sh $1 $2 $3 $4 DBLP-NSF > final_real_test_full_iuphar.txt
 
 
 echo "experiments done"
@@ -20,6 +20,6 @@ cd ../matlab
 
 mkdir -p exp5
 
-#matlab -nodisplay -nodesktop -r "run experiments_final_stress_test_group_time.m;quit"
+matlab -nodisplay -nodesktop -r "run experiments_final_real_test_time_dblp.m;quit"
 
 echo "matlab experiments done"

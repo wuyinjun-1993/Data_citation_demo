@@ -36,6 +36,6 @@ hold on;
 % xlabel('N_{v}','FontSize', 15);
 % ylabel('N_{cs}','FontSize', 15);
 xt = get(gca, 'XTick');
-xlim([2, 39]);
+%xlim([2, 39]);
 set(gca, 'FontSize', 15)
 saveas(gcf,'exp1/final_stress_test_view_num_full_covering_set_num.png')

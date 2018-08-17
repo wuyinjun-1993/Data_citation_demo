@@ -7,9 +7,9 @@ bash final_stress_test_view_num_min.sh $1 $2 $3 $4 $5 $6> final_stress_test_view
 
 echo "experiments done"
 
-java -jar ../target/process_text.jar ./ true false final_stress_test_view_num_full 4 
+java -jar ../target/process_text.jar ./ true false final_stress_test_view_num_full 4 3
 
-java -jar ../target/process_text.jar ./ false false final_stress_test_view_num_min 4
+java -jar ../target/process_text.jar ./ false false final_stress_test_view_num_min 4 10
 
 cp *.csv ../matlab
 

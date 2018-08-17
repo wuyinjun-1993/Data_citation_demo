@@ -38,7 +38,7 @@ max_predicate_num=$7
 
 #for view_size in 10 15 20 25 30 
 #do
-	for round_times in {1..$max_predicate_num}
+	for ((round_times=1; round_times<= max_predicate_num; round_times++))
 	do	
 		echo "$round_times"
 		if [ $round_times -eq 1 ];

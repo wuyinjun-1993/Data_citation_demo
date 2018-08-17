@@ -35,10 +35,11 @@ db_schema="IUPHAR"
 
 #for query_size in 4 5 6 7 8 9 10
 #do
-	for round_times in {1..$max_view_num}
+#	for round_times in {1..$max_view_num}
+	for ((round_times =1; round_times<=max_view_num; round_times++))
 	do	
 		echo "$round_times"
-		if [ $round_times -eq 1 ];
+		if (( round_times == 1 ));
 		then
 			echo "start new view size"
 			command="java -Xmx20480m  -jar final_stress_test_view_num_min.jar $query_size ${true_str} ${true_str} ${true_str} ${false_str}"

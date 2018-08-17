@@ -60,11 +60,11 @@ set([h1 h2 h3],'LineWidth',1)
 % bar(view_sub_num, reasoning_time,'barwidth', 1, 'basevalue', 1);
 % bar(view_number, SSL_reasoning_time,'barwidth', .1, 'basevalue', 1);
 % set(gca,'YScale','log')
-h = legend('t_{re} of TLA', 't_{qe} of TLA', 't_{re} of SSLA', 't_{qe} of SSLA', 't_{cs} of TLA', 't_{cs} of SSLA', 't_{cs} of SLA');
+h = legend({'t_{re} of TLA', 't_{qe} of TLA', 't_{re} of SSLA', 't_{qe} of SSLA', 't_{cs} of TLA', 't_{cs} of SSLA', 't_{cs} of SLA'}, 'Location','best');
 set(h,'FontSize',15); 
 xlabel('N_p','FontSize', 15);
 ylabel('time (s)','FontSize', 15);
 xt = get(gca, 'XTick');
-xlim([-1, 50]);
+%xlim([-1, 50]);
 set(gca, 'FontSize', 15)
-saveas(gcf,'final_stress_test_group_full_time.png')
+saveas(gcf,'exp2/final_stress_test_group_full_time.png')

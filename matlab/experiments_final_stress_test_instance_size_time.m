@@ -38,7 +38,7 @@ set(h,'FontSize',15);
 xlabel('N_t','FontSize', 25);
 ylabel('t_{cs}(s)','FontSize', 25);
 xt = get(gca, 'XTick');
-xlim([50, 10^7]);
-ylim([0 160]);
+%xlim([50, 10^7]);
+%ylim([0 160]);
 set(gca, 'FontSize', 15)
 saveas(gcf,'exp3/final_stress_test_instance_size_full_time.png')

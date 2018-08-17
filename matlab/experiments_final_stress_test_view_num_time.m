@@ -45,7 +45,7 @@ set(h,'FontSize',15);
 xlabel('N_{v}','FontSize', 15);
 ylabel('time (s)','FontSize', 15);
 xt = get(gca, 'XTick');
-xlim([2, 39]);
+%xlim([2, 39]);
 % ylim([10^-6, 10^4]);
 set(gca, 'FontSize', 15)
 

@@ -1,7 +1,7 @@
 Q1|gpcr.object_id, ligand.name|gpcr,interaction, ligand|gpcr.object_id = interaction.object_id, interaction.ligand_id = ligand.ligand_id||gpcr:gpcr, ligand:ligand, interaction:interaction
 Q2|gpcr.object_id, ligand.name|gpcr,interaction, ligand|gpcr.object_id = interaction.object_id, interaction.ligand_id = ligand.ligand_id, ligand.approved = 't'||gpcr:gpcr, ligand:ligand, interaction:interaction
 Q3|object.object_id, object.name|object, interaction, ligand|object.object_id = interaction.object_id, interaction.ligand_id = ligand.ligand_id, interaction.primary_target = 't'||object:object, interaction:interaction, ligand:ligand
-Q4|object.object_id, object.name|object, interaction, ligand|object.object_id = interaction.object_id, ligand.ligand_id = interaction.ligand_id, ligand.type = 'Natural product', interaction.affinity_median >= 8.0||ligand:ligand, object:object, interaction:interaction
+Q4|object.object_id, object.name|object, interaction, ligand|object.object_id = interaction.object_id, ligand.ligand_id = interaction.ligand_id, ligand.type = 'Natural product', interaction.affinity_median >= '8.0'||ligand:ligand, object:object, interaction:interaction
 Q5|interaction.type, object.object_id|object, interaction|object.object_id = interaction.object_id, interaction.type = 'Agonist'||object:object, interaction:interaction
 Q6|object.object_id, object.name|ligand, object, interaction|ligand.ligand_id = interaction.ligand_id, interaction.object_id = object.object_id, ligand.name = '12R-HETE'||object:object, ligand:ligand, interaction:interaction
 Q7|object.object_id, object.name|object|object.in_gtip = 't'||object:object

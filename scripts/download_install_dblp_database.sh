@@ -7,9 +7,9 @@ wget --no-check-certificate --content-disposition https://github.com/thuwuyinjun
 unzip ../database_dump/DBLP-NSF-Postgresql.sql.zip -d ../database_dump/
 
 
-dropdb --if-exists dblp1
-dropdb --if-exists dblp2
-createdb dblp1
-createdb dblp2
-psql dblp1 < ../database_dump/dblp.sql
-psql dblp2 < ../database_dump/dblp.sql
+dropdb --if-exists dblp1 -U $1
+dropdb --if-exists dblp2 -U $1
+createdb dblp1 -U $1
+createdb dblp2 -U $1
+psql dblp1 < ../database_dump/dblp.sql -U $1
+psql dblp2 < ../database_dump/dblp.sql -U $1

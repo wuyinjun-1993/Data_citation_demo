@@ -21,6 +21,7 @@ import edu.upenn.cis.citation.citation_view.Covering_set;
 import edu.upenn.cis.citation.citation_view.Head_strs;
 import edu.upenn.cis.citation.datalog.Query_converter;
 import edu.upenn.cis.citation.examples.Load_views_and_citation_queries;
+import edu.upenn.cis.citation.gen_citation.Gen_citation;
 import edu.upenn.cis.citation.reasoning1.Schema_level_approach;
 import edu.upenn.cis.citation.reasoning1.Semi_schema_level_approach;
 import edu.upenn.cis.citation.reasoning1.Tuple_level_approach;
@@ -263,6 +264,50 @@ public class stress_test {
      return query;
   }
   
+  
+  static HashMap<String, HashMap<String, Query>> create_citation_query_mappings(HashMap<String, HashMap<String, String>> citation_query_string_mappings, Vector<Query> citation_queries)
+  {
+    Set<String> view_names = citation_query_string_mappings.keySet();
+    
+    HashMap<String, HashMap<String, Query>> real_citation_query_mapppings = new HashMap<String, HashMap<String, Query>>();
+    
+    for(String view_name: view_names)
+    {
+      HashMap<String, String> cq_name_mappings = citation_query_string_mappings.get(view_name);
+      
+      Set<String> block_names = cq_name_mappings.keySet();
+      
+      for(String b_name: block_names)
+      {
+        String cq_name = cq_name_mappings.get(b_name);
+        
+        for(Query cq: citation_queries)
+        {
+          if(cq.name.equals(cq_name))
+          {
+            HashMap<String, Query> curr_real_cq_mappings = real_citation_query_mapppings.get(view_name);
+            
+            if(curr_real_cq_mappings == null)
+            {
+              curr_real_cq_mappings = new HashMap<String, Query>();
+              
+              
+            }
+            
+            curr_real_cq_mappings.put(b_name, cq);
+            
+            real_citation_query_mapppings.put(view_name, curr_real_cq_mappings);
+            
+            
+            break;
+          }
+        }
+      }
+      
+    }    
+    return real_citation_query_mapppings;
+  }
+  
   public static void stress_test(Query query, Vector<Query> views, Vector<Query> citation_queries, HashMap<String, HashMap<String, String>> view_citation_query_mappings, boolean tuple_level, boolean schema_level, boolean agg_intersection, boolean test_case, String db_name1, String db_name2, String usr_name, String passwd) throws SQLException, IOException, InterruptedException, JSONException, ClassNotFoundException
   {
 //    while(views.size() < view_max_size)
@@ -301,9 +346,11 @@ public class stress_test {
           
           middle_time = System.nanoTime();
           
-          Prepare_citation_info.prepare_citation_information(Tuple_level_approach.viewTuples, Tuple_level_approach.citation_queries, Tuple_level_approach.max_author_num, view_citation_query_mappings, Tuple_level_approach.author_mapping, Tuple_level_approach.query_ids, Tuple_level_approach.query_lambda_str, views, citation_queries, c, pst);
+//          Prepare_citation_info.prepare_citation_information(Tuple_level_approach.viewTuples, Tuple_level_approach.citation_queries, Tuple_level_approach.max_author_num, view_citation_query_mappings, Tuple_level_approach.author_mapping, Tuple_level_approach.query_ids, Tuple_level_approach.query_lambda_str, views, citation_queries, c, pst);
+//          
+//          agg_citations = Tuple_level_approach.gen_citation_schema_level(c, pst);
           
-          agg_citations = Tuple_level_approach.gen_citation_schema_level(c, pst);
+         agg_citations = Gen_citation.gen_citation_entire_query(Tuple_level_approach.signiture_rid_mappings, Tuple_level_approach.signiture_view_mappings_mappings, Tuple_level_approach.viewTuples, create_citation_query_mappings(view_citation_query_mappings, citation_queries), Tuple_level_approach.covering_set_schema_level, Tuple_level_approach.rs, Tuple_level_approach.Resultset_prefix_col_num, Tuple_level_approach.max_author_num, Tuple_level_approach.lambda_term_id_mapping, c, pst);
           
 //         Tuple_reasoning1_full_test_opt.tuple_gen_agg_citations(query, c, pst);
                                                   
@@ -556,11 +603,13 @@ public class stress_test {
               
               middle_time = System.nanoTime();
               
-              Prepare_citation_info.prepare_citation_information(Semi_schema_level_approach.viewTuples, Semi_schema_level_approach.citation_queries, Semi_schema_level_approach.max_author_num, view_citation_query_mappings, Semi_schema_level_approach.author_mapping, Semi_schema_level_approach.query_ids, Semi_schema_level_approach.query_lambda_str, views, citation_queries, c, pst);
+              agg_citations = Gen_citation.gen_citation_entire_query(Semi_schema_level_approach.signiture_rid_mappings, Semi_schema_level_approach.signature_view_mappings_mappings, Semi_schema_level_approach.viewTuples, create_citation_query_mappings(view_citation_query_mappings, citation_queries), Semi_schema_level_approach.covering_set_schema_level, Semi_schema_level_approach.rs, Semi_schema_level_approach.Resultset_prefix_col_num, Semi_schema_level_approach.max_author_num, Semi_schema_level_approach.lambda_term_id_mapping, c, pst);
               
-//            Semi_schema_level_approach.gen_citation_schema_level(views_per_group, c, pst);
-              
-              agg_citations = Semi_schema_level_approach.gen_citation_schema_level(c, pst);
+//              Prepare_citation_info.prepare_citation_information(Semi_schema_level_approach.viewTuples, Semi_schema_level_approach.citation_queries, Semi_schema_level_approach.max_author_num, view_citation_query_mappings, Semi_schema_level_approach.author_mapping, Semi_schema_level_approach.query_ids, Semi_schema_level_approach.query_lambda_str, views, citation_queries, c, pst);
+//              
+////            Semi_schema_level_approach.gen_citation_schema_level(views_per_group, c, pst);
+//              
+//              agg_citations = Semi_schema_level_approach.gen_citation_schema_level(c, pst);
                                                       
               end_time = System.nanoTime();
               
@@ -740,9 +789,11 @@ public class stress_test {
               
               middle_time = System.nanoTime();
               
-              Prepare_citation_info.prepare_citation_information(Schema_level_approach.viewTuples, Schema_level_approach.citation_queries, Schema_level_approach.max_author_num, view_citation_query_mappings, Schema_level_approach.author_mapping, Schema_level_approach.query_ids, Schema_level_approach.query_lambda_str, views, citation_queries, c, pst);
+              agg_citations = Gen_citation.gen_citation_entire_query(Schema_level_approach.tuple_num, Schema_level_approach.viewTuples, create_citation_query_mappings(view_citation_query_mappings, citation_queries), Schema_level_approach.covering_set_schema_level, Schema_level_approach.rs, Schema_level_approach.Resultset_prefix_col_num, Schema_level_approach.max_author_num, Schema_level_approach.lambda_term_id_mapping, c, pst);
               
-              agg_citations = Schema_level_approach.tuple_gen_agg_citations(query, c, pst);
+//              Prepare_citation_info.prepare_citation_information(Schema_level_approach.viewTuples, Schema_level_approach.citation_queries, Schema_level_approach.max_author_num, view_citation_query_mappings, Schema_level_approach.author_mapping, Schema_level_approach.query_ids, Schema_level_approach.query_lambda_str, views, citation_queries, c, pst);
+//              
+//              agg_citations = Schema_level_approach.tuple_gen_agg_citations(query, c, pst);
                                                       
               end_time = System.nanoTime();
               
@@ -846,6 +897,7 @@ public class stress_test {
                                               
               System.out.println();
               
+//              System.out.println(agg_citations);
 
               c.close();
               
@@ -917,9 +969,14 @@ public class stress_test {
           
           middle_time = System.nanoTime();
           
-          Prepare_citation_info.prepare_citation_information(TLA_min.viewTuples, TLA_min.citation_queries, TLA_min.max_author_num, view_citation_query_mappings, TLA_min.author_mapping, TLA_min.query_ids, TLA_min.query_lambda_str, views, citation_queries, c, pst);
+//          Prepare_citation_info.prepare_citation_information(TLA_min.viewTuples, TLA_min.citation_queries, TLA_min.max_author_num, view_citation_query_mappings, TLA_min.author_mapping, TLA_min.query_ids, TLA_min.query_lambda_str, views, citation_queries, c, pst);
+//          
+//          agg_citations = TLA_min.gen_citation_schema_level(c, pst);
+          HashSet<Covering_set> covering_sets =  new HashSet<Covering_set>();
           
-          agg_citations = TLA_min.gen_citation_schema_level(c, pst);
+          covering_sets.add(TLA_min.covering_set_schema_level);
+          
+          agg_citations = Gen_citation.gen_citation_entire_query(TLA_min.signiture_rid_mappings, TLA_min.signiture_view_mappings_mappings, TLA_min.viewTuples, create_citation_query_mappings(view_citation_query_mappings, citation_queries), covering_sets, TLA_min.rs, TLA_min.Resultset_prefix_col_num, TLA_min.max_author_num, TLA_min.lambda_term_id_mapping, c, pst);
           
 //         Tuple_reasoning1_full_test_opt.tuple_gen_agg_citations(query, c, pst);
                                                   
@@ -1167,11 +1224,18 @@ public class stress_test {
               
               middle_time = System.nanoTime();
               
-              Prepare_citation_info.prepare_citation_information(SSLA_min.viewTuples, SSLA_min.citation_queries, SSLA_min.max_author_num, view_citation_query_mappings, SSLA_min.author_mapping, SSLA_min.query_ids, SSLA_min.query_lambda_str, views, citation_queries, c, pst);
               
-//            Semi_schema_level_approach.gen_citation_schema_level(views_per_group, c, pst);
+              HashSet<Covering_set> covering_sets =  new HashSet<Covering_set>();
               
-              agg_citations = SSLA_min.gen_citation_schema_level(c, pst);
+              covering_sets.add(SSLA_min.covering_set_schema_level);
+              
+              agg_citations = Gen_citation.gen_citation_entire_query(SSLA_min.signiture_rid_mappings, SSLA_min.signature_view_mappings_mappings, SSLA_min.viewTuples, create_citation_query_mappings(view_citation_query_mappings, citation_queries), covering_sets, SSLA_min.rs, SSLA_min.Resultset_prefix_col_num, SSLA_min.max_author_num, SSLA_min.lambda_term_id_mapping, c, pst);
+              
+//              Prepare_citation_info.prepare_citation_information(SSLA_min.viewTuples, SSLA_min.citation_queries, SSLA_min.max_author_num, view_citation_query_mappings, SSLA_min.author_mapping, SSLA_min.query_ids, SSLA_min.query_lambda_str, views, citation_queries, c, pst);
+//              
+////            Semi_schema_level_approach.gen_citation_schema_level(views_per_group, c, pst);
+//              
+//              agg_citations = SSLA_min.gen_citation_schema_level(c, pst);
                                                       
               end_time = System.nanoTime();
               

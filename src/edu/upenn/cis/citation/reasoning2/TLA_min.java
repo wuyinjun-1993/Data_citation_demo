@@ -103,7 +103,7 @@ public class TLA_min {
 	
     public static HashSet<Tuple> valid_view_mapping_schema_level = null;
 	
-	static ResultSet rs = null;
+	public static ResultSet rs = null;
 	
 	public static int covering_set_num = 0;
 	
@@ -129,7 +129,7 @@ public class TLA_min {
 	
 	public static HashMap<Head_strs, ArrayList<Integer>> head_strs_rows_mapping = new HashMap<Head_strs, ArrayList<Integer>>();
 	
-	static int Resultset_prefix_col_num = 0;
+	public static int Resultset_prefix_col_num = 0;
 	
 	static HashMap<String, ArrayList<Tuple>> view_tuple_mapping = new HashMap<String, ArrayList<Tuple>>();
 	

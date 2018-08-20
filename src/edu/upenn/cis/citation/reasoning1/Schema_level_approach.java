@@ -85,7 +85,7 @@ public class Schema_level_approach {
 	static HashMap<String, ArrayList<Tuple>> view_tuple_mapping = new HashMap<String, ArrayList<Tuple>>();
 
 	
-	static ResultSet rs = null;
+	public static ResultSet rs = null;
 	
 	public static int covering_set_num = 0;
 	
@@ -103,7 +103,7 @@ public class Schema_level_approach {
 	
 	static StringList view_list = new StringList();
 	
-	static int Resultset_prefix_col_num = 0;
+	public static int Resultset_prefix_col_num = 0;
 	
 	public static HashMap<Head_strs, ArrayList<Integer>> head_strs_rows_mapping = new HashMap<Head_strs, ArrayList<Integer>>();
 

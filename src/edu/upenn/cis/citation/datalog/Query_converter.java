@@ -3220,35 +3220,35 @@ public class Query_converter {
         if(tuple.cluster_patial_mapping_condition_ids.get(i).size() <= 0)
           continue;
         
-         String curr_partial_mapping_string = "(select exists (select 1 from " + view.name;// + with_sub_queries_id_mappings_id + " where ";
+         String curr_partial_mapping_string = "(select exists (select 1 from " + from_clause;// + with_sub_queries_id_mappings_id + " where ";
          
 //       if(tuple.cluster_non_mapping_condition_ids.get(i).size() > 0)
            curr_partial_mapping_string += " where ";
             int join_condition_count = 0;
 
-//          for(Integer id: tuple.cluster_non_mapping_condition_ids.get(i))
-//              {
-//                Conditions condition = view.conditions.get(id);
-//                
-//                Argument arg1 = condition.arg1;
-//                
-//                Argument arg2 = condition.arg2;
-//                
-//                if(join_condition_count >= 1)
-//                  curr_partial_mapping_string += " and ";
-//                
-//                if(!condition.arg2.isConst())
-//                  curr_partial_mapping_string += view.name + "." + condition.subgoal1 + "_" + Query_converter.get_arg_name(arg1.name) + condition.op.toString() + view.name + "." +  condition.subgoal2 + "_" + Query_converter.get_arg_name(arg2.name);
-//                else
-//                  curr_partial_mapping_string += view.name + "." + condition.subgoal1 + "_" + Query_converter.get_arg_name(arg1.name) + condition.op.toString() + Query_converter.get_arg_name(arg2.name);
-//                
-//                join_condition_count ++;
-//              }
-//        
+          for(Integer id: tuple.cluster_non_mapping_condition_ids.get(i))
+              {
+                Conditions condition = view.conditions.get(id);
+                
+                Argument arg1 = condition.arg1;
+                
+                Argument arg2 = condition.arg2;
+                
+                if(join_condition_count >= 1)
+                  curr_partial_mapping_string += " and ";
+                
+                if(!condition.arg2.isConst())
+                  curr_partial_mapping_string += view.name + "_" + condition.subgoal1 + "." + Query_converter.get_arg_name(arg1.name) + condition.op.toString() + view.name + "_" +  condition.subgoal2 + "." + Query_converter.get_arg_name(arg2.name);
+                else
+                  curr_partial_mapping_string += view.name + "_" + condition.subgoal1 + "." + Query_converter.get_arg_name(arg1.name) + condition.op.toString() + Query_converter.get_arg_name(arg2.name);
+                
+                join_condition_count ++;
+              }
+        
         int partial_mapping_condition_count = 0;
-//         
-//        if(tuple.cluster_non_mapping_condition_ids.size() > 0 && tuple.cluster_non_mapping_condition_ids.get(0).size() > 0)
-//          curr_partial_mapping_string += " and ";
+         
+        if(tuple.cluster_non_mapping_condition_ids.size() > 0 && tuple.cluster_non_mapping_condition_ids.get(0).size() > 0)
+          curr_partial_mapping_string += " and ";
         
         for(Integer id: tuple.cluster_patial_mapping_condition_ids.get(i))
         {
@@ -3267,11 +3267,11 @@ public class Query_converter {
           
           if(tuple.mapSubgoals_str.get(subgoal_name1) == null)
           {
-            curr_partial_mapping_string += get_single_partial_mapping_bool_string(arg1, arg2, tuple, condition, view.name, subgoal_name1, subgoal_name2);
+            curr_partial_mapping_string += get_single_partial_mapping_bool_string(arg1, arg2, tuple, condition, view.name + "_" + subgoal_name1, subgoal_name2);
           }
           else
           {
-            curr_partial_mapping_string += get_single_partial_mapping_bool_string(arg2, arg1, tuple, condition, view.name, subgoal_name2, subgoal_name1);
+            curr_partial_mapping_string += get_single_partial_mapping_bool_string(arg2, arg1, tuple, condition, view.name + "_" + subgoal_name2, subgoal_name1);
           }
           
           partial_mapping_condition_count++;

@@ -214,6 +214,9 @@ public class Join_covering_sets {
     {
       ArrayList<Tuple> valid_view_mappings = valid_view_mappings_per_head_var[i];
       
+      if(valid_view_mappings_per_head_var[i] == null)
+        continue;
+      
 //      valid_view_mappings.retainAll(valid_view_mappings_schema_level);
       
 //      Set<Single_view> views = all_possible_view_mappings.keySet();

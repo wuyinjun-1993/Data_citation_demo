@@ -83,9 +83,9 @@ DataProvider provider = new MatrixProvider(distances);
     }
     
     
-    System.out.println(sorted_ids);
+//    System.out.println(sorted_ids);
     
-    double t1 = System.nanoTime();
+//    double t1 = System.nanoTime();
     
     for(Integer id : sorted_ids)
     {
@@ -120,11 +120,11 @@ DataProvider provider = new MatrixProvider(distances);
     
     all_covering_sets.clear();
     
-    double t2 = System.nanoTime();
+//    double t2 = System.nanoTime();
     
-    double time = (t2 - t1)*1.0/1000000000;
+//    double time = (t2 - t1)*1.0/1000000000;
     
-    System.out.println("time::" + time);
+//    System.out.println("time::" + time);
       
   }
   

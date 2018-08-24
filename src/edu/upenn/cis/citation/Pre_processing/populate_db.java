@@ -717,6 +717,20 @@ public class populate_db {
 //		c.close();
 	}
 	
+	   public static void initial(Connection c, PreparedStatement pst) throws SQLException, ClassNotFoundException
+	    {
+//	      Connection c = null;
+//	        PreparedStatement pst = null;
+//	      Class.forName("org.postgresql.Driver");
+//	      c = DriverManager
+//	          .getConnection(db_url, usr_name , passwd);
+//	      add_column(c,pst);
+	        renew_table2(c, pst);
+	        
+	        populate_db2(c, pst);
+//	      c.close();
+	    }
+	
 	public static void update(Query view) throws ClassNotFoundException, SQLException
 	{
 		Connection c = null;

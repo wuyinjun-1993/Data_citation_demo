@@ -221,19 +221,21 @@ public class Tuple_level_approach_agg {
 	
 	public static void main(String [] args) throws SQLException, ClassNotFoundException, IOException, InterruptedException, JSONException
 	{
-	  String query_file = path + args[0];
+	  String query_file = args[0];
       
-      String view_file = path + args[1];
+      String view_file = args[1];
       
-      String citation_query_file = path + args[2];
+//      String citation_query_file = args[2];
+//      
+//      String view_citation_query_mapping_file = args[3];
       
-      String view_citation_query_mapping_file = path + args[3];
-      
-      boolean cluster = Boolean.valueOf(args[4]);
+      boolean cluster = Boolean.valueOf(args[2]);
       
       isclustering = cluster;
       
       String db_name = args[3];
+      
+      boolean refresh_table = Boolean.valueOf(args[4]);
 
       Connection c = null;
       PreparedStatement pst = null;
@@ -241,10 +243,12 @@ public class Tuple_level_approach_agg {
     c = DriverManager
         .getConnection(populate_db.db_url_prefix + db_name, populate_db.usr_name , populate_db.passwd);
       
-//    populate_db.set_test_file_name(view_file);
+    if(refresh_table)
+    {
+      populate_db.set_test_file_name(view_file);
 //    
-//    populate_db.initial(c, pst);
-    
+      populate_db.initial(c, pst);
+    }
     
 //    System.out.println("annotation done");
       
@@ -254,9 +258,9 @@ public class Tuple_level_approach_agg {
         
         Vector<Query> views = Load_views_and_citation_queries.get_views(view_file, c, pst);
         
-        Vector<Query> citation_queries = Load_views_and_citation_queries.get_views(citation_query_file, c, pst);
+        Vector<Query> citation_queries = new Vector<Query>();//Load_views_and_citation_queries.get_views(citation_query_file, c, pst);
         
-        HashMap<String, HashMap<String, String>> view_citation_query_mappings = Load_views_and_citation_queries.get_view_citation_query_mappings(view_citation_query_mapping_file);
+        HashMap<String, HashMap<String, String>> view_citation_query_mappings = new HashMap<>();//.get_view_citation_query_mappings(view_citation_query_mapping_file);
         
         tuple_reasoning(query, views, citation_queries, view_citation_query_mappings, c, pst);
         
@@ -2058,7 +2062,7 @@ public class Tuple_level_approach_agg {
         
 //        System.out.println(q);
 //        
-//        System.out.println(sql);
+        System.out.println(sql);
         
         reasoning(q, partial_mapping_strings, partial_mapping_view_mapping_mappings, c, pst, sql, view_tuples);
 
@@ -2071,6 +2075,39 @@ public class Tuple_level_approach_agg {
         System.out.println("TLA_agg_time::" + time);
         
         System.out.println("Covering_set_time::" + covering_set_time);
+        
+        System.out.println("Group_num::" + group_num);
+        
+        System.out.println("Query_time::" + query_time);
+        
+        Set<String> signatures = signiture_view_mappings_mappings.keySet();
+        
+        for(String signature: signatures)
+        {
+          HashSet<Tuple> view_mappings = signiture_view_mappings_mappings.get(signature);
+          
+          Vector<String> view_mapping_strings = new Vector<String>();
+          
+          for(Tuple view_mapping: view_mappings)
+          {
+            view_mapping_strings.add(view_mapping.name);
+            
+//          System.out.print(view_mapping.name + "   ");
+          }
+          
+          Collections.sort(view_mapping_strings);
+          
+          HashSet<Covering_set> curr_covering_sets = c_view_map.get(signature);
+          
+          System.out.println(view_mapping_strings.size() + "|" + curr_covering_sets.size());
+          
+          for(String view_mapping: view_mapping_strings)
+          {
+            System.out.print(view_mapping + "   ");
+          }
+          
+          System.out.println();
+        }
         
 //		System.out.println(covering_set_schema_level);
 		
@@ -2402,10 +2439,9 @@ public class Tuple_level_approach_agg {
 //	
 	
 	
-	
 	public static void reasoning(Query query, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, Connection c, PreparedStatement pst, String sql, HashSet<Tuple> viewTuples) throws SQLException, ClassNotFoundException, IOException, InterruptedException, JSONException
 	{
-//		start = System.nanoTime();
+		double start = System.nanoTime();
 		
 		pst = c.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
 		
@@ -2413,9 +2449,9 @@ public class Tuple_level_approach_agg {
 				
 		rs = pst.executeQuery();
 
-//		end = System.nanoTime();
+		double end = System.nanoTime();
 //		
-//		query_time = (end - start) * 1.0/second2nano;
+		query_time = (end - start) * 1.0/second2nano;
 		
 		int lambda_term_num = valid_lambda_terms.size();
 
@@ -2550,30 +2586,41 @@ public class Tuple_level_approach_agg {
 				{
 					Array citation_vec = rs.getArray(i + 1);
 					
-					String citation_vec_string = citation_vec.toString();
+					String[] citation_vec_string = (String[]) citation_vec.getArray();
 					
-					String[] citation_vec_arr = citation_vec_string.substring(1, citation_vec_string.length() - 1).split(",");
+//					String citation_vec_string = citation_vec.toString();
+					
+//					String[] citation_vec_arr = citation_vec_string.substring(1, citation_vec_string.length() - 1).split(",");
 					
 					HashSet<String> c_unit_set = new HashSet<String>();
 					
 					HashMap<String, Integer> annotation_counts = new HashMap<String, Integer>();
 					
-					for(int k = 0; k<citation_vec_arr.length; k++)
+					for(int k = 0; k<citation_vec_string.length; k++)
 					{
-					  if(citation_vec_arr[k].equals("NULL"))
+					  if(citation_vec_string[k].equals("NULL"))
 					    continue;
 					  
-					  String[] curr_annotations = citation_vec_arr[k].split("\\" + populate_db.separator);
+					  String[] curr_annotations = citation_vec_string[k].split("\\" + populate_db.separator);
+					  
+					  HashSet<String> curr_c_unit_set = new HashSet<String>();
 					  
 					  for(int p = 0; p<curr_annotations.length; p++)
 					  {
-					    if(annotation_counts.get(curr_annotations[p]) == null)
-					    {
-					      annotation_counts.put(curr_annotations[p], 1);
-					    }
-					    else
-					      annotation_counts.put(curr_annotations[p], annotation_counts.get(curr_annotations[p]) + 1);
+					    
+					    curr_c_unit_set.add(curr_annotations[p]);
+//					    if(annotation_counts.get(curr_annotations[p]) == null)
+//					    {
+//					      annotation_counts.put(curr_annotations[p], 1);
+//					    }
+//					    else
+//					      annotation_counts.put(curr_annotations[p], annotation_counts.get(curr_annotations[p]) + 1);
 					  }
+					  
+					  if(k == 0)
+					    c_unit_set.addAll(curr_c_unit_set);
+					  else
+					    c_unit_set.retainAll(curr_c_unit_set);
 					  
 //					  HashSet<String> curr_c_unit_set = new HashSet<String>(Arrays.asList(curr_annotations));
 //					  
@@ -2582,15 +2629,15 @@ public class Tuple_level_approach_agg {
 					
 					
 					
-					for(Entry<String, Integer> pair:annotation_counts.entrySet())
-					{
-					  String key = pair.getKey();
-					  
-					  Integer value = pair.getValue();
-					  
-					  if(value == citation_vec_arr.length)
-					    c_unit_set.add(key);
-					}
+//					for(Entry<String, Integer> pair:annotation_counts.entrySet())
+//					{
+//					  String key = pair.getKey();
+//					  
+//					  Integer value = pair.getValue();
+//					  
+//					  if(value == citation_vec_string.length)
+//					    c_unit_set.add(key);
+//					}
 					
 					String[] c_unit_set_arr = c_unit_set.toArray(new String[1]);
 					
@@ -2700,7 +2747,28 @@ public class Tuple_level_approach_agg {
                   
 //                  System.out.println(c_unit_vec);
                   
-                  double start = System.nanoTime();
+                  
+//                  Vector<String> view_mapping_strings = new Vector<String>();
+//                  
+//                  for(Tuple view_mapping: c_unit_vec)
+//                  {
+//                    view_mapping_strings.add(view_mapping.name);
+//                    
+////                  System.out.print(view_mapping.name + "   ");
+//                  }
+//                  
+//                  Collections.sort(view_mapping_strings);
+//                  
+//                  System.out.println(view_mapping_strings.size());
+//                  
+//                  for(String view_mapping: view_mapping_strings)
+//                  {
+//                    System.out.print(view_mapping + "   ");
+//                  }
+//                  
+//                  System.out.println();
+                  
+                  start = System.nanoTime();
                   
 //                  if(isclustering && !query.head.has_agg)
 //                    reasoning_single_tuple(c_unit_vec, query, rs, c_view_template, all_head_vars);
@@ -2713,13 +2781,70 @@ public class Tuple_level_approach_agg {
                   {
                       
                       
-                      ArrayList<Tuple>[] curr_view_mappings_per_head_variables = Schema_reasoning_with_agg.get_curr_view_mappings_per_head_variables(curr_views, head_variable_view_mapping);
+                      ArrayList<Tuple>[] curr_view_mappings_per_head_variables = Schema_reasoning_with_agg.get_curr_view_mappings_per_head_variables(c_unit_vec, head_variable_view_mapping);
+                      
+//                      System.out.println(curr_view_mappings_per_head_variables.length);
+//                      
+//                      for(int k = 0; k<curr_view_mappings_per_head_variables.length; k++)
+//                      {
+//                        if(k >= 1)
+//                          System.out.print("|");
+//                        
+//                        ArrayList<Tuple> curr_tuples = curr_view_mappings_per_head_variables[k];
+//                        
+//                        Vector<String> tuple_names = new Vector<String>();
+//                        
+//                        for(Tuple tuple : curr_tuples)
+//                        {
+//                          tuple_names.add(tuple.name);
+//                        }
+//                        
+//                        Collections.sort(tuple_names);
+//                        
+//                        System.out.print(tuple_names);
+//                      }
+//                      
+//                      System.out.println();
+//                      
+//                      for(int k = 0; k<curr_view_mappings_per_head_variables.length; k++)
+//                      {
+//                        if(k >= 1)
+//                          System.out.print("|");
+//                        
+//                        ArrayList<Tuple> curr_tuples = curr_view_mappings_per_head_variables[k];
+//                        
+//                        System.out.print(curr_tuples.size());
+//                      }
+//                      
+//                      System.out.println();
+                      
+                      
                       
                       ArrayList<HashSet<Covering_set>> covering_sets_per_attributes = new ArrayList<HashSet<Covering_set>>();
                       
                       ArrayList<int[]> view_mapping_ids = Join_covering_sets.get_valid_view_mappings(covering_sets_per_attributes, query.head.args, query, curr_view_mappings_per_head_variables, view_mapping_id_mappings, view_mapping_head_var_ids_mappings);
                       
                       double[][]distances = Covering_sets_clustering_by_ML.cal_distances(view_mapping_ids);
+                      
+                      
+//                      for(int k = 0; k<distances.length; k++)
+//                      {
+//                        
+//                        if(k >= 1)
+//                          System.out.print("|");
+//                        
+//                        for(int g = 0; g<distances[k].length; g++)
+//                        {
+//                          if(g >= 1)
+//                            System.out.print(",");
+//                          
+//                          System.out.print(distances[k][g]);
+//                        }
+//                      }
+//                      
+//                      System.out.println();
+                      
+                      
                       
                       Covering_sets_clustering_by_ML.reasoning_single_tuple(covering_sets_per_attributes, distances, c_view_template, view_mapping);
                       
@@ -2770,7 +2895,7 @@ public class Tuple_level_approach_agg {
                   
                   c_view_map.put(curr_str, c_view_template);
                   
-                  double end = System.nanoTime();
+                  end = System.nanoTime();
                   
                   covering_set_time = (end - start)*1.0/second2nano;
                   
@@ -2857,7 +2982,7 @@ public class Tuple_level_approach_agg {
         }
         
         
-        double start = System.nanoTime();
+        start = System.nanoTime();
         
         if(!matched)
         {
@@ -2875,7 +3000,7 @@ public class Tuple_level_approach_agg {
             
             double[][]distances = Covering_sets_clustering_by_ML.cal_distances(view_mapping_ids);
             
-            Covering_sets_clustering_by_ML.reasoning_single_tuple(covering_sets_per_attributes, distances, c_view_template, view_mapping);     
+            Covering_sets_clustering_by_ML.reasoning_single_tuple(covering_sets_per_attributes, distances, covering_set_schema_level, view_mapping);     
 
             
 //            ArrayList<Tuple>[] curr_view_mappings_per_head_variables = Schema_reasoning_with_agg.get_curr_view_mappings_per_head_variables(valid_view_mapping_schema_level, head_variable_view_mapping);
@@ -2890,7 +3015,7 @@ public class Tuple_level_approach_agg {
 
         }
         
-        double end = System.nanoTime();
+        end = System.nanoTime();
         
         covering_set_time += (end - start) * 1.0/second2nano;
 		

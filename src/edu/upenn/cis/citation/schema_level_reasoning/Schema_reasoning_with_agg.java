@@ -57,6 +57,9 @@ public class Schema_reasoning_with_agg {
     
     for(int i = 0; i<curr_view_mappings_per_head_variables.length; i++)
     {
+      if(view_mappings_per_head_variable[i] == null)
+        continue;
+      
       ArrayList<Tuple> curr_view_mapping_sets = (ArrayList<Tuple>) view_mappings_per_head_variable[i].clone();
       
       curr_view_mapping_sets.retainAll(view_mappings);
@@ -328,6 +331,30 @@ public class Schema_reasoning_with_agg {
       }
   }
   
+  
+  public static HashMap<Tuple, ArrayList<Integer>> get_view_mapping_query_subgoals_mappings(HashSet<Tuple> view_mappings, HashMap<String, Integer> query_subgoal_ids)
+  {
+    HashMap<Tuple, ArrayList<Integer>> view_mapping_subgoal_id_mappings = new HashMap<Tuple, ArrayList<Integer>>();
+    
+    for(Tuple view_mapping: view_mappings)
+    {
+      HashSet<String> target_subgoals = view_mapping.getTargetSubgoal_strs();
+
+      ArrayList<Integer> ids = new ArrayList<Integer>();
+      
+      for(String target_subgoal: target_subgoals)
+      {
+        int subgoal_id = query_subgoal_ids.get(target_subgoal);
+        
+        ids.add(subgoal_id);
+      }
+      
+      view_mapping_subgoal_id_mappings.put(view_mapping, ids);
+      
+    }
+    
+    return view_mapping_subgoal_id_mappings;
+  }
   
   public static HashSet pre_processing(boolean isTLA, HashMap<String, Query> citation_queries, HashMap<String, Integer> max_author_num, HashMap<String, HashMap<String, String>> view_query_mapping, HashMap<String, ArrayList<ArrayList<String>>> author_mapping, IntList query_ids, ArrayList<Lambda_term[]> query_lambda_str, boolean prepare_info, HashMap<String, Integer> lambda_term_id_mapping, Vector<Lambda_term> valid_lambda_terms, HashMap<Conditions, ArrayList<Tuple>> conditions_map, Vector<Conditions> valid_conditions, HashMap<String, ArrayList<Tuple>> view_tuple_mapping, HashMap<String, ArrayList<Integer>> head_variable_query_mapping, HashMap<String, HashSet<Integer>> relation_arg_mapping, ArrayList<Tuple>[]head_variable_view_mapping, Vector<Query> views, Vector<Query> cqs, HashMap<String, HashMap<String, String>> view_citation_query_mappings, Query q, Vector<String> partial_mapping_strings, HashMap<String, HashSet<Tuple>> partial_mapping_view_mapping_mappings, HashMap<String, Integer> with_sub_queries_id_mappings, Vector<String> full_mapping_condition_str, HashMap<String, Integer> query_subgoal_id_mappings,  Connection c, PreparedStatement pst) throws SQLException
   {

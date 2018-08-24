@@ -201,15 +201,15 @@ public class Semi_schema_level_approach_agg {
 	public static void main(String [] args) throws SQLException, ClassNotFoundException, IOException, InterruptedException, JSONException
 	{
 		
-	  String query_file = path + args[0];
+	  String query_file = args[0];
       
-      String view_file = path + args[1];
+      String view_file = args[1];
       
-      String citation_query_file = path + args[2];
-      
-      String view_citation_query_mapping_file = path + args[3];
+//      String citation_query_file = path + args[2];
+//      
+//      String view_citation_query_mapping_file = path + args[3];
 	    
-	    boolean cluster = Boolean.valueOf(args[4]);
+	    boolean cluster = Boolean.valueOf(args[2]);
 	    
 	    isclustering = cluster;
 	    
@@ -228,9 +228,9 @@ public class Semi_schema_level_approach_agg {
 	      
 	      Vector<Query> views = Load_views_and_citation_queries.get_views(view_file, c, pst);
 	        
-	        Vector<Query> citation_queries = Load_views_and_citation_queries.get_views(citation_query_file, c, pst);
+	        Vector<Query> citation_queries = new Vector<Query>();//Load_views_and_citation_queries.get_views(citation_query_file, c, pst);
 	        
-	        HashMap<String, HashMap<String, String>> view_citation_query_mappings = Load_views_and_citation_queries.get_view_citation_query_mappings(view_citation_query_mapping_file);
+	        HashMap<String, HashMap<String, String>> view_citation_query_mappings = new HashMap<>();// Load_views_and_citation_queries.get_view_citation_query_mappings(view_citation_query_mapping_file);
 	        
 	        tuple_reasoning(query, views, citation_queries, view_citation_query_mappings, c, pst);
 	      
@@ -1238,7 +1238,7 @@ public class Semi_schema_level_approach_agg {
 		
 //        System.out.println(q);
 //        
-//        System.out.println(sql);
+        System.out.println(sql);
         
 		reasoning(q, partial_mapping_strings, partial_mapping_view_mapping_mappings, c, pst, sql, view_tuples);
 				
@@ -1250,8 +1250,51 @@ public class Semi_schema_level_approach_agg {
         System.out.println("SSLA_agg_time::" + time);
         
         System.out.println("Covering_set_time::" + covering_set_time);
+        
+        System.out.println("Group_num::" + group_num);
 		
-		System.out.println(covering_set_schema_level.size());
+        System.out.println("Query_time::" + query_time);
+        
+//		System.out.println(covering_set_schema_level);
+		
+		Set<String> signatures = signature_view_mappings_mappings.keySet();
+		
+		for(String signature: signatures)
+		{
+		  HashSet<Tuple> view_mappings = signature_view_mappings_mappings.get(signature);
+		  
+		  Vector<String> view_mapping_strings = new Vector<String>();
+		  
+		  for(Tuple view_mapping: view_mappings)
+		  {
+		    view_mapping_strings.add(view_mapping.name);
+		    
+//		    System.out.print(view_mapping.name + "   ");
+		  }
+		  
+		  Collections.sort(view_mapping_strings);
+		  
+		  HashSet<Covering_set> curr_covering_sets = c_view_map.get(signature);
+		  
+		  System.out.println(view_mapping_strings.size() + "|" + curr_covering_sets.size());
+		  
+		  for(String view_mapping: view_mapping_strings)
+		  {
+		    System.out.print(view_mapping + "   ");
+		  }
+		  
+		  System.out.println();
+		}
+		
+		
+		for(Tuple view_mapping: valid_view_mappings_schema_level)
+		{
+		  System.out.print(view_mapping.name + "::");
+		}
+		
+		System.out.println();
+		
+		
 	}
 	
 	public static void output (Vector<Vector<Vector<citation_view>>> citation_views)
@@ -2012,7 +2055,7 @@ public class Semi_schema_level_approach_agg {
 				
 				for(int i = pos1; i< pos1 + valid_conditions.size(); i++)
 				{
-				  if(Retrieve_query_result_util.retrieve_boolean_arr_values(rs, i))
+				  if(!Retrieve_query_result_util.retrieve_boolean_arr_values(rs, i))
                   {
                       curr_str += "0";
                   }
@@ -2024,7 +2067,7 @@ public class Semi_schema_level_approach_agg {
 				
 				for(int i = pos1 + valid_conditions.size(); i<pos1 + valid_conditions.size() + partial_mapping_strings.size(); i++)
 				{
-				  if(Retrieve_query_result_util.retrieve_boolean_arr_values(rs, i))
+				  if(!Retrieve_query_result_util.retrieve_boolean_arr_values(rs, i))
                   {
                       curr_str += "0";
                   }
@@ -2058,7 +2101,7 @@ public class Semi_schema_level_approach_agg {
                       {
                           Conditions curr_condition = (Conditions) iter.next();
                           
-                          if(Retrieve_query_result_util.retrieve_boolean_arr_values(rs, i))
+                          if(!Retrieve_query_result_util.retrieve_boolean_arr_values(rs, i))
                           {                           
                               ArrayList<Tuple> invalid_views = conditions_map.get(curr_condition);
                               
@@ -2069,7 +2112,7 @@ public class Semi_schema_level_approach_agg {
                       
                       for(String partial_mapping_string: partial_mapping_strings)
                       {
-                        if(Retrieve_query_result_util.retrieve_boolean_arr_values(rs, i))
+                        if(!Retrieve_query_result_util.retrieve_boolean_arr_values(rs, i))
                         {                           
                             HashSet<Tuple> invalid_views = partial_mapping_view_mapping_mappings.get(partial_mapping_string);
                             
@@ -2112,6 +2155,29 @@ public class Semi_schema_level_approach_agg {
                       Resultset_prefix_col_num = query.head.args.size();
                       
                       
+                      
+//                      Vector<String> view_mapping_strings = new Vector<String>();
+//                      
+//                      for(Tuple view_mapping: curr_views)
+//                      {
+//                        view_mapping_strings.add(view_mapping.name);
+//                        
+////                      System.out.print(view_mapping.name + "   ");
+//                      }
+//                      
+//                      Collections.sort(view_mapping_strings);
+//                      
+//                      System.out.println(view_mapping_strings.size());
+//                      
+//                      for(String view_mapping: view_mapping_strings)
+//                      {
+//                        System.out.print(view_mapping + "   ");
+//                      }
+//                      
+//                      System.out.println();
+                      
+                      
+                      
                       double start_time = System.nanoTime();
                       
                       if(isclustering)
@@ -2120,11 +2186,63 @@ public class Semi_schema_level_approach_agg {
                         
                         ArrayList<Tuple>[] curr_view_mappings_per_head_variables = Schema_reasoning_with_agg.get_curr_view_mappings_per_head_variables(curr_views, head_variable_view_mapping);
                         
+//                        System.out.println(curr_view_mappings_per_head_variables.length);
+//                        
+//                        for(int k = 0; k<curr_view_mappings_per_head_variables.length; k++)
+//                        {
+//                          if(k >= 1)
+//                            System.out.print("|");
+//                          
+//                          ArrayList<Tuple> curr_tuples = curr_view_mappings_per_head_variables[k];
+//                          
+//                          Vector<String> tuple_names = new Vector<String>();
+//                          
+//                          for(Tuple tuple : curr_tuples)
+//                          {
+//                            tuple_names.add(tuple.name);
+//                          }
+//                          
+//                          Collections.sort(tuple_names);
+//                          
+//                          System.out.print(tuple_names);
+//                        }
+//                        
+//                        System.out.println();
+//                        
+//                        for(int k = 0; k<curr_view_mappings_per_head_variables.length; k++)
+//                        {
+//                          if(k >= 1)
+//                            System.out.print("|");
+//                          
+//                          ArrayList<Tuple> curr_tuples = curr_view_mappings_per_head_variables[k];
+//                          
+//                          System.out.print(curr_tuples.size());
+//                        }
+//                        
+//                        System.out.println();
+                        
                         ArrayList<HashSet<Covering_set>> covering_sets_per_attributes = new ArrayList<HashSet<Covering_set>>();
                         
                         ArrayList<int[]> view_mapping_ids = Join_covering_sets.get_valid_view_mappings(covering_sets_per_attributes, query.head.args, query, curr_view_mappings_per_head_variables, view_mapping_id_mappings, view_mapping_head_var_ids_mappings);
                         
                         double[][]distances = Covering_sets_clustering_by_ML.cal_distances(view_mapping_ids);
+                        
+//                        for(int k = 0; k<distances.length; k++)
+//                        {
+//                          
+//                          if(k >= 1)
+//                            System.out.print("|");
+//                          
+//                          for(int g = 0; g<distances[k].length; g++)
+//                          {
+//                            if(g >= 1)
+//                              System.out.print(",");
+//                            
+//                            System.out.print(distances[k][g]);
+//                          }
+//                        }
+//                        
+//                        System.out.println();
                         
                         Covering_sets_clustering_by_ML.reasoning_single_tuple(covering_sets_per_attributes, distances, c_view_template, view_mapping);
                       }
@@ -2231,7 +2349,7 @@ public class Semi_schema_level_approach_agg {
             
             double[][]distances = Covering_sets_clustering_by_ML.cal_distances(view_mapping_ids);
             
-            Covering_sets_clustering_by_ML.reasoning_single_tuple(covering_sets_per_attributes, distances, c_view_template, view_mapping);     
+            Covering_sets_clustering_by_ML.reasoning_single_tuple(covering_sets_per_attributes, distances, covering_set_schema_level, view_mapping);     
             
 //            ArrayList<Tuple>[] curr_view_mappings_per_head_variables = Schema_reasoning_with_agg.get_curr_view_mappings_per_head_variables(valid_view_mappings_schema_level, head_variable_view_mapping);
 //            
